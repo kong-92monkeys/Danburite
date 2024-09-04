@@ -6,10 +6,10 @@
 #define IDR_MAINFRAME                   128
 #define IDR_AppTYPE                     130
 #define IDD_LOGVIEW                     310
-#define IDC_BUTTON1                     1000
 #define IDC_BTN_CLEAR_LOGS              1000
-#define IDC_LIST1                       1001
+#define IDC_LIST_LOG                    1001
 #define IDC_EDIT1                       1002
+#define IDC_EDIT_LOG_MSG                1002
 
 // Next default values for new objects
 // 

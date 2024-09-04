@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "ListBoxLoggerImpl.h"
 
 // CLogView form view
 
@@ -23,10 +23,26 @@ public:
 #endif
 #endif
 
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg void OnBnClickedClearLogs();
+	afx_msg void OnLbnSelchangeListLog();
+
+public:
+	void emplaceLoggerImpl() noexcept;
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+
+private:
+	CListBox __listLog;
+	CEdit __editLogMsg;
+
+	std::shared_ptr<ListBoxLoggerImpl> __pLoggerImpl;
+
+	void __onIdle();
 };
 
 

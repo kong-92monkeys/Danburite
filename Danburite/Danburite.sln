@@ -5,6 +5,12 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "App", "App\App.vcxproj", "{934F1421-1A8C-4482-8E28-D7304B333562}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Infra", "Infra\Infra.vcxproj", "{B43DEEF0-32FC-4467-829E-C918DC92A76A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Infra", "1. Infra", "{18C07CCF-E153-44D1-B13A-BFBA50729681}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "99. App", "99. App", "{0572F5E3-519B-4F17-AD2B-26CC8632688E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,9 +27,21 @@ Global
 		{934F1421-1A8C-4482-8E28-D7304B333562}.Release|x64.Build.0 = Release|x64
 		{934F1421-1A8C-4482-8E28-D7304B333562}.Release|x86.ActiveCfg = Release|Win32
 		{934F1421-1A8C-4482-8E28-D7304B333562}.Release|x86.Build.0 = Release|Win32
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Debug|x64.ActiveCfg = Debug|x64
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Debug|x64.Build.0 = Debug|x64
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Debug|x86.ActiveCfg = Debug|Win32
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Debug|x86.Build.0 = Debug|Win32
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Release|x64.ActiveCfg = Release|x64
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Release|x64.Build.0 = Release|x64
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Release|x86.ActiveCfg = Release|Win32
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{934F1421-1A8C-4482-8E28-D7304B333562} = {0572F5E3-519B-4F17-AD2B-26CC8632688E}
+		{B43DEEF0-32FC-4467-829E-C918DC92A76A} = {18C07CCF-E153-44D1-B13A-BFBA50729681}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F3C3A2F0-C2DE-46BF-B940-25BCAC080821}
