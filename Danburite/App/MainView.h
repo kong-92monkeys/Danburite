@@ -1,18 +1,18 @@
 
-// ChildView.h : interface of the CChildView class
+// ChildView.h : interface of the CMainView class
 //
 
 
 #pragma once
 
 
-// CChildView window
+// CMainView window
 
-class CChildView : public CWnd
+class CMainView : public CWnd
 {
 // Construction
 public:
-	CChildView();
+	CMainView();
 
 // Attributes
 public:
@@ -26,7 +26,7 @@ public:
 
 // Implementation
 public:
-	virtual ~CChildView();
+	virtual ~CMainView();
 
 	// Generated message map functions
 protected:

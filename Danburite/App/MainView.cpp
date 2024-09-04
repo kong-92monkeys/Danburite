@@ -1,37 +1,37 @@
 
-// ChildView.cpp : implementation of the CChildView class
+// MainView.cpp : implementation of the CMainView class
 //
 
 #include "pch.h"
 #include "framework.h"
 #include "App.h"
-#include "ChildView.h"
+#include "MainView.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CChildView
+// CMainView
 
-CChildView::CChildView()
+CMainView::CMainView()
 {
 }
 
-CChildView::~CChildView()
+CMainView::~CMainView()
 {
 }
 
 
-BEGIN_MESSAGE_MAP(CChildView, CWnd)
+BEGIN_MESSAGE_MAP(CMainView, CWnd)
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
 
-// CChildView message handlers
+// CMainView message handlers
 
-BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
+BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs) 
 {
 	if (!CWnd::PreCreateWindow(cs))
 		return FALSE;
@@ -44,7 +44,7 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 	return TRUE;
 }
 
-void CChildView::OnPaint() 
+void CMainView::OnPaint() 
 {
 	CPaintDC dc(this); // device context for painting
 	
