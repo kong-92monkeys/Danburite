@@ -13,6 +13,42 @@
     <Filter Include="WeakReferenceSet">
       <UniqueIdentifier>{89642a60-e664-4c8f-a651-9aeaf8c70052}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AssetManager">
+      <UniqueIdentifier>{b80d708d-672b-4bc2-b035-105d7ae4134e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThreadPool">
+      <UniqueIdentifier>{4f9ce5d3-b50a-4ed1-877b-b61ff89cf45f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bitmap">
+      <UniqueIdentifier>{9f749813-5d96-4a6b-aacc-0399af5c6c71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GenericBuffer">
+      <UniqueIdentifier>{f429d4b8-72ca-48df-ac47-08af3770c546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLM">
+      <UniqueIdentifier>{e904562f-6622-415d-b937-e85d7f3367a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IdAllocator">
+      <UniqueIdentifier>{ba6912c4-1bda-4e48-be9e-4984686c2508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LazyDeleter">
+      <UniqueIdentifier>{5459cab2-d945-48d4-bff6-85b01842e233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LazyRecycler">
+      <UniqueIdentifier>{54e92255-4f63-4f43-a8cc-a9e83a8bf12c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MathUtil">
+      <UniqueIdentifier>{f44a2425-9d22-4ac8-a03c-8aff7278bc3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RegionAllocator">
+      <UniqueIdentifier>{236be5cf-d4f0-48f7-9629-b88fc1b443d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Stateful">
+      <UniqueIdentifier>{da04291d-63e1-4eac-99fe-c1daca191b35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Version">
+      <UniqueIdentifier>{23af46b7-df64-4158-8e5b-747c68dcf44f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -27,10 +63,64 @@
     <ClInclude Include="WeakReferenceSet.h">
       <Filter>WeakReferenceSet</Filter>
     </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>AssetManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitmap.h">
+      <Filter>Bitmap</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericBuffer.h">
+      <Filter>GenericBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="GLM.h">
+      <Filter>GLM</Filter>
+    </ClInclude>
+    <ClInclude Include="IdAllocator.h">
+      <Filter>IdAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="LazyDeleter.h">
+      <Filter>LazyDeleter</Filter>
+    </ClInclude>
+    <ClInclude Include="LazyRecycler.h">
+      <Filter>LazyRecycler</Filter>
+    </ClInclude>
+    <ClInclude Include="MathUtil.h">
+      <Filter>MathUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="RegionAllocator.h">
+      <Filter>RegionAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Stateful.h">
+      <Filter>Stateful</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>ThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Version.h">
+      <Filter>Version</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
       <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>AssetManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Bitmap.cpp">
+      <Filter>Bitmap</Filter>
+    </ClCompile>
+    <ClCompile Include="GenericBuffer.cpp">
+      <Filter>GenericBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="LazyDeleter.cpp">
+      <Filter>LazyDeleter</Filter>
+    </ClCompile>
+    <ClCompile Include="RegionAllocator.cpp">
+      <Filter>RegionAllocator</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>ThreadPool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

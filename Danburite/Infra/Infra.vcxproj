@@ -19,13 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="GenericBuffer.h" />
+    <ClInclude Include="GLM.h" />
+    <ClInclude Include="IdAllocator.h" />
+    <ClInclude Include="LazyDeleter.h" />
+    <ClInclude Include="LazyRecycler.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MathUtil.h" />
+    <ClInclude Include="RegionAllocator.h" />
+    <ClInclude Include="Stateful.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Unique.h" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="WeakReferenceSet.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="GenericBuffer.cpp" />
+    <ClCompile Include="LazyDeleter.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="RegionAllocator.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -79,6 +97,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)ThirdParty\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)ThirdParty\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)ThirdParty\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)ThirdParty\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
