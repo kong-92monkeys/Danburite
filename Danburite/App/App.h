@@ -38,6 +38,8 @@ public:
 
 private:
 	mutable Infra::Event<> __idleEvent;
+
+	void __onInitBeforeMainFrame();
 };
 
 extern CApp theApp;

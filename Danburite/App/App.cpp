@@ -8,7 +8,7 @@
 #include "afxdialogex.h"
 #include "App.h"
 #include "MainFrm.h"
-
+#include "../System/Env.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -68,14 +68,13 @@ BOOL CApp::InitInstance()
 	if (!pFrame)
 		return FALSE;
 	m_pMainWnd = pFrame;
+
+	__onInitBeforeMainFrame();
+
 	// create and load the frame with its resources
 	pFrame->LoadFrame(IDR_MAINFRAME,
 		WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, nullptr,
 		nullptr);
-
-
-
-
 
 	// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOW);
@@ -99,6 +98,13 @@ BOOL CApp::OnIdle(LONG lCount)
 
 // CApp message handlers
 
+void CApp::__onInitBeforeMainFrame()
+{
+	auto &env			{ Sys::Env::getInstance() };
+	auto &assetManager	{ env.getAssetManager() };
+
+	assetManager.setRootPath("Assets");
+}
 
 // CAboutDlg dialog used for App About
 

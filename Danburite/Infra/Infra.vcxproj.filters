@@ -49,6 +49,9 @@
     <Filter Include="Version">
       <UniqueIdentifier>{23af46b7-df64-4158-8e5b-747c68dcf44f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Handle">
+      <UniqueIdentifier>{34eedeb6-8b28-44c0-bd2e-8feeb414c9a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -98,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="Version.h">
       <Filter>Version</Filter>
+    </ClInclude>
+    <ClInclude Include="Handle.h">
+      <Filter>Handle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
