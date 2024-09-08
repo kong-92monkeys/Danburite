@@ -12,7 +12,7 @@ namespace Infra
 			$H handle) noexcept;
 
 		[[nodiscard]]
-		constexpr const $H &getHandle() const noexcept;
+		constexpr const $H &getHandle() noexcept;
 
 	private:
 		$H const __handle;
@@ -25,7 +25,7 @@ namespace Infra
 	{}
 
 	template <typename $H>
-	constexpr const $H &Handle<$H>::getHandle() const noexcept
+	constexpr const $H &Handle<$H>::getHandle() noexcept
 	{
 		return __handle;
 	}

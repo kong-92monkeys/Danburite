@@ -86,7 +86,7 @@ void CLogView::OnDestroy()
 void CLogView::OnBnClickedClearLogs()
 {
 	__listLog.ResetContent();
-	__listLog.SetWindowText(TEXT(""));
+	__editLogMsg.SetWindowText(TEXT(""));
 }
 
 void CLogView::OnLbnSelchangeListLog()

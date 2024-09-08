@@ -9,10 +9,12 @@
 #include "App.h"
 #include "MainFrm.h"
 #include "../System/Env.h"
+#include "../Vulkan/Context.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "../Infra/Logger.h"
 
 
 // CApp
@@ -104,6 +106,24 @@ void CApp::__onInitBeforeMainFrame()
 	auto &assetManager	{ env.getAssetManager() };
 
 	assetManager.setRootPath("Assets");
+
+	VK::Context::CreateInfo vkContextCreateInfo
+	{
+		.loaderLibName			{ "vulkan_loader_dedicated-1.dll" },
+		.engineName				{ "Danburite" },
+		.engineVersion			{ 1U, 0U, 0U, 0U },
+		.appName				{ "Danburite Sample App" },
+		.appVersion				{ 1U, 0U, 0U, 0U }
+	};
+
+#ifndef NDEBUG
+	vkContextCreateInfo.debugMode = true;
+#endif
+
+	auto pVulkanContext{ std::make_unique<VK::Context>(vkContextCreateInfo) };
+	pVulkanContext = nullptr;
+
+	Infra::Logger::log(Infra::Logger::Severity::INFO, "Vulkan context 생성 테스트 완료");
 }
 
 // CAboutDlg dialog used for App About
