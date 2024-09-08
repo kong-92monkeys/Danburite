@@ -8,7 +8,7 @@
 #endif
 
 #include "resource.h"       // main symbols
-
+#include "../Infra/Event.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -24,12 +24,25 @@ public:
 public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
+	virtual BOOL OnIdle(LONG lCount);
 
 // Implementation
 
 public:
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
+
+public:
+	[[nodiscard]]
+	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
+
+private:
+	mutable Infra::Event<> __idleEvent;
 };
 
 extern CApp theApp;
+
+constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept
+{
+	return __idleEvent;
+}

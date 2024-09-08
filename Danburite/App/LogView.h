@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ListBoxLoggerImpl.h"
+#include "../Infra/Event.h"
 
 // CLogView form view
 
@@ -41,6 +42,7 @@ private:
 	CEdit __editLogMsg;
 
 	std::shared_ptr<ListBoxLoggerImpl> __pLoggerImpl;
+	Infra::EventListenerPtr<> __pAppIdleListener;
 
 	void __onIdle();
 };

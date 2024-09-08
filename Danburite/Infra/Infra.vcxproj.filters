@@ -7,6 +7,12 @@
     <Filter Include="Logger">
       <UniqueIdentifier>{c8406908-6425-4e99-bec9-6076384ba639}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Event">
+      <UniqueIdentifier>{1aaff2ca-9379-4cd5-89a6-a78c10156639}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WeakReferenceSet">
+      <UniqueIdentifier>{89642a60-e664-4c8f-a651-9aeaf8c70052}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -14,6 +20,12 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="WeakReferenceSet.h">
+      <Filter>WeakReferenceSet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -68,7 +68,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 	}
 
 	const auto pLogView{ STATIC_DOWNCAST(CLogView, __windowSplitter.GetPane(0, 0)) };
-	//pLogView->emplaceLoggerImpl();
+	pLogView->emplaceLoggerImpl();
 
 	return CFrameWnd::OnCreateClient(lpcs, pContext);
 }

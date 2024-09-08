@@ -89,6 +89,14 @@ int CApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
+BOOL CApp::OnIdle(LONG lCount)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	__idleEvent.invoke();
+
+	return CWinApp::OnIdle(lCount);
+}
+
 // CApp message handlers
 
 
