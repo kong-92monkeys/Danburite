@@ -396,3 +396,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Third-party resources
+!Danburite/ThirdParty/**
+
+# App's custom environment variable setting
+!Danburite/App/App.vcxproj.user
