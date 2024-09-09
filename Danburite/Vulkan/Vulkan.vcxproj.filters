@@ -31,6 +31,18 @@
     <Filter Include="Modules\PipelineCache">
       <UniqueIdentifier>{4f2afdc6-d1fc-4114-b9e4-801a3b838e0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\Memory">
+      <UniqueIdentifier>{0027cfb5-883d-4530-a366-28b634f01df7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Buffer">
+      <UniqueIdentifier>{20e7d301-a274-47c6-aff0-38af93d14dc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Image">
+      <UniqueIdentifier>{e12f814a-9719-4773-889d-196a855cd0b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\ImageView">
+      <UniqueIdentifier>{a27a533a-c4de-41ae-af52-c232d3999980}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -63,6 +75,12 @@
     <ClInclude Include="PipelineCache.h">
       <Filter>Modules\PipelineCache</Filter>
     </ClInclude>
+    <ClInclude Include="DeviceMemory.h">
+      <Filter>Modules\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Modules\Buffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -85,6 +103,12 @@
     </ClCompile>
     <ClCompile Include="PipelineCache.cpp">
       <Filter>Modules\PipelineCache</Filter>
+    </ClCompile>
+    <ClCompile Include="DeviceMemory.cpp">
+      <Filter>Modules\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>Modules\Buffer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

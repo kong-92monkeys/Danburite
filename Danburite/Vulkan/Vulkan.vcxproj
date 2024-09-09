@@ -19,11 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="DebugUtilsMessenger.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="Instance.h" />
+    <ClInclude Include="DeviceMemory.h" />
     <ClInclude Include="PhysicalDevice.h" />
     <ClInclude Include="PipelineCache.h" />
     <ClInclude Include="Vulkan.h" />
@@ -31,10 +33,12 @@
     <ClInclude Include="VulkanProc.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DebugUtilsMessenger.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="DeviceMemory.cpp" />
     <ClCompile Include="PhysicalDevice.cpp" />
     <ClCompile Include="PipelineCache.cpp" />
     <ClCompile Include="VulkanLoader.cpp" />

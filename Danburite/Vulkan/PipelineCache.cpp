@@ -6,8 +6,8 @@ namespace VK
 	PipelineCache::PipelineCache(
 		Device &device,
 		VkPipelineCacheCreateInfo const &createInfo) :
-		Handle				{ __create(device, createInfo) },
-		__device			{ device }
+		Handle		{ __create(device, createInfo) },
+		__device	{ device }
 	{}
 
 	PipelineCache::~PipelineCache() noexcept

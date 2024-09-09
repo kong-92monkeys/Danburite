@@ -38,6 +38,74 @@ namespace VK
 			getHandle(), pipelineCache, pAllocator);
 	}
 
+	VkResult Device::vkAllocateMemory(
+		VkMemoryAllocateInfo const *const pAllocateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkDeviceMemory *const pMemory)
+	{
+		return __deviceProc.vkAllocateMemory(
+			getHandle(), pAllocateInfo, pAllocator, pMemory);
+	}
+
+	void Device::vkFreeMemory(
+		VkDeviceMemory const memory,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkFreeMemory(
+			getHandle(), memory, pAllocator);
+	}
+
+	VkResult Device::vkMapMemory(
+		VkDeviceMemory const memory,
+		VkDeviceSize const offset,
+		VkDeviceSize const size,
+		VkMemoryMapFlags const flags,
+		void **const ppData)
+	{
+		return __deviceProc.vkMapMemory(
+			getHandle(), memory, offset, size, flags, ppData);
+	}
+
+	void Device::vkUnmapMemory(
+		VkDeviceMemory const memory)
+	{
+		__deviceProc.vkUnmapMemory(
+			getHandle(), memory);
+	}
+
+	VkResult Device::vkCreateBuffer(
+		VkBufferCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkBuffer *const pBuffer)
+	{
+		return __deviceProc.vkCreateBuffer(
+			getHandle(), pCreateInfo, pAllocator, pBuffer);
+	}
+
+	void Device::vkDestroyBuffer(
+		VkBuffer const buffer,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyBuffer(
+			getHandle(), buffer, pAllocator);
+	}
+
+	void Device::vkGetBufferMemoryRequirements2(
+		VkBufferMemoryRequirementsInfo2 const *const pInfo,
+		VkMemoryRequirements2 *const pMemoryRequirements) const
+	{
+		__deviceProc.vkGetBufferMemoryRequirements2(
+			getHandle(), pInfo, pMemoryRequirements);
+	}
+
+	VkResult Device::vkBindBufferMemory2(
+		uint32_t const bindInfoCount,
+		VkBindBufferMemoryInfo const *const pBindInfos)
+	{
+		return __deviceProc.vkBindBufferMemory2(
+			getHandle(), bindInfoCount, pBindInfos);
+	}
+
 	void Device::__loadDeviceProc() noexcept
 	{
 		// Device

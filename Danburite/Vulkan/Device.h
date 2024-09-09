@@ -22,6 +22,42 @@ namespace VK
 			VkPipelineCache pipelineCache,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkAllocateMemory(
+			VkMemoryAllocateInfo const *pAllocateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkDeviceMemory *pMemory);
+
+		void vkFreeMemory(
+			VkDeviceMemory memory,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkMapMemory(
+			VkDeviceMemory memory,
+			VkDeviceSize offset,
+			VkDeviceSize size,
+			VkMemoryMapFlags flags,
+			void **ppData);
+
+		void vkUnmapMemory(
+			VkDeviceMemory memory);
+
+		VkResult vkCreateBuffer(
+			VkBufferCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkBuffer *pBuffer);
+
+		void vkDestroyBuffer(
+			VkBuffer buffer,
+			VkAllocationCallbacks const *pAllocator);
+
+		void vkGetBufferMemoryRequirements2(
+			VkBufferMemoryRequirementsInfo2 const *pInfo,
+			VkMemoryRequirements2 *pMemoryRequirements) const;
+
+		VkResult vkBindBufferMemory2(
+			uint32_t bindInfoCount,
+			VkBindBufferMemoryInfo const *pBindInfos);
+
 	private:
 		PhysicalDevice &__physicalDevice;
 
