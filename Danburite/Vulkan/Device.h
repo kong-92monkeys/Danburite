@@ -84,6 +84,94 @@ namespace VK
 			VkImageView imageView,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkBeginCommandBuffer(
+			VkCommandBuffer commandBuffer,
+			VkCommandBufferBeginInfo const *pBeginInfo);
+
+		VkResult vkEndCommandBuffer(
+			VkCommandBuffer commandBuffer);
+
+		void vkCmdBeginRenderPass2(
+			VkCommandBuffer commandBuffer,
+			VkRenderPassBeginInfo const *pRenderPassBegin,
+			VkSubpassBeginInfo const *pSubpassBeginInfo);
+
+		void vkCmdEndRenderPass2(
+			VkCommandBuffer commandBuffer,
+			VkSubpassEndInfo const *pSubpassEndInfo);
+
+		void vkCmdBindPipeline(
+			VkCommandBuffer commandBuffer,
+			VkPipelineBindPoint pipelineBindPoint,
+			VkPipeline pipeline);
+
+		void vkCmdSetViewport(
+			VkCommandBuffer commandBuffer,
+			uint32_t firstViewport,
+			uint32_t viewportCount,
+			VkViewport const *pViewports);
+
+		void vkCmdSetScissor(
+			VkCommandBuffer commandBuffer,
+			uint32_t firstScissor,
+			uint32_t scissorCount,
+			VkRect2D const *pScissors);
+
+		void vkCmdDraw(
+			VkCommandBuffer commandBuffer,
+			uint32_t vertexCount,
+			uint32_t instanceCount,
+			uint32_t firstVertex,
+			uint32_t firstInstance);
+
+		void vkCmdDrawIndexed(
+			VkCommandBuffer commandBuffer,
+			uint32_t indexCount,
+			uint32_t instanceCount,
+			uint32_t firstIndex,
+			int32_t vertexOffset,
+			uint32_t firstInstance);
+
+		void vkCmdCopyBuffer2(
+			VkCommandBuffer commandBuffer,
+			VkCopyBufferInfo2 const *pCopyBufferInfo);
+
+		void vkCmdCopyBufferToImage2(
+			VkCommandBuffer commandBuffer,
+			VkCopyBufferToImageInfo2 const *pCopyBufferToImageInfo);
+
+		void vkCmdPipelineBarrier2(
+			VkCommandBuffer commandBuffer,
+			VkDependencyInfo const *pDependencyInfo);
+
+		void vkCmdBindVertexBuffers(
+			VkCommandBuffer commandBuffer,
+			uint32_t firstBinding,
+			uint32_t bindingCount,
+			VkBuffer const *pBuffers,
+			VkDeviceSize const *pOffsets);
+
+		void vkCmdBindIndexBuffer(
+			VkCommandBuffer commandBuffer,
+			VkBuffer buffer,
+			VkDeviceSize offset,
+			VkIndexType indexType);
+
+		void vkCmdBindDescriptorSets(
+			VkCommandBuffer commandBuffer,
+			VkPipelineBindPoint pipelineBindPoint,
+			VkPipelineLayout layout,
+			uint32_t firstSet,
+			uint32_t descriptorSetCount,
+			VkDescriptorSet const *pDescriptorSets,
+			uint32_t dynamicOffsetCount,
+			uint32_t const *pDynamicOffsets);
+
+		void vkCmdExecuteCommands(
+			VkCommandBuffer commandBuffer,
+			uint32_t commandBufferCount,
+			VkCommandBuffer const *pCommandBuffers);
+
 	private:
 		PhysicalDevice &__physicalDevice;
 

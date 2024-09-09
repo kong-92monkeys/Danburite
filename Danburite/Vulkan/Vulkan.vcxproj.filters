@@ -43,6 +43,9 @@
     <Filter Include="Modules\ImageView">
       <UniqueIdentifier>{a27a533a-c4de-41ae-af52-c232d3999980}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\CommandBuffer">
+      <UniqueIdentifier>{0ddc0ac1-e1dc-4017-8c95-b8241d3a9a9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -87,6 +90,9 @@
     <ClInclude Include="ImageView.h">
       <Filter>Modules\ImageView</Filter>
     </ClInclude>
+    <ClInclude Include="CommandBuffer.h">
+      <Filter>Modules\CommandBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -121,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="ImageView.cpp">
       <Filter>Modules\ImageView</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandBuffer.cpp">
+      <Filter>Modules\CommandBuffer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -156,6 +156,160 @@ namespace VK
 			getHandle(), imageView, pAllocator);
 	}
 
+	VkResult Device::vkBeginCommandBuffer(
+		VkCommandBuffer const commandBuffer,
+		VkCommandBufferBeginInfo const *const pBeginInfo)
+	{
+		return __deviceProc.vkBeginCommandBuffer(
+			commandBuffer, pBeginInfo);
+	}
+
+	VkResult Device::vkEndCommandBuffer(
+		VkCommandBuffer const commandBuffer)
+	{
+		return __deviceProc.vkEndCommandBuffer(
+			commandBuffer);
+	}
+
+	void Device::vkCmdBeginRenderPass2(
+		VkCommandBuffer const commandBuffer,
+		VkRenderPassBeginInfo const *const pRenderPassBegin,
+		VkSubpassBeginInfo const *const pSubpassBeginInfo)
+	{
+		__deviceProc.vkCmdBeginRenderPass2(
+			commandBuffer, pRenderPassBegin, pSubpassBeginInfo);
+	}
+
+	void Device::vkCmdEndRenderPass2(
+		VkCommandBuffer const commandBuffer,
+		VkSubpassEndInfo const *const pSubpassEndInfo)
+	{
+		__deviceProc.vkCmdEndRenderPass2(
+			commandBuffer, pSubpassEndInfo);
+	}
+
+	void Device::vkCmdBindPipeline(
+		VkCommandBuffer const commandBuffer,
+		VkPipelineBindPoint const pipelineBindPoint,
+		VkPipeline const pipeline)
+	{
+		__deviceProc.vkCmdBindPipeline(
+			commandBuffer, pipelineBindPoint, pipeline);
+	}
+
+	void Device::vkCmdSetViewport(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const firstViewport,
+		uint32_t const viewportCount,
+		VkViewport const *const pViewports)
+	{
+		__deviceProc.vkCmdSetViewport(
+			commandBuffer, firstViewport, viewportCount, pViewports);
+	}
+
+	void Device::vkCmdSetScissor(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const firstScissor,
+		uint32_t const scissorCount,
+		VkRect2D const *const pScissors)
+	{
+		__deviceProc.vkCmdSetScissor(
+			commandBuffer, firstScissor, scissorCount, pScissors);
+	}
+
+	void Device::vkCmdDraw(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const vertexCount,
+		uint32_t const instanceCount,
+		uint32_t const firstVertex,
+		uint32_t const firstInstance)
+	{
+		__deviceProc.vkCmdDraw(
+			commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance);
+	}
+
+	void Device::vkCmdDrawIndexed(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const indexCount,
+		uint32_t const instanceCount,
+		uint32_t const firstIndex,
+		int32_t const vertexOffset,
+		uint32_t const firstInstance)
+	{
+		__deviceProc.vkCmdDrawIndexed(
+			commandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+	}
+
+	void Device::vkCmdCopyBuffer2(
+		VkCommandBuffer const commandBuffer,
+		VkCopyBufferInfo2 const *const pCopyBufferInfo)
+	{
+		__deviceProc.vkCmdCopyBuffer2(
+			commandBuffer, pCopyBufferInfo);
+	}
+
+	void Device::vkCmdCopyBufferToImage2(
+		VkCommandBuffer const commandBuffer,
+		VkCopyBufferToImageInfo2 const *const pCopyBufferToImageInfo)
+	{
+		__deviceProc.vkCmdCopyBufferToImage2(
+			commandBuffer, pCopyBufferToImageInfo);
+	}
+
+	void Device::vkCmdPipelineBarrier2(
+		VkCommandBuffer const commandBuffer,
+		VkDependencyInfo const *const pDependencyInfo)
+	{
+		__deviceProc.vkCmdPipelineBarrier2(
+			commandBuffer, pDependencyInfo);
+	}
+
+	void Device::vkCmdBindVertexBuffers(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const firstBinding,
+		uint32_t const bindingCount,
+		VkBuffer const *const pBuffers,
+		VkDeviceSize const *const pOffsets)
+	{
+		__deviceProc.vkCmdBindVertexBuffers(
+			commandBuffer, firstBinding, bindingCount, pBuffers, pOffsets);
+	}
+
+	void Device::vkCmdBindIndexBuffer(
+		VkCommandBuffer const commandBuffer,
+		VkBuffer const buffer,
+		VkDeviceSize const offset,
+		VkIndexType const indexType)
+	{
+		__deviceProc.vkCmdBindIndexBuffer(
+			commandBuffer, buffer, offset, indexType);
+	}
+
+	void Device::vkCmdBindDescriptorSets(
+		VkCommandBuffer const commandBuffer,
+		VkPipelineBindPoint const pipelineBindPoint,
+		VkPipelineLayout const layout,
+		uint32_t const firstSet,
+		uint32_t const descriptorSetCount,
+		VkDescriptorSet const *const pDescriptorSets,
+		uint32_t const dynamicOffsetCount,
+		uint32_t const *const pDynamicOffsets)
+	{
+		__deviceProc.vkCmdBindDescriptorSets(
+			commandBuffer, pipelineBindPoint, layout,
+			firstSet, descriptorSetCount, pDescriptorSets,
+			dynamicOffsetCount, pDynamicOffsets);
+	}
+
+	void Device::vkCmdExecuteCommands(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const commandBufferCount,
+		VkCommandBuffer const *const pCommandBuffers)
+	{
+		__deviceProc.vkCmdExecuteCommands(
+			commandBuffer, commandBufferCount, pCommandBuffers);
+	}
+
 	void Device::__loadDeviceProc() noexcept
 	{
 		// Device
