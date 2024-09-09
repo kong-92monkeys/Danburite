@@ -24,6 +24,8 @@
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="DebugUtilsMessenger.h" />
     <ClInclude Include="Device.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="ImageView.h" />
     <ClInclude Include="Instance.h" />
     <ClInclude Include="DeviceMemory.h" />
     <ClInclude Include="PhysicalDevice.h" />
@@ -37,6 +39,8 @@
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DebugUtilsMessenger.cpp" />
     <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="ImageView.cpp" />
     <ClCompile Include="Instance.cpp" />
     <ClCompile Include="DeviceMemory.cpp" />
     <ClCompile Include="PhysicalDevice.cpp" />

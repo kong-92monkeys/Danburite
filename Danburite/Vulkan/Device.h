@@ -58,6 +58,32 @@ namespace VK
 			uint32_t bindInfoCount,
 			VkBindBufferMemoryInfo const *pBindInfos);
 
+		VkResult vkCreateImage(
+			VkImageCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkImage *pImage);
+
+		void vkDestroyImage(
+			VkImage image,
+			VkAllocationCallbacks const *pAllocator);
+
+		void vkGetImageMemoryRequirements2(
+			VkImageMemoryRequirementsInfo2 const *pInfo,
+			VkMemoryRequirements2 *pMemoryRequirements) const;
+
+		VkResult vkBindImageMemory2(
+			uint32_t bindInfoCount,
+			VkBindImageMemoryInfo const *pBindInfos);
+
+		VkResult vkCreateImageView(
+			VkImageViewCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkImageView *pView);
+
+		void vkDestroyImageView(
+			VkImageView imageView,
+			VkAllocationCallbacks const *pAllocator);
+
 	private:
 		PhysicalDevice &__physicalDevice;
 

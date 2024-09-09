@@ -81,6 +81,12 @@
     <ClInclude Include="Buffer.h">
       <Filter>Modules\Buffer</Filter>
     </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Modules\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageView.h">
+      <Filter>Modules\ImageView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -109,6 +115,12 @@
     </ClCompile>
     <ClCompile Include="Buffer.cpp">
       <Filter>Modules\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Modules\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageView.cpp">
+      <Filter>Modules\ImageView</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

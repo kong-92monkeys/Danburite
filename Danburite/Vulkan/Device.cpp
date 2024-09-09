@@ -106,6 +106,56 @@ namespace VK
 			getHandle(), bindInfoCount, pBindInfos);
 	}
 
+	VkResult Device::vkCreateImage(
+		VkImageCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkImage *const pImage)
+	{
+		return __deviceProc.vkCreateImage(
+			getHandle(), pCreateInfo, pAllocator, pImage);
+	}
+
+	void Device::vkDestroyImage(
+		VkImage const image,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyImage(
+			getHandle(), image, pAllocator);
+	}
+
+	void Device::vkGetImageMemoryRequirements2(
+		VkImageMemoryRequirementsInfo2 const *const pInfo,
+		VkMemoryRequirements2 *const pMemoryRequirements) const
+	{
+		__deviceProc.vkGetImageMemoryRequirements2(
+			getHandle(), pInfo, pMemoryRequirements);
+	}
+
+	VkResult Device::vkBindImageMemory2(
+		uint32_t const bindInfoCount,
+		VkBindImageMemoryInfo const *const pBindInfos)
+	{
+		return __deviceProc.vkBindImageMemory2(
+			getHandle(), bindInfoCount, pBindInfos);
+	}
+
+	VkResult Device::vkCreateImageView(
+		VkImageViewCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkImageView *const pView)
+	{
+		return __deviceProc.vkCreateImageView(
+			getHandle(), pCreateInfo, pAllocator, pView);
+	}
+
+	void Device::vkDestroyImageView(
+		VkImageView const imageView,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyImageView(
+			getHandle(), imageView, pAllocator);
+	}
+
 	void Device::__loadDeviceProc() noexcept
 	{
 		// Device
