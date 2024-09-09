@@ -46,6 +46,9 @@
     <Filter Include="Modules\CommandBuffer">
       <UniqueIdentifier>{0ddc0ac1-e1dc-4017-8c95-b8241d3a9a9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\CommandPool">
+      <UniqueIdentifier>{1bf86139-e881-414a-a64d-1cecd92d247a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -93,6 +96,9 @@
     <ClInclude Include="CommandBuffer.h">
       <Filter>Modules\CommandBuffer</Filter>
     </ClInclude>
+    <ClInclude Include="CommandPool.h">
+      <Filter>Modules\CommandPool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -130,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="CommandBuffer.cpp">
       <Filter>Modules\CommandBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandPool.cpp">
+      <Filter>Modules\CommandPool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="CommandBuffer.h" />
+    <ClInclude Include="CommandPool.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="DebugUtilsMessenger.h" />
@@ -38,6 +39,7 @@
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="CommandBuffer.cpp" />
+    <ClCompile Include="CommandPool.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DebugUtilsMessenger.cpp" />
     <ClCompile Include="Device.cpp" />

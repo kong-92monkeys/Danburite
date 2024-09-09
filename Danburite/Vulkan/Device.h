@@ -84,6 +84,23 @@ namespace VK
 			VkImageView imageView,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkCreateCommandPool(
+			VkCommandPoolCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkCommandPool *pCommandPool);
+
+		void vkDestroyCommandPool(
+			VkCommandPool commandPool,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkAllocateCommandBuffers(
+			VkCommandBufferAllocateInfo const *pAllocateInfo,
+			VkCommandBuffer *pCommandBuffers);
+
+		VkResult vkResetCommandPool(
+			VkCommandPool commandPool,
+			VkCommandPoolResetFlags flags);
+
 		VkResult vkBeginCommandBuffer(
 			VkCommandBuffer commandBuffer,
 			VkCommandBufferBeginInfo const *pBeginInfo);

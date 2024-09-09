@@ -156,6 +156,39 @@ namespace VK
 			getHandle(), imageView, pAllocator);
 	}
 
+	VkResult Device::vkCreateCommandPool(
+		VkCommandPoolCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkCommandPool *const pCommandPool)
+	{
+		return __deviceProc.vkCreateCommandPool(
+			getHandle(), pCreateInfo, pAllocator, pCommandPool);
+	}
+
+	void Device::vkDestroyCommandPool(
+		VkCommandPool const commandPool,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyCommandPool(
+			getHandle(), commandPool, pAllocator);
+	}
+
+	VkResult Device::vkAllocateCommandBuffers(
+		VkCommandBufferAllocateInfo const *const pAllocateInfo,
+		VkCommandBuffer *const pCommandBuffers)
+	{
+		return __deviceProc.vkAllocateCommandBuffers(
+			getHandle(), pAllocateInfo, pCommandBuffers);
+	}
+
+	VkResult Device::vkResetCommandPool(
+		VkCommandPool const commandPool,
+		VkCommandPoolResetFlags const flags)
+	{
+		return __deviceProc.vkResetCommandPool(
+			getHandle(), commandPool, flags);
+	}
+
 	VkResult Device::vkBeginCommandBuffer(
 		VkCommandBuffer const commandBuffer,
 		VkCommandBufferBeginInfo const *const pBeginInfo)
