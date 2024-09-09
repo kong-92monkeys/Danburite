@@ -55,6 +55,22 @@ namespace VK
 			uint32_t *pQueueFamilyPropertyCount,
 			VkQueueFamilyProperties2 *pQueueFamilyProperties) const;
 
+		[[nodiscard]]
+		VkBool32 vkGetPhysicalDeviceWin32PresentationSupportKHR(
+			VkPhysicalDevice physicalDevice,
+			uint32_t queueFamilyIndex) const;
+
+		VkResult vkCreateDevice(
+			VkPhysicalDevice physicalDevice,
+			VkDeviceCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkDevice *pDevice);
+
+		[[nodiscard]]
+		PFN_vkVoidFunction vkGetDeviceProcAddr(
+			VkDevice device,
+			char const *pName);
+
 	private:
 		VulkanLoader &__loader;
 

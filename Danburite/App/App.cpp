@@ -10,6 +10,7 @@
 #include "MainFrm.h"
 #include "../System/Env.h"
 #include "../Vulkan/Context.h"
+#include "../Render/Engine.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -107,7 +108,7 @@ void CApp::__onInitBeforeMainFrame()
 
 	assetManager.setRootPath("Assets");
 
-	VK::Context::CreateInfo vkContextCreateInfo
+	VK::Context::CreateInfo contextCreateInfo
 	{
 		.loaderLibName			{ "vulkan_loader_dedicated-1.dll" },
 		.engineName				{ "Danburite" },
@@ -117,10 +118,13 @@ void CApp::__onInitBeforeMainFrame()
 	};
 
 #ifndef NDEBUG
-	vkContextCreateInfo.debugMode = true;
+	contextCreateInfo.debugMode = true;
 #endif
 
-	auto pVulkanContext{ std::make_unique<VK::Context>(vkContextCreateInfo) };
+	auto pVulkanContext	{ std::make_unique<VK::Context>(contextCreateInfo) };
+	auto pRenderEngine	{ std::make_unique<Render::Engine>(*pVulkanContext, pVulkanContext->getPhysicalDeviceOf(0ULL)) };
+
+	pRenderEngine = nullptr;
 	pVulkanContext = nullptr;
 
 	Infra::Logger::log(Infra::Logger::Severity::INFO, "Vulkan context 생성 테스트 완료");

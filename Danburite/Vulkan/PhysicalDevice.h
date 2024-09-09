@@ -47,6 +47,20 @@ namespace VK
 			VkFormat format) noexcept;
 
 		[[nodiscard]]
+		VkBool32 vkGetPhysicalDeviceWin32PresentationSupportKHR(
+			uint32_t queueFamilyIndex) const;
+
+		VkResult vkCreateDevice(
+			VkDeviceCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkDevice *pDevice);
+
+		[[nodiscard]]
+		PFN_vkVoidFunction vkGetDeviceProcAddr(
+			VkDevice device,
+			char const *pName);
+
+		[[nodiscard]]
 		constexpr Props const &getProps() const noexcept;
 
 		[[nodiscard]]
@@ -57,9 +71,6 @@ namespace VK
 
 		[[nodiscard]]
 		constexpr std::vector<QueueFamilyInfo> const &getQueueFamilyInfos() const noexcept;
-
-		[[nodiscard]]
-		constexpr uint32_t getQueueFamilyIndex() const noexcept;
 
 	private:
 		Instance &__instance;
@@ -88,14 +99,12 @@ namespace VK
 		std::vector<VkQueueFamilyGlobalPriorityPropertiesKHR> __queueFamilyGlobalPriorityProps;
 		std::vector<QueueFamilyInfo> __queueFamilyInfos;
 
-		uint32_t __queueFamilyIndex{ };
 
 		void __resolveExtensions() noexcept;
 		void __resolveProps() noexcept;
 		void __resolveFeatures() noexcept;
 		void __resolveMemoryProps() noexcept;
 		void __resolveQueueFamilyInfos() noexcept;
-		void __resolveQueueFamilyIndex();
 	};
 
 	constexpr PhysicalDevice::Props const &PhysicalDevice::getProps() const noexcept
@@ -116,10 +125,5 @@ namespace VK
 	constexpr std::vector<QueueFamilyInfo> const &PhysicalDevice::getQueueFamilyInfos() const noexcept
 	{
 		return __queueFamilyInfos;
-	}
-
-	constexpr uint32_t PhysicalDevice::getQueueFamilyIndex() const noexcept
-	{
-		return __queueFamilyIndex;
 	}
 }

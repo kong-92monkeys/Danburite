@@ -98,6 +98,32 @@ namespace VK
 			physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
 	}
 
+	VkBool32 Instance::vkGetPhysicalDeviceWin32PresentationSupportKHR(
+		VkPhysicalDevice const physicalDevice,
+		uint32_t const queueFamilyIndex) const
+	{
+		return __instanceProc.vkGetPhysicalDeviceWin32PresentationSupportKHR(
+			physicalDevice, queueFamilyIndex);
+	}
+
+	VkResult Instance::vkCreateDevice(
+		VkPhysicalDevice const physicalDevice,
+		VkDeviceCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkDevice *const pDevice)
+	{
+		return __instanceProc.vkCreateDevice(
+			physicalDevice, pCreateInfo, pAllocator, pDevice);
+	}
+
+	PFN_vkVoidFunction Instance::vkGetDeviceProcAddr(
+		VkDevice const device,
+		char const *const pName)
+	{
+		return __instanceProc.vkGetDeviceProcAddr(
+			device, pName);
+	}
+
 	void Instance::__loadInstanceProc() noexcept
 	{
 		// VulkanInstance

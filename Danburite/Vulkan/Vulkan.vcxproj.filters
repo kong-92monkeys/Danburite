@@ -25,6 +25,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{2a296a88-2d1a-4721-a324-e60d53c561c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\Device">
+      <UniqueIdentifier>{ce383c17-35fe-4bb2-b98b-e8109f73f310}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -51,6 +54,9 @@
     <ClInclude Include="PhysicalDevice.h">
       <Filter>Modules\PhysicalDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>Modules\Device</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -67,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="PhysicalDevice.cpp">
       <Filter>Modules\PhysicalDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Device.cpp">
+      <Filter>Modules\Device</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

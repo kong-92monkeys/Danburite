@@ -1,5 +1,4 @@
 #include "PhysicalDevice.h"
-#include <optional>
 #include <stdexcept>
 
 namespace VK
@@ -15,10 +14,10 @@ namespace VK
 		__resolveFeatures();
 		__resolveMemoryProps();
 		__resolveQueueFamilyInfos();
-		__resolveQueueFamilyIndex();
 	}
 
-	VkExtensionProperties const *PhysicalDevice::getExtensionOf(const std::string_view &name) const noexcept
+	VkExtensionProperties const *PhysicalDevice::getExtensionOf(
+		std::string_view const &name) const noexcept
 	{
 		auto const foundIt{ __extensionMap.find(name) };
 		if (foundIt == __extensionMap.end())
@@ -27,7 +26,8 @@ namespace VK
 		return foundIt->second;
 	}
 
-	VkFormatProperties3 const &PhysicalDevice::getFormatPropsOf(const VkFormat format) noexcept
+	VkFormatProperties3 const &PhysicalDevice::getFormatPropsOf(
+		VkFormat const format) noexcept
 	{
 		auto const foundIt{ __formatPropsMap.find(format) };
 		if (foundIt != __formatPropsMap.end())
@@ -44,6 +44,29 @@ namespace VK
 
 		__instance.vkGetPhysicalDeviceFormatProperties2(getHandle(), format, &props2);
 		return retVal;
+	}
+
+	VkBool32 PhysicalDevice::vkGetPhysicalDeviceWin32PresentationSupportKHR(
+		uint32_t const queueFamilyIndex) const
+	{
+		return __instance.vkGetPhysicalDeviceWin32PresentationSupportKHR(
+			getHandle(), queueFamilyIndex);
+	}
+
+	VkResult PhysicalDevice::vkCreateDevice(
+		VkDeviceCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkDevice *const pDevice)
+	{
+		return __instance.vkCreateDevice(
+			getHandle(), pCreateInfo, pAllocator, pDevice);
+	}
+
+	PFN_vkVoidFunction PhysicalDevice::vkGetDeviceProcAddr(
+		VkDevice const device,
+		char const *const pName)
+	{
+		return __instance.vkGetDeviceProcAddr(device, pName);
 	}
 
 	void PhysicalDevice::__resolveExtensions() noexcept
@@ -142,31 +165,5 @@ namespace VK
 		}
 
 		__instance.vkGetPhysicalDeviceQueueFamilyProperties2(getHandle(), &familyCount, __queueFamilyProps.data());
-	}
-
-	void PhysicalDevice::__resolveQueueFamilyIndex()
-	{
-		std::optional<uint32_t> queueFamilyIndex;
-
-		const uint32_t familyCount{ static_cast<uint32_t>(__queueFamilyInfos.size()) };
-		for (uint32_t iter{ }; iter < familyCount; ++iter)
-		{
-			auto const &familyInfo	{ __queueFamilyInfos[iter] };
-			auto const queueFlags	{ familyInfo.pProps->queueFlags };
-
-			if (!(queueFlags & VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT))
-				continue;
-
-			queueFamilyIndex = iter;
-			break;
-		}
-
-		if (queueFamilyIndex.has_value())
-		{
-			__queueFamilyIndex = queueFamilyIndex.value();
-			return;
-		}
-
-		throw std::runtime_error{ "Cannot resolve suitable queue family index." };
 	}
 }

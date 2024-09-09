@@ -229,6 +229,9 @@
     <ProjectReference Include="..\Infra\Infra.vcxproj">
       <Project>{b43deef0-32fc-4467-829e-c918dc92a76a}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Render\Render.vcxproj">
+      <Project>{620c203b-ed6d-41b6-8762-608633cdcfd1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\System\System.vcxproj">
       <Project>{337d211e-3e14-42be-bee9-374f17327b0a}</Project>
     </ProjectReference>

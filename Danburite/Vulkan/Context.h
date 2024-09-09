@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Infra/Version.h"
-#include "Instance.h"
 #include "DebugUtilsMessenger.h"
 #include "PhysicalDevice.h"
 #include <memory>
@@ -30,6 +29,16 @@ namespace VK
 
 		virtual ~Context() noexcept override;
 
+		[[nodiscard]]
+		constexpr Instance &getInstance() const noexcept;
+
+		[[nodiscard]]
+		constexpr size_t getPhysicalDeviceCount() const noexcept;
+
+		[[nodiscard]]
+		constexpr PhysicalDevice &getPhysicalDeviceOf(
+			size_t index) noexcept;
+
 	private:
 		std::unique_ptr<VulkanLoader> __pLoader;
 		std::unique_ptr<Instance> __pInstance;
@@ -52,4 +61,20 @@ namespace VK
 			VkDebugUtilsMessengerCallbackDataEXT const *pCallbackData,
 			void *pUserData) noexcept;
 	};
+
+	constexpr Instance &Context::getInstance() const noexcept
+	{
+		return *__pInstance;
+	}
+
+	constexpr size_t Context::getPhysicalDeviceCount() const noexcept
+	{
+		return __physicalDevices.size();
+	}
+
+	constexpr PhysicalDevice &Context::getPhysicalDeviceOf(
+		size_t const index) noexcept
+	{
+		return *(__physicalDevices[index]);
+	}
 }
