@@ -52,6 +52,9 @@
     <Filter Include="Modules\DescriptorPool">
       <UniqueIdentifier>{97758bb4-d90f-4720-9baf-a62b49cb55a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\DescriptorSetLayout">
+      <UniqueIdentifier>{a4e2fbf5-0b0a-4ec3-b417-002500c57325}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -105,6 +108,9 @@
     <ClInclude Include="DescriptorPool.h">
       <Filter>Modules\DescriptorPool</Filter>
     </ClInclude>
+    <ClInclude Include="DescriptorSetLayout.h">
+      <Filter>Modules\DescriptorSetLayout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -148,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="DescriptorPool.cpp">
       <Filter>Modules\DescriptorPool</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorSetLayout.cpp">
+      <Filter>Modules\DescriptorSetLayout</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

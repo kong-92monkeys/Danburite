@@ -12,7 +12,7 @@ namespace VK
 
 	Image::~Image() noexcept
 	{
-		__device.vkDestroyPipelineCache(getHandle(), nullptr);
+		__device.vkDestroyImage(getHandle(), nullptr);
 	}
 
 	VkImage Image::__create(
@@ -20,7 +20,7 @@ namespace VK
 		VkImageCreateInfo const &createInfo)
 	{
 		VkImage retVal{ };
-		auto const result{ device.vkCreatePipelineCache(&createInfo, nullptr, &retVal) };
+		auto const result{ device.vkCreateImage(&createInfo, nullptr, &retVal) };
 
 		if (result != VkResult::VK_SUCCESS)
 			throw std::runtime_error{ "Cannot create a VkPipelineCache." };

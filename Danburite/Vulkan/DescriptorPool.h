@@ -13,6 +13,9 @@ namespace VK
 
 		virtual ~DescriptorPool() noexcept override;
 
+		VkResult vkResetDescriptorPool(
+			VkDescriptorPoolResetFlags flags);
+
 	private:
 		Device &__device;
 
