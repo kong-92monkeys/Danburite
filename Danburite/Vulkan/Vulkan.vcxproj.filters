@@ -49,6 +49,9 @@
     <Filter Include="Modules\CommandPool">
       <UniqueIdentifier>{1bf86139-e881-414a-a64d-1cecd92d247a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\DescriptorPool">
+      <UniqueIdentifier>{97758bb4-d90f-4720-9baf-a62b49cb55a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -99,6 +102,9 @@
     <ClInclude Include="CommandPool.h">
       <Filter>Modules\CommandPool</Filter>
     </ClInclude>
+    <ClInclude Include="DescriptorPool.h">
+      <Filter>Modules\DescriptorPool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -139,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="CommandPool.cpp">
       <Filter>Modules\CommandPool</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorPool.cpp">
+      <Filter>Modules\DescriptorPool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

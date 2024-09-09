@@ -156,6 +156,31 @@ namespace VK
 			getHandle(), imageView, pAllocator);
 	}
 
+	VkResult Device::vkCreateDescriptorPool(
+		VkDescriptorPoolCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkDescriptorPool *const pDescriptorPool)
+	{
+		return __deviceProc.vkCreateDescriptorPool(
+			getHandle(), pCreateInfo, pAllocator, pDescriptorPool);
+	}
+
+	void Device::vkDestroyDescriptorPool(
+		VkDescriptorPool const descriptorPool,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyDescriptorPool(
+			getHandle(), descriptorPool, pAllocator);
+	}
+
+	VkResult Device::vkResetDescriptorPool(
+		VkDescriptorPool const descriptorPool,
+		VkDescriptorPoolResetFlags const flags)
+	{
+		return __deviceProc.vkResetDescriptorPool(
+			getHandle(), descriptorPool, flags);
+	}
+
 	VkResult Device::vkCreateCommandPool(
 		VkCommandPoolCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,

@@ -25,6 +25,7 @@
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="DebugUtilsMessenger.h" />
+    <ClInclude Include="DescriptorPool.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ImageView.h" />
@@ -42,6 +43,7 @@
     <ClCompile Include="CommandPool.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DebugUtilsMessenger.cpp" />
+    <ClCompile Include="DescriptorPool.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="ImageView.cpp" />
