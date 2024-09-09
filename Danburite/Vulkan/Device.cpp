@@ -21,6 +21,23 @@ namespace VK
 		__deviceProc.vkDestroyDevice(getHandle(), nullptr);
 	}
 
+	VkResult Device::vkCreatePipelineCache(
+		VkPipelineCacheCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkPipelineCache *const pPipelineCache)
+	{
+		return __deviceProc.vkCreatePipelineCache(
+			getHandle(), pCreateInfo, pAllocator, pPipelineCache);
+	}
+
+	void Device::vkDestroyPipelineCache(
+		VkPipelineCache const pipelineCache,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyPipelineCache(
+			getHandle(), pipelineCache, pAllocator);
+	}
+
 	void Device::__loadDeviceProc() noexcept
 	{
 		// Device

@@ -13,6 +13,15 @@ namespace VK
 
 		virtual ~Device() noexcept override;
 
+		VkResult vkCreatePipelineCache(
+			VkPipelineCacheCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkPipelineCache *pPipelineCache);
+
+		void vkDestroyPipelineCache(
+			VkPipelineCache pipelineCache,
+			VkAllocationCallbacks const *pAllocator);
+
 	private:
 		PhysicalDevice &__physicalDevice;
 

@@ -28,6 +28,9 @@
     <Filter Include="Modules\Device">
       <UniqueIdentifier>{ce383c17-35fe-4bb2-b98b-e8109f73f310}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\PipelineCache">
+      <UniqueIdentifier>{4f2afdc6-d1fc-4114-b9e4-801a3b838e0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -57,6 +60,9 @@
     <ClInclude Include="Device.h">
       <Filter>Modules\Device</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineCache.h">
+      <Filter>Modules\PipelineCache</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -76,6 +82,9 @@
     </ClCompile>
     <ClCompile Include="Device.cpp">
       <Filter>Modules\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineCache.cpp">
+      <Filter>Modules\PipelineCache</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -14,10 +14,12 @@ namespace Render
 	{
 		__resolveQueueFamilyIndex();
 		__createDevice();
+		__createPipelineCache();
 	}
 
 	Engine::~Engine() noexcept
 	{
+		__pPipelineCache = nullptr;
 		__pDevice = nullptr;
 	}
 
@@ -148,5 +150,16 @@ namespace Render
 		};
 
 		__pDevice = std::make_unique<VK::Device>(__physicalDevice, createInfo);
+	}
+
+	void Engine::__createPipelineCache()
+	{
+		VkPipelineCacheCreateInfo const createInfo
+		{
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO },
+			.flags	{ VkPipelineCacheCreateFlagBits::VK_PIPELINE_CACHE_CREATE_EXTERNALLY_SYNCHRONIZED_BIT }
+		};
+
+		__pPipelineCache = std::make_unique<VK::PipelineCache>(*__pDevice, createInfo);
 	}
 }
