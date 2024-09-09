@@ -23,6 +23,7 @@
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="DebugUtilsMessenger.h" />
     <ClInclude Include="Instance.h" />
+    <ClInclude Include="PhysicalDevice.h" />
     <ClInclude Include="Vulkan.h" />
     <ClInclude Include="VulkanLoader.h" />
     <ClInclude Include="VulkanProc.h" />
@@ -31,6 +32,7 @@
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DebugUtilsMessenger.cpp" />
     <ClCompile Include="Instance.cpp" />
+    <ClCompile Include="PhysicalDevice.cpp" />
     <ClCompile Include="VulkanLoader.cpp" />
   </ItemGroup>
   <ItemGroup>

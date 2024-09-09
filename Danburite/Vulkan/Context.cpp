@@ -8,7 +8,7 @@
 namespace VK
 {
 	Context::Context(
-		const CreateInfo &createInfo)
+		CreateInfo const &createInfo)
 	{
 		__pLoader = std::make_unique<VK::VulkanLoader>(createInfo.loaderLibName);
 
@@ -16,6 +16,11 @@ namespace VK
 			__populateDebugMessengerCreateInfo();
 
 		__createInstance(createInfo);
+
+		if (createInfo.debugMode)
+			__pDebugUtilsMessenger = std::make_unique<VK::DebugUtilsMessenger>(*__pInstance, __debugMessengerCreateInfo);
+
+		__enumeratePhysicalDevices();
 	}
 
 	Context::~Context() noexcept
@@ -44,11 +49,11 @@ namespace VK
 	}
 
 	void Context::__createInstance(
-		const CreateInfo &contextCreateInfo)
+		CreateInfo const &contextCreateInfo)
 	{
-		const void *pNextChain{ };
-		std::vector<const char *> layers;
-		std::vector<const char *> extensions;
+		void const *pNextChain{ };
+		std::vector<char const *> layers;
+		std::vector<char const *> extensions;
 
 		std::vector<VkValidationFeatureEnableEXT> enabledFeatures;
 		VkValidationFeaturesEXT validationFeatures{ };
@@ -77,7 +82,7 @@ namespace VK
 			pNextChain = &validationFeatures;
 		}
 
-		for (const auto layer : layers)
+		for (auto const layer : layers)
 		{
 			if (__pLoader->getInstanceLayerOf(layer))
 				continue;
@@ -85,7 +90,7 @@ namespace VK
 			throw std::runtime_error{ std::format("Instance layer not supported: {}", layer) };
 		}
 
-		for (const auto extension : extensions)
+		for (auto const extension : extensions)
 		{
 			if (__pLoader->getInstanceExtensionOf(extension))
 				continue;
@@ -93,7 +98,7 @@ namespace VK
 			throw std::runtime_error{ std::format("Instance extension not supported: {}", extension) };
 		}
 
-		const VkApplicationInfo appInfo
+		VkApplicationInfo const appInfo
 		{
 			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_APPLICATION_INFO },
 			.pApplicationName	{ contextCreateInfo.appName.c_str() },
@@ -103,7 +108,7 @@ namespace VK
 			.apiVersion			{ __pLoader->getInstanceVersion() }
 		};
 
-		const VkInstanceCreateInfo instanceCreateInfo
+		VkInstanceCreateInfo const instanceCreateInfo
 		{
 			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO },
 			.pNext						{ pNextChain },
@@ -115,6 +120,23 @@ namespace VK
 		};
 
 		__pInstance = std::make_unique<VK::Instance>(*__pLoader, instanceCreateInfo);
+	}
+
+	void Context::__enumeratePhysicalDevices()
+	{
+		std::vector<VkPhysicalDevice> handles;
+
+		uint32_t deviceCount{ };
+		__pInstance->vkEnumeratePhysicalDevices(&deviceCount, nullptr);
+
+		if (!deviceCount)
+			throw std::runtime_error{ "No physical devices are detected." };
+
+		handles.resize(deviceCount);
+		__pInstance->vkEnumeratePhysicalDevices(&deviceCount, handles.data());
+
+		for (auto const handle : handles)
+			__physicalDevices.emplace_back(std::make_unique<PhysicalDevice>(*__pInstance, handle));
 	}
 
 	VkBool32 Context::__debugCallback(

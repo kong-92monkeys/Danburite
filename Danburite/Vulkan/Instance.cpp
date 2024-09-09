@@ -22,20 +22,80 @@ namespace VK
 	}
 
 	VkResult Instance::vkCreateDebugUtilsMessengerEXT(
-		VkDebugUtilsMessengerCreateInfoEXT const *pCreateInfo,
-		VkAllocationCallbacks const *pAllocator,
-		VkDebugUtilsMessengerEXT *pMessenger)
+		VkDebugUtilsMessengerCreateInfoEXT const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkDebugUtilsMessengerEXT *const pMessenger)
 	{
 		return __instanceProc.vkCreateDebugUtilsMessengerEXT(
 			getHandle(), pCreateInfo, pAllocator, pMessenger);
 	}
 
 	void Instance::vkDestroyDebugUtilsMessengerEXT(
-		VkDebugUtilsMessengerEXT messenger,
-		VkAllocationCallbacks const *pAllocator)
+		VkDebugUtilsMessengerEXT const messenger,
+		VkAllocationCallbacks const *const pAllocator)
 	{
 		__instanceProc.vkDestroyDebugUtilsMessengerEXT(
 			getHandle(), messenger, pAllocator);
+	}
+
+	VkResult Instance::vkEnumeratePhysicalDevices(
+		uint32_t *const pPhysicalDeviceCount,
+		VkPhysicalDevice *const pPhysicalDevices) const
+	{
+		return __instanceProc.vkEnumeratePhysicalDevices(
+			getHandle(), pPhysicalDeviceCount, pPhysicalDevices);
+	}
+
+	VkResult Instance::vkEnumerateDeviceExtensionProperties(
+		VkPhysicalDevice const physicalDevice,
+		char const *const pLayerName,
+		uint32_t *const pPropertyCount,
+		VkExtensionProperties *const pProperties) const
+	{
+		return __instanceProc.vkEnumerateDeviceExtensionProperties(
+			physicalDevice, pLayerName, pPropertyCount, pProperties);
+	}
+
+	void Instance::vkGetPhysicalDeviceProperties2(
+		VkPhysicalDevice const physicalDevice,
+		VkPhysicalDeviceProperties2 *const pProperties) const
+	{
+		__instanceProc.vkGetPhysicalDeviceProperties2(
+			physicalDevice, pProperties);
+	}
+
+	void Instance::vkGetPhysicalDeviceFeatures2(
+		VkPhysicalDevice const physicalDevice,
+		VkPhysicalDeviceFeatures2 *const pFeatures) const
+	{
+		__instanceProc.vkGetPhysicalDeviceFeatures2(
+			physicalDevice, pFeatures);
+	}
+
+	void Instance::vkGetPhysicalDeviceMemoryProperties2(
+		VkPhysicalDevice const physicalDevice,
+		VkPhysicalDeviceMemoryProperties2 *const pMemoryProperties) const
+	{
+		__instanceProc.vkGetPhysicalDeviceMemoryProperties2(
+			physicalDevice, pMemoryProperties);
+	}
+
+	void Instance::vkGetPhysicalDeviceFormatProperties2(
+		VkPhysicalDevice const physicalDevice,
+		VkFormat const format,
+		VkFormatProperties2 *const pFormatProperties) const
+	{
+		__instanceProc.vkGetPhysicalDeviceFormatProperties2(
+			physicalDevice, format, pFormatProperties);
+	}
+
+	void Instance::vkGetPhysicalDeviceQueueFamilyProperties2(
+		VkPhysicalDevice const physicalDevice,
+		uint32_t *const pQueueFamilyPropertyCount,
+		VkQueueFamilyProperties2 *const pQueueFamilyProperties) const
+	{
+		__instanceProc.vkGetPhysicalDeviceQueueFamilyProperties2(
+			physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
 	}
 
 	void Instance::__loadInstanceProc() noexcept

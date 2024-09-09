@@ -3,6 +3,7 @@
 #include "../Infra/Version.h"
 #include "Instance.h"
 #include "DebugUtilsMessenger.h"
+#include "PhysicalDevice.h"
 #include <memory>
 #include <vector>
 
@@ -25,22 +26,25 @@ namespace VK
 		};
 
 		explicit Context(
-			const CreateInfo &createInfo);
+			CreateInfo const &createInfo);
 
 		virtual ~Context() noexcept override;
 
 	private:
 		std::unique_ptr<VulkanLoader> __pLoader;
-
 		std::unique_ptr<Instance> __pInstance;
 
 		VkDebugUtilsMessengerCreateInfoEXT __debugMessengerCreateInfo{ };
 		std::unique_ptr<DebugUtilsMessenger> __pDebugUtilsMessenger;
 
+		std::vector<std::unique_ptr<PhysicalDevice>> __physicalDevices;
+
 		void __populateDebugMessengerCreateInfo();
 
 		void __createInstance(
-			const CreateInfo &createInfo);
+			CreateInfo const &createInfo);
+
+		void __enumeratePhysicalDevices();
 
 		static VkBool32 __debugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

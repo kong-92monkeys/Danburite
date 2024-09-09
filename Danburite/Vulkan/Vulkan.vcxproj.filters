@@ -48,6 +48,9 @@
     <ClInclude Include="ConversionUtil.h">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="PhysicalDevice.h">
+      <Filter>Modules\PhysicalDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -61,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="DebugUtilsMessenger.cpp">
       <Filter>Modules\DebugUtilsMessenger</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicalDevice.cpp">
+      <Filter>Modules\PhysicalDevice</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
