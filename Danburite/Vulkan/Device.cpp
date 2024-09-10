@@ -156,6 +156,40 @@ namespace VK
 			getHandle(), imageView, pAllocator);
 	}
 
+	VkResult Device::vkCreateFramebuffer(
+		VkFramebufferCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkFramebuffer *const pFramebuffer)
+	{
+		return __deviceProc.vkCreateFramebuffer(
+			getHandle(), pCreateInfo, pAllocator, pFramebuffer);
+	}
+
+	void Device::vkDestroyFramebuffer(
+		VkFramebuffer const framebuffer,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyFramebuffer(
+			getHandle(), framebuffer, pAllocator);
+	}
+
+	VkResult Device::vkCreateFence(
+		VkFenceCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkFence *const pFence)
+	{
+		return __deviceProc.vkCreateFence(
+			getHandle(), pCreateInfo, pAllocator, pFence);
+	}
+
+	void Device::vkDestroyFence(
+		VkFence const fence,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		return __deviceProc.vkDestroyFence(
+			getHandle(), fence, pAllocator);
+	}
+
 	VkResult Device::vkCreateDescriptorPool(
 		VkDescriptorPoolCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,

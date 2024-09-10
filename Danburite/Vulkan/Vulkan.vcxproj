@@ -29,6 +29,8 @@
     <ClInclude Include="DescriptorSet.h" />
     <ClInclude Include="DescriptorSetLayout.h" />
     <ClInclude Include="Device.h" />
+    <ClInclude Include="Fence.h" />
+    <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ImageView.h" />
     <ClInclude Include="Instance.h" />
@@ -49,6 +51,8 @@
     <ClCompile Include="DescriptorSet.cpp" />
     <ClCompile Include="DescriptorSetLayout.cpp" />
     <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Fence.cpp" />
+    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="ImageView.cpp" />
     <ClCompile Include="Instance.cpp" />

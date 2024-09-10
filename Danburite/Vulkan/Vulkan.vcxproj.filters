@@ -58,6 +58,12 @@
     <Filter Include="Modules\DescriptorSet">
       <UniqueIdentifier>{274b6311-4360-464e-9294-9a03010cee96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\Fence">
+      <UniqueIdentifier>{28b46fb0-afd2-4c3f-b5c6-7885daaeba9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Framebuffer">
+      <UniqueIdentifier>{7680d4bb-39ff-4451-8d72-c8c3a387f3c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -117,6 +123,12 @@
     <ClInclude Include="DescriptorSet.h">
       <Filter>Modules\DescriptorSet</Filter>
     </ClInclude>
+    <ClInclude Include="Fence.h">
+      <Filter>Modules\Fence</Filter>
+    </ClInclude>
+    <ClInclude Include="Framebuffer.h">
+      <Filter>Modules\Framebuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -166,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="DescriptorSet.cpp">
       <Filter>Modules\DescriptorSet</Filter>
+    </ClCompile>
+    <ClCompile Include="Fence.cpp">
+      <Filter>Modules\Fence</Filter>
+    </ClCompile>
+    <ClCompile Include="Framebuffer.cpp">
+      <Filter>Modules\Framebuffer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -84,6 +84,24 @@ namespace VK
 			VkImageView imageView,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkCreateFramebuffer(
+			VkFramebufferCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkFramebuffer *pFramebuffer);
+
+		void vkDestroyFramebuffer(
+			VkFramebuffer framebuffer,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkCreateFence(
+			VkFenceCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkFence *pFence);
+
+		void vkDestroyFence(
+			VkFence fence,
+			VkAllocationCallbacks const *pAllocator);
+
 		VkResult vkCreateDescriptorPool(
 			VkDescriptorPoolCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
