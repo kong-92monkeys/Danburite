@@ -6,7 +6,7 @@ namespace VK
 	DeviceMemory::DeviceMemory(
 		Device &device,
 		VkMemoryAllocateInfo const &allocInfo) :
-		Handle			{ __create(device, allocInfo) },
+		Handle			{ __allocate(device, allocInfo) },
 		__device		{ device },
 		__size			{ allocInfo.allocationSize },
 		__typeIndex		{ allocInfo.memoryTypeIndex }
@@ -28,7 +28,7 @@ namespace VK
 		return __pMapped;
 	}
 
-	VkDeviceMemory DeviceMemory::__create(
+	VkDeviceMemory DeviceMemory::__allocate(
 		Device &device,
 		VkMemoryAllocateInfo const &allocInfo)
 	{

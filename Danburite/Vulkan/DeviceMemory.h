@@ -31,7 +31,7 @@ namespace VK
 		void *__pMapped{ };
 
 		[[nodiscard]]
-		static VkDeviceMemory __create(
+		static VkDeviceMemory __allocate(
 			Device &device,
 			VkMemoryAllocateInfo const &allocInfo);
 	};

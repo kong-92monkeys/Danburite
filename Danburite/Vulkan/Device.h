@@ -106,6 +106,15 @@ namespace VK
 			VkDescriptorSetLayout descriptorSetLayout,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkAllocateDescriptorSets(
+			VkDescriptorSetAllocateInfo const *pAllocateInfo,
+			VkDescriptorSet *pDescriptorSets);
+
+		VkResult vkFreeDescriptorSets(
+			VkDescriptorPool descriptorPool,
+			uint32_t descriptorSetCount,
+			VkDescriptorSet const *pDescriptorSets);
+
 		VkResult vkCreateCommandPool(
 			VkCommandPoolCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,

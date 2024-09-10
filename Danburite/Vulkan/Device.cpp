@@ -198,6 +198,23 @@ namespace VK
 			getHandle(), descriptorSetLayout, pAllocator);
 	}
 
+	VkResult Device::vkAllocateDescriptorSets(
+		VkDescriptorSetAllocateInfo const *const pAllocateInfo,
+		VkDescriptorSet *const pDescriptorSets)
+	{
+		return __deviceProc.vkAllocateDescriptorSets(
+			getHandle(), pAllocateInfo, pDescriptorSets);
+	}
+
+	VkResult Device::vkFreeDescriptorSets(
+		VkDescriptorPool const descriptorPool,
+		uint32_t const descriptorSetCount,
+		VkDescriptorSet const *const pDescriptorSets)
+	{
+		return __deviceProc.vkFreeDescriptorSets(
+			getHandle(), descriptorPool, descriptorSetCount, pDescriptorSets);
+	}
+
 	VkResult Device::vkCreateCommandPool(
 		VkCommandPoolCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
