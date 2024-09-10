@@ -96,6 +96,7 @@ namespace VK
 
 		// Pipeline
 		DECLARE_PROC(vkCreateGraphicsPipelines);
+		DECLARE_PROC(vkCreateComputePipelines);
 		DECLARE_PROC(vkDestroyPipeline);
 
 		// Swapchain

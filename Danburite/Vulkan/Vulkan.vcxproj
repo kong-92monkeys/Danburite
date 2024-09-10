@@ -36,6 +36,7 @@
     <ClInclude Include="Instance.h" />
     <ClInclude Include="DeviceMemory.h" />
     <ClInclude Include="PhysicalDevice.h" />
+    <ClInclude Include="Pipeline.h" />
     <ClInclude Include="PipelineCache.h" />
     <ClInclude Include="Vulkan.h" />
     <ClInclude Include="VulkanLoader.h" />
@@ -58,6 +59,7 @@
     <ClCompile Include="Instance.cpp" />
     <ClCompile Include="DeviceMemory.cpp" />
     <ClCompile Include="PhysicalDevice.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="PipelineCache.cpp" />
     <ClCompile Include="VulkanLoader.cpp" />
   </ItemGroup>

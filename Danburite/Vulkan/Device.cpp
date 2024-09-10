@@ -249,6 +249,38 @@ namespace VK
 			getHandle(), descriptorPool, descriptorSetCount, pDescriptorSets);
 	}
 
+	VkResult Device::vkCreateGraphicsPipelines(
+		VkPipelineCache const pipelineCache,
+		uint32_t const createInfoCount,
+		VkGraphicsPipelineCreateInfo const *const pCreateInfos,
+		VkAllocationCallbacks const *const pAllocator,
+		VkPipeline *const pPipelines)
+	{
+		return __deviceProc.vkCreateGraphicsPipelines(
+			getHandle(), pipelineCache,
+			createInfoCount, pCreateInfos, pAllocator, pPipelines);
+	}
+
+	VkResult Device::vkCreateComputePipelines(
+		VkPipelineCache const pipelineCache,
+		uint32_t const createInfoCount,
+		VkComputePipelineCreateInfo const *const pCreateInfos,
+		VkAllocationCallbacks const *const pAllocator,
+		VkPipeline *const pPipelines)
+	{
+		return __deviceProc.vkCreateComputePipelines(
+			getHandle(), pipelineCache,
+			createInfoCount, pCreateInfos, pAllocator, pPipelines);
+	}
+
+	void Device::vkDestroyPipeline(
+		VkPipeline const pipeline,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyPipeline(
+			getHandle(), pipeline, pAllocator);
+	}
+
 	VkResult Device::vkCreateCommandPool(
 		VkCommandPoolCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
@@ -480,6 +512,7 @@ namespace VK
 
 		// Pipeline
 		LOAD_DEVICE_PROC(vkCreateGraphicsPipelines);
+		LOAD_DEVICE_PROC(vkCreateComputePipelines);
 		LOAD_DEVICE_PROC(vkDestroyPipeline);
 
 		// Swapchain

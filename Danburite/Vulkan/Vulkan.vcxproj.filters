@@ -64,6 +64,9 @@
     <Filter Include="Modules\Framebuffer">
       <UniqueIdentifier>{7680d4bb-39ff-4451-8d72-c8c3a387f3c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\Pipeline">
+      <UniqueIdentifier>{9625bd61-d201-4117-8b52-ec1b15683e88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -129,6 +132,9 @@
     <ClInclude Include="Framebuffer.h">
       <Filter>Modules\Framebuffer</Filter>
     </ClInclude>
+    <ClInclude Include="Pipeline.h">
+      <Filter>Modules\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -184,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="Framebuffer.cpp">
       <Filter>Modules\Framebuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipeline.cpp">
+      <Filter>Modules\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

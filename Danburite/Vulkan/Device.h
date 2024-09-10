@@ -133,6 +133,24 @@ namespace VK
 			uint32_t descriptorSetCount,
 			VkDescriptorSet const *pDescriptorSets);
 
+		VkResult vkCreateGraphicsPipelines(
+			VkPipelineCache pipelineCache,
+			uint32_t createInfoCount,
+			VkGraphicsPipelineCreateInfo const *pCreateInfos,
+			VkAllocationCallbacks const *pAllocator,
+			VkPipeline *pPipelines);
+
+		VkResult vkCreateComputePipelines(
+			VkPipelineCache pipelineCache,
+			uint32_t createInfoCount,
+			VkComputePipelineCreateInfo const *pCreateInfos,
+			VkAllocationCallbacks const *pAllocator,
+			VkPipeline *pPipelines);
+
+		void vkDestroyPipeline(
+			VkPipeline pipeline,
+			VkAllocationCallbacks const *pAllocator);
+
 		VkResult vkCreateCommandPool(
 			VkCommandPoolCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
