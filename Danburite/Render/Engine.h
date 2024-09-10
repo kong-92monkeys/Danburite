@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Vulkan/Context.h"
+#include "../Device/Context.h"
 #include "../Vulkan/PipelineCache.h"
 
 namespace Render
@@ -9,13 +9,13 @@ namespace Render
 	{
 	public:
 		Engine(
-			VK::Context &context,
+			Dev::Context &context,
 			VK::PhysicalDevice &physicalDevice);
 
 		virtual ~Engine() noexcept override;
 
 	private:
-		VK::Context &__context;
+		Dev::Context &__context;
 		VK::PhysicalDevice &__physicalDevice;
 
 		uint32_t __queueFamilyIndex{ };

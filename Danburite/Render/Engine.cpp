@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include "../Vulkan/ConversionUtil.h"
+#include "../Device/ConversionUtil.h"
 #include <optional>
 #include <stdexcept>
 #include <format>
@@ -7,7 +7,7 @@
 namespace Render
 {
 	Engine::Engine(
-		VK::Context &context,
+		Dev::Context &context,
 		VK::PhysicalDevice &physicalDevice) :
 		__context			{ context },
 		__physicalDevice	{ physicalDevice }
@@ -58,7 +58,7 @@ namespace Render
 
 		auto const deviceVersion
 		{
-			VK::ConversionUtil::fromVulkanVersion(
+			Dev::ConversionUtil::fromVulkanVersion(
 				physicalDeviceProps.p10->apiVersion)
 		};
 		

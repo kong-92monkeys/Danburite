@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <array>
 
-namespace VK
+namespace Dev
 {
 	Context::Context(
 		CreateInfo const &createInfo)
@@ -136,7 +136,7 @@ namespace VK
 		__pInstance->vkEnumeratePhysicalDevices(&deviceCount, handles.data());
 
 		for (auto const handle : handles)
-			__physicalDevices.emplace_back(std::make_unique<PhysicalDevice>(*__pInstance, handle));
+			__physicalDevices.emplace_back(std::make_unique<VK::PhysicalDevice>(*__pInstance, handle));
 	}
 
 	VkBool32 Context::__debugCallback(

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "../Infra/Version.h"
-#include "DebugUtilsMessenger.h"
-#include "PhysicalDevice.h"
+#include "../Vulkan/DebugUtilsMessenger.h"
+#include "../Vulkan/PhysicalDevice.h"
 #include <memory>
 #include <vector>
 
-namespace VK
+namespace Dev
 {
 	class Context : public Infra::Unique
 	{
@@ -30,23 +30,23 @@ namespace VK
 		virtual ~Context() noexcept override;
 
 		[[nodiscard]]
-		constexpr Instance &getInstance() const noexcept;
+		constexpr VK::Instance &getInstance() const noexcept;
 
 		[[nodiscard]]
 		constexpr size_t getPhysicalDeviceCount() const noexcept;
 
 		[[nodiscard]]
-		constexpr PhysicalDevice &getPhysicalDeviceOf(
+		constexpr VK::PhysicalDevice &getPhysicalDeviceOf(
 			size_t index) noexcept;
 
 	private:
-		std::unique_ptr<VulkanLoader> __pLoader;
-		std::unique_ptr<Instance> __pInstance;
+		std::unique_ptr<VK::VulkanLoader> __pLoader;
+		std::unique_ptr<VK::Instance> __pInstance;
 
 		VkDebugUtilsMessengerCreateInfoEXT __debugMessengerCreateInfo{ };
-		std::unique_ptr<DebugUtilsMessenger> __pDebugUtilsMessenger;
+		std::unique_ptr<VK::DebugUtilsMessenger> __pDebugUtilsMessenger;
 
-		std::vector<std::unique_ptr<PhysicalDevice>> __physicalDevices;
+		std::vector<std::unique_ptr<VK::PhysicalDevice>> __physicalDevices;
 
 		void __populateDebugMessengerCreateInfo();
 
@@ -62,7 +62,7 @@ namespace VK
 			void *pUserData) noexcept;
 	};
 
-	constexpr Instance &Context::getInstance() const noexcept
+	constexpr VK::Instance &Context::getInstance() const noexcept
 	{
 		return *__pInstance;
 	}
@@ -72,7 +72,7 @@ namespace VK
 		return __physicalDevices.size();
 	}
 
-	constexpr PhysicalDevice &Context::getPhysicalDeviceOf(
+	constexpr VK::PhysicalDevice &Context::getPhysicalDeviceOf(
 		size_t const index) noexcept
 	{
 		return *(__physicalDevices[index]);

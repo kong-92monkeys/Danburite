@@ -19,76 +19,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Buffer.h" />
-    <ClInclude Include="CommandBuffer.h" />
-    <ClInclude Include="CommandPool.h" />
-    <ClInclude Include="DebugUtilsMessenger.h" />
-    <ClInclude Include="DescriptorPool.h" />
-    <ClInclude Include="DescriptorSet.h" />
-    <ClInclude Include="DescriptorSetLayout.h" />
-    <ClInclude Include="Device.h" />
-    <ClInclude Include="Fence.h" />
-    <ClInclude Include="Framebuffer.h" />
-    <ClInclude Include="Image.h" />
-    <ClInclude Include="ImageView.h" />
-    <ClInclude Include="Instance.h" />
-    <ClInclude Include="DeviceMemory.h" />
-    <ClInclude Include="PhysicalDevice.h" />
-    <ClInclude Include="Pipeline.h" />
-    <ClInclude Include="PipelineCache.h" />
-    <ClInclude Include="PipelineLayout.h" />
-    <ClInclude Include="Queue.h" />
-    <ClInclude Include="RenderPass.h" />
-    <ClInclude Include="Sampler.h" />
-    <ClInclude Include="Semaphore.h" />
-    <ClInclude Include="ShaderModule.h" />
-    <ClInclude Include="Surface.h" />
-    <ClInclude Include="Swapchain.h" />
-    <ClInclude Include="Vulkan.h" />
-    <ClInclude Include="VulkanLoader.h" />
-    <ClInclude Include="VulkanProc.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="CommandBuffer.cpp" />
-    <ClCompile Include="CommandPool.cpp" />
-    <ClCompile Include="DebugUtilsMessenger.cpp" />
-    <ClCompile Include="DescriptorPool.cpp" />
-    <ClCompile Include="DescriptorSet.cpp" />
-    <ClCompile Include="DescriptorSetLayout.cpp" />
-    <ClCompile Include="Device.cpp" />
-    <ClCompile Include="Fence.cpp" />
-    <ClCompile Include="Framebuffer.cpp" />
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="ImageView.cpp" />
-    <ClCompile Include="Instance.cpp" />
-    <ClCompile Include="DeviceMemory.cpp" />
-    <ClCompile Include="PhysicalDevice.cpp" />
-    <ClCompile Include="Pipeline.cpp" />
-    <ClCompile Include="PipelineCache.cpp" />
-    <ClCompile Include="PipelineLayout.cpp" />
-    <ClCompile Include="Queue.cpp" />
-    <ClCompile Include="RenderPass.cpp" />
-    <ClCompile Include="Sampler.cpp" />
-    <ClCompile Include="Semaphore.cpp" />
-    <ClCompile Include="ShaderModule.cpp" />
-    <ClCompile Include="Surface.cpp" />
-    <ClCompile Include="Swapchain.cpp" />
-    <ClCompile Include="VulkanLoader.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Infra\Infra.vcxproj">
       <Project>{b43deef0-32fc-4467-829e-c918dc92a76a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\System\System.vcxproj">
       <Project>{337d211e-3e14-42be-bee9-374f17327b0a}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Vulkan\Vulkan.vcxproj">
+      <Project>{997dbb3c-2030-4dfb-8854-b742df444ed7}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Context.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Context.h" />
+    <ClInclude Include="ConversionUtil.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{997dbb3c-2030-4dfb-8854-b742df444ed7}</ProjectGuid>
-    <RootNamespace>Vulkan</RootNamespace>
+    <ProjectGuid>{ca7f0ad3-2229-4a43-b310-e5c23272f6c3}</ProjectGuid>
+    <RootNamespace>Device</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../Infra/Version.h"
-#include "Vulkan.h"
+#include "../Vulkan/Vulkan.h"
 
-namespace VK::ConversionUtil
+namespace Dev::ConversionUtil
 {
 	constexpr Infra::Version fromVulkanVersion(const uint32_t version) noexcept
 	{

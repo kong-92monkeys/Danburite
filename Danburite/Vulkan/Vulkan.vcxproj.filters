@@ -7,9 +7,6 @@
     <Filter Include="Infra\VulkanLoader">
       <UniqueIdentifier>{e0fa7b5d-f7c0-4e7a-bc71-c58a517f918d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Context">
-      <UniqueIdentifier>{2b1dcc2d-8e42-4e88-808e-884961d85822}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Modules">
       <UniqueIdentifier>{e893c24f-4b0f-4011-b8f2-d9e3f47c054b}</UniqueIdentifier>
     </Filter>
@@ -21,9 +18,6 @@
     </Filter>
     <Filter Include="Modules\DebugUtilsMessenger">
       <UniqueIdentifier>{03d344d5-e455-4a1a-98b0-0f6651065e4b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{2a296a88-2d1a-4721-a324-e60d53c561c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Modules\Device">
       <UniqueIdentifier>{ce383c17-35fe-4bb2-b98b-e8109f73f310}</UniqueIdentifier>
@@ -105,14 +99,8 @@
     <ClInclude Include="Instance.h">
       <Filter>Modules\Instance</Filter>
     </ClInclude>
-    <ClInclude Include="Context.h">
-      <Filter>Context</Filter>
-    </ClInclude>
     <ClInclude Include="DebugUtilsMessenger.h">
       <Filter>Modules\DebugUtilsMessenger</Filter>
-    </ClInclude>
-    <ClInclude Include="ConversionUtil.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="PhysicalDevice.h">
       <Filter>Modules\PhysicalDevice</Filter>
@@ -190,9 +178,6 @@
     </ClCompile>
     <ClCompile Include="Instance.cpp">
       <Filter>Modules\Instance</Filter>
-    </ClCompile>
-    <ClCompile Include="Context.cpp">
-      <Filter>Context</Filter>
     </ClCompile>
     <ClCompile Include="DebugUtilsMessenger.cpp">
       <Filter>Modules\DebugUtilsMessenger</Filter>

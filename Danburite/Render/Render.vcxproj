@@ -22,6 +22,9 @@
     <ClInclude Include="Engine.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Device\Device.vcxproj">
+      <Project>{ca7f0ad3-2229-4a43-b310-e5c23272f6c3}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Infra\Infra.vcxproj">
       <Project>{b43deef0-32fc-4467-829e-c918dc92a76a}</Project>
     </ProjectReference>
