@@ -133,6 +133,15 @@ namespace VK
 			uint32_t descriptorSetCount,
 			VkDescriptorSet const *pDescriptorSets);
 
+		VkResult vkCreatePipelineLayout(
+			VkPipelineLayoutCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkPipelineLayout *pPipelineLayout);
+
+		void vkDestroyPipelineLayout(
+			VkPipelineLayout pipelineLayout,
+			VkAllocationCallbacks const *pAllocator);
+
 		VkResult vkCreateGraphicsPipelines(
 			VkPipelineCache pipelineCache,
 			uint32_t createInfoCount,
@@ -150,6 +159,32 @@ namespace VK
 		void vkDestroyPipeline(
 			VkPipeline pipeline,
 			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkCreateRenderPass2(
+			VkRenderPassCreateInfo2 const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkRenderPass *pRenderPass);
+
+		void vkDestroyRenderPass(
+			VkRenderPass renderPass,
+			VkAllocationCallbacks const *pAllocator);
+
+		void vkGetDeviceQueue2(
+			VkDeviceQueueInfo2 const *pQueueInfo,
+			VkQueue *pQueue);
+
+		VkResult vkQueueWaitIdle(
+			VkQueue queue);
+
+		VkResult vkQueueSubmit2(
+			VkQueue queue,
+			uint32_t submitCount,
+			VkSubmitInfo2 const *pSubmits,
+			VkFence fence);
+
+		VkResult vkQueuePresentKHR(
+			VkQueue queue,
+			VkPresentInfoKHR const *pPresentInfo);
 
 		VkResult vkCreateCommandPool(
 			VkCommandPoolCreateInfo const *pCreateInfo,

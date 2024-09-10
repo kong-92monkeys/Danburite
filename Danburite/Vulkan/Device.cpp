@@ -249,6 +249,23 @@ namespace VK
 			getHandle(), descriptorPool, descriptorSetCount, pDescriptorSets);
 	}
 
+	VkResult Device::vkCreatePipelineLayout(
+		VkPipelineLayoutCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkPipelineLayout *const pPipelineLayout)
+	{
+		return __deviceProc.vkCreatePipelineLayout(
+			getHandle(), pCreateInfo, pAllocator, pPipelineLayout);
+	}
+
+	void Device::vkDestroyPipelineLayout(
+		VkPipelineLayout const pipelineLayout,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyPipelineLayout(
+			getHandle(), pipelineLayout, pAllocator);
+	}
+
 	VkResult Device::vkCreateGraphicsPipelines(
 		VkPipelineCache const pipelineCache,
 		uint32_t const createInfoCount,
@@ -279,6 +296,55 @@ namespace VK
 	{
 		__deviceProc.vkDestroyPipeline(
 			getHandle(), pipeline, pAllocator);
+	}
+
+	VkResult Device::vkCreateRenderPass2(
+		VkRenderPassCreateInfo2 const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkRenderPass *const pRenderPass)
+	{
+		return __deviceProc.vkCreateRenderPass2(
+			getHandle(), pCreateInfo, pAllocator, pRenderPass);
+	}
+
+	void Device::vkDestroyRenderPass(
+		VkRenderPass const renderPass,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyRenderPass(
+			getHandle(), renderPass, pAllocator);
+	}
+
+	void Device::vkGetDeviceQueue2(
+		VkDeviceQueueInfo2 const *const pQueueInfo,
+		VkQueue *const pQueue)
+	{
+		__deviceProc.vkGetDeviceQueue2(
+			getHandle(), pQueueInfo, pQueue);
+	}
+
+	VkResult Device::vkQueueWaitIdle(
+		VkQueue const queue)
+	{
+		return __deviceProc.vkQueueWaitIdle(queue);
+	}
+
+	VkResult Device::vkQueueSubmit2(
+		VkQueue const queue,
+		uint32_t const submitCount,
+		VkSubmitInfo2 const *const pSubmits,
+		VkFence const fence)
+	{
+		return __deviceProc.vkQueueSubmit2(
+			queue, submitCount, pSubmits, fence);
+	}
+
+	VkResult Device::vkQueuePresentKHR(
+		VkQueue const queue,
+		VkPresentInfoKHR const *const pPresentInfo)
+	{
+		return __deviceProc.vkQueuePresentKHR(
+			queue, pPresentInfo);
 	}
 
 	VkResult Device::vkCreateCommandPool(

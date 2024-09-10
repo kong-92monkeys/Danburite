@@ -38,6 +38,9 @@
     <ClInclude Include="PhysicalDevice.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="PipelineCache.h" />
+    <ClInclude Include="PipelineLayout.h" />
+    <ClInclude Include="Queue.h" />
+    <ClInclude Include="RenderPass.h" />
     <ClInclude Include="Vulkan.h" />
     <ClInclude Include="VulkanLoader.h" />
     <ClInclude Include="VulkanProc.h" />
@@ -61,6 +64,9 @@
     <ClCompile Include="PhysicalDevice.cpp" />
     <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="PipelineCache.cpp" />
+    <ClCompile Include="PipelineLayout.cpp" />
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="VulkanLoader.cpp" />
   </ItemGroup>
   <ItemGroup>

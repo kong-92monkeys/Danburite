@@ -67,6 +67,15 @@
     <Filter Include="Modules\Pipeline">
       <UniqueIdentifier>{9625bd61-d201-4117-8b52-ec1b15683e88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\PipelineLayout">
+      <UniqueIdentifier>{70a46935-15a2-4849-a65d-d1e81fa3bca2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Queue">
+      <UniqueIdentifier>{5e439d31-f908-42a5-a528-155d72a2f466}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\RenderPass">
+      <UniqueIdentifier>{098babf4-b943-45ce-ab45-80e1387aea06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -135,6 +144,15 @@
     <ClInclude Include="Pipeline.h">
       <Filter>Modules\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineLayout.h">
+      <Filter>Modules\PipelineLayout</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Modules\Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>Modules\RenderPass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -193,6 +211,15 @@
     </ClCompile>
     <ClCompile Include="Pipeline.cpp">
       <Filter>Modules\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineLayout.cpp">
+      <Filter>Modules\PipelineLayout</Filter>
+    </ClCompile>
+    <ClCompile Include="Queue.cpp">
+      <Filter>Modules\Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass.cpp">
+      <Filter>Modules\RenderPass</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
