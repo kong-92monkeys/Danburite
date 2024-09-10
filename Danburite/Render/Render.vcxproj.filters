@@ -4,15 +4,30 @@
     <Filter Include="Engine">
       <UniqueIdentifier>{69160b60-b128-4735-aa47-e43298c4b01e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Constants">
+      <UniqueIdentifier>{87012a27-38b7-4992-8ddb-e52a377b83b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LayerResourcePool">
+      <UniqueIdentifier>{601eeda5-6746-4d12-9a83-07ee88824f75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Constants</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerResourcePool.h">
+      <Filter>LayerResourcePool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
       <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerResourcePool.cpp">
+      <Filter>LayerResourcePool</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

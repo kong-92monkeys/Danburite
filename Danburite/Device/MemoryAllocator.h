@@ -57,7 +57,7 @@ namespace Dev
 	};
 
 	constexpr VkDeviceSize MemoryAllocator::__resolveBufferAlignment(
-		VkDeviceSize memAlignment,
+		VkDeviceSize const memAlignment,
 		VkBufferUsageFlags const usage) const noexcept
 	{
 		VkDeviceSize retVal{ memAlignment };

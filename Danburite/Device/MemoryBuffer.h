@@ -15,8 +15,16 @@ namespace Dev
 
 		virtual ~MemoryBuffer() noexcept override;
 
+		[[nodiscard]]
+		constexpr VkDeviceSize getSize() const noexcept;
+
 	private:
 		std::unique_ptr<VK::Buffer> __pBuffer;
 		std::unique_ptr<MemoryChunk> __pMemory;
 	};
+
+	constexpr VkDeviceSize MemoryBuffer::getSize() const noexcept
+	{
+		return __pBuffer->getSize();
+	}
 }

@@ -1,6 +1,6 @@
 #include "Engine.h"
 #include "../Device/ConversionUtil.h"
-#include <optional>
+#include "Constants.h"
 #include <stdexcept>
 #include <format>
 
@@ -12,13 +12,26 @@ namespace Render
 		__context			{ context },
 		__physicalDevice	{ physicalDevice }
 	{
+		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
+
 		__resolveQueueFamilyIndex();
 		__createDevice();
 		__createPipelineCache();
+
+		__pMemoryAllocator = std::make_unique<Dev::MemoryAllocator>(
+			__physicalDevice, *__pDevice,
+			Constants::DEFAULT_MEMORY_BLOCK_SIZE,
+			deviceLimits.minUniformBufferOffsetAlignment,
+			deviceLimits.minStorageBufferOffsetAlignment);
+
+		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
+			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
 	}
 
 	Engine::~Engine() noexcept
 	{
+		__pLayerResourcePool = nullptr;
+		__pMemoryAllocator = nullptr;
 		__pPipelineCache = nullptr;
 		__pDevice = nullptr;
 	}
