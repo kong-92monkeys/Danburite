@@ -10,8 +10,8 @@ namespace VK
 	Instance::Instance(
 		VulkanLoader &loader,
 		VkInstanceCreateInfo const &createInfo) :
-		Handle		{ __create(loader, createInfo) },
-		__loader	{ loader }
+		Handle{ __create(loader, createInfo) },
+		__loader{ loader }
 	{
 		__loadInstanceProc();
 	}
@@ -104,6 +104,62 @@ namespace VK
 	{
 		return __instanceProc.vkGetPhysicalDeviceWin32PresentationSupportKHR(
 			physicalDevice, queueFamilyIndex);
+	}
+
+	VkResult Instance::vkCreateWin32SurfaceKHR(
+		VkWin32SurfaceCreateInfoKHR const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkSurfaceKHR *const pSurface)
+	{
+		return __instanceProc.vkCreateWin32SurfaceKHR(
+			getHandle(), pCreateInfo, pAllocator, pSurface);
+	}
+
+	void Instance::vkDestroySurfaceKHR(
+		VkSurfaceKHR const surface,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__instanceProc.vkDestroySurfaceKHR(
+			getHandle(), surface, pAllocator);
+	}
+
+	VkResult Instance::vkGetPhysicalDeviceSurfaceSupportKHR(
+		VkPhysicalDevice const physicalDevice,
+		uint32_t const queueFamilyIndex,
+		VkSurfaceKHR const surface,
+		VkBool32 *const pSupported)
+	{
+		return __instanceProc.vkGetPhysicalDeviceSurfaceSupportKHR(
+			physicalDevice, queueFamilyIndex, surface, pSupported);
+	}
+
+	VkResult Instance::vkGetPhysicalDeviceSurfacePresentModesKHR(
+		VkPhysicalDevice const physicalDevice,
+		VkSurfaceKHR const surface,
+		uint32_t *const pPresentModeCount,
+		VkPresentModeKHR *const pPresentModes)
+	{
+		return __instanceProc.vkGetPhysicalDeviceSurfacePresentModesKHR(
+			physicalDevice, surface, pPresentModeCount, pPresentModes);
+	}
+
+	VkResult Instance::vkGetPhysicalDeviceSurfaceCapabilities2KHR(
+		VkPhysicalDevice const physicalDevice,
+		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
+		VkSurfaceCapabilities2KHR *const pSurfaceCapabilities)
+	{
+		return __instanceProc.vkGetPhysicalDeviceSurfaceCapabilities2KHR(
+			physicalDevice, pSurfaceInfo, pSurfaceCapabilities);
+	}
+
+	VkResult Instance::vkGetPhysicalDeviceSurfaceFormats2KHR(
+		VkPhysicalDevice const physicalDevice,
+		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
+		uint32_t *const pSurfaceFormatCount,
+		VkSurfaceFormat2KHR *const pSurfaceFormats)
+	{
+		return __instanceProc.vkGetPhysicalDeviceSurfaceFormats2KHR(
+			physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
 	}
 
 	VkResult Instance::vkCreateDevice(

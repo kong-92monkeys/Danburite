@@ -53,6 +53,41 @@ namespace VK
 			getHandle(), queueFamilyIndex);
 	}
 
+	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfaceSupportKHR(
+		uint32_t const queueFamilyIndex,
+		VkSurfaceKHR const surface,
+		VkBool32 *const pSupported)
+	{
+		return __instance.vkGetPhysicalDeviceSurfaceSupportKHR(
+			getHandle(), queueFamilyIndex, surface, pSupported);
+	}
+
+	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfacePresentModesKHR(
+		VkSurfaceKHR const surface,
+		uint32_t *const pPresentModeCount,
+		VkPresentModeKHR *const pPresentModes)
+	{
+		return __instance.vkGetPhysicalDeviceSurfacePresentModesKHR(
+			getHandle(), surface, pPresentModeCount, pPresentModes);
+	}
+
+	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfaceCapabilities2KHR(
+		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
+		VkSurfaceCapabilities2KHR *const pSurfaceCapabilities)
+	{
+		return __instance.vkGetPhysicalDeviceSurfaceCapabilities2KHR(
+			getHandle(), pSurfaceInfo, pSurfaceCapabilities);
+	}
+
+	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfaceFormats2KHR(
+		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
+		uint32_t *const pSurfaceFormatCount,
+		VkSurfaceFormat2KHR *const pSurfaceFormats)
+	{
+		return __instance.vkGetPhysicalDeviceSurfaceFormats2KHR(
+			getHandle(), pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
+	}
+
 	VkResult PhysicalDevice::vkCreateDevice(
 		VkDeviceCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,

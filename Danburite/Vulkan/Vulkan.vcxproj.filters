@@ -76,6 +76,21 @@
     <Filter Include="Modules\RenderPass">
       <UniqueIdentifier>{098babf4-b943-45ce-ab45-80e1387aea06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules\Sampler">
+      <UniqueIdentifier>{eab6a81a-9501-4874-b528-feac34044d7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Semaphore">
+      <UniqueIdentifier>{2172c57e-5891-45f8-ad66-9ce22d57c393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\ShaderModule">
+      <UniqueIdentifier>{89b80b29-e7e3-4de8-b4c5-2817dfb678f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Surface">
+      <UniqueIdentifier>{e7d4e92e-7fe0-4c33-afb4-cb5e05ec72de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Modules\Swapchain">
+      <UniqueIdentifier>{c20cf321-bde3-4c38-a482-c9a4ee3d87cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vulkan.h">
@@ -153,6 +168,21 @@
     <ClInclude Include="RenderPass.h">
       <Filter>Modules\RenderPass</Filter>
     </ClInclude>
+    <ClInclude Include="Sampler.h">
+      <Filter>Modules\Sampler</Filter>
+    </ClInclude>
+    <ClInclude Include="Semaphore.h">
+      <Filter>Modules\Semaphore</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderModule.h">
+      <Filter>Modules\ShaderModule</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface.h">
+      <Filter>Modules\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Swapchain.h">
+      <Filter>Modules\Swapchain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VulkanLoader.cpp">
@@ -220,6 +250,21 @@
     </ClCompile>
     <ClCompile Include="RenderPass.cpp">
       <Filter>Modules\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="Sampler.cpp">
+      <Filter>Modules\Sampler</Filter>
+    </ClCompile>
+    <ClCompile Include="Semaphore.cpp">
+      <Filter>Modules\Semaphore</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderModule.cpp">
+      <Filter>Modules\ShaderModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Surface.cpp">
+      <Filter>Modules\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="Swapchain.cpp">
+      <Filter>Modules\Swapchain</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

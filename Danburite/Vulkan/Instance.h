@@ -60,6 +60,38 @@ namespace VK
 			VkPhysicalDevice physicalDevice,
 			uint32_t queueFamilyIndex) const;
 
+		VkResult vkCreateWin32SurfaceKHR(
+			VkWin32SurfaceCreateInfoKHR const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkSurfaceKHR *pSurface);
+
+		void vkDestroySurfaceKHR(
+			VkSurfaceKHR surface,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkGetPhysicalDeviceSurfaceSupportKHR(
+			VkPhysicalDevice physicalDevice,
+			uint32_t queueFamilyIndex,
+			VkSurfaceKHR surface,
+			VkBool32 *pSupported);
+
+		VkResult vkGetPhysicalDeviceSurfacePresentModesKHR(
+			VkPhysicalDevice physicalDevice,
+			VkSurfaceKHR surface,
+			uint32_t *pPresentModeCount,
+			VkPresentModeKHR *pPresentModes);
+
+		VkResult vkGetPhysicalDeviceSurfaceCapabilities2KHR(
+			VkPhysicalDevice physicalDevice,
+			VkPhysicalDeviceSurfaceInfo2KHR const *pSurfaceInfo,
+			VkSurfaceCapabilities2KHR *pSurfaceCapabilities);
+
+		VkResult vkGetPhysicalDeviceSurfaceFormats2KHR(
+			VkPhysicalDevice physicalDevice,
+			VkPhysicalDeviceSurfaceInfo2KHR const *pSurfaceInfo,
+			uint32_t *pSurfaceFormatCount,
+			VkSurfaceFormat2KHR *pSurfaceFormats);
+
 		VkResult vkCreateDevice(
 			VkPhysicalDevice physicalDevice,
 			VkDeviceCreateInfo const *pCreateInfo,

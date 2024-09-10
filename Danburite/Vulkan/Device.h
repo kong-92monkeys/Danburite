@@ -102,6 +102,33 @@ namespace VK
 			VkFence fence,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkCreateSemaphore(
+			VkSemaphoreCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkSemaphore *pSemaphore);
+
+		void vkDestroySemaphore(
+			VkSemaphore semaphore,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkCreateSampler(
+			VkSamplerCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkSampler *pSampler);
+
+		void vkDestroySampler(
+			VkSampler sampler,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkCreateShaderModule(
+			VkShaderModuleCreateInfo const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkShaderModule *pShaderModule);
+
+		void vkDestroyShaderModule(
+			VkShaderModule shaderModule,
+			VkAllocationCallbacks const *pAllocator);
+
 		VkResult vkCreateDescriptorPool(
 			VkDescriptorPoolCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
@@ -168,6 +195,24 @@ namespace VK
 		void vkDestroyRenderPass(
 			VkRenderPass renderPass,
 			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkCreateSwapchainKHR(
+			VkSwapchainCreateInfoKHR const *pCreateInfo,
+			VkAllocationCallbacks const *pAllocator,
+			VkSwapchainKHR *pSwapchain);
+
+		void vkDestroySwapchainKHR(
+			VkSwapchainKHR swapchain,
+			VkAllocationCallbacks const *pAllocator);
+
+		VkResult vkGetSwapchainImagesKHR(
+			VkSwapchainKHR swapchain,
+			uint32_t *pSwapchainImageCount,
+			VkImage *pSwapchainImages);
+
+		VkResult vkAcquireNextImage2KHR(
+			VkAcquireNextImageInfoKHR const *pAcquireInfo,
+			uint32_t *pImageIndex);
 
 		void vkGetDeviceQueue2(
 			VkDeviceQueueInfo2 const *pQueueInfo,

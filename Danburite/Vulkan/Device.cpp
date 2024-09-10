@@ -186,8 +186,59 @@ namespace VK
 		VkFence const fence,
 		VkAllocationCallbacks const *const pAllocator)
 	{
-		return __deviceProc.vkDestroyFence(
+		__deviceProc.vkDestroyFence(
 			getHandle(), fence, pAllocator);
+	}
+
+	VkResult Device::vkCreateSemaphore(
+		VkSemaphoreCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkSemaphore *const pSemaphore)
+	{
+		return __deviceProc.vkCreateSemaphore(
+			getHandle(), pCreateInfo, pAllocator, pSemaphore);
+	}
+
+	void Device::vkDestroySemaphore(
+		VkSemaphore const semaphore,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroySemaphore(
+			getHandle(), semaphore, pAllocator);
+	}
+
+	VkResult Device::vkCreateSampler(
+		VkSamplerCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkSampler *const pSampler)
+	{
+		return __deviceProc.vkCreateSampler(
+			getHandle(), pCreateInfo, pAllocator, pSampler);
+	}
+
+	void Device::vkDestroySampler(
+		VkSampler const sampler,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroySampler(
+			getHandle(), sampler, pAllocator);
+	}
+
+	VkResult Device::vkCreateShaderModule(
+		VkShaderModuleCreateInfo const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkShaderModule *const pShaderModule)
+	{
+		return __deviceProc.vkCreateShaderModule(
+			getHandle(), pCreateInfo, pAllocator, pShaderModule);
+	}
+
+	void Device::vkDestroyShaderModule(
+		VkShaderModule const shaderModule,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroyShaderModule(
+			getHandle(), shaderModule, pAllocator);
 	}
 
 	VkResult Device::vkCreateDescriptorPool(
@@ -313,6 +364,40 @@ namespace VK
 	{
 		__deviceProc.vkDestroyRenderPass(
 			getHandle(), renderPass, pAllocator);
+	}
+
+	VkResult Device::vkCreateSwapchainKHR(
+		VkSwapchainCreateInfoKHR const *const pCreateInfo,
+		VkAllocationCallbacks const *const pAllocator,
+		VkSwapchainKHR *const pSwapchain)
+	{
+		return __deviceProc.vkCreateSwapchainKHR(
+			getHandle(), pCreateInfo, pAllocator, pSwapchain);
+	}
+
+	void Device::vkDestroySwapchainKHR(
+		VkSwapchainKHR const swapchain,
+		VkAllocationCallbacks const *const pAllocator)
+	{
+		__deviceProc.vkDestroySwapchainKHR(
+			getHandle(), swapchain, pAllocator);
+	}
+
+	VkResult Device::vkGetSwapchainImagesKHR(
+		VkSwapchainKHR const swapchain,
+		uint32_t *const pSwapchainImageCount,
+		VkImage *const pSwapchainImages)
+	{
+		return __deviceProc.vkGetSwapchainImagesKHR(
+			getHandle(), swapchain, pSwapchainImageCount, pSwapchainImages);
+	}
+
+	VkResult Device::vkAcquireNextImage2KHR(
+		VkAcquireNextImageInfoKHR const *const pAcquireInfo,
+		uint32_t *const pImageIndex)
+	{
+		return __deviceProc.vkAcquireNextImage2KHR(
+			getHandle(), pAcquireInfo, pImageIndex);
 	}
 
 	void Device::vkGetDeviceQueue2(
