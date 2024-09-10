@@ -14,6 +14,12 @@ namespace VK
 		virtual ~Buffer() noexcept override;
 
 		[[nodiscard]]
+		constexpr VkDeviceSize getSize() const noexcept;
+
+		[[nodiscard]]
+		constexpr VkBufferUsageFlags getUsage() const noexcept;
+
+		[[nodiscard]]
 		constexpr VkMemoryDedicatedRequirements const &getMemoryDedicatedRequirements() const noexcept;
 
 		[[nodiscard]]
@@ -21,6 +27,9 @@ namespace VK
 
 	private:
 		Device &__device;
+
+		VkDeviceSize const __size;
+		VkBufferUsageFlags const __usage;
 
 		VkMemoryDedicatedRequirements __memDedicatedReq{ };
 		VkMemoryRequirements2 __memReq2{ };
@@ -32,6 +41,16 @@ namespace VK
 			Device &device,
 			VkBufferCreateInfo const &createInfo);
 	};
+
+	constexpr VkDeviceSize Buffer::getSize() const noexcept
+	{
+		return __size;
+	}
+
+	constexpr VkBufferUsageFlags Buffer::getUsage() const noexcept
+	{
+		return __usage;
+	}
 
 	constexpr VkMemoryDedicatedRequirements const &Buffer::getMemoryDedicatedRequirements() const noexcept
 	{

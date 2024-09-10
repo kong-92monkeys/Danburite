@@ -59,21 +59,21 @@ namespace Infra
 		RegionAllocator &allocator,
 		size_t const size,
 		size_t const alignment) :
-		__allocator		{ allocator },
-		__size			{ size },
-		__alignment		{ alignment }
+		__regionAllocator	{ allocator },
+		__size				{ size },
+		__alignment			{ alignment }
 	{
 		__create();
 	}
 
 	Region::~Region() noexcept
 	{
-		__allocator.free(__offset);
+		__regionAllocator.free(__offset);
 	}
 
 	void Region::__create()
 	{
-		auto const offset{ __allocator.allocate(__size, __alignment) };
+		auto const offset{ __regionAllocator.allocate(__size, __alignment) };
 		if (offset.has_value())
 		{
 			__offset = offset.value();

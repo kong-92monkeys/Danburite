@@ -7,12 +7,43 @@ namespace VK
 		Device &device,
 		VkImageCreateInfo const &createInfo) :
 		Handle		{ __create(device, createInfo) },
-		__device	{ device }
+		__pDevice	{ &device },
+		__format	{ createInfo.format },
+		__ownHandle	{ true }
+	{
+		__resolveMemoryRequirements();
+	}
+
+	Image::Image(
+		VkImage const handle,
+		VkFormat const format) noexcept :
+		Handle		{ handle },
+		__format	{ format },
+		__ownHandle	{ false }
 	{}
 
 	Image::~Image() noexcept
 	{
-		__device.vkDestroyImage(getHandle(), nullptr);
+		if (!__ownHandle)
+			return;
+
+		__pDevice->vkDestroyImage(getHandle(), nullptr);
+	}
+
+	void Image::__resolveMemoryRequirements() noexcept
+	{
+		__memDedicatedReq.sType = VkStructureType::VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS;
+
+		__memReq2.sType = VkStructureType::VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2;
+		__memReq2.pNext = &__memDedicatedReq;
+
+		const VkImageMemoryRequirementsInfo2 resolveInfo
+		{
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2 },
+			.image	{ getHandle() }
+		};
+		
+		__pDevice->vkGetImageMemoryRequirements2(&resolveInfo, &__memReq2);
 	}
 
 	VkImage Image::__create(

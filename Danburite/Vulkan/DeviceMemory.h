@@ -14,7 +14,7 @@ namespace VK
 		virtual ~DeviceMemory() noexcept override;
 
 		[[nodiscard]]
-		void *getMappedMemory() noexcept;
+		void *map() noexcept;
 
 		[[nodiscard]]
 		constexpr VkDeviceSize getSize() const noexcept;

@@ -8,18 +8,20 @@ namespace Infra
 	class Handle : public Unique
 	{
 	public:
+		Handle() = default;
+
 		explicit Handle(
 			$H handle) noexcept;
 
 		[[nodiscard]]
-		constexpr $H const &getHandle() noexcept;
-
-	protected:
-		[[nodiscard]]
 		constexpr $H const &getHandle() const noexcept;
 
+	protected:
+		constexpr void _setHandle(
+			$H handle) noexcept;
+
 	private:
-		$H const __handle;
+		$H __handle{ };
 	};
 
 	template <typename $H>
@@ -29,14 +31,15 @@ namespace Infra
 	{}
 
 	template <typename $H>
-	constexpr $H const &Handle<$H>::getHandle() noexcept
+	constexpr $H const &Handle<$H>::getHandle() const noexcept
 	{
 		return __handle;
 	}
 
 	template <typename $H>
-	constexpr $H const &Handle<$H>::getHandle() const noexcept
+	constexpr void Handle<$H>::_setHandle(
+		$H const handle) noexcept
 	{
-		return __handle;
+		__handle = handle;
 	}
 }

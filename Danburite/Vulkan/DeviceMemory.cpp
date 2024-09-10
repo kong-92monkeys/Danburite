@@ -20,7 +20,7 @@ namespace VK
 		__device.vkFreeMemory(getHandle(), nullptr);
 	}
 
-	void *DeviceMemory::getMappedMemory() noexcept
+	void *DeviceMemory::map() noexcept
 	{
 		if (!__pMapped)
 			__device.vkMapMemory(getHandle(), 0U, VK_WHOLE_SIZE, 0U, &__pMapped);

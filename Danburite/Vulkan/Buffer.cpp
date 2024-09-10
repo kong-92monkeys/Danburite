@@ -7,7 +7,9 @@ namespace VK
 		Device &device,
 		VkBufferCreateInfo const &createInfo) :
 		Handle		{ __create(device, createInfo) },
-		__device	{ device }
+		__device	{ device },
+		__size		{ createInfo.size },
+		__usage		{ createInfo.usage }
 	{
 		__resolveMemoryRequirements();
 	}

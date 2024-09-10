@@ -46,7 +46,7 @@ namespace Infra
 		constexpr size_t getOffset() const noexcept;
 
 	private:
-		RegionAllocator &__allocator;
+		RegionAllocator &__regionAllocator;
 		size_t const __size;
 		size_t const __alignment;
 

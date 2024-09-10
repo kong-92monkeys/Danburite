@@ -7,10 +7,40 @@
     <Filter Include="Context">
       <UniqueIdentifier>{3b6c06c7-9349-4302-a544-950e7ce4c33a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MemoryAllocator">
+      <UniqueIdentifier>{661cb648-7386-4634-94fc-5ed3db7925ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryImage">
+      <UniqueIdentifier>{7047aafd-653d-4951-afda-ee56b6e498c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryBuffer">
+      <UniqueIdentifier>{84e228fa-e09d-4c60-83dc-54e2376f7908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryAllocator\MemoryBlock">
+      <UniqueIdentifier>{fdef35e8-f042-4c95-91b1-0a2534edd28b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MemoryAllocator\MemoryChunk">
+      <UniqueIdentifier>{5da80a06-13c4-4ce3-8969-7a7e26b88969}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
       <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryBlock.cpp">
+      <Filter>MemoryAllocator\MemoryBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryChunk.cpp">
+      <Filter>MemoryAllocator\MemoryChunk</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryBuffer.cpp">
+      <Filter>MemoryBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryImage.cpp">
+      <Filter>MemoryImage</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryAllocator.cpp">
+      <Filter>MemoryAllocator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -19,6 +49,21 @@
     </ClInclude>
     <ClInclude Include="ConversionUtil.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryBlock.h">
+      <Filter>MemoryAllocator\MemoryBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryChunk.h">
+      <Filter>MemoryAllocator\MemoryChunk</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryAllocator.h">
+      <Filter>MemoryAllocator</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryBuffer.h">
+      <Filter>MemoryBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryImage.h">
+      <Filter>MemoryImage</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

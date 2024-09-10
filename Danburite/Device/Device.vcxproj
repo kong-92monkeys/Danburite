@@ -31,10 +31,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp" />
+    <ClCompile Include="MemoryAllocator.cpp" />
+    <ClCompile Include="MemoryBuffer.cpp" />
+    <ClCompile Include="MemoryChunk.cpp" />
+    <ClCompile Include="MemoryBlock.cpp" />
+    <ClCompile Include="MemoryImage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
+    <ClInclude Include="MemoryAllocator.h" />
+    <ClInclude Include="MemoryBuffer.h" />
+    <ClInclude Include="MemoryChunk.h" />
+    <ClInclude Include="MemoryBlock.h" />
+    <ClInclude Include="MemoryImage.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
