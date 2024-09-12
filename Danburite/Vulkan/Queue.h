@@ -24,12 +24,31 @@ namespace VK
 		VkResult vkQueuePresentKHR(
 			VkPresentInfoKHR const *pPresentInfo);
 
+		[[nodiscard]]
+		constexpr uint32_t getFamilyIndex() const noexcept;
+
+		[[nodiscard]]
+		constexpr uint32_t getQueueIndex() const noexcept;
+
 	private:
 		Device &__device;
+
+		uint32_t const __familyIndex;
+		uint32_t const __queueIndex;
 
 		static VkQueue __retrieve(
 			Device &device,
 			uint32_t familyIndex,
 			uint32_t queueIndex);
 	};
+
+	constexpr uint32_t Queue::getFamilyIndex() const noexcept
+	{
+		return __familyIndex;
+	}
+
+	constexpr uint32_t Queue::getQueueIndex() const noexcept
+	{
+		return __queueIndex;
+	}
 }

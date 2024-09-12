@@ -29,6 +29,8 @@ BEGIN_MESSAGE_MAP(CMainView, CWnd)
 	ON_WM_PAINT()
 	ON_WM_CREATE()
 	ON_WM_DESTROY()
+	ON_WM_SIZE()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -50,11 +52,9 @@ BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs)
 
 void CMainView::OnPaint() 
 {
-	CPaintDC dc(this); // device context for painting
-	
 	// TODO: Add your message handler code here
-	
-	// Do not call CWnd::OnPaint() for painting messages
+
+	ValidateRect(nullptr);
 }
 
 int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -69,11 +69,28 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
-
 void CMainView::OnDestroy()
 {
 	CWnd::OnDestroy();
 
 	// TODO: Add your message handler code here
 	__pRenderTarget = nullptr;
+}
+
+
+void CMainView::OnSize(UINT nType, int cx, int cy)
+{
+	CWnd::OnSize(nType, cx, cy);
+
+	// TODO: Add your message handler code here
+}
+
+
+BOOL CMainView::OnEraseBkgnd(CDC *pDC)
+{
+	// TODO: Add your message handler code here and/or call default
+
+
+	// To prevent from erasing window
+	return TRUE;
 }

@@ -7,8 +7,10 @@ namespace VK
 		Device &device,
 		uint32_t const familyIndex,
 		uint32_t const queueIndex) :
-		Handle		{ __retrieve(device, familyIndex, queueIndex) },
-		__device	{ device }
+		Handle			{ __retrieve(device, familyIndex, queueIndex) },
+		__device		{ device },
+		__familyIndex	{ familyIndex },
+		__queueIndex	{ queueIndex }
 	{}
 
 	VkResult Queue::vkQueueWaitIdle()

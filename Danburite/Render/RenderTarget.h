@@ -13,6 +13,7 @@ namespace Render
 	public:
 		RenderTarget(
 			VK::Instance &instance,
+			VK::PhysicalDevice &physicalDevice,
 			VK::Device &device,
 			VK::Queue &queue,
 			HINSTANCE hinstance,
@@ -20,8 +21,11 @@ namespace Render
 
 		virtual ~RenderTarget() noexcept override;
 
+		void sync();
+
 	private:
 		VK::Instance &__instance;
+		VK::PhysicalDevice &__physicalDevice;
 		VK::Device &__device;
 		VK::Queue &__que;
 
@@ -30,5 +34,7 @@ namespace Render
 		void __createSurface(
 			HINSTANCE hinstance,
 			HWND hwnd);
+
+		void __verifySurfaceSupport();
 	};
 }
