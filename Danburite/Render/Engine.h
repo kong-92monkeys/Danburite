@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Vulkan/PipelineCache.h"
+#include "../Vulkan/DescriptorSetLayout.h"
 #include "../Device/Context.h"
 #include "../Device/MemoryAllocator.h"
 #include "../Device/CommandBufferCirculator.h"
@@ -28,6 +29,7 @@ namespace Render
 
 		std::unique_ptr<VK::Device> __pDevice;
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
+		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
 
 		std::unique_ptr<Dev::CommandBufferCirculator> __pCommandBufferCirculator;
@@ -39,5 +41,6 @@ namespace Render
 		void __resolveQueueFamilyIndex();
 		void __createDevice();
 		void __createPipelineCache();
+		void __createRenderTargetDescSetLayout();
 	};
 }

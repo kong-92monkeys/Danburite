@@ -21,6 +21,11 @@ namespace VK
 		__deviceProc.vkDestroyDevice(getHandle(), nullptr);
 	}
 
+	VkResult Device::vkDeviceWaitIdle()
+	{
+		return __deviceProc.vkDeviceWaitIdle(getHandle());
+	}
+
 	VkResult Device::vkCreatePipelineCache(
 		VkPipelineCacheCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,

@@ -17,6 +17,7 @@ namespace Render
 		__resolveQueueFamilyIndex();
 		__createDevice();
 		__createPipelineCache();
+		__createRenderTargetDescSetLayout();
 
 		__pMemoryAllocator = std::make_unique<Dev::MemoryAllocator>(
 			__physicalDevice, *__pDevice,
@@ -38,13 +39,18 @@ namespace Render
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
 			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
 
-		// Note: It seems render passes cannot be abstracted with managed modules
-
-
+		/*
+			TODO: Renderer dependent resources
+				- render pass
+				- descriptor layout, pool, set
+		*/
 	}
 
 	Engine::~Engine() noexcept
 	{
+		__lazyDeleter.flush();
+		__pDevice->vkDeviceWaitIdle();
+
 		__pLayerResourcePool = nullptr;
 
 		__pSubmitSemaphoreCirculator = nullptr;
@@ -52,6 +58,7 @@ namespace Render
 		__pCommandBufferCirculator = nullptr;
 
 		__pMemoryAllocator = nullptr;
+		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
 		__pDevice = nullptr;
 	}
@@ -194,5 +201,19 @@ namespace Render
 		};
 
 		__pPipelineCache = std::make_unique<VK::PipelineCache>(*__pDevice, createInfo);
+	}
+
+	void Engine::__createRenderTargetDescSetLayout()
+	{
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+		VkDescriptorSetLayoutCreateInfo const createInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
+			.bindingCount		{ static_cast<uint32_t>(bindings.size()) },
+			.pBindings			{ bindings.data() }
+		};
+
+		__pRenderTargetDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
 	}
 }

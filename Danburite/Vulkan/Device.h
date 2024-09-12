@@ -13,6 +13,8 @@ namespace VK
 
 		virtual ~Device() noexcept override;
 
+		VkResult vkDeviceWaitIdle();
+
 		VkResult vkCreatePipelineCache(
 			VkPipelineCacheCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
