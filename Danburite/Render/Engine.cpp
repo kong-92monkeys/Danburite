@@ -12,13 +12,14 @@ namespace Render
 		__context			{ context },
 		__physicalDevice	{ physicalDevice }
 	{
-		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
-
+		__verifyPhysicalDeviceSupport();
 		__resolveQueueFamilyIndex();
 		__createDevice();
 		__retrieveQueue();
 		__createPipelineCache();
 		__createRenderTargetDescSetLayout();
+
+		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
 
 		__pMemoryAllocator = std::make_unique<Dev::MemoryAllocator>(
 			__physicalDevice, *__pDevice,
@@ -75,35 +76,7 @@ namespace Render
 			*__pDevice, *__pQueue, hinstance, hwnd);
 	}
 
-	void Engine::__resolveQueueFamilyIndex()
-	{
-		auto const &familyInfos{ __physicalDevice.getQueueFamilyInfos() };
-
-		std::optional<uint32_t> familyIndex;
-
-		const uint32_t familyCount{ static_cast<uint32_t>(familyInfos.size()) };
-		for (uint32_t iter{ }; iter < familyCount; ++iter)
-		{
-			auto const &familyInfo	{ familyInfos[iter] };
-			auto const queueFlags	{ familyInfo.pProps->queueFlags };
-
-			if (!(queueFlags & VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT))
-				continue;
-
-			familyIndex = iter;
-			break;
-		}
-
-		if (familyIndex.has_value())
-		{
-			__queueFamilyIndex = familyIndex.value();
-			return;
-		}
-
-		throw std::runtime_error{ "Cannot resolve suitable queue family index." };
-	}
-
-	void Engine::__createDevice()
+	void Engine::__verifyPhysicalDeviceSupport()
 	{
 		auto const &physicalDeviceProps		{ __physicalDevice.getProps() };
 		auto const &physicalDeviceFeatures	{ __physicalDevice.getFeatures() };
@@ -137,7 +110,38 @@ namespace Render
 
 		if (!(__physicalDevice.vkGetPhysicalDeviceWin32PresentationSupportKHR(__queueFamilyIndex)))
 			throw std::runtime_error{ "The device doesn't support win32 presentation." };
-		
+	}
+
+	void Engine::__resolveQueueFamilyIndex()
+	{
+		auto const &familyInfos{ __physicalDevice.getQueueFamilyInfos() };
+
+		std::optional<uint32_t> familyIndex;
+
+		const uint32_t familyCount{ static_cast<uint32_t>(familyInfos.size()) };
+		for (uint32_t iter{ }; iter < familyCount; ++iter)
+		{
+			auto const &familyInfo	{ familyInfos[iter] };
+			auto const queueFlags	{ familyInfo.pProps->queueFlags };
+
+			if (!(queueFlags & VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT))
+				continue;
+
+			familyIndex = iter;
+			break;
+		}
+
+		if (familyIndex.has_value())
+		{
+			__queueFamilyIndex = familyIndex.value();
+			return;
+		}
+
+		throw std::runtime_error{ "Cannot resolve suitable queue family index." };
+	}
+
+	void Engine::__createDevice()
+	{
 		VkPhysicalDeviceFeatures2 features{ };
 		VkPhysicalDeviceVulkan11Features features11{ };
 		VkPhysicalDeviceVulkan12Features features12{ };

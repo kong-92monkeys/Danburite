@@ -45,7 +45,8 @@ namespace Render
 		std::unique_ptr<Dev::SemaphoreCirculator> __pSubmitSemaphoreCirculator;
 
 		std::unique_ptr<LayerResourcePool> __pLayerResourcePool;
-
+		
+		void __verifyPhysicalDeviceSupport();
 		void __resolveQueueFamilyIndex();
 		void __createDevice();
 		void __retrieveQueue();
