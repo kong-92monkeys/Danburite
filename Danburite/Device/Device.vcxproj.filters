@@ -22,6 +22,12 @@
     <Filter Include="MemoryAllocator\MemoryChunk">
       <UniqueIdentifier>{5da80a06-13c4-4ce3-8969-7a7e26b88969}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Circulator">
+      <UniqueIdentifier>{95719089-e8c9-434e-b68d-79e440bd91d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Circulator\CommandBufferCirculator">
+      <UniqueIdentifier>{3029419e-db7c-4c9a-894c-648cdd98803d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
@@ -41,6 +47,9 @@
     </ClCompile>
     <ClCompile Include="MemoryAllocator.cpp">
       <Filter>MemoryAllocator</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandBufferCirculator.cpp">
+      <Filter>Circulator\CommandBufferCirculator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="MemoryImage.h">
       <Filter>MemoryImage</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandBufferCirculator.h">
+      <Filter>Circulator\CommandBufferCirculator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

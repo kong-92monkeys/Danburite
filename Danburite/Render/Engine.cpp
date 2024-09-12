@@ -24,8 +24,16 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
+		__pCommandBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
+			*__pDevice, __queueFamilyIndex,
+			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
+
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
 			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
+
+		// Note: It seems render passes cannot be abstracted with managed modules
+
+
 	}
 
 	Engine::~Engine() noexcept

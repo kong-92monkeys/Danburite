@@ -30,6 +30,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommandBufferCirculator.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="MemoryAllocator.cpp" />
     <ClCompile Include="MemoryBuffer.cpp" />
@@ -38,6 +39,7 @@
     <ClCompile Include="MemoryImage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommandBufferCirculator.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="MemoryAllocator.h" />
