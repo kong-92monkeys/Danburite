@@ -38,6 +38,7 @@
     <ClCompile Include="MemoryChunk.cpp" />
     <ClCompile Include="MemoryBlock.cpp" />
     <ClCompile Include="MemoryImage.cpp" />
+    <ClCompile Include="SemaphoreCirculator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandBufferCirculator.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="MemoryChunk.h" />
     <ClInclude Include="MemoryBlock.h" />
     <ClInclude Include="MemoryImage.h" />
+    <ClInclude Include="SemaphoreCirculator.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

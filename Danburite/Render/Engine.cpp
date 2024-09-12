@@ -31,6 +31,10 @@ namespace Render
 		__pSubmitFenceCirculator = std::make_unique<Dev::FenceCirculator>(
 			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
+		__pSubmitSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
+			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY,
+			Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
+
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
 			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
 
@@ -43,6 +47,7 @@ namespace Render
 	{
 		__pLayerResourcePool = nullptr;
 
+		__pSubmitSemaphoreCirculator = nullptr;
 		__pSubmitFenceCirculator = nullptr;
 		__pCommandBufferCirculator = nullptr;
 

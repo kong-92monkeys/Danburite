@@ -5,6 +5,7 @@
 #include "../Device/MemoryAllocator.h"
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/FenceCirculator.h"
+#include "../Device/SemaphoreCirculator.h"
 #include "LayerResourcePool.h"
 
 namespace Render
@@ -31,6 +32,7 @@ namespace Render
 
 		std::unique_ptr<Dev::CommandBufferCirculator> __pCommandBufferCirculator;
 		std::unique_ptr<Dev::FenceCirculator> __pSubmitFenceCirculator;
+		std::unique_ptr<Dev::SemaphoreCirculator> __pSubmitSemaphoreCirculator;
 
 		std::unique_ptr<LayerResourcePool> __pLayerResourcePool;
 
