@@ -10,6 +10,9 @@
     <Filter Include="LayerResourcePool">
       <UniqueIdentifier>{601eeda5-6746-4d12-9a83-07ee88824f75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderTarget">
+      <UniqueIdentifier>{1515f0b2-6a93-41ff-a43a-6b78ed89692a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -21,6 +24,9 @@
     <ClInclude Include="LayerResourcePool.h">
       <Filter>LayerResourcePool</Filter>
     </ClInclude>
+    <ClInclude Include="RenderTarget.h">
+      <Filter>RenderTarget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -28,6 +34,9 @@
     </ClCompile>
     <ClCompile Include="LayerResourcePool.cpp">
       <Filter>LayerResourcePool</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTarget.cpp">
+      <Filter>RenderTarget</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

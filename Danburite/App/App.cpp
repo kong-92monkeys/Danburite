@@ -9,14 +9,10 @@
 #include "App.h"
 #include "MainFrm.h"
 #include "../System/Env.h"
-#include "../Device/Context.h"
-#include "../Render/Engine.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-#include "../Infra/Logger.h"
-
 
 // CApp
 
@@ -87,6 +83,9 @@ BOOL CApp::InitInstance()
 
 int CApp::ExitInstance()
 {
+	__pRenderEngine = nullptr;
+	__pVulkanContext = nullptr;
+
 	//TODO: handle additional resources you may have added
 	return CWinApp::ExitInstance();
 }
@@ -121,13 +120,9 @@ void CApp::__onInitBeforeMainFrame()
 	contextCreateInfo.debugMode = true;
 #endif
 
-	auto pVulkanContext	{ std::make_unique<Dev::Context>(contextCreateInfo) };
-	auto pRenderEngine	{ std::make_unique<Render::Engine>(*pVulkanContext, pVulkanContext->getPhysicalDeviceOf(0ULL)) };
-
-	pRenderEngine = nullptr;
-	pVulkanContext = nullptr;
-
-	Infra::Logger::log(Infra::Logger::Severity::INFO, "Vulkan context 생성 테스트 완료");
+	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
+	__pRenderEngine = std::make_unique<Render::Engine>(
+		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 }
 
 // CAboutDlg dialog used for App About

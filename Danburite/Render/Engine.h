@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Vulkan/Queue.h"
 #include "../Vulkan/PipelineCache.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Device/Context.h"
@@ -7,6 +8,7 @@
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/FenceCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
+#include "RenderTarget.h"
 #include "LayerResourcePool.h"
 
 namespace Render
@@ -20,6 +22,11 @@ namespace Render
 
 		virtual ~Engine() noexcept override;
 
+		[[nodiscard]]
+		std::unique_ptr<RenderTarget> createRenderTarget(
+			HINSTANCE hinstance,
+			HWND hwnd);
+
 	private:
 		Dev::Context &__context;
 		VK::PhysicalDevice &__physicalDevice;
@@ -28,6 +35,7 @@ namespace Render
 		uint32_t __queueFamilyIndex{ };
 
 		std::unique_ptr<VK::Device> __pDevice;
+		std::unique_ptr<VK::Queue> __pQueue;
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
 		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
@@ -40,6 +48,7 @@ namespace Render
 
 		void __resolveQueueFamilyIndex();
 		void __createDevice();
+		void __retrieveQueue();
 		void __createPipelineCache();
 		void __createRenderTargetDescSetLayout();
 	};

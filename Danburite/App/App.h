@@ -9,6 +9,7 @@
 
 #include "resource.h"       // main symbols
 #include "../Infra/Event.h"
+#include "../Render/Engine.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -34,15 +35,26 @@ public:
 
 public:
 	[[nodiscard]]
+	constexpr Render::Engine &getRenderEngine() noexcept;
+
+	[[nodiscard]]
 	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
 
 private:
+	std::unique_ptr<Dev::Context> __pVulkanContext;
+	std::unique_ptr<Render::Engine> __pRenderEngine;
+
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
 };
 
 extern CApp theApp;
+
+constexpr Render::Engine &CApp::getRenderEngine() noexcept
+{
+	return *__pRenderEngine;
+}
 
 constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept
 {

@@ -16,6 +16,7 @@ namespace Render
 
 		__resolveQueueFamilyIndex();
 		__createDevice();
+		__retrieveQueue();
 		__createPipelineCache();
 		__createRenderTargetDescSetLayout();
 
@@ -60,7 +61,17 @@ namespace Render
 		__pMemoryAllocator = nullptr;
 		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
+
+		__pQueue = nullptr;
 		__pDevice = nullptr;
+	}
+
+	std::unique_ptr<RenderTarget> Engine::createRenderTarget(
+		HINSTANCE const hinstance,
+		HWND const hwnd)
+	{
+		return std::make_unique<RenderTarget>(
+			__context.getInstance(), *__pDevice, *__pQueue, hinstance, hwnd);
 	}
 
 	void Engine::__resolveQueueFamilyIndex()
@@ -190,6 +201,11 @@ namespace Render
 		};
 
 		__pDevice = std::make_unique<VK::Device>(__physicalDevice, createInfo);
+	}
+
+	void Engine::__retrieveQueue()
+	{
+		__pQueue = std::make_unique<VK::Queue>(*__pDevice, __queueFamilyIndex, 0U);
 	}
 
 	void Engine::__createPipelineCache()

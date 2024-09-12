@@ -12,4 +12,7 @@ VK_ADD_LAYER_PATH=$(SolutionDir)ThirdParty\vvl
 $(LocalDebuggerEnvironment)</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup>
+    <RESOURCE_FILE>App.rc</RESOURCE_FILE>
+  </PropertyGroup>
 </Project>

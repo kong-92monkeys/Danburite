@@ -14,6 +14,8 @@
 
 // CMainView
 
+IMPLEMENT_DYNCREATE(CMainView, CWnd)
+
 CMainView::CMainView()
 {
 }
@@ -25,6 +27,8 @@ CMainView::~CMainView()
 
 BEGIN_MESSAGE_MAP(CMainView, CWnd)
 	ON_WM_PAINT()
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -53,3 +57,23 @@ void CMainView::OnPaint()
 	// Do not call CWnd::OnPaint() for painting messages
 }
 
+int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CWnd::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  Add your specialized creation code here
+	__pRenderTarget = theApp.getRenderEngine().createRenderTarget(
+		lpCreateStruct->hInstance, GetSafeHwnd());
+
+	return 0;
+}
+
+
+void CMainView::OnDestroy()
+{
+	CWnd::OnDestroy();
+
+	// TODO: Add your message handler code here
+	__pRenderTarget = nullptr;
+}
