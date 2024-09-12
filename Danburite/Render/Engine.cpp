@@ -28,6 +28,9 @@ namespace Render
 			*__pDevice, __queueFamilyIndex,
 			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
 
+		__pSubmitFenceCirculator = std::make_unique<Dev::FenceCirculator>(
+			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
+
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
 			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
 
@@ -39,6 +42,10 @@ namespace Render
 	Engine::~Engine() noexcept
 	{
 		__pLayerResourcePool = nullptr;
+
+		__pSubmitFenceCirculator = nullptr;
+		__pCommandBufferCirculator = nullptr;
+
 		__pMemoryAllocator = nullptr;
 		__pPipelineCache = nullptr;
 		__pDevice = nullptr;

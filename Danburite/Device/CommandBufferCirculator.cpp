@@ -12,7 +12,7 @@ namespace Dev
 		__bufferCount	{ bufferCount }
 	{
 		for (uint32_t poolIter{ }; poolIter < __poolCount; ++poolIter)
-			__poolResources.emplace_back(std::make_unique<PoolResource>(device, queueFamilyIndex, level, __bufferCount));
+			__poolResources.emplace_back(device, queueFamilyIndex, level, __bufferCount);
 	}
 
 	VK::CommandBuffer &CommandBufferCirculator::getNext()

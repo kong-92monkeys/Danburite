@@ -28,6 +28,9 @@
     <Filter Include="Circulator\CommandBufferCirculator">
       <UniqueIdentifier>{3029419e-db7c-4c9a-894c-648cdd98803d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Circulator\FenceCirculator">
+      <UniqueIdentifier>{56d177e4-91fc-4c53-9c63-e72a44139c17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
@@ -50,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="CommandBufferCirculator.cpp">
       <Filter>Circulator\CommandBufferCirculator</Filter>
+    </ClCompile>
+    <ClCompile Include="FenceCirculator.cpp">
+      <Filter>Circulator\FenceCirculator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="CommandBufferCirculator.h">
       <Filter>Circulator\CommandBufferCirculator</Filter>
+    </ClInclude>
+    <ClInclude Include="FenceCirculator.h">
+      <Filter>Circulator\FenceCirculator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
