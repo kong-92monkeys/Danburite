@@ -10,6 +10,8 @@
 #include "../Vulkan/ImageView.h"
 #include "../Vulkan/CommandBuffer.h"
 #include "../Vulkan/Semaphore.h"
+#include "../Vulkan/RenderPass.h"
+#include "../Vulkan/Framebuffer.h"
 #include <memory>
 
 namespace Render
@@ -35,7 +37,7 @@ namespace Render
 		[[nodiscard]]
 		uint32_t draw(
 			VK::CommandBuffer &commandBuffer,
-			VK::Semaphore &imageAcquireSemaphore);
+			VK::Semaphore &imageAcqSemaphore);
 
 		[[nodiscard]]
 		constexpr glm::vec4 const &getBackgroundColor() const noexcept;
@@ -72,6 +74,9 @@ namespace Render
 		std::vector<std::unique_ptr<VK::Image>> __swapchainImages;
 		std::vector<std::unique_ptr<VK::ImageView>> __swapchainImageViews;
 
+		std::unique_ptr<VK::RenderPass> __pClearImageRenderPass;
+		std::vector<std::unique_ptr<VK::Framebuffer>> __clearImageFramebuffers;
+
 		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 
 		mutable Infra::Event<RenderTarget const *> __needRedrawEvent;
@@ -80,8 +85,11 @@ namespace Render
 			HINSTANCE hinstance,
 			HWND hwnd);
 
+		void __createClearImageRenderPass();
+
 		void __syncSurface();
 		void __syncSwapchain();
+		void __syncClearImageFramebuffers();
 
 		void __verifySurfaceSupport();
 		void __resolvePresentMode() noexcept;
@@ -95,11 +103,13 @@ namespace Render
 		void __enumerateSwapchainImages();
 		void __createSwapchainImageViews();
 
+		void __createClearImageFramebuffers();
+
 		[[nodiscard]]
-		uint32_t __acquireNextSwapchainImage(
+		uint32_t __acquireNextImage(
 			VK::Semaphore &imageAcqSemaphore);
 
-		void __clearSwapchainImageOf(
+		void __readySwapchainImage(
 			VK::CommandBuffer &commandBuffer,
 			uint32_t imageIndex);
 	};

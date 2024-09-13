@@ -120,7 +120,6 @@ namespace Render
 		{
 			physicalDeviceFeatures.p10->samplerAnisotropy &&
 
-			physicalDeviceFeatures.p12->imagelessFramebuffer &&
 			physicalDeviceFeatures.p12->descriptorBindingVariableDescriptorCount &&
 			physicalDeviceFeatures.p12->descriptorBindingPartiallyBound &&
 			physicalDeviceFeatures.p12->runtimeDescriptorArray &&
@@ -182,7 +181,6 @@ namespace Render
 		features11.pNext = &features12;
 
 		features12.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-		features12.imagelessFramebuffer = VK_TRUE;
 		features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
 		features12.descriptorBindingPartiallyBound = VK_TRUE;
 		features12.runtimeDescriptorArray = VK_TRUE;

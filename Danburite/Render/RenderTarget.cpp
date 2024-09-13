@@ -17,25 +17,36 @@ namespace Render
 		__que				{ queue }
 	{
 		__createSurface(hinstance, hwnd);
-		sync();
+
+		__syncSurface();
+		__syncSwapchain();
+
+		__createClearImageRenderPass();
+		__syncClearImageFramebuffers();
 	}
 
 	RenderTarget::~RenderTarget() noexcept
 	{
 		__que.vkQueueWaitIdle();
 
+		__clearImageFramebuffers.clear();
+
 		__swapchainImageViews.clear();
 		__swapchainImages.clear();
-
 		__pSwapchain = nullptr;
+
+		__pClearImageRenderPass = nullptr;
 		__pSurface = nullptr;
 	}
 
 	void RenderTarget::sync()
 	{
 		__que.vkQueueWaitIdle();
+
 		__syncSurface();
 		__syncSwapchain();
+
+		__syncClearImageFramebuffers();
 	}
 
 	void RenderTarget::setBackgroundColor(
@@ -49,8 +60,8 @@ namespace Render
 		VK::CommandBuffer &commandBuffer,
 		VK::Semaphore &imageAcqSemaphore)
 	{
-		uint32_t const imageIdx{ __acquireNextSwapchainImage(imageAcqSemaphore) };
-		__clearSwapchainImageOf(commandBuffer, imageIdx);
+		uint32_t const imageIdx{ __acquireNextImage(imageAcqSemaphore) };
+		__readySwapchainImage(commandBuffer, imageIdx);
 
 
 
@@ -77,6 +88,68 @@ namespace Render
 		__surfaceInfo.surface		= __pSurface->getHandle();
 	}
 
+	void RenderTarget::__createClearImageRenderPass()
+	{
+		VkAttachmentDescription2 const colorAttachment
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2 },
+			.format				{ __surfaceFormat.format },
+			.samples			{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
+			.loadOp				{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR },
+			.storeOp			{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE },
+			.stencilLoadOp		{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE },
+			.stencilStoreOp		{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE },
+			.initialLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED },
+			.finalLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }
+		};
+
+		VkAttachmentReference2 const colorAttachmentRef
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2 },
+			.attachment		{ 0U },
+			.layout			{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT }
+		};
+
+		VkSubpassDescription2 const subpass
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
+			.pipelineBindPoint		{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
+			.colorAttachmentCount	{ 1U },
+			.pColorAttachments		{ &colorAttachmentRef }
+		};
+
+		VkMemoryBarrier2 const memoryBarrier
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
+			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.srcAccessMask	{ VK_ACCESS_2_NONE },
+			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.dstAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT }
+		};
+
+		VkSubpassDependency2 const dependency
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2 },
+			.pNext			{ &memoryBarrier },
+			.srcSubpass		{ VK_SUBPASS_EXTERNAL },
+			.dstSubpass		{ 0U }
+		};
+
+		VkRenderPassCreateInfo2 const createInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2 },
+			.attachmentCount	{ 1U },
+			.pAttachments		{ &colorAttachment },
+			.subpassCount		{ 1U },
+			.pSubpasses			{ &subpass },
+			.dependencyCount	{ 1U },
+			.pDependencies		{ &dependency }
+		};
+
+		__pClearImageRenderPass = std::make_unique<VK::RenderPass>(__device, createInfo);
+	}
+
 	void RenderTarget::__syncSurface()
 	{
 		__verifySurfaceSupport();
@@ -99,6 +172,12 @@ namespace Render
 		__createSwapchain(pOldSwapchain.get());
 		__enumerateSwapchainImages();
 		__createSwapchainImageViews();
+	}
+
+	void RenderTarget::__syncClearImageFramebuffers()
+	{
+		__clearImageFramebuffers.clear();
+		__createClearImageFramebuffers();
 	}
 
 	void RenderTarget::__verifySurfaceSupport()
@@ -274,7 +353,28 @@ namespace Render
 		}
 	}
 
-	uint32_t RenderTarget::__acquireNextSwapchainImage(
+	void RenderTarget::__createClearImageFramebuffers()
+	{
+		auto const &extent{ getExtent() };
+
+		for (auto const &pImageView : __swapchainImageViews)
+		{
+			VkFramebufferCreateInfo const createInfo
+			{
+				.sType				{ VkStructureType::VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO },
+				.renderPass			{ __pClearImageRenderPass->getHandle() },
+				.attachmentCount	{ 1U },
+				.pAttachments		{ &(pImageView->getHandle()) },
+				.width				{ extent.width },
+				.height				{ extent.height },
+				.layers				{ 1U }
+			};
+
+			__clearImageFramebuffers.emplace_back(std::make_unique<VK::Framebuffer>(__device, createInfo));
+		}
+	}
+
+	uint32_t RenderTarget::__acquireNextImage(
 		VK::Semaphore &imageAcqSemaphore)
 	{
 		uint32_t retVal{ };
@@ -295,7 +395,7 @@ namespace Render
 		return retVal;
 	}
 
-	void RenderTarget::__clearSwapchainImageOf(
+	void RenderTarget::__readySwapchainImage(
 		VK::CommandBuffer &commandBuffer,
 		uint32_t imageIndex)
 	{
