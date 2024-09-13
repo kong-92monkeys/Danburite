@@ -10,6 +10,7 @@
 #include "../Device/SemaphoreCirculator.h"
 #include "RenderTarget.h"
 #include "LayerResourcePool.h"
+#include <unordered_set>
 
 namespace Render
 {
@@ -45,10 +46,13 @@ namespace Render
 
 		std::unique_ptr<Dev::CommandBufferCirculator> __pPrimaryCmdBufferCirculator;
 		std::unique_ptr<Dev::FenceCirculator> __pSubmitFenceCirculator;
-		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcquireSemaphoreCirculator;
+		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pSubmitSemaphoreCirculator;
 
 		std::unique_ptr<LayerResourcePool> __pLayerResourcePool;
+
+		size_t __maxInFlightSubmissionCount{ 3U };
+		std::unordered_set<VK::Fence *> __inFlightFences;
 		
 		void __verifyPhysicalDeviceSupport();
 		void __resolveQueueFamilyIndex();
@@ -60,7 +64,15 @@ namespace Render
 		[[nodiscard]]
 		uint32_t __recordPrimaryCmdBuffer(
 			VK::CommandBuffer &cmdBuffer,
-			VK::Semaphore &imageAcquireSemaphore,
+			VK::Semaphore &imageAcqSemaphore,
 			RenderTarget &renderTarget);
+
+		void __submitPrimaryCmdBuffer(
+			VK::CommandBuffer &cmdBuffer,
+			VK::Semaphore &imageAcqSemaphore,
+			VK::Semaphore &submissonSemaphore);
+
+		[[nodiscard]]
+		VK::Fence &__getNextSubmissionFence() noexcept;
 	};
 }

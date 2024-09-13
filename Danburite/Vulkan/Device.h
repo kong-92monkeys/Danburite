@@ -104,6 +104,16 @@ namespace VK
 			VkFence fence,
 			VkAllocationCallbacks const *pAllocator);
 
+		VkResult vkWaitForFences(
+			uint32_t fenceCount,
+			VkFence const *pFences,
+			VkBool32 waitAll,
+			uint64_t timeout);
+
+		VkResult vkResetFences(
+			uint32_t fenceCount,
+			VkFence const *pFences);
+
 		VkResult vkCreateSemaphore(
 			VkSemaphoreCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,

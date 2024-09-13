@@ -61,11 +61,31 @@ namespace Render
 		VK::Semaphore &imageAcqSemaphore)
 	{
 		uint32_t const imageIdx{ __acquireNextImage(imageAcqSemaphore) };
-		__readySwapchainImage(commandBuffer, imageIdx);
+		__beginSwapchainImage(commandBuffer, imageIdx);
 
+		// TODO: draw layers
 
-
+		__endSwapchainImage(commandBuffer, imageIdx);
 		return imageIdx;
+	}
+
+	void RenderTarget::present(
+		VK::Semaphore &submissionSemaphore,
+		uint32_t const imageIndex)
+	{
+		const VkPresentInfoKHR presentInfo
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_PRESENT_INFO_KHR },
+			.waitSemaphoreCount		{ 1U },
+			.pWaitSemaphores		{ &(submissionSemaphore.getHandle()) },
+			.swapchainCount			{ 1U },
+			.pSwapchains			{ &(__pSwapchain->getHandle()) },
+			.pImageIndices			{ &imageIndex }
+		};
+
+		auto const result{ __que.vkQueuePresentKHR(&presentInfo) };
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Failed to present the swapchain image." };
 	}
 
 	void RenderTarget::__createSurface(
@@ -395,10 +415,67 @@ namespace Render
 		return retVal;
 	}
 
-	void RenderTarget::__readySwapchainImage(
+	void RenderTarget::__beginSwapchainImage(
 		VK::CommandBuffer &commandBuffer,
-		uint32_t imageIndex)
+		uint32_t const imageIndex)
 	{
-		auto &imageView{ *(__swapchainImageViews[imageIndex]) };
+		VkRenderPassBeginInfo renderPassBeginInfo{ };
+		renderPassBeginInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassBeginInfo.renderPass			= __pClearImageRenderPass->getHandle();
+		renderPassBeginInfo.framebuffer			= __clearImageFramebuffers[imageIndex]->getHandle();
+		renderPassBeginInfo.clearValueCount		= 1U;
+		renderPassBeginInfo.pClearValues		= reinterpret_cast<VkClearValue *>(&__backgroundColor);
+
+		auto &renderArea{ renderPassBeginInfo.renderArea };
+		renderArea.offset.x		= 0;
+		renderArea.offset.y		= 0;
+		renderArea.extent		= getExtent();
+
+		VkSubpassBeginInfo const subpassBeginInfo
+		{
+			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO },
+			.contents	{ VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE }
+		};
+
+		VkSubpassEndInfo const subpassEndInfo
+		{
+			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_END_INFO }
+		};
+
+		commandBuffer.vkCmdBeginRenderPass2(&renderPassBeginInfo, &subpassBeginInfo);
+		commandBuffer.vkCmdEndRenderPass2(&subpassEndInfo);
+	}
+
+	void RenderTarget::__endSwapchainImage(
+		VK::CommandBuffer &commandBuffer,
+		uint32_t const imageIndex)
+	{
+		const VkImageMemoryBarrier2 imageBarrier
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 },
+			.srcStageMask			{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.srcAccessMask			{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT },
+			.dstStageMask			{ VK_PIPELINE_STAGE_2_NONE },
+			.dstAccessMask			{ VK_ACCESS_2_NONE },
+			.oldLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+			.newLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR },
+			.image					{ __swapchainImages[imageIndex]->getHandle() },
+			.subresourceRange		{
+				.aspectMask			{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT },
+				.baseMipLevel		{ 0U },
+				.levelCount			{ 1U },
+				.baseArrayLayer		{ 0U },
+				.layerCount			{ 1U }
+			}
+		};
+
+		const VkDependencyInfo dependencyInfo
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_DEPENDENCY_INFO },
+			.imageMemoryBarrierCount	{ 1U },
+			.pImageMemoryBarriers		{ &imageBarrier }
+		};
+
+		commandBuffer.vkCmdPipelineBarrier2(&dependencyInfo);
 	}
 }

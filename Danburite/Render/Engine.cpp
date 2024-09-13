@@ -34,7 +34,7 @@ namespace Render
 		__pSubmitFenceCirculator = std::make_unique<Dev::FenceCirculator>(
 			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
-		__pImageAcquireSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
+		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, 30ULL);
 
 		__pSubmitSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
@@ -58,7 +58,7 @@ namespace Render
 		__pLayerResourcePool = nullptr;
 
 		__pSubmitSemaphoreCirculator = nullptr;
-		__pImageAcquireSemaphoreCirculator = nullptr;
+		__pImageAcqSemaphoreCirculator = nullptr;
 		__pSubmitFenceCirculator = nullptr;
 		__pPrimaryCmdBufferCirculator = nullptr;
 
@@ -85,8 +85,9 @@ namespace Render
 		if (!(renderTarget.isPresentable()))
 			return;
 
-		auto &cmdBuffer			{ __pPrimaryCmdBufferCirculator->getNext() };
-		auto &imageAcqSemaphore	{ __pImageAcquireSemaphoreCirculator->getNext() };
+		auto &cmdBuffer				{ __pPrimaryCmdBufferCirculator->getNext() };
+		auto &imageAcqSemaphore		{ __pImageAcqSemaphoreCirculator->getNext() };
+		auto &submissonSemaphore	{ __pSubmitSemaphoreCirculator->getNext() };
 
 		uint32_t const imageIndex
 		{
@@ -94,12 +95,10 @@ namespace Render
 				cmdBuffer, imageAcqSemaphore, renderTarget)
 		};
 
-		VkSemaphoreSubmitInfo const waitSemaphoreInfo
-		{
-			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO },
-			.semaphore	{ imageAcqSemaphore.getHandle() },
-			.stageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT }
-		};
+		__submitPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, submissonSemaphore);
+		__lazyDeleter.advance();
+
+		renderTarget.present(submissonSemaphore, imageIndex);
 	}
 
 	void Engine::__verifyPhysicalDeviceSupport()
@@ -282,5 +281,99 @@ namespace Render
 		cmdBuffer.vkEndCommandBuffer();
 
 		return imageIndex;
+	}
+
+	void Engine::__submitPrimaryCmdBuffer(
+		VK::CommandBuffer &cmdBuffer,
+		VK::Semaphore &imageAcqSemaphore,
+		VK::Semaphore &submissonSemaphore)
+	{
+		VkCommandBufferSubmitInfo const cmdBufferInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO },
+			.commandBuffer	{ cmdBuffer.getHandle() }
+		};
+
+		VkSemaphoreSubmitInfo const waitSemaphoreInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO },
+			.semaphore		{ imageAcqSemaphore.getHandle() },
+			.stageMask		{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT }
+		};
+
+		VkSemaphoreSubmitInfo const signalSemaphoreInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO },
+			.semaphore		{ submissonSemaphore.getHandle() },
+			.stageMask		{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT }
+		};
+
+		VkSubmitInfo2 const submitInfo
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SUBMIT_INFO_2 },
+			.waitSemaphoreInfoCount		{ 1U },
+			.pWaitSemaphoreInfos		{ &waitSemaphoreInfo },
+			.commandBufferInfoCount		{ 1U },
+			.pCommandBufferInfos		{ &cmdBufferInfo },
+			.signalSemaphoreInfoCount	{ 1U },
+			.pSignalSemaphoreInfos		{ &signalSemaphoreInfo }
+		};
+
+		auto &fence{ __getNextSubmissionFence() };
+		__pDevice->vkResetFences(1U, &(fence.getHandle()));
+
+		__pQueue->vkQueueSubmit2(1U, &submitInfo, fence.getHandle());
+	}
+
+	VK::Fence &Engine::__getNextSubmissionFence() noexcept
+	{
+		for (auto it{ __inFlightFences.begin() }; it != __inFlightFences.end(); ++it)
+		{
+			auto const pFence{ *it };
+
+			auto const result
+			{
+				__pDevice->vkWaitForFences(
+					1U, &(pFence->getHandle()), VK_FALSE, 0ULL)
+			};
+
+			if (result == VK_SUCCESS)
+			{
+				__inFlightFences.erase(it);
+				return *pFence;
+			}
+		}
+
+		if (__inFlightFences.size() < __maxInFlightSubmissionCount)
+		{
+			auto &nextFence{ __pSubmitFenceCirculator->getNext() };
+			__inFlightFences.emplace(&nextFence);
+			return nextFence;
+		}
+
+		VK::Fence *pRetVal{ };
+		while (!pRetVal)
+		{
+			for (auto it{ __inFlightFences.begin() }; it != __inFlightFences.end(); ++it)
+			{
+				const auto pFence{ *it };
+
+				auto const result
+				{
+					// 1ms
+					__pDevice->vkWaitForFences(
+						1U, &(pFence->getHandle()), VK_FALSE, 1'000'000ULL)
+				};
+
+				if (result == VK_SUCCESS)
+				{
+					__inFlightFences.erase(it);
+					pRetVal = pFence;
+					break;
+				}
+			}
+		}
+
+		return *pRetVal;
 	}
 }

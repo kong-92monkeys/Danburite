@@ -39,6 +39,10 @@ namespace Render
 			VK::CommandBuffer &commandBuffer,
 			VK::Semaphore &imageAcqSemaphore);
 
+		void present(
+			VK::Semaphore &submissionSemaphore,
+			uint32_t imageIndex);
+
 		[[nodiscard]]
 		constexpr glm::vec4 const &getBackgroundColor() const noexcept;
 
@@ -109,7 +113,11 @@ namespace Render
 		uint32_t __acquireNextImage(
 			VK::Semaphore &imageAcqSemaphore);
 
-		void __readySwapchainImage(
+		void __beginSwapchainImage(
+			VK::CommandBuffer &commandBuffer,
+			uint32_t imageIndex);
+
+		void __endSwapchainImage(
 			VK::CommandBuffer &commandBuffer,
 			uint32_t imageIndex);
 	};

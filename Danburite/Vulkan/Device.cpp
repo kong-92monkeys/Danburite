@@ -195,6 +195,24 @@ namespace VK
 			getHandle(), fence, pAllocator);
 	}
 
+	VkResult Device::vkWaitForFences(
+		uint32_t const fenceCount,
+		VkFence const *const pFences,
+		VkBool32 const waitAll,
+		uint64_t const timeout)
+	{
+		return __deviceProc.vkWaitForFences(
+			getHandle(), fenceCount, pFences, waitAll, timeout);
+	}
+
+	VkResult Device::vkResetFences(
+		uint32_t const fenceCount,
+		VkFence const *const pFences)
+	{
+		return __deviceProc.vkResetFences(
+			getHandle(), fenceCount, pFences);
+	}
+
 	VkResult Device::vkCreateSemaphore(
 		VkSemaphoreCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
