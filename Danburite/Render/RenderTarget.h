@@ -5,6 +5,8 @@
 #include "../Vulkan/Queue.h"
 #include "../Vulkan/Surface.h"
 #include "../Vulkan/Swapchain.h"
+#include "../Vulkan/Image.h"
+#include "../Vulkan/ImageView.h"
 #include <memory>
 
 namespace Render
@@ -37,7 +39,6 @@ namespace Render
 		VK::Queue &__que;
 
 		std::unique_ptr<VK::Surface> __pSurface;
-		std::unique_ptr<VK::Swapchain> __pSwapchain;
 
 		VkSurfacePresentModeEXT __presentModeInfo{ };
 		VkPhysicalDeviceSurfaceInfo2KHR __surfaceInfo{ };
@@ -46,6 +47,10 @@ namespace Render
 		VkSurfaceCapabilities2KHR __capabilities{ };
 		VkSurfaceFormatKHR __surfaceFormat{ };
 		VkCompositeAlphaFlagBitsKHR __compositeAlpha{ };
+
+		std::unique_ptr<VK::Swapchain> __pSwapchain;
+		std::vector<std::unique_ptr<VK::Image>> __swapchainImages;
+		std::vector<std::unique_ptr<VK::ImageView>> __swapchainImageViews;
 
 		void __createSurface(
 			HINSTANCE hinstance,
@@ -62,6 +67,9 @@ namespace Render
 
 		void __createSwapchain(
 			VK::Swapchain *pOldSwapchain);
+
+		void __enumerateSwapchainImages();
+		void __createSwapchainImageViews();
 	};
 
 	constexpr VkExtent2D const &RenderTarget::getExtent() const noexcept

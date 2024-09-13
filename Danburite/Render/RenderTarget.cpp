@@ -1,5 +1,6 @@
 #include "RenderTarget.h"
 #include <stdexcept>
+#include <algorithm>
 
 namespace Render
 {
@@ -22,6 +23,9 @@ namespace Render
 	RenderTarget::~RenderTarget() noexcept
 	{
 		__que.vkQueueWaitIdle();
+
+		__swapchainImageViews.clear();
+		__swapchainImages.clear();
 
 		__pSwapchain = nullptr;
 		__pSurface = nullptr;
@@ -65,12 +69,17 @@ namespace Render
 
 	void RenderTarget::__syncSwapchain()
 	{
+		__swapchainImageViews.clear();
+		__swapchainImages.clear();
+
 		auto pOldSwapchain{ std::move(__pSwapchain) };
 
 		if (!(isPresentable()))
 			return;
 
 		__createSwapchain(pOldSwapchain.get());
+		__enumerateSwapchainImages();
+		__createSwapchainImageViews();
 	}
 
 	void RenderTarget::__verifySurfaceSupport()
@@ -169,13 +178,14 @@ namespace Render
 	void RenderTarget::__createSwapchain(
 		VK::Swapchain *const pOldSwapchain)
 	{
-		auto const &capabilities{ __capabilities.surfaceCapabilities };
+		auto const &capabilities	{ __capabilities.surfaceCapabilities };
+		auto const minImageCount	{ std::clamp(3U, capabilities.minImageCount, capabilities.maxImageCount)};
 
 		VkSwapchainCreateInfoKHR const createInfo
 		{
 			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR },
 			.surface				{ __pSurface->getHandle() },
-			.minImageCount			{ capabilities.minImageCount },
+			.minImageCount			{ minImageCount },
 			.imageFormat			{ __surfaceFormat.format },
 			.imageColorSpace		{ __surfaceFormat.colorSpace },
 			.imageExtent			{ capabilities.currentExtent },
@@ -190,5 +200,58 @@ namespace Render
 		};
 
 		__pSwapchain = std::make_unique<VK::Swapchain>(__device, createInfo);
+	}
+
+	void RenderTarget::__enumerateSwapchainImages()
+	{
+		uint32_t imageCount{ };
+		__device.vkGetSwapchainImagesKHR(__pSwapchain->getHandle(), &imageCount, nullptr);
+
+		if (!imageCount)
+			throw std::runtime_error{ "No swapchain images are detected." };
+
+		std::vector<VkImage> imageHandles;
+		imageHandles.resize(imageCount);
+
+		__device.vkGetSwapchainImagesKHR(__pSwapchain->getHandle(), &imageCount, imageHandles.data());
+
+		for (auto const handle : imageHandles)
+			__swapchainImages.emplace_back(std::make_unique<VK::Image>(handle, __surfaceFormat.format));
+	}
+
+	void RenderTarget::__createSwapchainImageViews()
+	{
+		for (auto const &pImage : __swapchainImages)
+		{
+			VkImageViewUsageCreateInfo const usageInfo
+			{
+				.sType	{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO },
+				.usage	{ VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT }
+			};
+
+			VkImageViewCreateInfo const createInfo
+			{
+				.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO },
+				.pNext					{ &usageInfo },
+				.image					{ pImage->getHandle() },
+				.viewType				{ VkImageViewType::VK_IMAGE_VIEW_TYPE_2D },
+				.format					{ __surfaceFormat.format },
+				.components				{
+					.r					{ VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY },
+					.g					{ VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY },
+					.b					{ VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY },
+					.a					{ VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY }
+				},
+				.subresourceRange		{
+					.aspectMask			{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT },
+					.baseMipLevel		{ 0U },
+					.levelCount			{ 1U },
+					.baseArrayLayer		{ 0U },
+					.layerCount			{ 1U }
+				}
+			};
+
+			__swapchainImageViews.emplace_back(std::make_unique<VK::ImageView>(__device, createInfo));
+		}
 	}
 }
