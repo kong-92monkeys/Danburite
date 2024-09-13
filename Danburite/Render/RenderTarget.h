@@ -114,11 +114,11 @@ namespace Render
 			VK::Semaphore &imageAcqSemaphore);
 
 		void __beginSwapchainImage(
-			VK::CommandBuffer &commandBuffer,
+			VK::CommandBuffer &cmdBuffer,
 			uint32_t imageIndex);
 
 		void __endSwapchainImage(
-			VK::CommandBuffer &commandBuffer,
+			VK::CommandBuffer &cmdBuffer,
 			uint32_t imageIndex);
 	};
 

@@ -72,6 +72,8 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		Infra::EventListener<Render::RenderTarget const *>::bind(
 			&CMainView::__onRenderTargetRedrawNeeded, this);
 
+	__pRenderTarget->setBackgroundColor(glm::vec4{ 0.01f, 0.015f, 0.015f, 1.0f });
+
 	return 0;
 }
 

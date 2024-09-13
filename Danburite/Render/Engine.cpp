@@ -31,13 +31,13 @@ namespace Render
 			*__pDevice, __queueFamilyIndex,
 			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
 
-		__pSubmitFenceCirculator = std::make_unique<Dev::FenceCirculator>(
+		__pSubmissionFenceCirculator = std::make_unique<Dev::FenceCirculator>(
 			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
 		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, 30ULL);
 
-		__pSubmitSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
+		__pSubmissionSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
@@ -57,9 +57,9 @@ namespace Render
 
 		__pLayerResourcePool = nullptr;
 
-		__pSubmitSemaphoreCirculator = nullptr;
+		__pSubmissionSemaphoreCirculator = nullptr;
 		__pImageAcqSemaphoreCirculator = nullptr;
-		__pSubmitFenceCirculator = nullptr;
+		__pSubmissionFenceCirculator = nullptr;
 		__pPrimaryCmdBufferCirculator = nullptr;
 
 		__pMemoryAllocator = nullptr;
@@ -87,15 +87,11 @@ namespace Render
 
 		auto &cmdBuffer				{ __pPrimaryCmdBufferCirculator->getNext() };
 		auto &imageAcqSemaphore		{ __pImageAcqSemaphoreCirculator->getNext() };
-		auto &submissonSemaphore	{ __pSubmitSemaphoreCirculator->getNext() };
+		auto &submissonSemaphore	{ __pSubmissionSemaphoreCirculator->getNext() };
 
-		uint32_t const imageIndex
-		{
-			__recordPrimaryCmdBuffer(
-				cmdBuffer, imageAcqSemaphore, renderTarget)
-		};
-
+		uint32_t const imageIndex{ __recordPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, renderTarget) };
 		__submitPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, submissonSemaphore);
+
 		__lazyDeleter.advance();
 
 		renderTarget.present(submissonSemaphore, imageIndex);
@@ -274,8 +270,7 @@ namespace Render
 
 		cmdBuffer.vkBeginCommandBuffer(&cbBeginInfo);
 
-		// __commandExecutor.execute(commandBuffer);
-
+		 __commandExecutor.execute(cmdBuffer);
 		uint32_t const imageIndex{ renderTarget.draw(cmdBuffer, imageAcqSemaphore) };
 
 		cmdBuffer.vkEndCommandBuffer();
@@ -346,7 +341,7 @@ namespace Render
 
 		if (__inFlightFences.size() < __maxInFlightSubmissionCount)
 		{
-			auto &nextFence{ __pSubmitFenceCirculator->getNext() };
+			auto &nextFence{ __pSubmissionFenceCirculator->getNext() };
 			__inFlightFences.emplace(&nextFence);
 			return nextFence;
 		}

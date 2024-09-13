@@ -416,7 +416,7 @@ namespace Render
 	}
 
 	void RenderTarget::__beginSwapchainImage(
-		VK::CommandBuffer &commandBuffer,
+		VK::CommandBuffer &cmdBuffer,
 		uint32_t const imageIndex)
 	{
 		VkRenderPassBeginInfo renderPassBeginInfo{ };
@@ -442,12 +442,12 @@ namespace Render
 			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_END_INFO }
 		};
 
-		commandBuffer.vkCmdBeginRenderPass2(&renderPassBeginInfo, &subpassBeginInfo);
-		commandBuffer.vkCmdEndRenderPass2(&subpassEndInfo);
+		cmdBuffer.vkCmdBeginRenderPass2(&renderPassBeginInfo, &subpassBeginInfo);
+		cmdBuffer.vkCmdEndRenderPass2(&subpassEndInfo);
 	}
 
 	void RenderTarget::__endSwapchainImage(
-		VK::CommandBuffer &commandBuffer,
+		VK::CommandBuffer &cmdBuffer,
 		uint32_t const imageIndex)
 	{
 		const VkImageMemoryBarrier2 imageBarrier
@@ -476,6 +476,6 @@ namespace Render
 			.pImageMemoryBarriers		{ &imageBarrier }
 		};
 
-		commandBuffer.vkCmdPipelineBarrier2(&dependencyInfo);
+		cmdBuffer.vkCmdPipelineBarrier2(&dependencyInfo);
 	}
 }

@@ -31,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandBufferCirculator.cpp" />
+    <ClCompile Include="CommandExecutor.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="FenceCirculator.cpp" />
     <ClCompile Include="MemoryAllocator.cpp" />
@@ -42,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommandBufferCirculator.h" />
+    <ClInclude Include="CommandExecutor.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
     <ClInclude Include="FenceCirculator.h" />
