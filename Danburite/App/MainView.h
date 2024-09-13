@@ -34,6 +34,8 @@ public:
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnDestroy();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg BOOL OnEraseBkgnd(CDC *pDC);
 
 protected:
 	afx_msg void OnPaint();
@@ -41,8 +43,9 @@ protected:
 
 private:
 	std::unique_ptr<Render::RenderTarget> __pRenderTarget;
-public:
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg BOOL OnEraseBkgnd(CDC *pDC);
+
+	Infra::EventListenerPtr<Render::RenderTarget const *> __pRenderTargetNeedRedrawListener;
+
+	void __onRenderTargetRedrawNeeded() noexcept;
 };
 

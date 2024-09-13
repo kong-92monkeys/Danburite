@@ -27,16 +27,18 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
-		__pCommandBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
+		__pPrimaryCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
 			*__pDevice, __queueFamilyIndex,
 			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
 
 		__pSubmitFenceCirculator = std::make_unique<Dev::FenceCirculator>(
 			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
+		__pImageAcquireSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
+			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, 30ULL);
+
 		__pSubmitSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
-			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY,
-			Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
+			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
 			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
@@ -56,8 +58,9 @@ namespace Render
 		__pLayerResourcePool = nullptr;
 
 		__pSubmitSemaphoreCirculator = nullptr;
+		__pImageAcquireSemaphoreCirculator = nullptr;
 		__pSubmitFenceCirculator = nullptr;
-		__pCommandBufferCirculator = nullptr;
+		__pPrimaryCmdBufferCirculator = nullptr;
 
 		__pMemoryAllocator = nullptr;
 		__pRenderTargetDescSetLayout = nullptr;
@@ -74,6 +77,29 @@ namespace Render
 		return std::make_unique<RenderTarget>(
 			__context.getInstance(), __physicalDevice,
 			*__pDevice, *__pQueue, hinstance, hwnd);
+	}
+
+	void Engine::render(
+		RenderTarget &renderTarget)
+	{
+		if (!(renderTarget.isPresentable()))
+			return;
+
+		auto &cmdBuffer			{ __pPrimaryCmdBufferCirculator->getNext() };
+		auto &imageAcqSemaphore	{ __pImageAcquireSemaphoreCirculator->getNext() };
+
+		uint32_t const imageIndex
+		{
+			__recordPrimaryCmdBuffer(
+				cmdBuffer, imageAcqSemaphore, renderTarget)
+		};
+
+		VkSemaphoreSubmitInfo const waitSemaphoreInfo
+		{
+			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO },
+			.semaphore	{ imageAcqSemaphore.getHandle() },
+			.stageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT }
+		};
 	}
 
 	void Engine::__verifyPhysicalDeviceSupport()
@@ -236,5 +262,27 @@ namespace Render
 		};
 
 		__pRenderTargetDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
+	}
+
+	uint32_t Engine::__recordPrimaryCmdBuffer(
+		VK::CommandBuffer &cmdBuffer,
+		VK::Semaphore &imageAcqSemaphore,
+		RenderTarget &renderTarget)
+	{
+		VkCommandBufferBeginInfo const cbBeginInfo
+		{
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+			.flags	{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
+		};
+
+		cmdBuffer.vkBeginCommandBuffer(&cbBeginInfo);
+
+		// __commandExecutor.execute(commandBuffer);
+
+		uint32_t const imageIndex{ renderTarget.draw(cmdBuffer, imageAcqSemaphore) };
+
+		cmdBuffer.vkEndCommandBuffer();
+
+		return imageIndex;
 	}
 }

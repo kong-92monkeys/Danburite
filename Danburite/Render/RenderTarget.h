@@ -2,11 +2,14 @@
 
 #include <Windows.h>
 #include "../Infra/GLM.h"
+#include "../Infra/Event.h"
 #include "../Vulkan/Queue.h"
 #include "../Vulkan/Surface.h"
 #include "../Vulkan/Swapchain.h"
 #include "../Vulkan/Image.h"
 #include "../Vulkan/ImageView.h"
+#include "../Vulkan/CommandBuffer.h"
+#include "../Vulkan/Semaphore.h"
 #include <memory>
 
 namespace Render
@@ -24,13 +27,30 @@ namespace Render
 
 		virtual ~RenderTarget() noexcept override;
 
+		void sync();
+
+		void setBackgroundColor(
+			glm::vec4 const &color) noexcept;
+
+		[[nodiscard]]
+		uint32_t draw(
+			VK::CommandBuffer &commandBuffer,
+			VK::Semaphore &imageAcquireSemaphore);
+
+		[[nodiscard]]
+		constexpr glm::vec4 const &getBackgroundColor() const noexcept;
+
 		[[nodiscard]]
 		constexpr VkExtent2D const &getExtent() const noexcept;
 
 		[[nodiscard]]
 		constexpr bool isPresentable() const noexcept;
 
-		void sync();
+		[[nodiscard]]
+		constexpr uint32_t getSwapchainImageCount() const noexcept;
+
+		[[nodiscard]]
+		constexpr Infra::Event<RenderTarget const *> &getNeedRedrawEvent() const noexcept;
 
 	private:
 		VK::Instance &__instance;
@@ -52,6 +72,10 @@ namespace Render
 		std::vector<std::unique_ptr<VK::Image>> __swapchainImages;
 		std::vector<std::unique_ptr<VK::ImageView>> __swapchainImageViews;
 
+		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
+
+		mutable Infra::Event<RenderTarget const *> __needRedrawEvent;
+
 		void __createSurface(
 			HINSTANCE hinstance,
 			HWND hwnd);
@@ -70,7 +94,20 @@ namespace Render
 
 		void __enumerateSwapchainImages();
 		void __createSwapchainImageViews();
+
+		[[nodiscard]]
+		uint32_t __acquireNextSwapchainImage(
+			VK::Semaphore &imageAcqSemaphore);
+
+		void __clearSwapchainImageOf(
+			VK::CommandBuffer &commandBuffer,
+			uint32_t imageIndex);
 	};
+
+	constexpr glm::vec4 const &RenderTarget::getBackgroundColor() const noexcept
+	{
+		return __backgroundColor;
+	}
 
 	constexpr VkExtent2D const &RenderTarget::getExtent() const noexcept
 	{
@@ -81,5 +118,15 @@ namespace Render
 	{
 		auto const &extent{ getExtent() };
 		return (extent.width && extent.height);
+	}
+
+	constexpr uint32_t RenderTarget::getSwapchainImageCount() const noexcept
+	{
+		return static_cast<uint32_t>(__swapchainImages.size());
+	}
+
+	constexpr Infra::Event<RenderTarget const *> &RenderTarget::getNeedRedrawEvent() const noexcept
+	{
+		return __needRedrawEvent;
 	}
 }

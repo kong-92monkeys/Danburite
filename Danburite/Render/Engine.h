@@ -27,6 +27,9 @@ namespace Render
 			HINSTANCE hinstance,
 			HWND hwnd);
 
+		void render(
+			RenderTarget &renderTarget);
+
 	private:
 		Dev::Context &__context;
 		VK::PhysicalDevice &__physicalDevice;
@@ -40,8 +43,9 @@ namespace Render
 		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
 
-		std::unique_ptr<Dev::CommandBufferCirculator> __pCommandBufferCirculator;
+		std::unique_ptr<Dev::CommandBufferCirculator> __pPrimaryCmdBufferCirculator;
 		std::unique_ptr<Dev::FenceCirculator> __pSubmitFenceCirculator;
+		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcquireSemaphoreCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pSubmitSemaphoreCirculator;
 
 		std::unique_ptr<LayerResourcePool> __pLayerResourcePool;
@@ -52,5 +56,11 @@ namespace Render
 		void __retrieveQueue();
 		void __createPipelineCache();
 		void __createRenderTargetDescSetLayout();
+
+		[[nodiscard]]
+		uint32_t __recordPrimaryCmdBuffer(
+			VK::CommandBuffer &cmdBuffer,
+			VK::Semaphore &imageAcquireSemaphore,
+			RenderTarget &renderTarget);
 	};
 }

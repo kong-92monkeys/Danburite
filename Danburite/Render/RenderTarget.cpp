@@ -38,6 +38,25 @@ namespace Render
 		__syncSwapchain();
 	}
 
+	void RenderTarget::setBackgroundColor(
+		glm::vec4 const &color) noexcept
+	{
+		__backgroundColor = color;
+		__needRedrawEvent.invoke(this);
+	}
+
+	uint32_t RenderTarget::draw(
+		VK::CommandBuffer &commandBuffer,
+		VK::Semaphore &imageAcqSemaphore)
+	{
+		uint32_t const imageIdx{ __acquireNextSwapchainImage(imageAcqSemaphore) };
+		__clearSwapchainImageOf(commandBuffer, imageIdx);
+
+
+
+		return imageIdx;
+	}
+
 	void RenderTarget::__createSurface(
 		HINSTANCE const hinstance,
 		HWND const hwnd)
@@ -253,5 +272,33 @@ namespace Render
 
 			__swapchainImageViews.emplace_back(std::make_unique<VK::ImageView>(__device, createInfo));
 		}
+	}
+
+	uint32_t RenderTarget::__acquireNextSwapchainImage(
+		VK::Semaphore &imageAcqSemaphore)
+	{
+		uint32_t retVal{ };
+
+		VkAcquireNextImageInfoKHR const imageAcqInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHR },
+			.swapchain		{ __pSwapchain->getHandle() },
+			.timeout		{ std::numeric_limits<uint64_t>::max() },
+			.semaphore		{ imageAcqSemaphore.getHandle() },
+			.deviceMask		{ 1U }
+		};
+
+		auto const result{ __device.vkAcquireNextImage2KHR(&imageAcqInfo, &retVal) };
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Failed to acquire the swapchain image." };
+
+		return retVal;
+	}
+
+	void RenderTarget::__clearSwapchainImageOf(
+		VK::CommandBuffer &commandBuffer,
+		uint32_t imageIndex)
+	{
+		auto &imageView{ *(__swapchainImageViews[imageIndex]) };
 	}
 }
