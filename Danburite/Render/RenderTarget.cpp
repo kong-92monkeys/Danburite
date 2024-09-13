@@ -23,6 +23,7 @@ namespace Render
 	{
 		__que.vkQueueWaitIdle();
 
+		__pSwapchain = nullptr;
 		__pSurface = nullptr;
 	}
 
@@ -30,6 +31,7 @@ namespace Render
 	{
 		__que.vkQueueWaitIdle();
 		__syncSurface();
+		__syncSwapchain();
 	}
 
 	void RenderTarget::__createSurface(
@@ -61,6 +63,16 @@ namespace Render
 		__resolveCompositeAlpha();
 	}
 
+	void RenderTarget::__syncSwapchain()
+	{
+		auto pOldSwapchain{ std::move(__pSwapchain) };
+
+		if (!(isPresentable()))
+			return;
+
+		__createSwapchain(pOldSwapchain.get());
+	}
+
 	void RenderTarget::__verifySurfaceSupport()
 	{
 		VkBool32 supported{ };
@@ -73,8 +85,6 @@ namespace Render
 
 	void RenderTarget::__resolvePresentMode() noexcept
 	{
-		auto &presentMode{ __presentModeInfo.presentMode };
-
 		uint32_t presentModeCount{ };
 		__physicalDevice.vkGetPhysicalDeviceSurfacePresentModesKHR(
 			__pSurface->getHandle(), &presentModeCount, nullptr);
@@ -85,15 +95,17 @@ namespace Render
 		__physicalDevice.vkGetPhysicalDeviceSurfacePresentModesKHR(
 			__pSurface->getHandle(), &presentModeCount, supportedModes.data());
 
-		presentMode = VkPresentModeKHR::VK_PRESENT_MODE_FIFO_KHR;
+		__presentMode = VkPresentModeKHR::VK_PRESENT_MODE_FIFO_KHR;
 		for (const auto mode : supportedModes)
 		{
 			if (mode != VkPresentModeKHR::VK_PRESENT_MODE_MAILBOX_KHR)
 				continue;
 
-			presentMode = VkPresentModeKHR::VK_PRESENT_MODE_MAILBOX_KHR;
+			__presentMode = VkPresentModeKHR::VK_PRESENT_MODE_MAILBOX_KHR;
 			break;
 		}
+
+		__presentModeInfo.presentMode = __presentMode;
 	}
 
 	void RenderTarget::__resolveCapabilities()
@@ -152,5 +164,31 @@ namespace Render
 				return;
 			}
 		}
+	}
+
+	void RenderTarget::__createSwapchain(
+		VK::Swapchain *const pOldSwapchain)
+	{
+		auto const &capabilities{ __capabilities.surfaceCapabilities };
+
+		VkSwapchainCreateInfoKHR const createInfo
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR },
+			.surface				{ __pSurface->getHandle() },
+			.minImageCount			{ capabilities.minImageCount },
+			.imageFormat			{ __surfaceFormat.format },
+			.imageColorSpace		{ __surfaceFormat.colorSpace },
+			.imageExtent			{ capabilities.currentExtent },
+			.imageArrayLayers		{ 1U },
+			.imageUsage				{ VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT },
+			.imageSharingMode		{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE },
+			.preTransform			{ capabilities.currentTransform },
+			.compositeAlpha			{ __compositeAlpha },
+			.presentMode			{ __presentMode },
+			.clipped				{ VK_TRUE },
+			.oldSwapchain			{ pOldSwapchain ? pOldSwapchain->getHandle() : VK_NULL_HANDLE }
+		};
+
+		__pSwapchain = std::make_unique<VK::Swapchain>(__device, createInfo);
 	}
 }

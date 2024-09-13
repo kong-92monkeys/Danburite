@@ -4,6 +4,7 @@
 #include "../Infra/GLM.h"
 #include "../Vulkan/Queue.h"
 #include "../Vulkan/Surface.h"
+#include "../Vulkan/Swapchain.h"
 #include <memory>
 
 namespace Render
@@ -21,6 +22,12 @@ namespace Render
 
 		virtual ~RenderTarget() noexcept override;
 
+		[[nodiscard]]
+		constexpr VkExtent2D const &getExtent() const noexcept;
+
+		[[nodiscard]]
+		constexpr bool isPresentable() const noexcept;
+
 		void sync();
 
 	private:
@@ -30,10 +37,12 @@ namespace Render
 		VK::Queue &__que;
 
 		std::unique_ptr<VK::Surface> __pSurface;
+		std::unique_ptr<VK::Swapchain> __pSwapchain;
 
 		VkSurfacePresentModeEXT __presentModeInfo{ };
 		VkPhysicalDeviceSurfaceInfo2KHR __surfaceInfo{ };
 
+		VkPresentModeKHR __presentMode{ };
 		VkSurfaceCapabilities2KHR __capabilities{ };
 		VkSurfaceFormatKHR __surfaceFormat{ };
 		VkCompositeAlphaFlagBitsKHR __compositeAlpha{ };
@@ -43,11 +52,26 @@ namespace Render
 			HWND hwnd);
 
 		void __syncSurface();
+		void __syncSwapchain();
 
 		void __verifySurfaceSupport();
 		void __resolvePresentMode() noexcept;
 		void __resolveCapabilities();
 		void __resolveSurfaceFormat();
 		void __resolveCompositeAlpha() noexcept;
+
+		void __createSwapchain(
+			VK::Swapchain *pOldSwapchain);
 	};
+
+	constexpr VkExtent2D const &RenderTarget::getExtent() const noexcept
+	{
+		return __capabilities.surfaceCapabilities.currentExtent;
+	}
+
+	constexpr bool RenderTarget::isPresentable() const noexcept
+	{
+		auto const &extent{ getExtent() };
+		return (extent.width && extent.height);
+	}
 }
