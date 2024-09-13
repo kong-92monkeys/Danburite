@@ -30,11 +30,24 @@ namespace Render
 		VK::Queue &__que;
 
 		std::unique_ptr<VK::Surface> __pSurface;
-		
+
+		VkSurfacePresentModeEXT __presentModeInfo{ };
+		VkPhysicalDeviceSurfaceInfo2KHR __surfaceInfo{ };
+
+		VkSurfaceCapabilities2KHR __capabilities{ };
+		VkSurfaceFormatKHR __surfaceFormat{ };
+		VkCompositeAlphaFlagBitsKHR __compositeAlpha{ };
+
 		void __createSurface(
 			HINSTANCE hinstance,
 			HWND hwnd);
 
+		void __syncSurface();
+
 		void __verifySurfaceSupport();
+		void __resolvePresentMode() noexcept;
+		void __resolveCapabilities();
+		void __resolveSurfaceFormat();
+		void __resolveCompositeAlpha() noexcept;
 	};
 }
