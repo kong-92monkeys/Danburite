@@ -7,13 +7,13 @@
 
 namespace Infra
 {
-	class LazyDeleter : public Unique
+	class DeferredDeleter : public Unique
 	{
 	public:
-		explicit LazyDeleter(
+		explicit DeferredDeleter(
 			size_t queueSize) noexcept;
 
-		virtual ~LazyDeleter() noexcept override;
+		virtual ~DeferredDeleter() noexcept override;
 
 		[[nodiscard]]
 		size_t getQueueSize() const noexcept;
@@ -32,7 +32,7 @@ namespace Infra
 	};
 
 	template <typename $T>
-	void LazyDeleter::reserve($T &&garbage) noexcept
+	void DeferredDeleter::reserve($T &&garbage) noexcept
 	{
 		__garbageQueue.back().emplace_back(std::forward<$T>(garbage));
 	}

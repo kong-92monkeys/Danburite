@@ -4,11 +4,11 @@ namespace Render
 {
 	LayerResourcePool::LayerResourcePool(
 		VK::Device &device,
-		Infra::LazyDeleter &lazyDeleter,
+		Infra::DeferredDeleter &deferredDeleter,
 		Dev::MemoryAllocator &memoryAllocator) noexcept :
 		__device					{ device },
 		__memoryAllocator			{ memoryAllocator },
-		__storageBufferRecycler		{ lazyDeleter }
+		__storageBufferRecycler		{ deferredDeleter }
 	{}
 
 	std::shared_ptr<Dev::MemoryBuffer> LayerResourcePool::getStorageBuffer(

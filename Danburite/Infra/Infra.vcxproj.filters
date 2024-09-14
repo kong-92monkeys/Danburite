@@ -31,12 +31,6 @@
     <Filter Include="IdAllocator">
       <UniqueIdentifier>{ba6912c4-1bda-4e48-be9e-4984686c2508}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LazyDeleter">
-      <UniqueIdentifier>{5459cab2-d945-48d4-bff6-85b01842e233}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LazyRecycler">
-      <UniqueIdentifier>{54e92255-4f63-4f43-a8cc-a9e83a8bf12c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="RegionAllocator">
       <UniqueIdentifier>{236be5cf-d4f0-48f7-9629-b88fc1b443d0}</UniqueIdentifier>
     </Filter>
@@ -51,6 +45,12 @@
     </Filter>
     <Filter Include="Utils">
       <UniqueIdentifier>{f44a2425-9d22-4ac8-a03c-8aff7278bc3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DeferredRecycler">
+      <UniqueIdentifier>{54e92255-4f63-4f43-a8cc-a9e83a8bf12c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DeferredDeleter">
+      <UniqueIdentifier>{5459cab2-d945-48d4-bff6-85b01842e233}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -81,11 +81,11 @@
     <ClInclude Include="IdAllocator.h">
       <Filter>IdAllocator</Filter>
     </ClInclude>
-    <ClInclude Include="LazyDeleter.h">
-      <Filter>LazyDeleter</Filter>
+    <ClInclude Include="DeferredDeleter.h">
+      <Filter>DeferredDeleter</Filter>
     </ClInclude>
-    <ClInclude Include="LazyRecycler.h">
-      <Filter>LazyRecycler</Filter>
+    <ClInclude Include="DeferredRecycler.h">
+      <Filter>DeferredRecycler</Filter>
     </ClInclude>
     <ClInclude Include="MathUtil.h">
       <Filter>Utils</Filter>
@@ -119,8 +119,8 @@
     <ClCompile Include="GenericBuffer.cpp">
       <Filter>GenericBuffer</Filter>
     </ClCompile>
-    <ClCompile Include="LazyDeleter.cpp">
-      <Filter>LazyDeleter</Filter>
+    <ClCompile Include="DeferredDeleter.cpp">
+      <Filter>DeferredDeleter</Filter>
     </ClCompile>
     <ClCompile Include="RegionAllocator.cpp">
       <Filter>RegionAllocator</Filter>

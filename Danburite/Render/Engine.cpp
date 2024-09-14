@@ -41,7 +41,7 @@ namespace Render
 			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
 
 		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
-			*__pDevice, __lazyDeleter, *__pMemoryAllocator);
+			*__pDevice, __deferredDeleter, *__pMemoryAllocator);
 
 		/*
 			TODO: Renderer dependent resources
@@ -52,7 +52,7 @@ namespace Render
 
 	Engine::~Engine() noexcept
 	{
-		__lazyDeleter.flush();
+		__deferredDeleter.flush();
 		__pDevice->vkDeviceWaitIdle();
 
 		__pLayerResourcePool = nullptr;
@@ -92,7 +92,7 @@ namespace Render
 		uint32_t const imageIndex{ __recordPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, renderTarget) };
 		__submitPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, submissonSemaphore);
 
-		__lazyDeleter.advance();
+		__deferredDeleter.advance();
 
 		renderTarget.present(submissonSemaphore, imageIndex);
 	}

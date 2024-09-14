@@ -36,7 +36,7 @@ namespace Render
 		Dev::Context &__context;
 		VK::PhysicalDevice &__physicalDevice;
 
-		Infra::LazyDeleter __lazyDeleter{ 5ULL };
+		Infra::DeferredDeleter __deferredDeleter{ 5ULL };
 		Dev::CommandExecutor __commandExecutor;
 
 		uint32_t __queueFamilyIndex{ };

@@ -13,6 +13,9 @@
     <Filter Include="RenderTarget">
       <UniqueIdentifier>{1515f0b2-6a93-41ff-a43a-6b78ed89692a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{872b6c72-d46f-48a3-93ee-3042a2a8941c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -26,6 +29,9 @@
     </ClInclude>
     <ClInclude Include="RenderTarget.h">
       <Filter>RenderTarget</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

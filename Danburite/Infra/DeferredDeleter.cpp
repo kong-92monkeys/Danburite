@@ -1,24 +1,24 @@
-#include "LazyDeleter.h"
+#include "DeferredDeleter.h"
 
 namespace Infra
 {
-	LazyDeleter::LazyDeleter(
+	DeferredDeleter::DeferredDeleter(
 		size_t const queueSize) noexcept
 	{
 		__garbageQueue.resize(queueSize);
 	}
 
-	LazyDeleter::~LazyDeleter() noexcept
+	DeferredDeleter::~DeferredDeleter() noexcept
 	{
 		flush();
 	}
 
-	size_t LazyDeleter::getQueueSize() const noexcept
+	size_t DeferredDeleter::getQueueSize() const noexcept
 	{
 		return __garbageQueue.size();
 	}
 
-	void LazyDeleter::setQueueSize(
+	void DeferredDeleter::setQueueSize(
 		size_t const size)
 	{
 		size_t const oldSize{ getQueueSize() };
@@ -31,7 +31,7 @@ namespace Infra
 		__garbageQueue.resize(size);
 	}
 
-	void LazyDeleter::advance()
+	void DeferredDeleter::advance()
 	{
 		auto holder{ std::move(__garbageQueue.front()) };
 		holder.clear();
@@ -40,7 +40,7 @@ namespace Infra
 		__garbageQueue.emplace_back(std::move(holder));
 	}
 
-	void LazyDeleter::flush()
+	void DeferredDeleter::flush()
 	{
 		for (auto &holder : __garbageQueue)
 			holder.clear();

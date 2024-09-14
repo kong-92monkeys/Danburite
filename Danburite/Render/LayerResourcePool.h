@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/LazyRecycler.h"
+#include "../Infra/DeferredRecycler.h"
 #include "../Device/MemoryBuffer.h"
 
 namespace Render
@@ -10,7 +10,7 @@ namespace Render
 	public:
 		LayerResourcePool(
 			VK::Device &device,
-			Infra::LazyDeleter &lazyDeleter,
+			Infra::DeferredDeleter &deferredDeleter,
 			Dev::MemoryAllocator &memoryAllocator) noexcept;
 
 		virtual ~LayerResourcePool() noexcept override = default;
@@ -25,6 +25,6 @@ namespace Render
 	private:
 		VK::Device &__device;
 		Dev::MemoryAllocator &__memoryAllocator;
-		Infra::LazyRecycler<Dev::MemoryBuffer> __storageBufferRecycler;
+		Infra::DeferredRecycler<Dev::MemoryBuffer> __storageBufferRecycler;
 	};
 }

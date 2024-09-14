@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Unique.h"
-#include "LazyDeleter.h"
+#include "DeferredDeleter.h"
 #include <memory>
 #include <deque>
 #include <functional>
@@ -9,11 +9,11 @@
 namespace Infra
 {
 	template <typename $T>
-	class LazyRecycler : public Unique
+	class DeferredRecycler : public Unique
 	{
 	public:
-		explicit LazyRecycler(
-			LazyDeleter &deleter) noexcept;
+		explicit DeferredRecycler(
+			DeferredDeleter &deleter) noexcept;
 
 		[[nodiscard]]
 		std::shared_ptr<$T> retrieve() noexcept;
@@ -45,20 +45,20 @@ namespace Infra
 			std::shared_ptr<$T> __pResource;
 		};
 
-		LazyDeleter &__deleter;
+		DeferredDeleter &__deleter;
 		std::shared_ptr<__ResourceContainer> __pResourceContainer;
 	};
 
 	template <typename $T>
-	LazyRecycler<$T>::LazyRecycler(
-		LazyDeleter &deleter) noexcept :
+	DeferredRecycler<$T>::DeferredRecycler(
+		DeferredDeleter &deleter) noexcept :
 		__deleter	{ deleter }
 	{
 		__pResourceContainer = std::make_shared<std::deque<std::shared_ptr<$T>>>();
 	}
 
 	template <typename $T>
-	std::shared_ptr<$T> LazyRecycler<$T>::retrieve() noexcept
+	std::shared_ptr<$T> DeferredRecycler<$T>::retrieve() noexcept
 	{
 		if (__pResourceContainer->empty())
 			return nullptr;
@@ -70,7 +70,7 @@ namespace Infra
 	}
 
 	template <typename $T>
-	std::shared_ptr<$T> LazyRecycler<$T>::retrieveWhere(
+	std::shared_ptr<$T> DeferredRecycler<$T>::retrieveWhere(
 		std::function<bool($T const &)> &&test) noexcept
 	{
 		if (__pResourceContainer->empty())
@@ -92,21 +92,21 @@ namespace Infra
 	}
 
 	template <typename $T>
-	void LazyRecycler<$T>::recycle(
+	void DeferredRecycler<$T>::recycle(
 		std::shared_ptr<$T> &&pResource) noexcept
 	{
 		__deleter.reserve(std::make_shared<__ResourceHolder>(__pResourceContainer, std::move(pResource)));
 	}
 
 	template <typename $T>
-	void LazyRecycler<$T>::standby(
+	void DeferredRecycler<$T>::standby(
 		std::shared_ptr<$T> &&pResource) noexcept
 	{
 		__pResourceContainer->emplace_back(std::move(pResource));
 	}
 
 	template <typename $T>
-	LazyRecycler<$T>::__ResourceHolder::__ResourceHolder(
+	DeferredRecycler<$T>::__ResourceHolder::__ResourceHolder(
 		std::weak_ptr<__ResourceContainer> const &pContainer,
 		std::shared_ptr<$T> &&pResource) noexcept :
 		__pContainer	{ pContainer },
@@ -114,7 +114,7 @@ namespace Infra
 	{}
 
 	template <typename $T>
-	LazyRecycler<$T>::__ResourceHolder::~__ResourceHolder() noexcept
+	DeferredRecycler<$T>::__ResourceHolder::~__ResourceHolder() noexcept
 	{
 		auto const pContainer{ __pContainer.lock() };
 		if (!pContainer)
