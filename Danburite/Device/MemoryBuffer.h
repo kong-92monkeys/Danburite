@@ -16,6 +16,9 @@ namespace Dev
 		virtual ~MemoryBuffer() noexcept override;
 
 		[[nodiscard]]
+		std::byte *getData() noexcept;
+
+		[[nodiscard]]
 		constexpr VkDeviceSize getSize() const noexcept;
 
 	private:

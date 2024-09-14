@@ -28,4 +28,9 @@ namespace Dev
 		__pBuffer = nullptr;
 		__pMemory = nullptr;
 	}
+
+	std::byte *MemoryBuffer::getData() noexcept
+	{
+		return (static_cast<std::byte *>(__pMemory->getMemory().map()) + __pMemory->getOffset());
+	}
 }

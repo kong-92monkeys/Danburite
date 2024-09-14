@@ -44,5 +44,8 @@
     <ClCompile Include="RenderTarget.cpp">
       <Filter>RenderTarget</Filter>
     </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Mesh</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
