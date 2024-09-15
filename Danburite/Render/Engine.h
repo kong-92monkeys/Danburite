@@ -7,11 +7,13 @@
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/FenceCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
+#include "Constants.h"
 #include "RenderTarget.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "LayerResourcePool.h"
+#include "ResourcePool.h"
 #include <unordered_set>
+#include <typeindex>
 
 namespace Render
 {
@@ -20,7 +22,8 @@ namespace Render
 	public:
 		Engine(
 			Dev::Context &context,
-			VK::PhysicalDevice &physicalDevice);
+			VK::PhysicalDevice &physicalDevice,
+			std::unordered_map<std::type_index, uint32_t> const &materialTypeIds);
 
 		virtual ~Engine() noexcept override;
 
@@ -44,7 +47,7 @@ namespace Render
 		Dev::Context &__context;
 		VK::PhysicalDevice &__physicalDevice;
 
-		Infra::DeferredDeleter __deferredDeleter{ 5ULL };
+		Infra::DeferredDeleter __deferredDeleter{ Constants::MAX_IN_FLIGHT_FRAME_COUNT };
 		Dev::CommandExecutor __commandExecutor;
 
 		uint32_t __queueFamilyIndex{ };
@@ -60,9 +63,8 @@ namespace Render
 		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pSubmissionSemaphoreCirculator;
 
-		std::unique_ptr<LayerResourcePool> __pLayerResourcePool;
+		std::unique_ptr<ResourcePool> __pResourcePool;
 
-		size_t __maxInFlightSubmissionCount{ 3U };
 		std::unordered_set<VK::Fence *> __inFlightFences;
 		
 		void __verifyPhysicalDeviceSupport();

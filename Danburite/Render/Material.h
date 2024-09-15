@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Infra/Updatable.h"
-#include "Texture.h"
 #include <concepts>
 #include <typeindex>
 #include <unordered_set>
@@ -17,25 +16,6 @@ namespace Render
 
 		[[nodiscard]]
 		virtual size_t getSize() const noexcept = 0;
-
-		[[nodiscard]]
-		virtual uint32_t getTextureSlotCount() const noexcept;
-
-		[[nodiscard]]
-		constexpr std::unordered_map<uint32_t, Texture const *> const &getTextureSlots() const noexcept;
-
-		[[nodiscard]]
-		constexpr Infra::EventView<Material const *, uint32_t, Texture const *, Texture const *> &
-			getTextureChangeEvent() const noexcept;
-
-	protected:
-		void _setTexture(
-			uint32_t slotIndex,
-			Texture const *pTexture) noexcept;
-
-	private:
-		std::unordered_map<uint32_t, Texture const *> __textureSlots;
-		mutable Infra::Event<Material const *, uint32_t, Texture const *, Texture const *> __textureChangeEvent;
 	};
 
 	template <typename $Data>
@@ -97,17 +77,6 @@ namespace Render
 
 		mutable Infra::Event<MaterialPack const *, std::type_index, Material const *, Material const *> __materialChangeEvent;
 	};
-
-	constexpr std::unordered_map<uint32_t, Texture const *> const &Material::getTextureSlots() const noexcept
-	{
-		return __textureSlots;
-	}
-
-	constexpr Infra::EventView<Material const *, uint32_t, Texture const *, Texture const *> &
-		Material::getTextureChangeEvent() const noexcept
-	{
-		return __textureChangeEvent;
-	}
 
 	template <typename $Data>
 	std::byte const *TypedMaterial<$Data>::getData() const noexcept

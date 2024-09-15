@@ -8,7 +8,8 @@ namespace Render
 {
 	Engine::Engine(
 		Dev::Context &context,
-		VK::PhysicalDevice &physicalDevice) :
+		VK::PhysicalDevice &physicalDevice,
+		std::unordered_map<std::type_index, uint32_t> const &materialTypeIds) :
 		__context			{ context },
 		__physicalDevice	{ physicalDevice }
 	{
@@ -32,15 +33,15 @@ namespace Render
 			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
 
 		__pSubmissionFenceCirculator = std::make_unique<Dev::FenceCirculator>(
-			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
+			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT);
 
 		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, 30ULL);
 
 		__pSubmissionSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
-			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT_LIMIT);
+			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT);
 
-		__pLayerResourcePool = std::make_unique<LayerResourcePool>(
+		__pResourcePool = std::make_unique<ResourcePool>(
 			*__pDevice, __deferredDeleter, *__pMemoryAllocator);
 
 		/*
@@ -55,7 +56,7 @@ namespace Render
 		__deferredDeleter.flush();
 		__pDevice->vkDeviceWaitIdle();
 
-		__pLayerResourcePool = nullptr;
+		__pResourcePool = nullptr;
 
 		__pSubmissionSemaphoreCirculator = nullptr;
 		__pImageAcqSemaphoreCirculator = nullptr;
@@ -363,7 +364,7 @@ namespace Render
 			}
 		}
 
-		if (__inFlightFences.size() < __maxInFlightSubmissionCount)
+		if (__inFlightFences.size() < Constants::MAX_IN_FLIGHT_FRAME_COUNT)
 		{
 			auto &nextFence{ __pSubmissionFenceCirculator->getNext() };
 			__inFlightFences.emplace(&nextFence);

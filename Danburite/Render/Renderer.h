@@ -5,6 +5,7 @@
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Infra/DeferredDeleter.h"
 #include "Material.h"
+#include <optional>
 
 namespace Render
 {
@@ -25,11 +26,7 @@ namespace Render
 			MaterialPack const &materialPack) const noexcept;
 
 		[[nodiscard]]
-		virtual std::optional<uint32_t> getMaterialDescLocationOf(
-			std::type_index const &materialType) const noexcept;
-
-		[[nodiscard]]
-		virtual std::optional<uint32_t> getTextureLUTDescLocationOf(
+		virtual std::optional<uint32_t> getMaterialSlotIndexOf(
 			std::type_index const &materialType) const noexcept;
 
 	protected:

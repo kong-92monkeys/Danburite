@@ -2,25 +2,6 @@
 
 namespace Render
 {
-	uint32_t Material::getTextureSlotCount() const noexcept
-	{
-		return 0U;
-	}
-
-	void Material::_setTexture(
-		uint32_t const slotIndex,
-		Texture const *const pTexture) noexcept
-	{
-		auto &pPlaceholder{ __textureSlots[slotIndex] };
-		if (pPlaceholder == pTexture)
-			return;
-
-		auto const pPrevTexture{ pPlaceholder };
-		pPlaceholder = pTexture;
-
-		__textureChangeEvent.invoke(this, slotIndex, pPrevTexture, pTexture);
-	}
-
 	bool MaterialPack::hasMaterialOf(
 		std::type_index const &type) const noexcept
 	{

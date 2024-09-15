@@ -8,13 +8,7 @@ namespace VK
 		VkDescriptorSetLayoutCreateInfo const &createInfo) :
 		Handle		{ __create(device, createInfo) },
 		__device	{ device }
-	{
-		for (uint32_t iter{ }; iter < createInfo.bindingCount; ++iter)
-		{
-			auto const &binding{ createInfo.pBindings[iter] };
-			__descCountMap[binding.descriptorType] += binding.descriptorCount;
-		}
-	}
+	{}
 
 	DescriptorSetLayout::~DescriptorSetLayout() noexcept
 	{

@@ -28,6 +28,9 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{453da233-e48d-4a99-8591-e62c5ed8dda6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MaterialDescriptorManager">
+      <UniqueIdentifier>{da8da781-1ed6-4add-975b-a685de9ae1a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -36,7 +39,7 @@
     <ClInclude Include="Constants.h">
       <Filter>Constants</Filter>
     </ClInclude>
-    <ClInclude Include="LayerResourcePool.h">
+    <ClInclude Include="ResourcePool.h">
       <Filter>LayerResourcePool</Filter>
     </ClInclude>
     <ClInclude Include="RenderTarget.h">
@@ -57,12 +60,15 @@
     <ClInclude Include="Renderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="MaterialDescriptorManager.h">
+      <Filter>MaterialDescriptorManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="LayerResourcePool.cpp">
+    <ClCompile Include="ResourcePool.cpp">
       <Filter>LayerResourcePool</Filter>
     </ClCompile>
     <ClCompile Include="RenderTarget.cpp">
@@ -82,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialDescriptorManager.cpp">
+      <Filter>MaterialDescriptorManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -21,16 +21,4 @@ namespace Render
 	{
 		return false;
 	}
-
-	std::optional<uint32_t> Renderer::getMaterialDescLocationOf(
-		std::type_index const &materialType) const noexcept
-	{
-		return std::nullopt;
-	}
-
-	std::optional<uint32_t> Renderer::getTextureLUTDescLocationOf(
-		std::type_index const &materialType) const noexcept
-	{
-		return std::nullopt;
-	}
 }

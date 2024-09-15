@@ -22,8 +22,9 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DrawParam.h" />
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="LayerResourcePool.h" />
+    <ClInclude Include="ResourcePool.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialDescriptorManager.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTarget.h" />
@@ -46,8 +47,9 @@
   <ItemGroup>
     <ClCompile Include="DrawParam.cpp" />
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="LayerResourcePool.cpp" />
+    <ClCompile Include="ResourcePool.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MaterialDescriptorManager.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTarget.cpp" />

@@ -120,9 +120,14 @@ void CApp::__onInitBeforeMainFrame()
 	contextCreateInfo.debugMode = true;
 #endif
 
+	std::unordered_map<std::type_index, uint32_t> materialTypeIds;
+
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
+
 	__pRenderEngine = std::make_unique<Render::Engine>(
-		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
+		*__pVulkanContext,
+		__pVulkanContext->getPhysicalDeviceOf(0ULL),
+		materialTypeIds);
 }
 
 // CAboutDlg dialog used for App About
