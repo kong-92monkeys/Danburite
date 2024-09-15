@@ -46,6 +46,7 @@
     <ClCompile Include="DrawParam.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="LayerResourcePool.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Texture.cpp" />

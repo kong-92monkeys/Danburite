@@ -52,6 +52,9 @@
     <Filter Include="DeferredDeleter">
       <UniqueIdentifier>{5459cab2-d945-48d4-bff6-85b01842e233}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Updatable">
+      <UniqueIdentifier>{14c9106b-49cf-4166-9fcc-8ba7c36128b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -104,6 +107,9 @@
     </ClInclude>
     <ClInclude Include="Handle.h">
       <Filter>Handle</Filter>
+    </ClInclude>
+    <ClInclude Include="Updatable.h">
+      <Filter>Updatable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

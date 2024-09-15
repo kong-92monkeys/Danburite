@@ -34,6 +34,7 @@
     <ClInclude Include="Stateful.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Unique.h" />
+    <ClInclude Include="Updatable.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WeakReferenceSet.h" />
   </ItemGroup>
