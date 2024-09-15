@@ -79,6 +79,23 @@ namespace Render
 			*__pDevice, *__pQueue, hinstance, hwnd);
 	}
 
+	std::shared_ptr<Mesh> Engine::createMesh()
+	{
+		return std::make_shared<Mesh>(
+			*__pDevice, __commandExecutor,
+			*__pMemoryAllocator, __deferredDeleter);
+	}
+
+	std::shared_ptr<Texture> Engine::createTexture(
+		Texture::ImageCreateInfo const &imageCreateInfo,
+		Texture::ImageViewCreateInfo const &imageViewCreateInfo)
+	{
+		return std::make_shared<Texture>(
+			*__pDevice, __commandExecutor,
+			*__pMemoryAllocator, __deferredDeleter,
+			imageCreateInfo, imageViewCreateInfo);
+	}
+
 	void Engine::render(
 		RenderTarget &renderTarget)
 	{

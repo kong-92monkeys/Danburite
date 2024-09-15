@@ -4,12 +4,12 @@
 #include "../Vulkan/PipelineCache.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Device/Context.h"
-#include "../Device/MemoryAllocator.h"
-#include "../Device/CommandExecutor.h"
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/FenceCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "RenderTarget.h"
+#include "Mesh.h"
+#include "Texture.h"
 #include "LayerResourcePool.h"
 #include <unordered_set>
 
@@ -28,6 +28,14 @@ namespace Render
 		std::unique_ptr<RenderTarget> createRenderTarget(
 			HINSTANCE hinstance,
 			HWND hwnd);
+
+		[[nodiscard]]
+		std::shared_ptr<Mesh> createMesh();
+
+		[[nodiscard]]
+		std::shared_ptr<Texture> createTexture(
+			Texture::ImageCreateInfo const &imageCreateInfo,
+			Texture::ImageViewCreateInfo const &imageViewCreateInfo);
 
 		void render(
 			RenderTarget &renderTarget);

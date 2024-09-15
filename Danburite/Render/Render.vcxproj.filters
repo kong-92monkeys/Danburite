@@ -16,6 +16,15 @@
     <Filter Include="Mesh">
       <UniqueIdentifier>{872b6c72-d46f-48a3-93ee-3042a2a8941c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DrawParam">
+      <UniqueIdentifier>{66b1948e-e211-47b4-a4b2-3f85335e1ed0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{2ece43cc-52e9-4d34-9368-9d0b1dca1f7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{e74c68a1-5aad-4a90-b62e-6fe66baf895b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -33,6 +42,15 @@
     <ClInclude Include="Mesh.h">
       <Filter>Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="DrawParam.h">
+      <Filter>DrawParam</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -46,6 +64,12 @@
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawParam.cpp">
+      <Filter>DrawParam</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

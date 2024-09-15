@@ -51,6 +51,8 @@ namespace Render
 
 		__updateData(
 			*pVertexBuffer, pData, size, 0ULL,
+			VK_PIPELINE_STAGE_2_NONE,
+			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT,
 			VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT);
 
@@ -65,6 +67,8 @@ namespace Render
 	{
 		__updateData(
 			*(__vertexBuffers[bindingIndex]), pData, size, offset,
+			VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT,
+			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT,
 			VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT);
 	}
@@ -118,6 +122,8 @@ namespace Render
 
 		__updateData(
 			*__pIndexBuffer, pData, size, 0ULL,
+			VK_PIPELINE_STAGE_2_NONE,
+			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT,
 			VK_ACCESS_2_INDEX_READ_BIT);
 	}
@@ -129,6 +135,8 @@ namespace Render
 	{
 		__updateData(
 			*__pIndexBuffer, pData, size, offset,
+			VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT,
+			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT,
 			VK_ACCESS_2_INDEX_READ_BIT);
 	}
@@ -162,8 +170,10 @@ namespace Render
 		void const *const pData,
 		size_t const size,
 		size_t const offset,
-		VkPipelineStageFlags2 const targetStageMask,
-		VkAccessFlags2 const targetAccessMask)
+		VkPipelineStageFlags2 const beforeStageMask,
+		VkAccessFlags2 const beforeAccessMask,
+		VkPipelineStageFlags2 const afterStageMask,
+		VkAccessFlags2 const afterAccessMask)
 	{
 		auto pStagingBuffer{ __createStagingBuffer(size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
@@ -173,8 +183,8 @@ namespace Render
 			VkMemoryBarrier2 const beforeMemoryBarrier
 			{
 				.sType				{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
-				.srcStageMask		{ targetStageMask },
-				.srcAccessMask		{ 0U },
+				.srcStageMask		{ beforeStageMask },
+				.srcAccessMask		{ beforeAccessMask },
 				.dstStageMask		{ VK_PIPELINE_STAGE_2_COPY_BIT },
 				.dstAccessMask		{ VK_ACCESS_2_TRANSFER_WRITE_BIT }
 			};
@@ -208,8 +218,8 @@ namespace Render
 				.sType				{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
 				.srcStageMask		{ VK_PIPELINE_STAGE_2_COPY_BIT },
 				.srcAccessMask		{ VK_ACCESS_2_TRANSFER_WRITE_BIT },
-				.dstStageMask		{ targetStageMask },
-				.dstAccessMask		{ targetAccessMask }
+				.dstStageMask		{ afterStageMask },
+				.dstAccessMask		{ afterAccessMask }
 			};
 
 			VkDependencyInfo const afterBarrier

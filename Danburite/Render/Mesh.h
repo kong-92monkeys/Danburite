@@ -70,8 +70,10 @@ namespace Render
 			void const *pData,
 			size_t size,
 			size_t offset,
-			VkPipelineStageFlags2 targetStageMask,
-			VkAccessFlags2 targetAccessMask);
+			VkPipelineStageFlags2 beforeStageMask,
+			VkAccessFlags2 beforeAccessMask,
+			VkPipelineStageFlags2 afterStageMask,
+			VkAccessFlags2 afterAccessMask);
 
 		void __validateCmdParams() noexcept;
 
