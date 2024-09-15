@@ -10,17 +10,28 @@
 #include "../Vulkan/Swapchain.h"
 #include "../Vulkan/Image.h"
 #include "../Vulkan/ImageView.h"
-#include "../Vulkan/CommandBuffer.h"
-#include "../Vulkan/Semaphore.h"
 #include "../Vulkan/RenderPass.h"
 #include "../Vulkan/Framebuffer.h"
-#include <memory>
+#include "../Device/CommandBufferCirculator.h"
+#include "../Device/SemaphoreCirculator.h"
+#include "../Device/CommandExecutor.h"
 
 namespace Render
 {
 	class RenderTarget : public Infra::Unique, public Infra::Stateful<RenderTarget>
 	{
 	public:
+		struct DrawResult
+		{
+		public:
+			std::future<void> completion;
+			VK::CommandBuffer *pCmdBuffer{ };
+			VK::Swapchain *pSwapchain{ };
+			uint32_t imageIndex{ };
+			VK::Semaphore *pImageAcqSemaphore{ };
+			VK::Semaphore *pSignalSemaphore{ };
+		};
+
 		RenderTarget(
 			VK::Instance &instance,
 			VK::PhysicalDevice &physicalDevice,
@@ -37,13 +48,7 @@ namespace Render
 			glm::vec4 const &color) noexcept;
 
 		[[nodiscard]]
-		uint32_t draw(
-			VK::CommandBuffer &cmdBuffer,
-			VK::Semaphore &imageAcqSemaphore);
-
-		void present(
-			VK::Semaphore &submissionSemaphore,
-			uint32_t imageIndex);
+		DrawResult draw();
 
 		[[nodiscard]]
 		constexpr glm::vec4 const &getBackgroundColor() const noexcept;
@@ -85,6 +90,11 @@ namespace Render
 
 		std::unique_ptr<VK::RenderPass> __pClearImageRenderPass;
 		std::vector<std::unique_ptr<VK::Framebuffer>> __clearImageFramebuffers;
+
+		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
+		std::unique_ptr<Dev::SemaphoreCirculator> __pCompleteSemaphoreCirculator;
+
+		std::unique_ptr<Dev::CommandExecutor> __pDrawCommandExecutor;
 
 		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 

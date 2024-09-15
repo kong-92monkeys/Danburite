@@ -31,6 +31,9 @@
     <Filter Include="MaterialDescriptorManager">
       <UniqueIdentifier>{da8da781-1ed6-4add-975b-a685de9ae1a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CommandSubmitter">
+      <UniqueIdentifier>{fdbb4b8f-c1de-4ead-9af7-9eacca4e6170}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -63,6 +66,9 @@
     <ClInclude Include="MaterialDescriptorManager.h">
       <Filter>MaterialDescriptorManager</Filter>
     </ClInclude>
+    <ClInclude Include="CommandSubmitter.h">
+      <Filter>CommandSubmitter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -91,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="MaterialDescriptorManager.cpp">
       <Filter>MaterialDescriptorManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandSubmitter.cpp">
+      <Filter>CommandSubmitter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

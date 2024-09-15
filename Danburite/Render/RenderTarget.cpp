@@ -1,4 +1,5 @@
 #include "RenderTarget.h"
+#include "Constants.h"
 #include <stdexcept>
 #include <algorithm>
 
@@ -23,11 +24,24 @@ namespace Render
 
 		__createClearImageRenderPass();
 		__syncClearImageFramebuffers();
+
+		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
+			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1U);
+
+		__pCompleteSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
+			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1U);
+
+		__pDrawCommandExecutor = std::make_unique<Dev::CommandExecutor>(
+			__device, __que.getFamilyIndex());
 	}
 
 	RenderTarget::~RenderTarget() noexcept
 	{
 		__que.vkQueueWaitIdle();
+
+		__pDrawCommandExecutor = nullptr;
+		__pCompleteSemaphoreCirculator = nullptr;
+		__pImageAcqSemaphoreCirculator = nullptr;
 
 		__clearImageFramebuffers.clear();
 
@@ -56,36 +70,39 @@ namespace Render
 		__needRedrawEvent.invoke(this);
 	}
 
-	uint32_t RenderTarget::draw(
-		VK::CommandBuffer &cmdBuffer,
-		VK::Semaphore &imageAcqSemaphore)
+	RenderTarget::DrawResult RenderTarget::draw()
 	{
+		auto &imageAcqSemaphore	{ __pImageAcqSemaphoreCirculator->getNext() };
+		auto &completeSemaphore	{ __pCompleteSemaphoreCirculator->getNext() };
+
 		uint32_t const imageIdx{ __acquireNextImage(imageAcqSemaphore) };
-		__beginSwapchainImage(cmdBuffer, imageIdx);
 
-		// TODO: draw layers
-
-		__endSwapchainImage(cmdBuffer, imageIdx);
-		return imageIdx;
-	}
-
-	void RenderTarget::present(
-		VK::Semaphore &submissionSemaphore,
-		uint32_t const imageIndex)
-	{
-		const VkPresentInfoKHR presentInfo
+		__pDrawCommandExecutor->reserve([this, imageIdx] (auto &cmdBuffer)
 		{
-			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_PRESENT_INFO_KHR },
-			.waitSemaphoreCount		{ 1U },
-			.pWaitSemaphores		{ &(submissionSemaphore.getHandle()) },
-			.swapchainCount			{ 1U },
-			.pSwapchains			{ &(__pSwapchain->getHandle()) },
-			.pImageIndices			{ &imageIndex }
-		};
+			VkCommandBufferBeginInfo const cbBeginInfo
+			{
+				.sType{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+				.flags{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
+			};
 
-		auto const result{ __que.vkQueuePresentKHR(&presentInfo) };
-		if (result != VkResult::VK_SUCCESS)
-			throw std::runtime_error{ "Failed to present the swapchain image." };
+			__beginSwapchainImage(cmdBuffer, imageIdx);
+
+			// TODO: draw layers
+
+			__endSwapchainImage(cmdBuffer, imageIdx);
+		});
+
+		auto executionResult{ __pDrawCommandExecutor->execute() };
+
+		DrawResult retVal{ };
+		retVal.completion			= std::move(executionResult.completion);
+		retVal.pCmdBuffer			= executionResult.pCmdBuffer;
+		retVal.pSwapchain			= __pSwapchain.get();
+		retVal.imageIndex			= imageIdx;
+		retVal.pImageAcqSemaphore	= &imageAcqSemaphore;
+		retVal.pSignalSemaphore		= &completeSemaphore;
+
+		return retVal;
 	}
 
 	void RenderTarget::_onValidate()

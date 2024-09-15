@@ -28,24 +28,16 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
-		__pCommandExecutor = std::make_unique<Dev::CommandExecutor>(
+		__pInstantCommandExecutor = std::make_unique<Dev::CommandExecutor>(
 			*__pDevice, __queueFamilyIndex);
-
-		__pPrimaryCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
-			*__pDevice, __queueFamilyIndex,
-			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
 
 		__pSubmissionFenceCirculator = std::make_unique<Dev::FenceCirculator>(
 			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT);
 
-		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
-			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, 30ULL);
-
-		__pSubmissionSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
-			*__pDevice, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT);
-
 		__pResourcePool = std::make_unique<ResourcePool>(
 			*__pDevice, __deferredDeleter, *__pMemoryAllocator);
+
+		__pCommandSubmitter = std::make_unique<CommandSubmitter>(*__pQueue);
 
 		/*
 			TODO: Renderer dependent resources
@@ -59,14 +51,10 @@ namespace Render
 		__deferredDeleter.flush();
 		__pDevice->vkDeviceWaitIdle();
 
+		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
-
-		__pSubmissionSemaphoreCirculator = nullptr;
-		__pImageAcqSemaphoreCirculator = nullptr;
 		__pSubmissionFenceCirculator = nullptr;
-		__pPrimaryCmdBufferCirculator = nullptr;
-
-		__pCommandExecutor = nullptr;
+		__pInstantCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
 		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
@@ -87,7 +75,7 @@ namespace Render
 	std::shared_ptr<Mesh> Engine::createMesh()
 	{
 		return std::make_shared<Mesh>(
-			*__pDevice, *__pCommandExecutor,
+			*__pDevice, *__pInstantCommandExecutor,
 			*__pMemoryAllocator, __deferredDeleter);
 	}
 
@@ -96,7 +84,7 @@ namespace Render
 		Texture::ImageViewCreateInfo const &imageViewCreateInfo)
 	{
 		return std::make_shared<Texture>(
-			*__pDevice, *__pCommandExecutor,
+			*__pDevice, *__pInstantCommandExecutor,
 			*__pMemoryAllocator, __deferredDeleter,
 			imageCreateInfo, imageViewCreateInfo);
 	}
@@ -107,16 +95,17 @@ namespace Render
 		if (!(renderTarget.isPresentable()))
 			return;
 
-		auto &cmdBuffer				{ __pPrimaryCmdBufferCirculator->getNext() };
-		auto &imageAcqSemaphore		{ __pImageAcqSemaphoreCirculator->getNext() };
-		auto &submissonSemaphore	{ __pSubmissionSemaphoreCirculator->getNext() };
+		__pCommandSubmitter->clear();
+		__pCommandSubmitter->addCommandExecutionResult(__pInstantCommandExecutor->execute());
+		__pCommandSubmitter->addRenderTargetDrawResult(renderTarget.draw());
 
-		uint32_t const imageIndex{ __recordPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, renderTarget) };
-		__submitPrimaryCmdBuffer(cmdBuffer, imageAcqSemaphore, submissonSemaphore);
+		auto &fence{ __getNextSubmissionFence() };
+		__pDevice->vkResetFences(1U, &(fence.getHandle()));
+
+		__pCommandSubmitter->submit(fence);
+		__pCommandSubmitter->present();
 
 		__deferredDeleter.advance();
-
-		renderTarget.present(submissonSemaphore, imageIndex);
 	}
 
 	void Engine::__verifyPhysicalDeviceSupport()
@@ -284,69 +273,6 @@ namespace Render
 		};
 
 		__pRenderTargetDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
-	}
-
-	uint32_t Engine::__recordPrimaryCmdBuffer(
-		VK::CommandBuffer &cmdBuffer,
-		VK::Semaphore &imageAcqSemaphore,
-		RenderTarget &renderTarget)
-	{
-		VkCommandBufferBeginInfo const cbBeginInfo
-		{
-			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
-			.flags	{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
-		};
-
-		cmdBuffer.vkBeginCommandBuffer(&cbBeginInfo);
-
-		 __commandExecutor.execute(cmdBuffer);
-		uint32_t const imageIndex{ renderTarget.draw(cmdBuffer, imageAcqSemaphore) };
-
-		cmdBuffer.vkEndCommandBuffer();
-
-		return imageIndex;
-	}
-
-	void Engine::__submitPrimaryCmdBuffer(
-		VK::CommandBuffer &cmdBuffer,
-		VK::Semaphore &imageAcqSemaphore,
-		VK::Semaphore &submissonSemaphore)
-	{
-		VkCommandBufferSubmitInfo const cmdBufferInfo
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO },
-			.commandBuffer	{ cmdBuffer.getHandle() }
-		};
-
-		VkSemaphoreSubmitInfo const waitSemaphoreInfo
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO },
-			.semaphore		{ imageAcqSemaphore.getHandle() },
-			.stageMask		{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT }
-		};
-
-		VkSemaphoreSubmitInfo const signalSemaphoreInfo
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO },
-			.semaphore		{ submissonSemaphore.getHandle() },
-			.stageMask		{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT }
-		};
-
-		VkSubmitInfo2 const submitInfo
-		{
-			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SUBMIT_INFO_2 },
-			.waitSemaphoreInfoCount		{ 1U },
-			.pWaitSemaphoreInfos		{ &waitSemaphoreInfo },
-			.commandBufferInfoCount		{ 1U },
-			.pCommandBufferInfos		{ &cmdBufferInfo },
-			.signalSemaphoreInfoCount	{ 1U },
-			.pSignalSemaphoreInfos		{ &signalSemaphoreInfo }
-		};
-
-		auto &fence{ __getNextSubmissionFence() };
-		__pDevice->vkResetFences(1U, &(fence.getHandle()));
-
-		__pQueue->vkQueueSubmit2(1U, &submitInfo, fence.getHandle());
 	}
 
 	VK::Fence &Engine::__getNextSubmissionFence() noexcept

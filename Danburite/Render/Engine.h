@@ -4,7 +4,6 @@
 #include "../Vulkan/PipelineCache.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Device/Context.h"
-#include "../Device/CommandBufferCirculator.h"
 #include "../Device/FenceCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "Constants.h"
@@ -12,6 +11,7 @@
 #include "Mesh.h"
 #include "Texture.h"
 #include "ResourcePool.h"
+#include "CommandSubmitter.h"
 #include <unordered_set>
 #include <typeindex>
 
@@ -56,14 +56,10 @@ namespace Render
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
 		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
-		std::unique_ptr<Dev::CommandExecutor> __pCommandExecutor;
-
-		std::unique_ptr<Dev::CommandBufferCirculator> __pPrimaryCmdBufferCirculator;
+		std::unique_ptr<Dev::CommandExecutor> __pInstantCommandExecutor;
 		std::unique_ptr<Dev::FenceCirculator> __pSubmissionFenceCirculator;
-		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
-		std::unique_ptr<Dev::SemaphoreCirculator> __pSubmissionSemaphoreCirculator;
-
 		std::unique_ptr<ResourcePool> __pResourcePool;
+		std::unique_ptr<CommandSubmitter> __pCommandSubmitter;
 
 		std::unordered_set<VK::Fence *> __inFlightFences;
 		
@@ -73,17 +69,6 @@ namespace Render
 		void __retrieveQueue();
 		void __createPipelineCache();
 		void __createRenderTargetDescSetLayout();
-
-		[[nodiscard]]
-		uint32_t __recordPrimaryCmdBuffer(
-			VK::CommandBuffer &cmdBuffer,
-			VK::Semaphore &imageAcqSemaphore,
-			RenderTarget &renderTarget);
-
-		void __submitPrimaryCmdBuffer(
-			VK::CommandBuffer &cmdBuffer,
-			VK::Semaphore &imageAcqSemaphore,
-			VK::Semaphore &submissonSemaphore);
 
 		[[nodiscard]]
 		VK::Fence &__getNextSubmissionFence() noexcept;

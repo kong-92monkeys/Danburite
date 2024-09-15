@@ -18,7 +18,9 @@ namespace Dev
 			uint32_t bufferCount);
 
 		[[nodiscard]]
-		VK::CommandBuffer &getNext();
+		constexpr VK::CommandBuffer &getCurrent() noexcept;
+
+		void advance();
 
 	private:
 		class PoolResource
@@ -49,9 +51,12 @@ namespace Dev
 		uint32_t __bufferIdx{ };
 
 		std::vector<PoolResource> __poolResources;
-
-		void __advanceIndex();
 	};
+
+	constexpr VK::CommandBuffer &CommandBufferCirculator::getCurrent() noexcept
+	{
+		return __poolResources[__poolIdx].getCommandBufferOf(__bufferIdx);
+	}
 
 	constexpr VK::CommandBuffer &CommandBufferCirculator::PoolResource::getCommandBufferOf(
 		uint32_t bufferIndex) noexcept
