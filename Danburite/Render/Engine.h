@@ -48,7 +48,6 @@ namespace Render
 		VK::PhysicalDevice &__physicalDevice;
 
 		Infra::DeferredDeleter __deferredDeleter{ Constants::MAX_IN_FLIGHT_FRAME_COUNT };
-		Dev::CommandExecutor __commandExecutor;
 
 		uint32_t __queueFamilyIndex{ };
 
@@ -57,6 +56,7 @@ namespace Render
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
 		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
+		std::unique_ptr<Dev::CommandExecutor> __pCommandExecutor;
 
 		std::unique_ptr<Dev::CommandBufferCirculator> __pPrimaryCmdBufferCirculator;
 		std::unique_ptr<Dev::FenceCirculator> __pSubmissionFenceCirculator;

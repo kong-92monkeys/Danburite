@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Infra/ThreadPool.h"
 #include "../Infra/AssetManager.h"
 
 namespace Sys

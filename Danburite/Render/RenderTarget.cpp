@@ -57,15 +57,15 @@ namespace Render
 	}
 
 	uint32_t RenderTarget::draw(
-		VK::CommandBuffer &commandBuffer,
+		VK::CommandBuffer &cmdBuffer,
 		VK::Semaphore &imageAcqSemaphore)
 	{
 		uint32_t const imageIdx{ __acquireNextImage(imageAcqSemaphore) };
-		__beginSwapchainImage(commandBuffer, imageIdx);
+		__beginSwapchainImage(cmdBuffer, imageIdx);
 
 		// TODO: draw layers
 
-		__endSwapchainImage(commandBuffer, imageIdx);
+		__endSwapchainImage(cmdBuffer, imageIdx);
 		return imageIdx;
 	}
 
@@ -86,6 +86,11 @@ namespace Render
 		auto const result{ __que.vkQueuePresentKHR(&presentInfo) };
 		if (result != VkResult::VK_SUCCESS)
 			throw std::runtime_error{ "Failed to present the swapchain image." };
+	}
+
+	void RenderTarget::_onValidate()
+	{
+
 	}
 
 	void RenderTarget::__createSurface(
@@ -450,7 +455,7 @@ namespace Render
 		VK::CommandBuffer &cmdBuffer,
 		uint32_t const imageIndex)
 	{
-		const VkImageMemoryBarrier2 imageBarrier
+		VkImageMemoryBarrier2 const imageBarrier
 		{
 			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 },
 			.srcStageMask			{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
@@ -469,7 +474,7 @@ namespace Render
 			}
 		};
 
-		const VkDependencyInfo dependencyInfo
+		VkDependencyInfo const dependencyInfo
 		{
 			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_DEPENDENCY_INFO },
 			.imageMemoryBarrierCount	{ 1U },

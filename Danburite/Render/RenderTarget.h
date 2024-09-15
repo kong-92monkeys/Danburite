@@ -1,8 +1,10 @@
 #pragma once
 
 #include <Windows.h>
+#include "../Infra/Stateful.h"
 #include "../Infra/GLM.h"
 #include "../Infra/Event.h"
+#include "../Infra/ThreadPool.h"
 #include "../Vulkan/Queue.h"
 #include "../Vulkan/Surface.h"
 #include "../Vulkan/Swapchain.h"
@@ -16,7 +18,7 @@
 
 namespace Render
 {
-	class RenderTarget : public Infra::Unique
+	class RenderTarget : public Infra::Unique, public Infra::Stateful<RenderTarget>
 	{
 	public:
 		RenderTarget(
@@ -36,7 +38,7 @@ namespace Render
 
 		[[nodiscard]]
 		uint32_t draw(
-			VK::CommandBuffer &commandBuffer,
+			VK::CommandBuffer &cmdBuffer,
 			VK::Semaphore &imageAcqSemaphore);
 
 		void present(
@@ -57,6 +59,9 @@ namespace Render
 
 		[[nodiscard]]
 		constexpr Infra::Event<RenderTarget const *> &getNeedRedrawEvent() const noexcept;
+
+	protected:
+		virtual void _onValidate() override;
 
 	private:
 		VK::Instance &__instance;

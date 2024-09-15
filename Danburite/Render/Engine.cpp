@@ -28,6 +28,9 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
+		__pCommandExecutor = std::make_unique<Dev::CommandExecutor>(
+			*__pDevice, __queueFamilyIndex);
+
 		__pPrimaryCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
 			*__pDevice, __queueFamilyIndex,
 			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
@@ -63,6 +66,7 @@ namespace Render
 		__pSubmissionFenceCirculator = nullptr;
 		__pPrimaryCmdBufferCirculator = nullptr;
 
+		__pCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
 		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
@@ -83,7 +87,7 @@ namespace Render
 	std::shared_ptr<Mesh> Engine::createMesh()
 	{
 		return std::make_shared<Mesh>(
-			*__pDevice, __commandExecutor,
+			*__pDevice, *__pCommandExecutor,
 			*__pMemoryAllocator, __deferredDeleter);
 	}
 
@@ -92,7 +96,7 @@ namespace Render
 		Texture::ImageViewCreateInfo const &imageViewCreateInfo)
 	{
 		return std::make_shared<Texture>(
-			*__pDevice, __commandExecutor,
+			*__pDevice, *__pCommandExecutor,
 			*__pMemoryAllocator, __deferredDeleter,
 			imageCreateInfo, imageViewCreateInfo);
 	}
