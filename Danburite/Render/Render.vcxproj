@@ -25,6 +25,7 @@
     <ClInclude Include="LayerResourcePool.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
@@ -48,6 +49,7 @@
     <ClCompile Include="LayerResourcePool.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>

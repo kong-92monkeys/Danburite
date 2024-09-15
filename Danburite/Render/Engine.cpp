@@ -124,7 +124,7 @@ namespace Render
 			Dev::ConversionUtil::fromVulkanVersion(
 				physicalDeviceProps.p10->apiVersion)
 		};
-		
+
 		if ((deviceVersion.major <= 1U) && (deviceVersion.minor < 3U))
 			throw std::runtime_error{ "The device API version is too low." };
 
@@ -139,7 +139,8 @@ namespace Render
 			physicalDeviceFeatures.p13->pipelineCreationCacheControl &&
 			physicalDeviceFeatures.p13->synchronization2 &&
 
-			physicalDeviceFeatures.pRobustness2->nullDescriptor
+			physicalDeviceFeatures.pRobustness2->nullDescriptor &&
+			physicalDeviceFeatures.pNestedCommandBuffer->nestedCommandBuffer
 		};
 
 		if (!featureSupported)
@@ -184,6 +185,7 @@ namespace Render
 		VkPhysicalDeviceVulkan12Features features12{ };
 		VkPhysicalDeviceVulkan13Features features13{ };
 		VkPhysicalDeviceRobustness2FeaturesEXT featuresRobustness{ };
+		VkPhysicalDeviceNestedCommandBufferFeaturesEXT featuresNestedCommandBuffer{ };
 
 		features.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 		features.features.samplerAnisotropy = VK_TRUE;
@@ -205,12 +207,17 @@ namespace Render
 
 		featuresRobustness.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
 		featuresRobustness.nullDescriptor = VK_TRUE;
-		featuresRobustness.pNext = nullptr;
+		featuresRobustness.pNext = &featuresNestedCommandBuffer;
+
+		featuresNestedCommandBuffer.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NESTED_COMMAND_BUFFER_FEATURES_EXT;
+		featuresNestedCommandBuffer.nestedCommandBuffer = VK_TRUE;
+		featuresNestedCommandBuffer.pNext = nullptr;
 
 		std::vector<char const *> extensions;
 		extensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 		extensions.emplace_back(VK_KHR_MAINTENANCE_5_EXTENSION_NAME);
 		extensions.emplace_back(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME);
+		extensions.emplace_back(VK_EXT_NESTED_COMMAND_BUFFER_EXTENSION_NAME);
 		//extensions.emplace_back(VK_EXT_IMAGE_COMPRESSION_CONTROL_EXTENSION_NAME);
 
 		for (auto const extension : extensions)
