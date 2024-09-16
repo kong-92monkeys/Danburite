@@ -53,9 +53,7 @@ BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs)
 void CMainView::OnPaint() 
 {
 	// TODO: Add your message handler code here
-	auto &renderingEngine{ theApp.getRenderEngine() };
-	renderingEngine.render(*__pRenderTarget);
-
+	theApp.render(*__pRenderTarget);
 	ValidateRect(nullptr);
 }
 
@@ -65,8 +63,7 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
-	__pRenderTarget = theApp.getRenderEngine().createRenderTarget(
-		lpCreateStruct->hInstance, GetSafeHwnd());
+	__pRenderTarget = theApp.createRenderTarget(GetSafeHwnd());
 
 	__pRenderTargetNeedRedrawListener =
 		Infra::EventListener<Render::RenderTarget const *>::bind(
@@ -85,7 +82,6 @@ void CMainView::OnDestroy()
 	__pRenderTarget = nullptr;
 }
 
-
 void CMainView::OnSize(UINT nType, int cx, int cy)
 {
 	CWnd::OnSize(nType, cx, cy);
@@ -93,7 +89,6 @@ void CMainView::OnSize(UINT nType, int cx, int cy)
 	// TODO: Add your message handler code here
 	__pRenderTarget->sync();
 }
-
 
 BOOL CMainView::OnEraseBkgnd(CDC *pDC)
 {

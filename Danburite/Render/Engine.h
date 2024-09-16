@@ -4,7 +4,6 @@
 #include "../Vulkan/PipelineCache.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Device/Context.h"
-#include "../Device/FenceCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "Constants.h"
 #include "RenderTarget.h"
@@ -12,8 +11,8 @@
 #include "Texture.h"
 #include "ResourcePool.h"
 #include "CommandSubmitter.h"
-#include <unordered_set>
 #include <typeindex>
+#include <unordered_set>
 
 namespace Render
 {
@@ -41,7 +40,7 @@ namespace Render
 			Texture::ImageViewCreateInfo const &imageViewCreateInfo);
 
 		void render(
-			RenderTarget &renderTarget);
+			std::unordered_set<RenderTarget *> const &renderTargets);
 
 	private:
 		Dev::Context &__context;
@@ -57,11 +56,11 @@ namespace Render
 		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
 		std::unique_ptr<Dev::CommandExecutor> __pGeneralCommandExecutor;
-		std::unique_ptr<Dev::FenceCirculator> __pSubmissionFenceCirculator;
 		std::unique_ptr<ResourcePool> __pResourcePool;
 		std::unique_ptr<CommandSubmitter> __pCommandSubmitter;
 
-		std::unordered_set<VK::Fence *> __inFlightFences;
+		std::vector<std::unique_ptr<VK::Fence>> __submissionFences;
+		size_t __submissionFenceCursor{ };
 		
 		void __verifyPhysicalDeviceSupport();
 		void __resolveQueueFamilyIndex();
@@ -69,8 +68,9 @@ namespace Render
 		void __retrieveQueue();
 		void __createPipelineCache();
 		void __createRenderTargetDescSetLayout();
+		void __createSubmissionFences();
 
 		[[nodiscard]]
-		VK::Fence &__getNextSubmissionFence() noexcept;
+		VK::Fence &__getNextSubmissionFence();
 	};
 }

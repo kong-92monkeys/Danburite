@@ -30,6 +30,9 @@ public:
 public:
 	virtual ~CMainView();
 
+	[[nodiscard]]
+	constexpr Render::RenderTarget &getRenderTarget() noexcept;
+
 	// Generated message map functions
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -49,3 +52,7 @@ private:
 	void __onRenderTargetRedrawNeeded() noexcept;
 };
 
+constexpr Render::RenderTarget &CMainView::getRenderTarget() noexcept
+{
+	return *__pRenderTarget;
+}

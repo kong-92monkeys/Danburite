@@ -19,6 +19,7 @@ namespace Render
 		__retrieveQueue();
 		__createPipelineCache();
 		__createRenderTargetDescSetLayout();
+		__createSubmissionFences();
 
 		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
 
@@ -30,9 +31,6 @@ namespace Render
 
 		__pGeneralCommandExecutor = std::make_unique<Dev::CommandExecutor>(
 			*__pDevice, __queueFamilyIndex);
-
-		__pSubmissionFenceCirculator = std::make_unique<Dev::FenceCirculator>(
-			*__pDevice, Constants::MAX_IN_FLIGHT_FRAME_COUNT);
 
 		__pResourcePool = std::make_unique<ResourcePool>(
 			*__pDevice, __deferredDeleter, *__pMemoryAllocator);
@@ -53,9 +51,10 @@ namespace Render
 
 		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
-		__pSubmissionFenceCirculator = nullptr;
 		__pGeneralCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
+
+		__submissionFences.clear();
 		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
 
@@ -90,17 +89,23 @@ namespace Render
 	}
 
 	void Engine::render(
-		RenderTarget &renderTarget)
+		std::unordered_set<RenderTarget *> const &renderTargets)
 	{
-		if (!(renderTarget.isPresentable()))
-			return;
-
 		__pCommandSubmitter->clear();
 
 		if (!(__pGeneralCommandExecutor->isEmpty()))
 			__pCommandSubmitter->reserve(__pGeneralCommandExecutor->execute());
 
-		__pCommandSubmitter->reserve(renderTarget.draw());
+		for (auto const pRenderTarget : renderTargets)
+		{
+			if (!(pRenderTarget->isPresentable()))
+				return;
+
+			__pCommandSubmitter->reserve(pRenderTarget->draw());
+		}
+
+		if (__pCommandSubmitter->isEmpty())
+			return;
 
 		auto &submissionFence{ __getNextSubmissionFence() };
 		__pDevice->vkResetFences(1U, &(submissionFence.getHandle()));
@@ -278,55 +283,32 @@ namespace Render
 		__pRenderTargetDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
 	}
 
-	VK::Fence &Engine::__getNextSubmissionFence() noexcept
+	void Engine::__createSubmissionFences()
 	{
-		for (auto it{ __inFlightFences.begin() }; it != __inFlightFences.end(); ++it)
+		VkFenceCreateInfo const createInfo
 		{
-			auto const pFence{ *it };
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_FENCE_CREATE_INFO },
+			.flags	{ VkFenceCreateFlagBits::VK_FENCE_CREATE_SIGNALED_BIT }
+		};
 
-			auto const result
-			{
-				__pDevice->vkWaitForFences(
-					1U, &(pFence->getHandle()), VK_FALSE, 0ULL)
-			};
+		for (size_t iter{ }; iter < Constants::MAX_IN_FLIGHT_FRAME_COUNT; ++iter)
+			__submissionFences.emplace_back(std::make_unique<VK::Fence>(*__pDevice, createInfo));
+	}
 
-			if (result == VK_SUCCESS)
-			{
-				__inFlightFences.erase(it);
-				return *pFence;
-			}
-		}
+	VK::Fence &Engine::__getNextSubmissionFence()
+	{
+		auto &retVal{ *(__submissionFences[__submissionFenceCursor]) };
+		__submissionFenceCursor = ((__submissionFenceCursor + 1ULL) % __submissionFences.size());
 
-		if (__inFlightFences.size() < Constants::MAX_IN_FLIGHT_FRAME_COUNT)
+		auto const result
 		{
-			auto &nextFence{ __pSubmissionFenceCirculator->getNext() };
-			__inFlightFences.emplace(&nextFence);
-			return nextFence;
-		}
+			__pDevice->vkWaitForFences(
+				1U, &(retVal.getHandle()), VK_FALSE, UINT64_MAX)
+		};
+		
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Cannot resolve a submission fence." };
 
-		VK::Fence *pRetVal{ };
-		while (!pRetVal)
-		{
-			for (auto it{ __inFlightFences.begin() }; it != __inFlightFences.end(); ++it)
-			{
-				const auto pFence{ *it };
-
-				auto const result
-				{
-					// 1ms
-					__pDevice->vkWaitForFences(
-						1U, &(pFence->getHandle()), VK_FALSE, 1'000'000ULL)
-				};
-
-				if (result == VK_SUCCESS)
-				{
-					__inFlightFences.erase(it);
-					pRetVal = pFence;
-					break;
-				}
-			}
-		}
-
-		return *pRetVal;
+		return retVal;
 	}
 }

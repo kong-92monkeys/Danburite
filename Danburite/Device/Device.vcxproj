@@ -33,7 +33,6 @@
     <ClCompile Include="CommandBufferCirculator.cpp" />
     <ClCompile Include="CommandExecutor.cpp" />
     <ClCompile Include="Context.cpp" />
-    <ClCompile Include="FenceCirculator.cpp" />
     <ClCompile Include="MemoryAllocator.cpp" />
     <ClCompile Include="MemoryBuffer.cpp" />
     <ClCompile Include="MemoryChunk.cpp" />
@@ -46,7 +45,6 @@
     <ClInclude Include="CommandExecutor.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="ConversionUtil.h" />
-    <ClInclude Include="FenceCirculator.h" />
     <ClInclude Include="MemoryAllocator.h" />
     <ClInclude Include="MemoryBuffer.h" />
     <ClInclude Include="MemoryChunk.h" />

@@ -10,6 +10,7 @@
 #include "resource.h"       // main symbols
 #include "../Infra/Event.h"
 #include "../Render/Engine.h"
+#include <unordered_set>
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -35,7 +36,11 @@ public:
 
 public:
 	[[nodiscard]]
-	constexpr Render::Engine &getRenderEngine() noexcept;
+	std::unique_ptr<Render::RenderTarget> createRenderTarget(
+		HWND hWindow);
+
+	void render(
+		Render::RenderTarget &renderTarget);
 
 	[[nodiscard]]
 	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
@@ -44,17 +49,14 @@ private:
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Render::Engine> __pRenderEngine;
 
+	std::unordered_set<Render::RenderTarget *> __standbyRenderTargets;
+
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
 };
 
 extern CApp theApp;
-
-constexpr Render::Engine &CApp::getRenderEngine() noexcept
-{
-	return *__pRenderEngine;
-}
 
 constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept
 {
