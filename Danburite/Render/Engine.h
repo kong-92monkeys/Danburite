@@ -2,15 +2,14 @@
 
 #include "../Vulkan/Queue.h"
 #include "../Vulkan/PipelineCache.h"
-#include "../Vulkan/DescriptorSetLayout.h"
 #include "../Device/Context.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "Constants.h"
 #include "RenderTarget.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "ResourcePool.h"
 #include "CommandSubmitter.h"
+#include "GlobalDescriptorManager.h"
 #include <typeindex>
 #include <unordered_set>
 
@@ -58,6 +57,7 @@ namespace Render
 		std::unique_ptr<Dev::CommandExecutor> __pGeneralCommandExecutor;
 		std::unique_ptr<ResourcePool> __pResourcePool;
 		std::unique_ptr<CommandSubmitter> __pCommandSubmitter;
+		std::unique_ptr<GlobalDescriptorManager> __pGlobalDescriptorManager;
 
 		std::vector<std::unique_ptr<VK::Fence>> __submissionFences;
 		size_t __submissionFenceCursor{ };

@@ -7,9 +7,6 @@
     <Filter Include="Constants">
       <UniqueIdentifier>{87012a27-38b7-4992-8ddb-e52a377b83b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LayerResourcePool">
-      <UniqueIdentifier>{601eeda5-6746-4d12-9a83-07ee88824f75}</UniqueIdentifier>
-    </Filter>
     <Filter Include="RenderTarget">
       <UniqueIdentifier>{1515f0b2-6a93-41ff-a43a-6b78ed89692a}</UniqueIdentifier>
     </Filter>
@@ -34,6 +31,12 @@
     <Filter Include="CommandSubmitter">
       <UniqueIdentifier>{fdbb4b8f-c1de-4ead-9af7-9eacca4e6170}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GlobalDescriptorManager">
+      <UniqueIdentifier>{4e9de112-b397-4937-9807-bc8180fa4c7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourcePool">
+      <UniqueIdentifier>{601eeda5-6746-4d12-9a83-07ee88824f75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -43,7 +46,7 @@
       <Filter>Constants</Filter>
     </ClInclude>
     <ClInclude Include="ResourcePool.h">
-      <Filter>LayerResourcePool</Filter>
+      <Filter>ResourcePool</Filter>
     </ClInclude>
     <ClInclude Include="RenderTarget.h">
       <Filter>RenderTarget</Filter>
@@ -69,13 +72,16 @@
     <ClInclude Include="CommandSubmitter.h">
       <Filter>CommandSubmitter</Filter>
     </ClInclude>
+    <ClInclude Include="GlobalDescriptorManager.h">
+      <Filter>GlobalDescriptorManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="ResourcePool.cpp">
-      <Filter>LayerResourcePool</Filter>
+      <Filter>ResourcePool</Filter>
     </ClCompile>
     <ClCompile Include="RenderTarget.cpp">
       <Filter>RenderTarget</Filter>
@@ -100,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="CommandSubmitter.cpp">
       <Filter>CommandSubmitter</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalDescriptorManager.cpp">
+      <Filter>GlobalDescriptorManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

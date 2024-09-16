@@ -37,6 +37,9 @@ namespace Render
 
 		__pCommandSubmitter = std::make_unique<CommandSubmitter>(*__pQueue);
 
+		__pGlobalDescriptorManager = std::make_unique<GlobalDescriptorManager>(
+			*__pDevice, __deferredDeleter, *__pResourcePool, materialTypeIds);
+
 		/*
 			TODO: Renderer dependent resources
 				- render pass
@@ -49,6 +52,7 @@ namespace Render
 		__deferredDeleter.flush();
 		__pDevice->vkDeviceWaitIdle();
 
+		__pGlobalDescriptorManager = nullptr;
 		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
 		__pGeneralCommandExecutor = nullptr;
