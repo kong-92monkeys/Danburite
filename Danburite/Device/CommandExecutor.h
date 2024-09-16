@@ -14,13 +14,6 @@ namespace Dev
 	public:
 		using Job = std::function<void(VK::CommandBuffer &)>;
 
-		struct ExecutionResult
-		{
-		public:
-			std::future<void> completion;
-			VK::CommandBuffer *pCmdBuffer{ };
-		};
-
 		CommandExecutor(
 			VK::Device &device,
 			uint32_t queueFamilyIndex);
@@ -34,10 +27,10 @@ namespace Dev
 		constexpr bool isEmpty() const noexcept;
 
 		[[nodiscard]]
-		ExecutionResult execute() noexcept;
+		std::future<VK::CommandBuffer *> execute() noexcept;
 
 	private:
-		Infra::ThreadPool __recordThread{ 1ULL };
+		Infra::ThreadPool __executionThread{ 1ULL };
 
 		std::unique_ptr<CommandBufferCirculator> __pCmdBufferCirculator;
 		std::vector<Job> __jobs;

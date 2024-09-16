@@ -6,7 +6,7 @@ namespace Dev
 		VK::Device &device,
 		uint32_t queueFamilyIndex)
 	{
-		__recordThread.run([this, &device, queueFamilyIndex]
+		__executionThread.run([this, &device, queueFamilyIndex]
 		{
 			__pCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
 				device, queueFamilyIndex,
@@ -16,7 +16,7 @@ namespace Dev
 
 	CommandExecutor::~CommandExecutor() noexcept
 	{
-		__recordThread.run([this]
+		__executionThread.run([this]
 		{
 			__pCmdBufferCirculator = nullptr;
 		}).wait();
@@ -28,35 +28,31 @@ namespace Dev
 		__jobs.emplace_back(std::move(job));
 	}
 
-	CommandExecutor::ExecutionResult CommandExecutor::execute() noexcept
+	std::future<VK::CommandBuffer *> CommandExecutor::execute() noexcept
 	{
-		auto &cmdBuffer{ __pCmdBufferCirculator->getCurrent() };
+		auto const pPromise{ new std::promise<VK::CommandBuffer *> };
 
-		auto completion
+		__executionThread.silentRun([this, pPromise, jobs{ std::move(__jobs) }]
 		{
-			__recordThread.run([this, &cmdBuffer, jobs{ std::move(__jobs) }]
+			auto &cmdBuffer{ __pCmdBufferCirculator->getNext() };
+
+			VkCommandBufferBeginInfo const cbBeginInfo
 			{
-				VkCommandBufferBeginInfo const cbBeginInfo
-				{
-					.sType	{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
-					.flags	{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
-				};
+				.sType	{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+				.flags	{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
+			};
 
-				cmdBuffer.vkBeginCommandBuffer(&cbBeginInfo);
+			cmdBuffer.vkBeginCommandBuffer(&cbBeginInfo);
 
-				for (auto const &job : jobs)
-					job(cmdBuffer);
+			for (auto const &job : jobs)
+				job(cmdBuffer);
 
-				cmdBuffer.vkEndCommandBuffer();
+			cmdBuffer.vkEndCommandBuffer();
 
-				__pCmdBufferCirculator->advance();
-			})
-		};
-		
-		ExecutionResult retVal;
-		retVal.completion	= std::move(completion);
-		retVal.pCmdBuffer	= &cmdBuffer;
+			pPromise->set_value(&cmdBuffer);
+			delete pPromise;
+		});
 
-		return retVal;
+		return pPromise->get_future();
 	}
 }

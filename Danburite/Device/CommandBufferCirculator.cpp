@@ -15,7 +15,14 @@ namespace Dev
 			__poolResources.emplace_back(device, queueFamilyIndex, level, __bufferCount);
 	}
 
-	void CommandBufferCirculator::advance()
+	VK::CommandBuffer &CommandBufferCirculator::getNext()
+	{
+		auto &retVal{ __poolResources[__poolIdx].getCommandBufferOf(__bufferIdx) };
+		__advance();
+		return retVal;
+	}
+
+	void CommandBufferCirculator::__advance()
 	{
 		++__bufferIdx;
 		if (__bufferIdx < __bufferCount)

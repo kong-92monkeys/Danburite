@@ -2,32 +2,36 @@
 
 namespace Render
 {
-	CommandSubmitter::CommandSubmitter(VK::Queue &queue) noexcept :
+	CommandSubmitter::CommandSubmitter(
+		VK::Queue &queue) noexcept :
 		__que	{ queue }
 	{}
 
-	void CommandSubmitter::addCommandExecutionResult(Dev::CommandExecutor::ExecutionResult &&result)
+	void CommandSubmitter::reserve(
+		std::future<VK::CommandBuffer *> &&result)
 	{
-		__commandExecutionResults.emplace_back(std::move(result));
+		__generalSubmissions.emplace_back(std::move(result));
 	}
 
-	void CommandSubmitter::addRenderTargetDrawResult(RenderTarget::DrawResult &&result)
+	void CommandSubmitter::reserve(
+		RenderTarget::DrawResult &&result)
 	{
-		__renderTargetDrawResults.emplace_back(std::move(result));
+		__drawcallSubmissions.emplace_back(std::move(result));
 	}
 
-	void CommandSubmitter::submit(VK::Fence &fence)
+	void CommandSubmitter::submit(
+		VK::Fence &fence)
 	{
-		__submitInfos.reserve(__commandExecutionResults.size() + __renderTargetDrawResults.size());
-		__commandBufferInfos.reserve(__commandExecutionResults.size() + __renderTargetDrawResults.size());
-		__waitSemaphoreInfos.reserve(__renderTargetDrawResults.size());
-		__signalSemaphoreInfos.reserve(__renderTargetDrawResults.size());
+		__submitInfos.reserve(__generalSubmissions.size() + __drawcallSubmissions.size());
+		__commandBufferInfos.reserve(__generalSubmissions.size() + __drawcallSubmissions.size());
+		__waitSemaphoreInfos.reserve(__drawcallSubmissions.size());
+		__signalSemaphoreInfos.reserve(__drawcallSubmissions.size());
 
-		for (const auto &result : __commandExecutionResults)
+		for (auto &submission : __generalSubmissions)
 		{
-			auto &cmdBufferInfo				{ __commandBufferInfos.emplace_back() };
-			cmdBufferInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
-			cmdBufferInfo.commandBuffer		= result.pCmdBuffer->getHandle();
+			auto &cmdBufferInfo					{ __commandBufferInfos.emplace_back() };
+			cmdBufferInfo.sType					= VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+			cmdBufferInfo.commandBuffer			= submission.get()->getHandle();
 
 			auto &submitInfo					{ __submitInfos.emplace_back() };
 			submitInfo.sType					= VkStructureType::VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
@@ -35,20 +39,20 @@ namespace Render
 			submitInfo.pCommandBufferInfos		= &cmdBufferInfo;
 		}
 
-		for (const auto &result : __renderTargetDrawResults)
+		for (auto &submission : __drawcallSubmissions)
 		{
-			auto &cmdBufferInfo				{ __commandBufferInfos.emplace_back() };
-			cmdBufferInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
-			cmdBufferInfo.commandBuffer		= result.pCmdBuffer->getHandle();
+			auto &cmdBufferInfo					{ __commandBufferInfos.emplace_back() };
+			cmdBufferInfo.sType					= VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+			cmdBufferInfo.commandBuffer			= submission.cmdBuffer.get()->getHandle();
 
-			auto &waitSemaphoreInfo			{ __waitSemaphoreInfos.emplace_back() };
-			waitSemaphoreInfo.sType			= VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-			waitSemaphoreInfo.semaphore		= result.pImageAcqSemaphore->getHandle();
-			waitSemaphoreInfo.stageMask		= VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
+			auto &waitSemaphoreInfo				{ __waitSemaphoreInfos.emplace_back() };
+			waitSemaphoreInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
+			waitSemaphoreInfo.semaphore			= submission.pImageAcqSemaphore->getHandle();
+			waitSemaphoreInfo.stageMask			= VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 
 			auto &signalSemaphoreInfo			{ __signalSemaphoreInfos.emplace_back() };
 			signalSemaphoreInfo.sType			= VkStructureType::VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-			signalSemaphoreInfo.semaphore		= result.pSignalSemaphore->getHandle();
+			signalSemaphoreInfo.semaphore		= submission.pSignalSemaphore->getHandle();
 			signalSemaphoreInfo.stageMask		= VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT;
 
 			auto &submitInfo					{ __submitInfos.emplace_back() };
@@ -60,12 +64,6 @@ namespace Render
 			submitInfo.signalSemaphoreInfoCount	= 1U;
 			submitInfo.pSignalSemaphoreInfos	= &signalSemaphoreInfo;
 		}
-
-		for (const auto &result : __commandExecutionResults)
-			result.completion.wait();
-
-		for (const auto &result : __renderTargetDrawResults)
-			result.completion.wait();
 
 		auto const result
 		{
@@ -80,28 +78,28 @@ namespace Render
 
 	void CommandSubmitter::present()
 	{
-		for (auto const &result : __renderTargetDrawResults)
+		for (auto const &submission : __drawcallSubmissions)
 		{
 			VkPresentInfoKHR const presentInfo
 			{
 				.sType					{ VkStructureType::VK_STRUCTURE_TYPE_PRESENT_INFO_KHR },
 				.waitSemaphoreCount		{ 1U },
-				.pWaitSemaphores		{ &(result.pSignalSemaphore->getHandle()) },
+				.pWaitSemaphores		{ &(submission.pSignalSemaphore->getHandle()) },
 				.swapchainCount			{ 1U },
-				.pSwapchains			{ &(result.pSwapchain->getHandle()) },
-				.pImageIndices			{ &(result.imageIndex) }
+				.pSwapchains			{ &(submission.pSwapchain->getHandle()) },
+				.pImageIndices			{ &(submission.imageIndex) }
 			};
 
 			auto const result{ __que.vkQueuePresentKHR(&presentInfo) };
 			if (result != VkResult::VK_SUCCESS)
-				throw std::runtime_error{ "Failed to present the draw result." };
+				throw std::runtime_error{ "Failed to present the draw submission." };
 		}
 	}
 
 	void CommandSubmitter::clear()
 	{
-		__commandExecutionResults.clear();
-		__renderTargetDrawResults.clear();
+		__generalSubmissions.clear();
+		__drawcallSubmissions.clear();
 
 		__commandBufferInfos.clear();
 		__waitSemaphoreInfos.clear();

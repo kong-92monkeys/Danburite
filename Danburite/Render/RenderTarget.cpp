@@ -31,7 +31,7 @@ namespace Render
 		__pCompleteSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1U);
 
-		__pDrawCommandExecutor = std::make_unique<Dev::CommandExecutor>(
+		__pDrawcallExecutor = std::make_unique<Dev::CommandExecutor>(
 			__device, __que.getFamilyIndex());
 	}
 
@@ -39,7 +39,7 @@ namespace Render
 	{
 		__que.vkQueueWaitIdle();
 
-		__pDrawCommandExecutor = nullptr;
+		__pDrawcallExecutor = nullptr;
 		__pCompleteSemaphoreCirculator = nullptr;
 		__pImageAcqSemaphoreCirculator = nullptr;
 
@@ -77,7 +77,7 @@ namespace Render
 
 		uint32_t const imageIdx{ __acquireNextImage(imageAcqSemaphore) };
 
-		__pDrawCommandExecutor->reserve([this, imageIdx] (auto &cmdBuffer)
+		__pDrawcallExecutor->reserve([this, imageIdx] (auto &cmdBuffer)
 		{
 			VkCommandBufferBeginInfo const cbBeginInfo
 			{
@@ -92,11 +92,8 @@ namespace Render
 			__endSwapchainImage(cmdBuffer, imageIdx);
 		});
 
-		auto executionResult{ __pDrawCommandExecutor->execute() };
-
 		DrawResult retVal{ };
-		retVal.completion			= std::move(executionResult.completion);
-		retVal.pCmdBuffer			= executionResult.pCmdBuffer;
+		retVal.cmdBuffer			= __pDrawcallExecutor->execute();
 		retVal.pSwapchain			= __pSwapchain.get();
 		retVal.imageIndex			= imageIdx;
 		retVal.pImageAcqSemaphore	= &imageAcqSemaphore;

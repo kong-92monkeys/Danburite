@@ -28,7 +28,7 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
-		__pInstantCommandExecutor = std::make_unique<Dev::CommandExecutor>(
+		__pGeneralCommandExecutor = std::make_unique<Dev::CommandExecutor>(
 			*__pDevice, __queueFamilyIndex);
 
 		__pSubmissionFenceCirculator = std::make_unique<Dev::FenceCirculator>(
@@ -54,7 +54,7 @@ namespace Render
 		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
 		__pSubmissionFenceCirculator = nullptr;
-		__pInstantCommandExecutor = nullptr;
+		__pGeneralCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
 		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
@@ -75,7 +75,7 @@ namespace Render
 	std::shared_ptr<Mesh> Engine::createMesh()
 	{
 		return std::make_shared<Mesh>(
-			*__pDevice, *__pInstantCommandExecutor,
+			*__pDevice, *__pGeneralCommandExecutor,
 			*__pMemoryAllocator, __deferredDeleter);
 	}
 
@@ -84,7 +84,7 @@ namespace Render
 		Texture::ImageViewCreateInfo const &imageViewCreateInfo)
 	{
 		return std::make_shared<Texture>(
-			*__pDevice, *__pInstantCommandExecutor,
+			*__pDevice, *__pGeneralCommandExecutor,
 			*__pMemoryAllocator, __deferredDeleter,
 			imageCreateInfo, imageViewCreateInfo);
 	}
@@ -96,13 +96,16 @@ namespace Render
 			return;
 
 		__pCommandSubmitter->clear();
-		__pCommandSubmitter->addCommandExecutionResult(__pInstantCommandExecutor->execute());
-		__pCommandSubmitter->addRenderTargetDrawResult(renderTarget.draw());
 
-		auto &fence{ __getNextSubmissionFence() };
-		__pDevice->vkResetFences(1U, &(fence.getHandle()));
+		if (!(__pGeneralCommandExecutor->isEmpty()))
+			__pCommandSubmitter->reserve(__pGeneralCommandExecutor->execute());
 
-		__pCommandSubmitter->submit(fence);
+		__pCommandSubmitter->reserve(renderTarget.draw());
+
+		auto &submissionFence{ __getNextSubmissionFence() };
+		__pDevice->vkResetFences(1U, &(submissionFence.getHandle()));
+
+		__pCommandSubmitter->submit(submissionFence);
 		__pCommandSubmitter->present();
 
 		__deferredDeleter.advance();

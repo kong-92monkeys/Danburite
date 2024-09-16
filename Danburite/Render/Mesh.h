@@ -14,7 +14,7 @@ namespace Render
 	public:
 		Mesh(
 			VK::Device &device,
-			Dev::CommandExecutor &instantCommandExecutor,
+			Dev::CommandExecutor &generalCommandExecutor,
 			Dev::MemoryAllocator &memoryAllocator,
 			Infra::DeferredDeleter &deferredDeleter) noexcept;
 
@@ -53,7 +53,7 @@ namespace Render
 
 	private:
 		VK::Device &__device;
-		Dev::CommandExecutor &__instantCommandExecutor;
+		Dev::CommandExecutor &__generalCommandExecutor;
 		Dev::MemoryAllocator &__memoryAllocator;
 		Infra::DeferredDeleter &__deferredDeleter;
 

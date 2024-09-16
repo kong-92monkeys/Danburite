@@ -4,13 +4,13 @@ namespace Render
 {
 	Texture::Texture(
 		VK::Device &device,
-		Dev::CommandExecutor &instantCommandExecutor,
+		Dev::CommandExecutor &generalCommandExecutor,
 		Dev::MemoryAllocator &memoryAllocator,
 		Infra::DeferredDeleter &deferredDeleter,
 		ImageCreateInfo const &imageCreateInfo,
 		ImageViewCreateInfo const &imageViewCreateInfo) :
 		__device					{ device },
-		__instantCommandExecutor	{ instantCommandExecutor },
+		__generalCommandExecutor	{ generalCommandExecutor },
 		__memoryAllocator			{ memoryAllocator },
 		__deferredDeleter			{ deferredDeleter }
 	{
@@ -41,7 +41,7 @@ namespace Render
 		auto pStagingBuffer{ __createStagingBuffer(size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
-		__instantCommandExecutor.reserve([=, &dst{ *__pImage }, &src{ *pStagingBuffer }, regionInfo{ dst }](auto &cmdBuffer)
+		__generalCommandExecutor.reserve([=, &dst{ *__pImage }, &src{ *pStagingBuffer }, regionInfo{ dst }](auto &cmdBuffer)
 		{
 			VkImageMemoryBarrier2 const beforeMemoryBarrier
 			{

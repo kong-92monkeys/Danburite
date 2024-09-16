@@ -24,8 +24,7 @@ namespace Render
 		struct DrawResult
 		{
 		public:
-			std::future<void> completion;
-			VK::CommandBuffer *pCmdBuffer{ };
+			std::future<VK::CommandBuffer *> cmdBuffer;
 			VK::Swapchain *pSwapchain{ };
 			uint32_t imageIndex{ };
 			VK::Semaphore *pImageAcqSemaphore{ };
@@ -94,7 +93,7 @@ namespace Render
 		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pCompleteSemaphoreCirculator;
 
-		std::unique_ptr<Dev::CommandExecutor> __pDrawCommandExecutor;
+		std::unique_ptr<Dev::CommandExecutor> __pDrawcallExecutor;
 
 		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 
