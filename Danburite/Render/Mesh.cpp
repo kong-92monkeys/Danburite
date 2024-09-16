@@ -4,13 +4,13 @@ namespace Render
 {
 	Mesh::Mesh(
 		VK::Device &device,
-		Dev::CommandExecutor &generalCommandExecutor,
 		Dev::MemoryAllocator &memoryAllocator,
-		Infra::DeferredDeleter &deferredDeleter) noexcept :
+		Dev::CommandExecutor &generalCommandExecutor,
+		Render::ResourcePool &resourcePool) noexcept :
 		__device					{ device },
-		__generalCommandExecutor	{ generalCommandExecutor },
 		__memoryAllocator			{ memoryAllocator },
-		__deferredDeleter			{ deferredDeleter }
+		__generalCommandExecutor	{ generalCommandExecutor },
+		__resourcePool				{ resourcePool }
 	{}
 
 	Mesh::~Mesh() noexcept
@@ -18,11 +18,19 @@ namespace Render
 		for (auto &[_, pVertexBuffer] : __vertexBuffers)
 		{
 			if (pVertexBuffer)
-				__deferredDeleter.reserve(std::move(pVertexBuffer));
+			{
+				__resourcePool.recycleBuffer(
+					ResourcePool::BufferType::DEVICE_LOCAL_VERTEX,
+					std::move(pVertexBuffer));
+			}
 		}
 
 		if (__pIndexBuffer)
-			__deferredDeleter.reserve(std::move(__pIndexBuffer));
+		{
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::DEVICE_LOCAL_INDEX,
+				std::move(__pIndexBuffer));
+		}
 	}
 
 	void Mesh::createVertexBuffer(
@@ -32,22 +40,14 @@ namespace Render
 	{
 		auto &pVertexBuffer{ __vertexBuffers[bindingIndex] };
 		if (pVertexBuffer)
-			__deferredDeleter.reserve(std::move(pVertexBuffer));
-
-		VkBufferCreateInfo const bufferCreateInfo
 		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO },
-			.size			{ size },
-			.usage			{
-				VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
-				VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_DST_BIT
-			},
-			.sharingMode	{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE }
-		};
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::DEVICE_LOCAL_VERTEX,
+				std::move(pVertexBuffer));
+		}
 
-		pVertexBuffer = std::make_shared<Dev::MemoryBuffer>(
-			__device, __memoryAllocator, bufferCreateInfo,
-			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		pVertexBuffer = __resourcePool.getBuffer(
+			ResourcePool::BufferType::DEVICE_LOCAL_VERTEX, size);
 
 		__updateData(
 			*pVertexBuffer, pData, size, 0ULL,
@@ -80,19 +80,26 @@ namespace Render
 		if (!pVertexBuffer)
 			return;
 
-		__deferredDeleter.reserve(std::move(pVertexBuffer));
+		__resourcePool.recycleBuffer(
+			ResourcePool::BufferType::DEVICE_LOCAL_VERTEX,
+			std::move(pVertexBuffer));
+
 		__validateCmdParams();
 	}
 
 	void Mesh::clearVertexBuffers()
 	{
-		for (auto &[bindingIndex, pVertexBuffer] : __vertexBuffers)
+		for (auto &[_, pVertexBuffer] : __vertexBuffers)
 		{
 			if (!pVertexBuffer)
 				continue;
 
-			__deferredDeleter.reserve(std::move(pVertexBuffer));
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::DEVICE_LOCAL_VERTEX,
+				std::move(pVertexBuffer));
 		}
+
+		__validateCmdParams();
 	}
 
 	void Mesh::createIndexBuffer(
@@ -103,22 +110,14 @@ namespace Render
 		__indexType = type;
 
 		if (__pIndexBuffer)
-			__deferredDeleter.reserve(std::move(__pIndexBuffer));
-
-		VkBufferCreateInfo const bufferCreateInfo
 		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO },
-			.size			{ size },
-			.usage			{
-				VkBufferUsageFlagBits::VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
-				VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_DST_BIT
-			},
-			.sharingMode	{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE }
-		};
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::DEVICE_LOCAL_INDEX,
+				std::move(__pIndexBuffer));
+		}
 
-		__pIndexBuffer = std::make_shared<Dev::MemoryBuffer>(
-			__device, __memoryAllocator, bufferCreateInfo,
-			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		__pIndexBuffer = __resourcePool.getBuffer(
+			ResourcePool::BufferType::DEVICE_LOCAL_INDEX, size);
 
 		__updateData(
 			*__pIndexBuffer, pData, size, 0ULL,
@@ -146,7 +145,9 @@ namespace Render
 		if (!__pIndexBuffer)
 			return;
 
-		__deferredDeleter.reserve(std::move(__pIndexBuffer));
+		__resourcePool.recycleBuffer(
+			ResourcePool::BufferType::DEVICE_LOCAL_INDEX,
+			std::move(__pIndexBuffer));
 	}
 
 	void Mesh::bind(
@@ -175,7 +176,7 @@ namespace Render
 		VkPipelineStageFlags2 const afterStageMask,
 		VkAccessFlags2 const afterAccessMask)
 	{
-		auto pStagingBuffer{ __createStagingBuffer(size) };
+		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
 		__generalCommandExecutor.reserve([=, &dst, &src{ *pStagingBuffer }] (auto &cmdBuffer)
@@ -234,7 +235,8 @@ namespace Render
 			cmdBuffer.vkCmdPipelineBarrier2(&afterBarrier);
 		});
 
-		__deferredDeleter.reserve(std::move(pStagingBuffer));
+		__resourcePool.recycleBuffer(
+			ResourcePool::BufferType::STAGING, std::move(pStagingBuffer));
 	}
 
 	void Mesh::__validateCmdParams() noexcept
@@ -256,22 +258,5 @@ namespace Render
 			__cmdParam_vertexBufferHandles[bindingIndex] = pVertexBuffer->getHandle();
 			__cmdParam_vertexBufferOffsets[bindingIndex] = 0ULL;
 		}
-	}
-
-	std::shared_ptr<Dev::MemoryBuffer> Mesh::__createStagingBuffer(
-		size_t const size)
-	{
-		VkBufferCreateInfo const bufferCreateInfo
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO },
-			.size			{ size },
-			.usage			{ VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_SRC_BIT },
-			.sharingMode	{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE }
-		};
-
-		return std::make_shared<Dev::MemoryBuffer>(
-			__device, __memoryAllocator, bufferCreateInfo,
-			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 }

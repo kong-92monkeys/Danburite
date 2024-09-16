@@ -1,9 +1,7 @@
 #pragma once
 
-#include "../Infra/DeferredDeleter.h"
-#include "../Vulkan/CommandBuffer.h"
-#include "../Device/MemoryBuffer.h"
 #include "../Device/CommandExecutor.h"
+#include "../Render/ResourcePool.h"
 #include <unordered_map>
 #include <memory>
 
@@ -14,9 +12,9 @@ namespace Render
 	public:
 		Mesh(
 			VK::Device &device,
-			Dev::CommandExecutor &generalCommandExecutor,
 			Dev::MemoryAllocator &memoryAllocator,
-			Infra::DeferredDeleter &deferredDeleter) noexcept;
+			Dev::CommandExecutor &generalCommandExecutor,
+			Render::ResourcePool &resourcePool) noexcept;
 
 		virtual ~Mesh() noexcept override;
 
@@ -53,9 +51,9 @@ namespace Render
 
 	private:
 		VK::Device &__device;
-		Dev::CommandExecutor &__generalCommandExecutor;
 		Dev::MemoryAllocator &__memoryAllocator;
-		Infra::DeferredDeleter &__deferredDeleter;
+		Dev::CommandExecutor &__generalCommandExecutor;
+		Render::ResourcePool &__resourcePool;
 
 		std::unordered_map<uint32_t, std::shared_ptr<Dev::MemoryBuffer>> __vertexBuffers;
 
@@ -76,9 +74,5 @@ namespace Render
 			VkAccessFlags2 afterAccessMask);
 
 		void __validateCmdParams() noexcept;
-
-		[[nodiscard]]
-		std::shared_ptr<Dev::MemoryBuffer> __createStagingBuffer(
-			size_t size);
 	};
 }

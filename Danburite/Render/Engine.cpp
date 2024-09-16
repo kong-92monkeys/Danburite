@@ -74,8 +74,8 @@ namespace Render
 	std::shared_ptr<Mesh> Engine::createMesh()
 	{
 		return std::make_shared<Mesh>(
-			*__pDevice, *__pGeneralCommandExecutor,
-			*__pMemoryAllocator, __deferredDeleter);
+			*__pDevice, *__pMemoryAllocator,
+			*__pGeneralCommandExecutor, *__pResourcePool);
 	}
 
 	std::shared_ptr<Texture> Engine::createTexture(

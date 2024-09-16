@@ -10,7 +10,10 @@ namespace Render
 		__deferredDeleter	{ deferredDeleter },
 		__memoryAllocator	{ memoryAllocator }
 	{
+		__registerDeviceLocalVertexBufferPool();
+		__registerDeviceLocalIndexBufferPool();
 		__registerHostVisibleCoherentStorageBufferPool();
+		__registerStagingBufferPool();
 	}
 
 	std::shared_ptr<Dev::MemoryBuffer> ResourcePool::getBuffer(
@@ -27,27 +30,74 @@ namespace Render
 		return __bufferPools.at(type)->recycle(std::move(pBuffer));
 	}
 
+	void ResourcePool::__registerDeviceLocalVertexBufferPool()
+	{
+		VkBufferUsageFlags bufferUsage{ };
+		bufferUsage |= VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		bufferUsage |= VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+		VkMemoryPropertyFlags memoryProp{ };
+		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+		__registerBufferPool(BufferType::DEVICE_LOCAL_VERTEX, bufferUsage, memoryProp);
+	}
+
+	void ResourcePool::__registerDeviceLocalIndexBufferPool()
+	{
+		VkBufferUsageFlags bufferUsage{ };
+		bufferUsage |= VkBufferUsageFlagBits::VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+		bufferUsage |= VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+		VkMemoryPropertyFlags memoryProp{ };
+		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+		__registerBufferPool(BufferType::DEVICE_LOCAL_VERTEX, bufferUsage, memoryProp);
+	}
+
 	void ResourcePool::__registerHostVisibleCoherentStorageBufferPool()
 	{
-		auto creator = [this] (size_t const size)
+		VkBufferUsageFlags bufferUsage{ };
+		bufferUsage |= VkBufferUsageFlagBits::VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+
+		VkMemoryPropertyFlags memoryProp{ };
+		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+		__registerBufferPool(BufferType::HOST_VISIBLE_COHERENT_STORAGE, bufferUsage, memoryProp);
+	}
+
+	void ResourcePool::__registerStagingBufferPool()
+	{
+		VkBufferUsageFlags bufferUsage{ };
+		bufferUsage |= VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+		VkMemoryPropertyFlags memoryProp{ };
+		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
+		__registerBufferPool(BufferType::HOST_VISIBLE_COHERENT_STORAGE, bufferUsage, memoryProp);
+	}
+
+	void ResourcePool::__registerBufferPool(
+		BufferType const bufferType,
+		VkBufferUsageFlags const bufferUsage,
+		VkMemoryPropertyFlags const memoryProp)
+	{
+		auto creator = [this, bufferUsage, memoryProp] (size_t const size)
 		{
 			VkBufferCreateInfo const bufferCreateInfo
 			{
 				.sType			{ VkStructureType::VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO },
 				.size			{ size },
-				.usage			{ VkBufferUsageFlagBits::VK_BUFFER_USAGE_STORAGE_BUFFER_BIT },
+				.usage			{ bufferUsage },
 				.sharingMode	{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE }
 			};
-
-			VkMemoryPropertyFlags memoryProp{ };
-			memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-			memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 			return std::make_shared<Dev::MemoryBuffer>(
 				__device, __memoryAllocator, bufferCreateInfo, memoryProp);
 		};
 
-		__bufferPools[BufferType::HOST_VISIBLE_COHERENT_STORAGE] =
+		__bufferPools[bufferType] =
 			std::make_unique<__BufferPool>(std::move(creator), __deferredDeleter);
 	}
 

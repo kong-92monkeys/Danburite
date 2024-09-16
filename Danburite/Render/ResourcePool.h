@@ -10,7 +10,10 @@ namespace Render
 	public:
 		enum class BufferType
 		{
-			HOST_VISIBLE_COHERENT_STORAGE
+			DEVICE_LOCAL_VERTEX,
+			DEVICE_LOCAL_INDEX,
+			HOST_VISIBLE_COHERENT_STORAGE,
+			STAGING
 		};
 
 		ResourcePool(
@@ -55,6 +58,14 @@ namespace Render
 
 		std::unordered_map<BufferType, std::unique_ptr<__BufferPool>> __bufferPools;
 
+		void __registerDeviceLocalVertexBufferPool();
+		void __registerDeviceLocalIndexBufferPool();
 		void __registerHostVisibleCoherentStorageBufferPool();
+		void __registerStagingBufferPool();
+
+		void __registerBufferPool(
+			BufferType bufferType,
+			VkBufferUsageFlags bufferUsage,
+			VkMemoryPropertyFlags memoryProp);
 	};
 }
