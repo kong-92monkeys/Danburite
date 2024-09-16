@@ -5,7 +5,6 @@
 #include "../Infra/GenericBuffer.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Vulkan/DescriptorPool.h"
-#include "../Vulkan/DescriptorSet.h"
 #include "Material.h"
 #include "ResourcePool.h"
 #include "Constants.h"
@@ -56,7 +55,7 @@ namespace Render
 		std::unique_ptr<VK::DescriptorSetLayout> __pDescSetLayout;
 		std::unique_ptr<VK::DescriptorPool> __pDescPool;
 
-		std::array<std::unique_ptr<VK::DescriptorSet>, Constants::MAX_IN_FLIGHT_FRAME_COUNT> __descSets;
+		//std::array<std::unique_ptr<VK::DescriptorSet>, Constants::MAX_IN_FLIGHT_FRAME_COUNT> __descSets;
 		uint32_t __descSetCursor{ };
 
 		Infra::EventListenerPtr<Material const *> __pMaterialUpdateListener;

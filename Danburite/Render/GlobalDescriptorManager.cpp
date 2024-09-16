@@ -1,5 +1,4 @@
 #include "GlobalDescriptorManager.h"
-#include "Constants.h"
 #include <stdexcept>
 
 namespace Render
@@ -18,6 +17,7 @@ namespace Render
 	{
 		__createDescSetLayout();
 		__createDescPool();
+		__allocateDescSets();
 	}
 
 	GlobalDescriptorManager::~GlobalDescriptorManager() noexcept
@@ -74,13 +74,11 @@ namespace Render
 
 	void GlobalDescriptorManager::__createDescPool()
 	{
-		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
+		auto const &deviceLimits				{ __physicalDevice.getProps().p10->limits };
 
-		uint32_t const sampledImagePoolSize
-		{
-			static_cast<uint32_t>(
-				__sampledImageDescCount * Constants::MAX_IN_FLIGHT_FRAME_COUNT)
-		};
+		uint32_t const descSetCount				{ static_cast<uint32_t>(__descSets.size()) };
+		uint32_t const materialBufferPoolSize	{ static_cast<uint32_t>(__materialTypeIds.size()) * descSetCount };
+		uint32_t const sampledImagePoolSize		{ __sampledImageDescCount * descSetCount };
 
 		if (deviceLimits.maxPerStageDescriptorSampledImages < sampledImagePoolSize)
 			throw std::runtime_error{ "The sampledImagePoolSize is overflowed." };
@@ -89,7 +87,7 @@ namespace Render
 
 		/*poolSizes.emplace_back(
 			VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			static_cast<uint32_t>(__materialTypeIds.size() * Constants::MAX_IN_FLIGHT_FRAME_COUNT));*/
+			materialBufferPoolSize);*/
 
 		poolSizes.emplace_back(
 			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
@@ -98,11 +96,52 @@ namespace Render
 		VkDescriptorPoolCreateInfo const createInfo
 		{
 			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO },
-			.maxSets		{ static_cast<uint32_t>(Constants::MAX_IN_FLIGHT_FRAME_COUNT) },
+			.maxSets		{ descSetCount },
 			.poolSizeCount	{ static_cast<uint32_t>(poolSizes.size()) },
 			.pPoolSizes		{ poolSizes.data() }
 		};
 
-		__pDescPool = std::make_unique<VK::DescriptorPool>(__device, createInfo);
+		__pDescPool = std::make_shared<VK::DescriptorPool>(__device, createInfo);
+	}
+
+	void GlobalDescriptorManager::__allocateDescSets()
+	{
+		uint32_t const descSetCount{ static_cast<uint32_t>(__descSets.size()) };
+
+		std::vector<uint32_t> sampledImageDescCounts;
+		std::vector<VkDescriptorSetLayout> layoutHandles;
+
+		for (uint32_t iter{ }; iter < descSetCount; ++iter)
+		{
+			sampledImageDescCounts.emplace_back(__sampledImageDescCount);
+			layoutHandles.emplace_back(__pDescSetLayout->getHandle());
+		}
+
+		VkDescriptorSetVariableDescriptorCountAllocateInfo const descCountInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO },
+			.descriptorSetCount	{ descSetCount },
+			.pDescriptorCounts	{ sampledImageDescCounts.data() }
+		};
+
+		VkDescriptorSetAllocateInfo const allocInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO },
+			.pNext				{ &descCountInfo },
+			.descriptorPool		{ __pDescPool->getHandle() },
+			.descriptorSetCount	{ descSetCount },
+			.pSetLayouts		{ layoutHandles.data() }
+		};
+
+		__device.vkAllocateDescriptorSets(&allocInfo, __descSets.data());
+	}
+
+	void GlobalDescriptorManager::__growSampledImageDescCount()
+	{
+		__deferredDeleter.reserve(std::move(__pDescPool));
+
+		__sampledImageDescCount <<= 1U;
+		__createDescPool();
+		__allocateDescSets();
 	}
 }

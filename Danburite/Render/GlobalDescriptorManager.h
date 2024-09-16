@@ -3,7 +3,9 @@
 #include "../Infra/DeferredRecycler.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Vulkan/DescriptorPool.h"
+#include "Constants.h"
 #include "ResourcePool.h"
+#include <array>
 #include <typeindex>
 
 namespace Render
@@ -28,11 +30,17 @@ namespace Render
 		std::unordered_map<std::type_index, uint32_t> const __materialTypeIds;
 
 		std::unique_ptr<VK::DescriptorSetLayout> __pDescSetLayout;
-		std::unique_ptr<VK::DescriptorPool> __pDescPool;
+		std::shared_ptr<VK::DescriptorPool> __pDescPool;
+
+		std::array<VkDescriptorSet, Constants::MAX_IN_FLIGHT_FRAME_COUNT> __descSets;
+		uint32_t __descSetCursor{ };
 
 		uint32_t __sampledImageDescCount{ 128U };
 
 		void __createDescSetLayout();
 		void __createDescPool();
+		void __allocateDescSets();
+
+		void __growSampledImageDescCount();
 	};
 }
