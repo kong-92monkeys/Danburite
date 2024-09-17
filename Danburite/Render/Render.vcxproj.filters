@@ -25,9 +25,6 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{453da233-e48d-4a99-8591-e62c5ed8dda6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MaterialDescriptorManager">
-      <UniqueIdentifier>{da8da781-1ed6-4add-975b-a685de9ae1a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="CommandSubmitter">
       <UniqueIdentifier>{fdbb4b8f-c1de-4ead-9af7-9eacca4e6170}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,9 @@
     </Filter>
     <Filter Include="ResourcePool">
       <UniqueIdentifier>{601eeda5-6746-4d12-9a83-07ee88824f75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MaterialBufferBuilder">
+      <UniqueIdentifier>{cb2ad3d7-7386-4812-ba24-e25d338bc0a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -66,14 +66,14 @@
     <ClInclude Include="Renderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="MaterialDescriptorManager.h">
-      <Filter>MaterialDescriptorManager</Filter>
-    </ClInclude>
     <ClInclude Include="CommandSubmitter.h">
       <Filter>CommandSubmitter</Filter>
     </ClInclude>
     <ClInclude Include="GlobalDescriptorManager.h">
       <Filter>GlobalDescriptorManager</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialBufferBuilder.h">
+      <Filter>MaterialBufferBuilder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,14 +101,14 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialDescriptorManager.cpp">
-      <Filter>MaterialDescriptorManager</Filter>
-    </ClCompile>
     <ClCompile Include="CommandSubmitter.cpp">
       <Filter>CommandSubmitter</Filter>
     </ClCompile>
     <ClCompile Include="GlobalDescriptorManager.cpp">
       <Filter>GlobalDescriptorManager</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialBufferBuilder.cpp">
+      <Filter>MaterialBufferBuilder</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

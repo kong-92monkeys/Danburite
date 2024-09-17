@@ -3,44 +3,104 @@
 #include "../Infra/DeferredRecycler.h"
 #include "../Vulkan/DescriptorSetLayout.h"
 #include "../Vulkan/DescriptorPool.h"
+#include "../Device/DescriptorUpdater.h"
 #include "Constants.h"
 #include "ResourcePool.h"
+#include "MaterialBufferBuilder.h"
 #include <array>
 #include <typeindex>
 
 namespace Render
 {
-	class GlobalDescriptorManager : public Infra::Unique
+	class GlobalDescriptorManager : public Infra::Unique, public Infra::Stateful<GlobalDescriptorManager>
 	{
 	public:
+		struct BindingInfo
+		{
+		public:
+			std::unordered_map<std::type_index, uint32_t> materialBufferBindings;
+			uint32_t sampledImageBinding{ };
+		};
+
 		GlobalDescriptorManager(
 			VK::PhysicalDevice &physicalDevice,
 			VK::Device &device,
 			Infra::DeferredDeleter &deferredDeleter,
+			Dev::DescriptorUpdater &descriptorUpdater,
 			ResourcePool &resourcePool,
-			std::unordered_map<std::type_index, uint32_t> const &materialTypeIds);
+			BindingInfo const &bindingInfo);
 
 		virtual ~GlobalDescriptorManager() noexcept override;
+
+		void registerMaterial(
+			Material const *pMaterial);
+
+		void unregisterMaterial(
+			Material const *pMaterial);
+
+		[[nodiscard]]
+		uint32_t getIdOf(
+			Material const *pMaterial) const noexcept;
+
+		[[nodiscard]]
+		constexpr VK::DescriptorSetLayout const &getDescriptorSetLayout() const noexcept;
+
+		[[nodiscard]]
+		constexpr VkDescriptorSet getDescriptorSet() const noexcept;
+
+	protected:
+		virtual void _onValidate() override;
 
 	private:
 		VK::PhysicalDevice &__physicalDevice;
 		VK::Device &__device;
 		Infra::DeferredDeleter &__deferredDeleter;
+		Dev::DescriptorUpdater &__descriptorUpdater;
 		ResourcePool &__resourcePool;
-		std::unordered_map<std::type_index, uint32_t> const __materialTypeIds;
+		BindingInfo const __bindingInfo;
 
 		std::unique_ptr<VK::DescriptorSetLayout> __pDescSetLayout;
 		std::shared_ptr<VK::DescriptorPool> __pDescPool;
 
-		std::array<VkDescriptorSet, Constants::MAX_IN_FLIGHT_FRAME_COUNT> __descSets;
+		std::array<VkDescriptorSet, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1ULL> __descSets;
 		uint32_t __descSetCursor{ };
 
-		uint32_t __sampledImageDescCount{ 128U };
+		VkDescriptorSet __hCurDescSet{ };
+
+		std::unordered_map<std::type_index, std::unique_ptr<MaterialBufferBuilder>> __materialBufferBuilders;
+
+		uint32_t __sampledImageDescCount{ 16U };
+
+		Infra::EventListenerPtr<MaterialBufferBuilder *> __pMaterialBufferBuilderInvalidateListener;
 
 		void __createDescSetLayout();
 		void __createDescPool();
 		void __allocateDescSets();
+		void __createMaterialBufferBuilders();
+
+		void __validateMaterialBufferBuilders();
+		void __validateDescSet();
+
+		[[nodiscard]]
+		constexpr VkDescriptorSet __getNextDescSet() noexcept;
 
 		void __growSampledImageDescCount();
 	};
+
+	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getDescriptorSetLayout() const noexcept
+	{
+		return *__pDescSetLayout;
+	}
+
+	constexpr VkDescriptorSet GlobalDescriptorManager::getDescriptorSet() const noexcept
+	{
+		return __hCurDescSet;
+	}
+
+	constexpr VkDescriptorSet GlobalDescriptorManager::__getNextDescSet() noexcept
+	{
+		auto const retVal{ __descSets[__descSetCursor] };
+		__descSetCursor = ((__descSetCursor + 1U) % static_cast<uint32_t>(__descSets.size()));
+		return retVal;
+	}
 }

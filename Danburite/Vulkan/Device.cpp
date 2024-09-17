@@ -323,6 +323,18 @@ namespace VK
 			getHandle(), descriptorPool, descriptorSetCount, pDescriptorSets);
 	}
 
+	void Device::vkUpdateDescriptorSets(
+		uint32_t const descriptorWriteCount,
+		VkWriteDescriptorSet const *const pDescriptorWrites,
+		uint32_t const descriptorCopyCount,
+		VkCopyDescriptorSet const *const pDescriptorCopies)
+	{
+		__deviceProc.vkUpdateDescriptorSets(
+			getHandle(),
+			descriptorWriteCount, pDescriptorWrites,
+			descriptorCopyCount, pDescriptorCopies);
+	}
+
 	VkResult Device::vkCreatePipelineLayout(
 		VkPipelineLayoutCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,

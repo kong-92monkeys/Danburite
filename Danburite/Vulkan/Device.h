@@ -172,6 +172,12 @@ namespace VK
 			uint32_t descriptorSetCount,
 			VkDescriptorSet const *pDescriptorSets);
 
+		void vkUpdateDescriptorSets(
+			uint32_t descriptorWriteCount,
+			VkWriteDescriptorSet const *pDescriptorWrites,
+			uint32_t descriptorCopyCount,
+			VkCopyDescriptorSet const *pDescriptorCopies);
+
 		VkResult vkCreatePipelineLayout(
 			VkPipelineLayoutCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,

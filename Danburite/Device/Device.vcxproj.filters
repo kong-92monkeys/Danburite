@@ -34,6 +34,9 @@
     <Filter Include="CommandExecutor">
       <UniqueIdentifier>{3f2eb002-d8bf-4915-9eea-5bc877c2139b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DescriptorUpdater">
+      <UniqueIdentifier>{6bf22b45-1d04-4744-9c94-dfc4b06ca1ed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
@@ -62,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="CommandExecutor.cpp">
       <Filter>CommandExecutor</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorUpdater.cpp">
+      <Filter>DescriptorUpdater</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="CommandExecutor.h">
       <Filter>CommandExecutor</Filter>
+    </ClInclude>
+    <ClInclude Include="DescriptorUpdater.h">
+      <Filter>DescriptorUpdater</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

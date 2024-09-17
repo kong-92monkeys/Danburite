@@ -9,7 +9,7 @@ namespace Render
 	Engine::Engine(
 		Dev::Context &context,
 		VK::PhysicalDevice &physicalDevice,
-		std::unordered_map<std::type_index, uint32_t> const &materialTypeIds) :
+		GlobalDescriptorManager::BindingInfo const &globalDescBindingInfo) :
 		__context			{ context },
 		__physicalDevice	{ physicalDevice }
 	{
@@ -32,13 +32,16 @@ namespace Render
 		__pGeneralCommandExecutor = std::make_unique<Dev::CommandExecutor>(
 			*__pDevice, __queueFamilyIndex);
 
+		__pDescriptorUpdater = std::make_unique<Dev::DescriptorUpdater>(*__pDevice);
+
 		__pResourcePool = std::make_unique<ResourcePool>(
 			*__pDevice, __deferredDeleter, *__pMemoryAllocator);
 
 		__pCommandSubmitter = std::make_unique<CommandSubmitter>(*__pQueue);
 
 		__pGlobalDescriptorManager = std::make_unique<GlobalDescriptorManager>(
-			__physicalDevice, *__pDevice, __deferredDeleter, *__pResourcePool, materialTypeIds);
+			__physicalDevice, *__pDevice, __deferredDeleter,
+			*__pDescriptorUpdater, *__pResourcePool, globalDescBindingInfo);
 
 		/*
 			TODO: Renderer dependent resources
@@ -55,6 +58,7 @@ namespace Render
 		__pGlobalDescriptorManager = nullptr;
 		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
+		__pDescriptorUpdater = nullptr;
 		__pGeneralCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
 
@@ -95,6 +99,8 @@ namespace Render
 	void Engine::render(
 		std::unordered_set<RenderTarget *> const &renderTargets)
 	{
+		__pGlobalDescriptorManager->validate();
+		__pDescriptorUpdater->update();
 		__pCommandSubmitter->clear();
 
 		if (!(__pGeneralCommandExecutor->isEmpty()))

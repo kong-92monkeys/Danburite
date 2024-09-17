@@ -10,7 +10,6 @@
 #include "Texture.h"
 #include "CommandSubmitter.h"
 #include "GlobalDescriptorManager.h"
-#include <typeindex>
 #include <unordered_set>
 
 namespace Render
@@ -21,7 +20,7 @@ namespace Render
 		Engine(
 			Dev::Context &context,
 			VK::PhysicalDevice &physicalDevice,
-			std::unordered_map<std::type_index, uint32_t> const &materialTypeIds);
+			GlobalDescriptorManager::BindingInfo const &globalDescBindingInfo);
 
 		virtual ~Engine() noexcept override;
 
@@ -53,8 +52,10 @@ namespace Render
 		std::unique_ptr<VK::Queue> __pQueue;
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
 		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
+
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
 		std::unique_ptr<Dev::CommandExecutor> __pGeneralCommandExecutor;
+		std::unique_ptr<Dev::DescriptorUpdater> __pDescriptorUpdater;
 		std::unique_ptr<ResourcePool> __pResourcePool;
 		std::unique_ptr<CommandSubmitter> __pCommandSubmitter;
 		std::unique_ptr<GlobalDescriptorManager> __pGlobalDescriptorManager;

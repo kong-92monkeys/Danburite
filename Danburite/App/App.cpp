@@ -138,10 +138,13 @@ void CApp::__onInitBeforeMainFrame()
 
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
 
+	Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
+	globalDescBindingInfo.sampledImageBinding = 0U;
+
 	__pRenderEngine = std::make_unique<Render::Engine>(
 		*__pVulkanContext,
 		__pVulkanContext->getPhysicalDeviceOf(0ULL),
-		materialTypeIds);
+		globalDescBindingInfo);
 }
 
 // CAboutDlg dialog used for App About

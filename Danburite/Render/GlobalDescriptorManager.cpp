@@ -7,23 +7,52 @@ namespace Render
 		VK::PhysicalDevice &physicalDevice,
 		VK::Device &device,
 		Infra::DeferredDeleter &deferredDeleter,
+		Dev::DescriptorUpdater &descriptorUpdater,
 		ResourcePool &resourcePool,
-		std::unordered_map<std::type_index, uint32_t> const &materialTypeIds) :
+		BindingInfo const &bindingInfo) :
 		__physicalDevice	{ physicalDevice },
 		__device			{ device },
 		__deferredDeleter	{ deferredDeleter },
+		__descriptorUpdater	{ descriptorUpdater },
 		__resourcePool		{ resourcePool },
-		__materialTypeIds	{ materialTypeIds }
+		__bindingInfo		{ bindingInfo }
 	{
 		__createDescSetLayout();
 		__createDescPool();
 		__allocateDescSets();
+		__createMaterialBufferBuilders();
 	}
 
 	GlobalDescriptorManager::~GlobalDescriptorManager() noexcept
 	{
+		__materialBufferBuilders.clear();
 		__pDescPool = nullptr;
 		__pDescSetLayout = nullptr;
+	}
+
+	void GlobalDescriptorManager::registerMaterial(
+		Material const *const pMaterial)
+	{
+		__materialBufferBuilders.at(typeid(*pMaterial))->registerMaterial(pMaterial);
+		_invalidate();
+	}
+
+	void GlobalDescriptorManager::unregisterMaterial(
+		Material const *pMaterial)
+	{
+		__materialBufferBuilders.at(typeid(*pMaterial))->unregisterMaterial(pMaterial);
+	}
+
+	uint32_t GlobalDescriptorManager::getIdOf(
+		Material const *pMaterial) const noexcept
+	{
+		return __materialBufferBuilders.at(typeid(*pMaterial))->getIdOf(pMaterial);
+	}
+
+	void GlobalDescriptorManager::_onValidate()
+	{
+		__validateMaterialBufferBuilders();
+		__validateDescSet();
 	}
 
 	void GlobalDescriptorManager::__createDescSetLayout()
@@ -33,10 +62,10 @@ namespace Render
 		std::vector<VkDescriptorBindingFlags> bindingFlags;
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-		for (auto const &[typeIndex, typeId] : __materialTypeIds)
+		for (auto const &[typeIndex, binding] : __bindingInfo.materialBufferBindings)
 		{
 			auto &materialBufferBinding				{ bindings.emplace_back() };
-			materialBufferBinding.binding			= (typeId + 1U);
+			materialBufferBinding.binding			= binding;
 			materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 			materialBufferBinding.descriptorCount	= 1U;
 			materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
@@ -77,7 +106,8 @@ namespace Render
 		auto const &deviceLimits				{ __physicalDevice.getProps().p10->limits };
 
 		uint32_t const descSetCount				{ static_cast<uint32_t>(__descSets.size()) };
-		uint32_t const materialBufferPoolSize	{ static_cast<uint32_t>(__materialTypeIds.size()) * descSetCount };
+		uint32_t const materialTypeCount		{ static_cast<uint32_t>(__bindingInfo.materialBufferBindings.size()) };
+		uint32_t const materialBufferPoolSize	{ materialTypeCount * descSetCount };
 		uint32_t const sampledImagePoolSize		{ __sampledImageDescCount * descSetCount };
 
 		if (deviceLimits.maxPerStageDescriptorSampledImages < sampledImagePoolSize)
@@ -85,9 +115,12 @@ namespace Render
 
 		std::vector<VkDescriptorPoolSize> poolSizes;
 
-		/*poolSizes.emplace_back(
-			VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			materialBufferPoolSize);*/
+		if (materialBufferPoolSize)
+		{
+			poolSizes.emplace_back(
+				VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+				materialBufferPoolSize);
+		}
 
 		poolSizes.emplace_back(
 			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
@@ -136,11 +169,46 @@ namespace Render
 		__device.vkAllocateDescriptorSets(&allocInfo, __descSets.data());
 	}
 
+	void GlobalDescriptorManager::__createMaterialBufferBuilders()
+	{
+		for (auto const &[type, _] : __bindingInfo.materialBufferBindings)
+			__materialBufferBuilders[type] = std::make_unique<MaterialBufferBuilder>(__resourcePool);
+	}
+
+	void GlobalDescriptorManager::__validateMaterialBufferBuilders()
+	{
+		for (auto const &[_, pBuilder] : __materialBufferBuilders)
+			pBuilder->validate();
+	}
+
+	void GlobalDescriptorManager::__validateDescSet()
+	{
+		__hCurDescSet = __getNextDescSet();
+
+		for (auto const &[type, pBuilder] : __materialBufferBuilders)
+		{
+			auto const &materialBuffer{ pBuilder->getMaterialBuffer() };
+
+			VkDescriptorBufferInfo const bufferInfo
+			{
+				.buffer	{ materialBuffer.getHandle() },
+				.offset	{ 0ULL },
+				.range	{ materialBuffer.getSize() }
+			};
+
+			__descriptorUpdater.addBufferInfos(
+				__hCurDescSet, __bindingInfo.materialBufferBindings.at(type), 0U, 1U,
+				VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
+		}
+	}
+
 	void GlobalDescriptorManager::__growSampledImageDescCount()
 	{
 		__deferredDeleter.reserve(std::move(__pDescPool));
 
 		__sampledImageDescCount <<= 1U;
+		__descSetCursor = 0U;
+
 		__createDescPool();
 		__allocateDescSets();
 	}
