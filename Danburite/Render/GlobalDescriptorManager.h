@@ -43,10 +43,10 @@ namespace Render
 			Material const *pMaterial) const noexcept;
 
 		[[nodiscard]]
-		constexpr VK::DescriptorSetLayout const &getDescriptorSetLayout() const noexcept;
+		constexpr VK::DescriptorSetLayout const &getDescSetLayout() const noexcept;
 
 		[[nodiscard]]
-		constexpr VkDescriptorSet getDescriptorSet() const noexcept;
+		constexpr VkDescriptorSet getDescSet() const noexcept;
 
 	protected:
 		virtual void _onValidate() override;
@@ -87,12 +87,12 @@ namespace Render
 		void __growSampledImageDescCount();
 	};
 
-	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getDescriptorSetLayout() const noexcept
+	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getDescSetLayout() const noexcept
 	{
 		return *__pDescSetLayout;
 	}
 
-	constexpr VkDescriptorSet GlobalDescriptorManager::getDescriptorSet() const noexcept
+	constexpr VkDescriptorSet GlobalDescriptorManager::getDescSet() const noexcept
 	{
 		return __hCurDescSet;
 	}

@@ -37,6 +37,12 @@
     <Filter Include="DescriptorUpdater">
       <UniqueIdentifier>{6bf22b45-1d04-4744-9c94-dfc4b06ca1ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\ConversionUtil">
+      <UniqueIdentifier>{ff8b1305-077e-4ad4-88b4-20666857b571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\ShaderIncluder">
+      <UniqueIdentifier>{e5641657-87a4-422d-ada0-c69de3139f67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
@@ -69,13 +75,13 @@
     <ClCompile Include="DescriptorUpdater.cpp">
       <Filter>DescriptorUpdater</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderIncluder.cpp">
+      <Filter>Utils\ShaderIncluder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h">
       <Filter>Context</Filter>
-    </ClInclude>
-    <ClInclude Include="ConversionUtil.h">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="MemoryBlock.h">
       <Filter>MemoryAllocator\MemoryBlock</Filter>
@@ -103,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="DescriptorUpdater.h">
       <Filter>DescriptorUpdater</Filter>
+    </ClInclude>
+    <ClInclude Include="ConversionUtil.h">
+      <Filter>Utils\ConversionUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderIncluder.h">
+      <Filter>Utils\ShaderIncluder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

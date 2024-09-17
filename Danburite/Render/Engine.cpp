@@ -18,7 +18,6 @@ namespace Render
 		__createDevice();
 		__retrieveQueue();
 		__createPipelineCache();
-		__createRenderTargetDescSetLayout();
 		__createSubmissionFences();
 
 		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
@@ -63,7 +62,6 @@ namespace Render
 		__pMemoryAllocator = nullptr;
 
 		__submissionFences.clear();
-		__pRenderTargetDescSetLayout = nullptr;
 		__pPipelineCache = nullptr;
 
 		__pQueue = nullptr;
@@ -277,20 +275,6 @@ namespace Render
 		};
 
 		__pPipelineCache = std::make_unique<VK::PipelineCache>(*__pDevice, createInfo);
-	}
-
-	void Engine::__createRenderTargetDescSetLayout()
-	{
-		std::vector<VkDescriptorSetLayoutBinding> bindings;
-
-		VkDescriptorSetLayoutCreateInfo const createInfo
-		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
-			.bindingCount		{ static_cast<uint32_t>(bindings.size()) },
-			.pBindings			{ bindings.data() }
-		};
-
-		__pRenderTargetDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
 	}
 
 	void Engine::__createSubmissionFences()

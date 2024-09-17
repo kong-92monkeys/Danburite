@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Renderers">
+      <UniqueIdentifier>{482aaace-be0d-44c2-9bda-ea1986422923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{a143e88c-8899-49cf-b2e7-e30688ddec8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderers\TestRenderer">
+      <UniqueIdentifier>{e27bec54-51b5-46f9-b18b-15ca092b01e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Materials\TestMaterial">
+      <UniqueIdentifier>{40adb138-8314-46dd-83bf-b5ae4f02cd67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vertex">
+      <UniqueIdentifier>{ad2c5361-8bb6-4e0f-863d-67d9b89f3c61}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="TestRenderer.h">
+      <Filter>Renderers\TestRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="TestMaterial.h">
+      <Filter>Materials\TestMaterial</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Vertex</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexAttribute.h">
+      <Filter>Vertex</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TestRenderer.cpp">
+      <Filter>Renderers\TestRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="TestMaterial.cpp">
+      <Filter>Materials\TestMaterial</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

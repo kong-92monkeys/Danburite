@@ -51,7 +51,6 @@ namespace Render
 		std::unique_ptr<VK::Device> __pDevice;
 		std::unique_ptr<VK::Queue> __pQueue;
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
-		std::unique_ptr<VK::DescriptorSetLayout> __pRenderTargetDescSetLayout;
 
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
 		std::unique_ptr<Dev::CommandExecutor> __pGeneralCommandExecutor;
@@ -68,7 +67,6 @@ namespace Render
 		void __createDevice();
 		void __retrieveQueue();
 		void __createPipelineCache();
-		void __createRenderTargetDescSetLayout();
 		void __createSubmissionFences();
 
 		[[nodiscard]]

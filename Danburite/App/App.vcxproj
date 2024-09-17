@@ -229,6 +229,9 @@
     <ProjectReference Include="..\Device\Device.vcxproj">
       <Project>{ca7f0ad3-2229-4a43-b310-e5c23272f6c3}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Frameworks\Frameworks.vcxproj">
+      <Project>{e7796a9c-2fc2-42b1-8e0e-41657743d6dd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Infra\Infra.vcxproj">
       <Project>{b43deef0-32fc-4467-829e-c918dc92a76a}</Project>
     </ProjectReference>

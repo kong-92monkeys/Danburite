@@ -12,7 +12,7 @@ namespace Infra
 		constexpr EventView<$T const *> &getUpdateEvent() const noexcept;
 
 	protected:
-		void _invokeUpdateEvent() const noexcept;
+		void _invokeUpdateEvent() noexcept;
 
 	private:
 		mutable Event<$T const *> __updateEvent;
@@ -25,8 +25,8 @@ namespace Infra
 	}
 
 	template <typename $T>
-	void Updatable<$T>::_invokeUpdateEvent() const noexcept
+	void Updatable<$T>::_invokeUpdateEvent() noexcept
 	{
-		__updateEvent.invoke(this);
+		__updateEvent.invoke(static_cast<$T *>(this));
 	}
 }
