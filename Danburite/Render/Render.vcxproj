@@ -24,6 +24,7 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GlobalDescriptorManager.h" />
     <ClInclude Include="MaterialBufferBuilder.h" />
+    <ClInclude Include="RendererResourceManager.h" />
     <ClInclude Include="ResourcePool.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -51,6 +52,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GlobalDescriptorManager.cpp" />
     <ClCompile Include="MaterialBufferBuilder.cpp" />
+    <ClCompile Include="RendererResourceManager.cpp" />
     <ClCompile Include="ResourcePool.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />

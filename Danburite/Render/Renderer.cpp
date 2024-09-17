@@ -4,6 +4,11 @@
 
 namespace Render
 {
+	Renderer::~Renderer() noexcept
+	{
+		__destroyEvent.invoke(this);
+	}
+
 	void Renderer::init(
 		VK::PhysicalDevice &physicalDevice,
 		VK::Device &device,

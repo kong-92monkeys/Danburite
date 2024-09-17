@@ -99,7 +99,7 @@ namespace Frx
 			.height				{ outputHeight },
 			.layers				{ 1U }
 		};
-
+		
 		return std::make_unique<VK::Framebuffer>(_getDevice(), createInfo);
 	}
 

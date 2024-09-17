@@ -37,6 +37,9 @@
     <Filter Include="MaterialBufferBuilder">
       <UniqueIdentifier>{cb2ad3d7-7386-4812-ba24-e25d338bc0a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RendererResourceManager">
+      <UniqueIdentifier>{948c246a-e05f-4159-b80b-5bd88f10123e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -75,6 +78,9 @@
     <ClInclude Include="MaterialBufferBuilder.h">
       <Filter>MaterialBufferBuilder</Filter>
     </ClInclude>
+    <ClInclude Include="RendererResourceManager.h">
+      <Filter>RendererResourceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -109,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="MaterialBufferBuilder.cpp">
       <Filter>MaterialBufferBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererResourceManager.cpp">
+      <Filter>RendererResourceManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

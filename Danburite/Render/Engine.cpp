@@ -73,8 +73,8 @@ namespace Render
 		HWND const hwnd)
 	{
 		return std::make_unique<RenderTarget>(
-			__context.getInstance(), __physicalDevice,
-			*__pDevice, *__pQueue, hinstance, hwnd);
+			__context.getInstance(), __physicalDevice, *__pDevice, *__pQueue,
+			__deferredDeleter, hinstance, hwnd);
 	}
 
 	std::shared_ptr<Mesh> Engine::createMesh()

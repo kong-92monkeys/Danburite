@@ -15,6 +15,7 @@
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "../Device/CommandExecutor.h"
+#include "RendererResourceManager.h"
 
 namespace Render
 {
@@ -36,6 +37,7 @@ namespace Render
 			VK::PhysicalDevice &physicalDevice,
 			VK::Device &device,
 			VK::Queue &queue,
+			Infra::DeferredDeleter &deferredDeleter,
 			HINSTANCE hinstance,
 			HWND hwnd);
 
@@ -72,6 +74,7 @@ namespace Render
 		VK::PhysicalDevice &__physicalDevice;
 		VK::Device &__device;
 		VK::Queue &__que;
+		Infra::DeferredDeleter &__deferredDeleter;
 
 		std::unique_ptr<VK::Surface> __pSurface;
 
@@ -94,6 +97,7 @@ namespace Render
 		std::unique_ptr<Dev::SemaphoreCirculator> __pCompleteSemaphoreCirculator;
 
 		std::unique_ptr<Dev::CommandExecutor> __pDrawcallExecutor;
+		std::unique_ptr<RendererResourceManager> __pRendererResourceManager;
 
 		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 

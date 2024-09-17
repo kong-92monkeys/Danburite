@@ -10,12 +10,14 @@ namespace Render
 		VK::PhysicalDevice &physicalDevice,
 		VK::Device &device,
 		VK::Queue &queue,
+		Infra::DeferredDeleter &deferredDeleter,
 		HINSTANCE const hinstance,
 		HWND const hwnd) :
 		__instance			{ instance },
 		__physicalDevice	{ physicalDevice },
 		__device			{ device },
-		__que				{ queue }
+		__que				{ queue },
+		__deferredDeleter	{ deferredDeleter }
 	{
 		__createSurface(hinstance, hwnd);
 
@@ -33,13 +35,19 @@ namespace Render
 
 		__pDrawcallExecutor = std::make_unique<Dev::CommandExecutor>(
 			__device, __que.getFamilyIndex());
+
+		auto const &extent{ getExtent() };
+		__pRendererResourceManager = std::make_unique<RendererResourceManager>(__deferredDeleter);
+		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
 	}
 
 	RenderTarget::~RenderTarget() noexcept
 	{
 		__que.vkQueueWaitIdle();
 
+		__pRendererResourceManager = nullptr;
 		__pDrawcallExecutor = nullptr;
+
 		__pCompleteSemaphoreCirculator = nullptr;
 		__pImageAcqSemaphoreCirculator = nullptr;
 

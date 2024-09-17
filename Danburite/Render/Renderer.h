@@ -22,7 +22,7 @@ namespace Render
 	{
 	public:
 		Renderer() = default;
-		virtual ~Renderer() noexcept override = default;
+		virtual ~Renderer() noexcept override;
 
 		void init(
 			VK::PhysicalDevice &physicalDevice,
@@ -58,6 +58,9 @@ namespace Render
 			VK::RenderPass &renderPass,
 			uint32_t outputWidth,
 			uint32_t outputHeight) const = 0;
+
+		[[nodiscard]]
+		constexpr Infra::EventView<Renderer const *> &getDestroyEvent() const noexcept;
 
 	protected:
 		struct InitResult
@@ -96,7 +99,8 @@ namespace Render
 		VK::DescriptorSetLayout const *__pGlobalDescSetLayout{ };
 
 		std::shared_ptr<VK::PipelineLayout> __pPipelineLayout;
-		std::shared_ptr<VK::Pipeline> __pPipeline;
+
+		mutable Infra::Event<Renderer const *> __destroyEvent;
 
 		[[nodiscard]]
 		std::vector<uint32_t> __readShaderFile(
@@ -105,6 +109,11 @@ namespace Render
 		[[nodiscard]]
 		static shaderc::CompileOptions __makeCopileOptions() noexcept;
 	};
+
+	constexpr Infra::EventView<Renderer const *> &Renderer::getDestroyEvent() const noexcept
+	{
+		return __destroyEvent;
+	}
 
 	constexpr VK::PhysicalDevice &Renderer::_getPhysicalDevice() const noexcept
 	{
