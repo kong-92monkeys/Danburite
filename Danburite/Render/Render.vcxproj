@@ -54,6 +54,7 @@
     <ClCompile Include="GlobalDescriptorManager.cpp" />
     <ClCompile Include="MaterialBufferBuilder.cpp" />
     <ClCompile Include="RendererResourceManager.cpp" />
+    <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="ResourcePool.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />

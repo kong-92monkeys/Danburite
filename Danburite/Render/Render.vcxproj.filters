@@ -125,5 +125,8 @@
     <ClCompile Include="RendererResourceManager.cpp">
       <Filter>RendererResourceManager</Filter>
     </ClCompile>
+    <ClCompile Include="RenderObject.cpp">
+      <Filter>RenderObject</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
