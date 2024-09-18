@@ -1,5 +1,4 @@
 #include "TestRenderer.h"
-#include "TestMaterial.h"
 #include "Vertex.h"
 #include <array>
 
@@ -8,16 +7,7 @@ namespace Frx
 	bool TestRenderer::isValidMaterialPack(
 		Render::MaterialPack const &materialPack) const noexcept
 	{
-		return materialPack.hasMaterialOf<TestMaterial>();
-	}
-
-	std::optional<uint32_t> TestRenderer::getMaterialSlotOf(
-		std::type_index const &materialType) const noexcept
-	{
-		if (materialType == typeid(TestMaterial))
-			return __TEST_MATERIAL_SLOT;
-
-		return std::nullopt;
+		return true;
 	}
 
 	std::unique_ptr<VK::RenderPass> TestRenderer::createRenderPass(
@@ -265,9 +255,7 @@ namespace Frx
 	{
 		VkPipelineLayoutCreateInfo const createInfo
 		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO },
-			.setLayoutCount		{ 1U },
-			.pSetLayouts		{ &(_getGlobalDescSetLayout().getHandle()) }
+			.sType{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO },
 		};
 
 		return std::make_shared<VK::PipelineLayout>(_getDevice(), createInfo);

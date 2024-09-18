@@ -10,9 +10,6 @@
     <Filter Include="Renderers\TestRenderer">
       <UniqueIdentifier>{e27bec54-51b5-46f9-b18b-15ca092b01e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Materials\TestMaterial">
-      <UniqueIdentifier>{40adb138-8314-46dd-83bf-b5ae4f02cd67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Vertex">
       <UniqueIdentifier>{ad2c5361-8bb6-4e0f-863d-67d9b89f3c61}</UniqueIdentifier>
     </Filter>
@@ -20,9 +17,6 @@
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
       <Filter>Renderers\TestRenderer</Filter>
-    </ClInclude>
-    <ClInclude Include="TestMaterial.h">
-      <Filter>Materials\TestMaterial</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Vertex</Filter>
@@ -34,9 +28,6 @@
   <ItemGroup>
     <ClCompile Include="TestRenderer.cpp">
       <Filter>Renderers\TestRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="TestMaterial.cpp">
-      <Filter>Materials\TestMaterial</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -15,13 +15,15 @@ namespace Render
 		VK::Device &device,
 		VK::PipelineCache &pipelineCache,
 		Infra::DeferredDeleter &deferredDeleter,
-		VK::DescriptorSetLayout const &globalDescSetLayout)
+		VK::DescriptorSetLayout const &globalDescSetLayout,
+		VK::DescriptorSetLayout const &subLayerDescSetLayout)
 	{
-		__pPhysicalDevice		= &physicalDevice;
-		__pDevice				= &device;
-		__pPipelineCache		= &pipelineCache;
-		__pDeferredDeleter		= &deferredDeleter;
-		__pGlobalDescSetLayout	= &globalDescSetLayout;
+		__pPhysicalDevice			= &physicalDevice;
+		__pDevice					= &device;
+		__pPipelineCache			= &pipelineCache;
+		__pDeferredDeleter			= &deferredDeleter;
+		__pGlobalDescSetLayout		= &globalDescSetLayout;
+		__pSubLayerDescSetLayout	= &subLayerDescSetLayout;
 
 		auto initResult{ _onInit() };
 
@@ -48,7 +50,7 @@ namespace Render
 	bool Renderer::isValidMaterialPack(
 		MaterialPack const &materialPack) const noexcept
 	{
-		return false;
+		return true;
 	}
 
 	std::optional<uint32_t> Renderer::getMaterialSlotOf(
@@ -57,7 +59,7 @@ namespace Render
 		return std::nullopt;
 	}
 
-	bool Renderer::isInstanceInfoEnabled() const noexcept
+	bool Renderer::useMaterial() const noexcept
 	{
 		return false;
 	}

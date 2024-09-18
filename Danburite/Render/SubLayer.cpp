@@ -18,21 +18,10 @@ namespace Render
 		__globalDescManager		{ globalDescManager },
 		__renderer				{ renderer }
 	{
-		if (__renderer.isInstanceInfoEnabled())
-		{
-			__createDescPool();
-			__allocDescSets();
-		}
-
 		__pObjectMeshChangeListener =
 			Infra::EventListener<RenderObject const *, Mesh const *, Mesh const *>::bind(
 				&SubLayer::__onObjectMeshChanged, this,
 				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
-		__pObjectMaterialChangeListener =
-			Infra::EventListener<RenderObject const *, uint32_t, std::type_index, Material const *, Material const *>::bind(
-				&SubLayer::__onObjectMaterialChanged, this,
-				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
 
 		__pObjectInstanceCountChangeListener =
 			Infra::EventListener<RenderObject const *, uint32_t, uint32_t>::bind(
@@ -42,6 +31,17 @@ namespace Render
 		__pObjectDrawableChangeListener =
 			Infra::EventListener<const RenderObject *, bool>::bind(
 				&SubLayer::__onObjectDrawableChanged, this, std::placeholders::_1, std::placeholders::_2);
+
+		if (__renderer.useMaterial())
+		{
+			__createDescPool();
+			__allocDescSets();
+
+			__pObjectMaterialChangeListener =
+				Infra::EventListener<RenderObject const *, uint32_t, std::type_index, Material const *, Material const *>::bind(
+					&SubLayer::__onObjectMaterialChanged, this,
+					std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
+		}
 	}
 
 	SubLayer::~SubLayer() noexcept
@@ -53,7 +53,8 @@ namespace Render
 				std::move(__pInstanceInfoBuffer));
 		}
 
-		__deferredDeleter.reserve(std::move(__pDescPool));
+		if (__pDescPool)
+			__deferredDeleter.reserve(std::move(__pDescPool));
 	}
 
 	void SubLayer::addRenderObject(
@@ -78,9 +79,43 @@ namespace Render
 	}
 
 	void SubLayer::draw(
-		VK::CommandBuffer &cmdBuffer) const
+		VK::CommandBuffer &cmdBuffer,
+		VkDescriptorSet const hGlobalDescSet,
+		VK::ImageView &outputAttachment,
+		RendererResourceManager &rendererResourceManager,
+		VkRect2D const &renderArea) const
 	{
+		__beginRenderPass(
+			cmdBuffer, outputAttachment,
+			rendererResourceManager, renderArea);
 
+		__bindPipeline(cmdBuffer, rendererResourceManager);
+
+		if (__renderer.useMaterial())
+			__bindDescSets(cmdBuffer, hGlobalDescSet);
+
+		Mesh const *pBoundMesh{ };
+		for (auto const &[pMesh, objects] : __mesh2Objects)
+		{
+			if (pBoundMesh != pMesh)
+			{
+				pBoundMesh = pMesh;
+				pMesh->bind(cmdBuffer);
+			}
+
+			for (auto const pObject : objects)
+			{
+				uint32_t const baseId
+				{
+					static_cast<uint32_t>(
+						__object2Region.at(pObject)->getOffset())
+				};
+
+				pObject->draw(cmdBuffer, baseId);
+			}
+		}
+
+		__endRenderPass(cmdBuffer);
 	}
 
 	void SubLayer::_onValidate()
@@ -141,7 +176,6 @@ namespace Render
 		RenderObject const *const pObject)
 	{
 		pObject->getMeshChangeEvent() += __pObjectMeshChangeListener;
-		pObject->getMaterialChangeEvent() += __pObjectMaterialChangeListener;
 		pObject->getInstanceCountChangeEvent() += __pObjectInstanceCountChangeListener;
 
 		uint32_t const instanceCount{ pObject->getInstanceCount() };
@@ -149,15 +183,20 @@ namespace Render
 
 		__registerMesh(pObject, pObject->getMesh().get());
 
-		for (uint32_t instanceIter{ }; instanceIter < instanceCount; ++instanceIter)
+		if (__renderer.useMaterial())
 		{
-			for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
-				__registerMaterial(pMaterial);
-		}
+			pObject->getMaterialChangeEvent() += __pObjectMaterialChangeListener;
 
-		__validateInstanceInfoHostBuffer(pObject);
-		__instanceInfoBufferInvalidated = true;
-		_invalidate();
+			for (uint32_t instanceIter{ }; instanceIter < instanceCount; ++instanceIter)
+			{
+				for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
+					__registerMaterial(pMaterial);
+			}
+
+			__validateInstanceInfoHostBuffer(pObject);
+			__instanceInfoBufferInvalidated = true;
+			_invalidate();
+		}
 
 		__needRedrawEvent.invoke(this);
 	}
@@ -166,7 +205,6 @@ namespace Render
 		RenderObject const *pObject)
 	{
 		pObject->getMeshChangeEvent() -= __pObjectMeshChangeListener;
-		pObject->getMaterialChangeEvent() -= __pObjectMaterialChangeListener;
 		pObject->getInstanceCountChangeEvent() -= __pObjectInstanceCountChangeListener;
 
 		__object2Region.erase(pObject);
@@ -175,10 +213,15 @@ namespace Render
 		if (pMesh)
 			__unregisterMesh(pObject, pMesh.get());
 
-		for (uint32_t instanceIter{ }; instanceIter < pObject->getInstanceCount(); ++instanceIter)
+		if (__renderer.useMaterial())
 		{
-			for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
-				__unregisterMaterial(pMaterial);
+			pObject->getMaterialChangeEvent() -= __pObjectMaterialChangeListener;
+
+			for (uint32_t instanceIter{ }; instanceIter < pObject->getInstanceCount(); ++instanceIter)
+			{
+				for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
+					__unregisterMaterial(pMaterial);
+			}
 		}
 
 		__needRedrawEvent.invoke(this);
@@ -358,5 +401,70 @@ namespace Render
 			__registerObject(pObject);
 		else
 			__unregisterObject(pObject);
+	}
+
+	void SubLayer::__beginRenderPass(
+		VK::CommandBuffer &cmdBuffer,
+		VK::ImageView &outputAttachment,
+		RendererResourceManager &rendererResourceManager,
+		VkRect2D const &renderArea) const
+	{
+		auto &renderPass	{ rendererResourceManager.getRenderPassOf(__renderer) };
+		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__renderer, outputAttachment) };
+
+		VkRenderPassBeginInfo renderPassBeginInfo{ };
+		renderPassBeginInfo.sType			= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassBeginInfo.renderPass		= renderPass.getHandle();
+		renderPassBeginInfo.framebuffer		= framebuffer.getHandle();
+
+		VkSubpassBeginInfo const subpassBeginInfo
+		{
+			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO },
+			.contents	{ VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE }
+		};
+
+		VkSubpassEndInfo const subpassEndInfo
+		{
+			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_END_INFO }
+		};
+
+		cmdBuffer.vkCmdBeginRenderPass2(&renderPassBeginInfo, &subpassBeginInfo);
+	}
+
+	void SubLayer::__bindPipeline(
+		VK::CommandBuffer &cmdBuffer,
+		RendererResourceManager &rendererResourceManager) const
+	{
+		auto &pipeline{ rendererResourceManager.getPipelineOf(__renderer) };
+		
+		cmdBuffer.vkCmdBindPipeline(
+			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
+			pipeline.getHandle());
+	}
+
+	void SubLayer::__bindDescSets(
+		VK::CommandBuffer &cmdBuffer,
+		VkDescriptorSet const hGlobalDescSet) const
+	{
+		std::array<VkDescriptorSet, 2ULL> descSets{ };
+		descSets[Constants::GLOBAL_DESC_SET_LOCATION]		= hGlobalDescSet;
+		descSets[Constants::SUB_LAYER_DESC_SET_LOCATION]	= __getDescSet();
+
+		cmdBuffer.vkCmdBindDescriptorSets(
+			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
+			__renderer.getPipelineLayout().getHandle(),
+			0U, static_cast<uint32_t>(descSets.size()), descSets.data(),
+			0U, nullptr);
+	}
+
+	void SubLayer::__endRenderPass(
+		VK::CommandBuffer &cmdBuffer) const
+	{
+		VkSubpassEndInfo const subpassEndInfo
+		{
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_END_INFO }
+		};
+
+		cmdBuffer.vkCmdEndRenderPass2(&subpassEndInfo);
 	}
 }

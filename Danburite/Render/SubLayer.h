@@ -1,11 +1,12 @@
 #pragma once
 
-#include "ShaderData.h"
 #include "../Infra/Stateful.h"
 #include "../Device/DescriptorUpdater.h"
 #include "ResourcePool.h"
 #include "GlobalDescriptorManager.h"
+#include "RendererResourceManager.h"
 #include "RenderObject.h"
+#include "ShaderData.h"
 
 namespace Render
 {
@@ -33,7 +34,11 @@ namespace Render
 		bool isEmpty() const noexcept;
 
 		void draw(
-			VK::CommandBuffer &cmdBuffer) const;
+			VK::CommandBuffer &cmdBuffer,
+			VkDescriptorSet hGlobalDescSet,
+			VK::ImageView &outputAttachment,
+			RendererResourceManager &rendererResourceManager,
+			VkRect2D const &renderArea) const;
 
 		[[nodiscard]]
 		constexpr Infra::EventView<SubLayer const *> &getNeedRedrawEvent() const noexcept;
@@ -133,6 +138,23 @@ namespace Render
 		void __onObjectDrawableChanged(
 			RenderObject const *pObject,
 			bool cur) noexcept;
+
+		void __beginRenderPass(
+			VK::CommandBuffer &cmdBuffer,
+			VK::ImageView &outputAttachment,
+			RendererResourceManager &rendererResourceManager,
+			VkRect2D const &renderArea) const;
+
+		void __bindPipeline(
+			VK::CommandBuffer &cmdBuffer,
+			RendererResourceManager &rendererResourceManager) const;
+
+		void __bindDescSets(
+			VK::CommandBuffer &cmdBuffer,
+			VkDescriptorSet hGlobalDescSet) const;
+
+		void __endRenderPass(
+			VK::CommandBuffer &cmdBuffer) const;
 
 		[[nodiscard]]
 		constexpr VkDescriptorSet __getDescSet() const noexcept;

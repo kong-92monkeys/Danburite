@@ -13,10 +13,6 @@ namespace Frx
 			Render::MaterialPack const &materialPack) const noexcept override;
 
 		[[nodiscard]]
-		virtual std::optional<uint32_t> getMaterialSlotOf(
-			std::type_index const &materialType) const noexcept override;
-
-		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
 			VkFormat outputFormat) const override;
 

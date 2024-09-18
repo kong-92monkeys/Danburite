@@ -29,7 +29,8 @@ namespace Render
 			VK::Device &device,
 			VK::PipelineCache &pipelineCache,
 			Infra::DeferredDeleter &deferredDeleter,
-			VK::DescriptorSetLayout const &globalDescSetLayout);
+			VK::DescriptorSetLayout const &globalDescSetLayout,
+			VK::DescriptorSetLayout const &subLayerDescSetLayout);
 
 		[[nodiscard]]
 		constexpr int getPriority() const noexcept;
@@ -48,7 +49,7 @@ namespace Render
 			std::type_index const &materialType) const noexcept;
 
 		[[nodiscard]]
-		virtual bool isInstanceInfoEnabled() const noexcept;
+		virtual bool useMaterial() const noexcept;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
@@ -105,12 +106,16 @@ namespace Render
 		[[nodiscard]]
 		constexpr VK::DescriptorSetLayout const &_getGlobalDescSetLayout() const noexcept;
 
+		[[nodiscard]]
+		constexpr VK::DescriptorSetLayout const &_getSubLayerDescSetLayout() const noexcept;
+
 	private:
 		VK::PhysicalDevice *__pPhysicalDevice{ };
 		VK::Device *__pDevice{ };
 		VK::PipelineCache *__pPipelineCache{ };
 		Infra::DeferredDeleter *__pDeferredDeleter{ };
 		VK::DescriptorSetLayout const *__pGlobalDescSetLayout{ };
+		VK::DescriptorSetLayout const *__pSubLayerDescSetLayout{ };
 
 		int __priority{ };
 
@@ -166,5 +171,10 @@ namespace Render
 	constexpr VK::DescriptorSetLayout const &Renderer::_getGlobalDescSetLayout() const noexcept
 	{
 		return *__pGlobalDescSetLayout;
+	}
+
+	constexpr VK::DescriptorSetLayout const &Renderer::_getSubLayerDescSetLayout() const noexcept
+	{
+		return *__pSubLayerDescSetLayout;
 	}
 }
