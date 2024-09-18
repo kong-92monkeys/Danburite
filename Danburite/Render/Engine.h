@@ -30,6 +30,9 @@ namespace Render
 			HWND hwnd);
 
 		[[nodiscard]]
+		std::shared_ptr<Layer> createLayer();
+
+		[[nodiscard]]
 		std::shared_ptr<Mesh> createMesh();
 
 		template <std::derived_from<Renderer> $Renderer, typename ...$Args>

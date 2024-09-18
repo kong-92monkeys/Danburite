@@ -15,7 +15,7 @@
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "../Device/CommandExecutor.h"
-#include "RendererResourceManager.h"
+#include "Layer.h"
 
 namespace Render
 {

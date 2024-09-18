@@ -9,7 +9,7 @@ namespace Render
 	public:
 		Layer(
 			VK::Device &device,
-			VK::DescriptorSetLayout &descSetLayout,
+			VK::DescriptorSetLayout &subLayerDescSetLayout,
 			Infra::DeferredDeleter &deferredDeleter,
 			Dev::DescriptorUpdater &descUpdater,
 			ResourcePool &resourcePool,
@@ -50,7 +50,7 @@ namespace Render
 
 	private:
 		VK::Device &__device;
-		VK::DescriptorSetLayout &__descSetLayout;
+		VK::DescriptorSetLayout &__subLayerDescSetLayout;
 		Infra::DeferredDeleter &__deferredDeleter;
 		Dev::DescriptorUpdater &__descUpdater;
 		ResourcePool &__resourcePool;

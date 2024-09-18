@@ -79,6 +79,13 @@ namespace Render
 			__deferredDeleter, hinstance, hwnd);
 	}
 
+	std::shared_ptr<Layer> Engine::createLayer()
+	{
+		return std::make_shared<Layer>(
+			*__pDevice, *__pSubLayerDescSetLayout, __deferredDeleter,
+			*__pDescriptorUpdater, *__pResourcePool, *__pGlobalDescriptorManager);
+	}
+
 	std::shared_ptr<Mesh> Engine::createMesh()
 	{
 		return std::make_shared<Mesh>(
