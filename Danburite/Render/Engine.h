@@ -37,8 +37,10 @@ namespace Render
 			Texture::ImageCreateInfo const &imageCreateInfo,
 			Texture::ImageViewCreateInfo const &imageViewCreateInfo);
 
-		void render(
-			std::unordered_set<RenderTarget *> const &renderTargets);
+		void reserveRender(
+			RenderTarget *pRenderTarget) noexcept;
+
+		void render();
 
 	private:
 		Dev::Context &__context;
@@ -64,6 +66,8 @@ namespace Render
 		
 		std::unique_ptr<VK::DescriptorSetLayout> __pSubLayerDescSetLayout;
 
+		std::unordered_set<RenderTarget *> __reservedRenderTargets;
+
 		void __verifyPhysicalDeviceSupport();
 		void __resolveQueueFamilyIndex();
 		void __createDevice();
@@ -74,5 +78,7 @@ namespace Render
 
 		[[nodiscard]]
 		VK::Fence &__getNextSubmissionFence();
+
+		void __validateReservedRenderTargets();
 	};
 }

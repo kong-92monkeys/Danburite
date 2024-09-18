@@ -62,7 +62,7 @@ namespace Render
 		std::unique_ptr<VK::DescriptorSetLayout> __pDescSetLayout;
 		std::shared_ptr<VK::DescriptorPool> __pDescPool;
 
-		std::array<VkDescriptorSet, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1ULL> __descSets;
+		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets;
 		size_t __descSetCursor{ };
 
 		std::unordered_map<std::type_index, std::unique_ptr<MaterialBufferBuilder>> __materialBufferBuilders;

@@ -8,6 +8,7 @@ namespace Render::Constants
 
 	constexpr size_t DEFAULT_MEMORY_BLOCK_SIZE						{ 16ULL << 20ULL };
 	constexpr size_t MAX_IN_FLIGHT_FRAME_COUNT						{ 3ULL };
+	constexpr size_t DEFERRED_DELETER_QUEUE_SIZE					{ MAX_IN_FLIGHT_FRAME_COUNT + 1ULL };
 
 	// Descriptor set locations
 	constexpr uint32_t GLOBAL_DESC_SET_LOCATION						{ 0U };

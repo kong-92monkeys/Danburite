@@ -98,16 +98,14 @@ std::unique_ptr<Render::RenderTarget> CApp::createRenderTarget(
 
 void CApp::render(Render::RenderTarget &renderTarget)
 {
-	__standbyRenderTargets.emplace(&renderTarget);
+	__pRenderEngine->reserveRender(&renderTarget);
 }
 
 BOOL CApp::OnIdle(LONG lCount)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	__idleEvent.invoke();
-
-	__pRenderEngine->render(__standbyRenderTargets);
-	__standbyRenderTargets.clear();
+	__pRenderEngine->render();
 
 	return CWinApp::OnIdle(lCount);
 }

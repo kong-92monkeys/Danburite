@@ -96,16 +96,15 @@ namespace Render
 			imageCreateInfo, imageViewCreateInfo);
 	}
 
-	void Engine::render(
-		std::unordered_set<RenderTarget *> const &renderTargets)
+	void Engine::reserveRender(
+		RenderTarget *const pRenderTarget) noexcept
 	{
-		for (auto const pRenderTarget : renderTargets)
-		{
-			if (!(pRenderTarget->isPresentable()))
-				return;
+		__reservedRenderTargets.emplace(pRenderTarget);
+	}
 
-			pRenderTarget->validate();
-		}
+	void Engine::render()
+	{
+		__validateReservedRenderTargets();
 
 		__pGlobalDescriptorManager->validate();
 		__pDescriptorUpdater->update();
@@ -116,13 +115,8 @@ namespace Render
 		if (!(__pGeneralCommandExecutor->isEmpty()))
 			__pCommandSubmitter->reserve(__pGeneralCommandExecutor->execute());
 
-		for (auto const pRenderTarget : renderTargets)
-		{
-			if (!(pRenderTarget->isPresentable()))
-				return;
-
+		for (auto const pRenderTarget : __reservedRenderTargets)
 			__pCommandSubmitter->reserve(pRenderTarget->draw(hGlobalDescSet));
-		}
 
 		if (__pCommandSubmitter->isEmpty())
 			return;
@@ -134,6 +128,7 @@ namespace Render
 		__pCommandSubmitter->present();
 
 		__deferredDeleter.advance();
+		__reservedRenderTargets.clear();
 	}
 
 	void Engine::__verifyPhysicalDeviceSupport()
@@ -347,5 +342,21 @@ namespace Render
 			throw std::runtime_error{ "Cannot resolve a submission fence." };
 
 		return retVal;
+	}
+
+	void Engine::__validateReservedRenderTargets()
+	{
+		for (auto it{ __reservedRenderTargets.begin() }; it != __reservedRenderTargets.end(); )
+		{
+			auto const pRenderTarget{ *it };
+
+			if (pRenderTarget->isPresentable())
+			{
+				pRenderTarget->validate();
+				++it;
+			}
+			else
+				it = __reservedRenderTargets.erase(it);
+		}
 	}
 }

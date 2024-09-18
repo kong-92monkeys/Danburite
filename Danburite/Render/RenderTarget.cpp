@@ -28,10 +28,10 @@ namespace Render
 		__syncClearImageFramebuffers();
 
 		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
-			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1U);
+			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::DEFERRED_DELETER_QUEUE_SIZE);
 
 		__pCompleteSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
-			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1U);
+			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::DEFERRED_DELETER_QUEUE_SIZE);
 
 		__pDrawcallExecutor = std::make_unique<Dev::CommandExecutor>(
 			__device, __que.getFamilyIndex());
@@ -113,7 +113,7 @@ namespace Render
 
 	void RenderTarget::_onValidate()
 	{
-
+		// TODO: validate layers
 	}
 
 	void RenderTarget::__createSurface(

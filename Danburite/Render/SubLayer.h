@@ -61,7 +61,7 @@ namespace Render
 
 		std::shared_ptr<VK::DescriptorPool> __pDescPool;
 
-		std::array<VkDescriptorSet, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1ULL> __descSets;
+		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets;
 		uint32_t __descSetCursor{ };
 		VkDescriptorSet __hCurDescSet{ };
 

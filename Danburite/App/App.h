@@ -49,8 +49,6 @@ private:
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Render::Engine> __pRenderEngine;
 
-	std::unordered_set<Render::RenderTarget *> __standbyRenderTargets;
-
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
