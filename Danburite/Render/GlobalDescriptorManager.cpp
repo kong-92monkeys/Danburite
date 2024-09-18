@@ -30,20 +30,20 @@ namespace Render
 		__pDescSetLayout = nullptr;
 	}
 
-	void GlobalDescriptorManager::registerMaterial(
+	void GlobalDescriptorManager::addMaterial(
 		Material const *const pMaterial)
 	{
-		__materialBufferBuilders.at(typeid(*pMaterial))->registerMaterial(pMaterial);
+		__materialBufferBuilders.at(typeid(*pMaterial))->addMaterial(pMaterial);
 		_invalidate();
 	}
 
-	void GlobalDescriptorManager::unregisterMaterial(
+	void GlobalDescriptorManager::removeMaterial(
 		Material const *pMaterial)
 	{
-		__materialBufferBuilders.at(typeid(*pMaterial))->unregisterMaterial(pMaterial);
+		__materialBufferBuilders.at(typeid(*pMaterial))->removeMaterial(pMaterial);
 	}
 
-	uint32_t GlobalDescriptorManager::getIdOf(
+	uint32_t GlobalDescriptorManager::getMaterialIdOf(
 		Material const *pMaterial) const noexcept
 	{
 		return __materialBufferBuilders.at(typeid(*pMaterial))->getIdOf(pMaterial);

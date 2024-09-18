@@ -48,6 +48,9 @@ namespace Render
 			std::type_index const &materialType) const noexcept;
 
 		[[nodiscard]]
+		virtual bool isInstanceInfoEnabled() const noexcept;
+
+		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
 			VkFormat outputFormat) const = 0;
 
@@ -70,6 +73,8 @@ namespace Render
 
 		[[nodiscard]]
 		constexpr Infra::EventView<Renderer const *> &getDestroyEvent() const noexcept;
+
+		// TODO: Managing its own descriptors
 
 	protected:
 		struct InitResult

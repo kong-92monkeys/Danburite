@@ -18,8 +18,11 @@ namespace Render
 		__globalDescManager		{ globalDescManager },
 		__renderer				{ renderer }
 	{
-		__createSubLayerDescSetPool();
-		__allocSubLayerDescSets();
+		if (__renderer.isInstanceInfoEnabled())
+		{
+			__createDescPool();
+			__allocDescSets();
+		}
 
 		__pObjectMeshChangeListener =
 			Infra::EventListener<RenderObject const *, Mesh const *, Mesh const *>::bind(
@@ -43,22 +46,58 @@ namespace Render
 
 	SubLayer::~SubLayer() noexcept
 	{
+		if (__pInstanceInfoBuffer)
+		{
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
+				std::move(__pInstanceInfoBuffer));
+		}
+
 		__deferredDeleter.reserve(std::move(__pDescPool));
 	}
 
 	void SubLayer::addRenderObject(
 		RenderObject const *const pObject) noexcept
 	{
-
+		pObject->getDrawableChangeEvent() += __pObjectDrawableChangeListener;
+		if (pObject->isDrawable())
+			__registerObject(pObject);
 	}
 
 	void SubLayer::removeRenderObject(
 		RenderObject const *const pObject) noexcept
 	{
+		pObject->getDrawableChangeEvent() -= __pObjectDrawableChangeListener;
+		if (pObject->isDrawable())
+			__unregisterObject(pObject);
+	}
+
+	bool SubLayer::isEmpty() const noexcept
+	{
+		return __object2Region.empty();
+	}
+
+	void SubLayer::draw(
+		VK::CommandBuffer &cmdBuffer) const
+	{
 
 	}
 
-	void SubLayer::__createSubLayerDescSetPool()
+	void SubLayer::_onValidate()
+	{
+		if (isEmpty())
+			return;
+
+		if (__instanceInfoBufferInvalidated)
+		{
+			__validateInstanceInfoBuffer();
+			__validateDescSet();
+		}
+
+		__instanceInfoBufferInvalidated = false;
+	}
+
+	void SubLayer::__createDescPool()
 	{
 		uint32_t const descSetCount{ static_cast<uint32_t>(__descSets.size()) };
 
@@ -78,7 +117,7 @@ namespace Render
 		__pDescPool = std::make_shared<VK::DescriptorPool>(__device, createInfo);
 	}
 
-	void SubLayer::__allocSubLayerDescSets()
+	void SubLayer::__allocDescSets()
 	{
 		uint32_t const descSetCount{ static_cast<uint32_t>(__descSets.size()) };
 
@@ -98,12 +137,183 @@ namespace Render
 		__device.vkAllocateDescriptorSets(&allocInfo, __descSets.data());
 	}
 
+	void SubLayer::__registerObject(
+		RenderObject const *const pObject)
+	{
+		pObject->getMeshChangeEvent() += __pObjectMeshChangeListener;
+		pObject->getMaterialChangeEvent() += __pObjectMaterialChangeListener;
+		pObject->getInstanceCountChangeEvent() += __pObjectInstanceCountChangeListener;
+
+		uint32_t const instanceCount{ pObject->getInstanceCount() };
+		__object2Region[pObject] = std::make_unique<Infra::Region>(__objectRegionAllocator, instanceCount, 1ULL);
+
+		__registerMesh(pObject, pObject->getMesh().get());
+
+		for (uint32_t instanceIter{ }; instanceIter < instanceCount; ++instanceIter)
+		{
+			for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
+				__registerMaterial(pMaterial);
+		}
+
+		__validateInstanceInfoHostBuffer(pObject);
+		__instanceInfoBufferInvalidated = true;
+		_invalidate();
+
+		__needRedrawEvent.invoke(this);
+	}
+
+	void SubLayer::__unregisterObject(
+		RenderObject const *pObject)
+	{
+		pObject->getMeshChangeEvent() -= __pObjectMeshChangeListener;
+		pObject->getMaterialChangeEvent() -= __pObjectMaterialChangeListener;
+		pObject->getInstanceCountChangeEvent() -= __pObjectInstanceCountChangeListener;
+
+		__object2Region.erase(pObject);
+
+		auto const &pMesh{ pObject->getMesh() };
+		if (pMesh)
+			__unregisterMesh(pObject, pMesh.get());
+
+		for (uint32_t instanceIter{ }; instanceIter < pObject->getInstanceCount(); ++instanceIter)
+		{
+			for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
+				__unregisterMaterial(pMaterial);
+		}
+
+		__needRedrawEvent.invoke(this);
+	}
+
+	void SubLayer::__registerMesh(
+		RenderObject const *const pObject,
+		Mesh const *const pMesh)
+	{
+		__mesh2Objects[pMesh].emplace(pObject);
+	}
+
+	void SubLayer::__unregisterMesh(
+		RenderObject const *const pObject,
+		Mesh const *const pMesh)
+	{
+		auto &objects{ __mesh2Objects.at(pMesh) };
+		objects.erase(pObject);
+
+		if (objects.empty())
+			__mesh2Objects.erase(pMesh);
+	}
+
+	void SubLayer::__registerMaterial(
+		Material const *const pMaterial)
+	{
+		__globalDescManager.addMaterial(pMaterial);
+	}
+
+	void SubLayer::__unregisterMaterial(
+		Material const *const pMaterial)
+	{
+		__globalDescManager.removeMaterial(pMaterial);
+	}
+
+	void SubLayer::__validateInstanceInfoHostBuffer(
+		RenderObject const *pObject)
+	{
+		auto const &pRegion{ __object2Region.at(pObject) };
+
+		const uint32_t instanceCount	{ pObject->getInstanceCount() };
+		const size_t baseId				{ pRegion->getOffset() };
+		const size_t lastId				{ baseId + instanceCount };
+
+		if (lastId >= __instanceInfoHostBuffer.size())
+			__instanceInfoHostBuffer.resize(lastId);
+
+		for (uint32_t instanceIter{ }; instanceIter < instanceCount; ++instanceIter)
+		{
+			auto &instanceInfo{ __instanceInfoHostBuffer[baseId + instanceIter] };
+			instanceInfo.reset();
+
+			for (auto const pMaterial : pObject->getMaterialPack(instanceIter))
+			{
+				std::type_index const materialType{ typeid(*pMaterial) };
+
+				auto const slot{ __renderer.getMaterialSlotOf(materialType) };
+				if (slot.has_value())
+				{
+					instanceInfo.materialIds[slot.value()] =
+						__globalDescManager.getMaterialIdOf(pMaterial);
+				}
+			}
+		}
+	}
+
+	void SubLayer::__validateInstanceInfoHostBuffer(
+		RenderObject const *const pObject,
+		uint32_t const instanceIndex,
+		std::type_index const &materialType,
+		Material const *const pMaterial)
+	{
+		auto const &pRegion{ __object2Region.at(pObject) };
+
+		const size_t baseId			{ pRegion->getOffset() };
+		const size_t instanceId		{ baseId + instanceIndex };
+
+		if (instanceId >= __instanceInfoHostBuffer.size())
+			__instanceInfoHostBuffer.resize(instanceId);
+
+		auto &instanceInfo{ __instanceInfoHostBuffer[instanceId] };
+
+		auto const slot{ __renderer.getMaterialSlotOf(materialType) };
+		if (slot.has_value())
+		{
+			instanceInfo.materialIds[slot.value()] =
+				__globalDescManager.getMaterialIdOf(pMaterial);
+		}
+	}
+
+	void SubLayer::__validateInstanceInfoBuffer()
+	{
+		size_t const bufferSize{ __instanceInfoHostBuffer.size() * sizeof(InstanceInfo) };
+
+		if (__pInstanceInfoBuffer)
+		{
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
+				std::move(__pInstanceInfoBuffer));
+		}
+
+		__pInstanceInfoBuffer = __resourcePool.getBuffer(
+			ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
+			bufferSize);
+
+		std::memcpy(__pInstanceInfoBuffer->getData(), __instanceInfoHostBuffer.data(), bufferSize);
+	}
+
+	void SubLayer::__validateDescSet()
+	{
+		__advanceDescSet();
+
+		VkDescriptorBufferInfo const bufferInfo
+		{
+			.buffer	{ __pInstanceInfoBuffer->getHandle() },
+			.range	{ __pInstanceInfoBuffer->getSize() }
+		};
+
+		__descUpdater.addBufferInfos(
+			__getDescSet(), Constants::SUB_LAYER_DESC_SET_LOCATION,
+			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
+	}
+
 	void SubLayer::__onObjectMeshChanged(
 		RenderObject const *const pObject,
 		Mesh const *const pPrev,
 		Mesh const *const pCur) noexcept
 	{
+		__unregisterMesh(pObject, pPrev);
 
+		if (pCur)
+		{
+			__registerMesh(pObject, pCur);
+			__needRedrawEvent.invoke(this);
+		}
 	}
 
 	void SubLayer::__onObjectMaterialChanged(
@@ -113,7 +323,19 @@ namespace Render
 		Material const *const pPrev,
 		Material const *const pCur) noexcept
 	{
+		if (pPrev)
+			__unregisterMaterial(pPrev);
 
+		if (pCur)
+		{
+			__registerMaterial(pCur);
+
+			__validateInstanceInfoHostBuffer(pObject, instanceIndex, type, pCur);
+			__instanceInfoBufferInvalidated = true;
+			_invalidate();
+
+			__needRedrawEvent.invoke(this);
+		}
 	}
 
 	void SubLayer::__onObjectInstanceCountChanged(
@@ -121,13 +343,20 @@ namespace Render
 		uint32_t const prev,
 		uint32_t const cur) noexcept
 	{
+		auto &pRegion{ __object2Region.at(pObject) };
+		pRegion.reset();
+		pRegion = std::make_unique<Infra::Region>(__objectRegionAllocator, cur, 1ULL);
 
+		__needRedrawEvent.invoke(this);
 	}
 
 	void SubLayer::__onObjectDrawableChanged(
 		RenderObject const *const pObject,
 		bool const cur) noexcept
 	{
-
+		if (cur)
+			__registerObject(pObject);
+		else
+			__unregisterObject(pObject);
 	}
 }

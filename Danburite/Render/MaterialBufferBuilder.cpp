@@ -20,26 +20,20 @@ namespace Render
 		}
 	}
 
-	void MaterialBufferBuilder::registerMaterial(
+	void MaterialBufferBuilder::addMaterial(
 		Material const *const pMaterial)
 	{
 		auto &[ref, id] { __materialRefIdMap[pMaterial] };
 		if (!ref)
 		{
-			pMaterial->getUpdateEvent() += __pMaterialUpdateListener;
-
 			id = __materialIdAllocator.allocate();
-
-			__validateMaterialHostBuffer(pMaterial);
-			__materialBufferInvalidated = true;
-
-			_invalidate();
+			__registerMaterial(pMaterial);
 		}
 
 		++ref;
 	}
 
-	void MaterialBufferBuilder::unregisterMaterial(
+	void MaterialBufferBuilder::removeMaterial(
 		Material const *const pMaterial)
 	{
 		auto &[ref, id] { __materialRefIdMap[pMaterial] };
@@ -47,10 +41,8 @@ namespace Render
 
 		if (!ref)
 		{
-			pMaterial->getUpdateEvent() -= __pMaterialUpdateListener;
-
+			__unregisterMaterial(pMaterial);
 			__materialIdAllocator.free(id);
-			__materialRefIdMap.erase(pMaterial);
 		}
 	}
 
@@ -68,6 +60,24 @@ namespace Render
 	void MaterialBufferBuilder::_onValidate()
 	{
 		__validateMaterialBuffer();
+	}
+
+	void MaterialBufferBuilder::__registerMaterial(
+		Material const *const pMaterial)
+	{
+		pMaterial->getUpdateEvent() += __pMaterialUpdateListener;
+
+		__validateMaterialHostBuffer(pMaterial);
+		__materialBufferInvalidated = true;
+
+		_invalidate();
+	}
+
+	void MaterialBufferBuilder::__unregisterMaterial(
+		Material const *const pMaterial)
+	{
+		pMaterial->getUpdateEvent() -= __pMaterialUpdateListener;
+		__materialRefIdMap.erase(pMaterial);
 	}
 
 	void MaterialBufferBuilder::__validateMaterialHostBuffer(

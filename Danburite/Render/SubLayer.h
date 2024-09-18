@@ -61,9 +61,8 @@ namespace Render
 
 		std::shared_ptr<VK::DescriptorPool> __pDescPool;
 
-		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets;
+		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets{ };
 		uint32_t __descSetCursor{ };
-		VkDescriptorSet __hCurDescSet{ };
 
 		Infra::EventListenerPtr<RenderObject const *, Mesh const *, Mesh const *>
 			__pObjectMeshChangeListener;
@@ -79,8 +78,40 @@ namespace Render
 
 		mutable Infra::Event<SubLayer const *> __needRedrawEvent;
 
-		void __createSubLayerDescSetPool();
-		void __allocSubLayerDescSets();
+		void __createDescPool();
+		void __allocDescSets();
+
+		void __registerObject(
+			RenderObject const *pObject);
+
+		void __unregisterObject(
+			RenderObject const *pObject);
+
+		void __registerMesh(
+			RenderObject const *pObject,
+			Mesh const *pMesh);
+
+		void __unregisterMesh(
+			RenderObject const *pObject,
+			Mesh const *pMesh);
+
+		void __registerMaterial(
+			Material const *pMaterial);
+
+		void __unregisterMaterial(
+			Material const *pMaterial);
+
+		void __validateInstanceInfoHostBuffer(
+			RenderObject const *pObject);
+
+		void __validateInstanceInfoHostBuffer(
+			RenderObject const *const pObject,
+			uint32_t instanceIndex,
+			std::type_index const &materialType,
+			Material const *const pMaterial);
+
+		void __validateInstanceInfoBuffer();
+		void __validateDescSet();
 
 		void __onObjectMeshChanged(
 			RenderObject const *pObject,

@@ -57,6 +57,11 @@ namespace Render
 		return std::nullopt;
 	}
 
+	bool Renderer::isInstanceInfoEnabled() const noexcept
+	{
+		return false;
+	}
+
 	std::unique_ptr<VK::ShaderModule> Renderer::_createShaderModule(
 		std::string_view const &assetPath) const
 	{

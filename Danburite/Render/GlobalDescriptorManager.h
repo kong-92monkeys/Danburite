@@ -32,14 +32,14 @@ namespace Render
 
 		virtual ~GlobalDescriptorManager() noexcept override;
 
-		void registerMaterial(
+		void addMaterial(
 			Material const *pMaterial);
 
-		void unregisterMaterial(
+		void removeMaterial(
 			Material const *pMaterial);
 
 		[[nodiscard]]
-		uint32_t getIdOf(
+		uint32_t getMaterialIdOf(
 			Material const *pMaterial) const noexcept;
 
 		[[nodiscard]]

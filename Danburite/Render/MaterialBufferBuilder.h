@@ -16,10 +16,10 @@ namespace Render
 
 		virtual ~MaterialBufferBuilder() noexcept override;
 
-		void registerMaterial(
+		void addMaterial(
 			Material const *pMaterial);
 
-		void unregisterMaterial(
+		void removeMaterial(
 			Material const *pMaterial);
 
 		[[nodiscard]]
@@ -43,6 +43,12 @@ namespace Render
 		bool __materialBufferInvalidated{ };
 
 		Infra::EventListenerPtr<Material const *> __pMaterialUpdateListener;
+
+		void __registerMaterial(
+			Material const *pMaterial);
+
+		void __unregisterMaterial(
+			Material const *pMaterial);
 
 		void __validateMaterialHostBuffer(
 			Material const *const pMaterial) noexcept;

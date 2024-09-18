@@ -30,6 +30,8 @@ namespace Render
 		constexpr Infra::EventView<Layer const *> &
 			getNeedRedrawEvent() const noexcept;
 
+		// TODO: Handle renderer's priority
+
 	private:
 
 	};
