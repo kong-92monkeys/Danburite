@@ -149,5 +149,8 @@
     <ClCompile Include="SubLayer.cpp">
       <Filter>SubLayer</Filter>
     </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Layer</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

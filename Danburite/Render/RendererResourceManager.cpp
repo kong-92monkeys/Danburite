@@ -23,38 +23,38 @@ namespace Render
 	}
 
 	VK::RenderPass &RendererResourceManager::getRenderPassOf(
-		Renderer const &renderer)
+		Renderer const *const pRenderer)
 	{
-		auto &pResource{ __resources[&renderer] };
+		auto &pResource{ __resources[pRenderer] };
 		if (!pResource)
 		{
-			renderer.getDestroyEvent() += __pRendererDestroyListener;
+			pRenderer->getDestroyEvent() += __pRendererDestroyListener;
 			pResource = std::make_shared<__RendererResource>();
 		}
 
 		auto &pRetVal{ pResource->pRenderPass };
 		if (!pRetVal)
-			pRetVal = renderer.createRenderPass(__outputFormat);
+			pRetVal = pRenderer->createRenderPass(__outputFormat);
 
 		return *pRetVal;
 	}
 
 	VK::Framebuffer &RendererResourceManager::getFramebufferOf(
-		Renderer const &renderer,
+		Renderer const *const pRenderer,
 		VK::ImageView &outputAttachment)
 	{
-		auto &pResource{ __resources[&renderer] };
+		auto &pResource{ __resources[pRenderer] };
 		if (!pResource)
 		{
-			renderer.getDestroyEvent() += __pRendererDestroyListener;
+			pRenderer->getDestroyEvent() += __pRendererDestroyListener;
 			pResource = std::make_shared<__RendererResource>();
 		}
 
 		auto &pRetVal{ pResource->framebuffers[&outputAttachment] };
 		if (!pRetVal)
 		{
-			pRetVal = renderer.createFramebuffer(
-				getRenderPassOf(renderer), outputAttachment,
+			pRetVal = pRenderer->createFramebuffer(
+				getRenderPassOf(pRenderer), outputAttachment,
 				__outputWidth, __outputHeight);
 		}
 
@@ -62,20 +62,20 @@ namespace Render
 	}
 
 	VK::Pipeline &RendererResourceManager::getPipelineOf(
-		Renderer const &renderer)
+		Renderer const *const pRenderer)
 	{
-		auto &pResource{ __resources[&renderer] };
+		auto &pResource{ __resources[pRenderer] };
 		if (!pResource)
 		{
-			renderer.getDestroyEvent() += __pRendererDestroyListener;
+			pRenderer->getDestroyEvent() += __pRendererDestroyListener;
 			pResource = std::make_shared<__RendererResource>();
 		}
 
 		auto &pRetVal{ pResource->pPipeline };
 		if (!pRetVal)
 		{
-			pRetVal = renderer.createPipeline(
-				getRenderPassOf(renderer),
+			pRetVal = pRenderer->createPipeline(
+				getRenderPassOf(pRenderer),
 				__outputWidth, __outputHeight);
 		}
 

@@ -20,7 +20,7 @@ namespace Render
 			Dev::DescriptorUpdater &descUpdater,
 			ResourcePool &resourcePool,
 			GlobalDescriptorManager &globalDescManager,
-			Renderer const &renderer) noexcept;
+			Renderer const *pRenderer) noexcept;
 
 		virtual ~SubLayer() noexcept override;
 
@@ -41,6 +41,9 @@ namespace Render
 			VkRect2D const &renderArea) const;
 
 		[[nodiscard]]
+		constexpr Renderer const *getRenderer() const noexcept;
+
+		[[nodiscard]]
 		constexpr Infra::EventView<SubLayer const *> &getNeedRedrawEvent() const noexcept;
 
 	protected:
@@ -53,7 +56,7 @@ namespace Render
 		Dev::DescriptorUpdater &__descUpdater;
 		ResourcePool &__resourcePool;
 		GlobalDescriptorManager &__globalDescManager;
-		Renderer const &__renderer;
+		Renderer const *const __pRenderer;
 
 		Infra::RegionAllocator __objectRegionAllocator{ UINT32_MAX };
 
@@ -160,6 +163,11 @@ namespace Render
 		constexpr VkDescriptorSet __getDescSet() const noexcept;
 		constexpr void __advanceDescSet() noexcept;
 	};
+
+	constexpr Renderer const *SubLayer::getRenderer() const noexcept
+	{
+		return __pRenderer;
+	}
 
 	constexpr Infra::EventView<SubLayer const *> &SubLayer::getNeedRedrawEvent() const noexcept
 	{

@@ -17,16 +17,16 @@ namespace Render
 
 		[[nodiscard]]
 		VK::RenderPass &getRenderPassOf(
-			Renderer const &renderer);
+			Renderer const *pRenderer);
 
 		[[nodiscard]]
 		VK::Framebuffer &getFramebufferOf(
-			Renderer const &renderer,
+			Renderer const *pRenderer,
 			VK::ImageView &outputAttachment);
 
 		[[nodiscard]]
 		VK::Pipeline &getPipelineOf(
-			Renderer const &renderer);
+			Renderer const *pRenderer);
 
 	private:
 		class __RendererResource

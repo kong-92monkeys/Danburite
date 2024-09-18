@@ -9,14 +9,14 @@ namespace Render
 		Dev::DescriptorUpdater &descUpdater,
 		ResourcePool &resourcePool,
 		GlobalDescriptorManager &globalDescManager,
-		Renderer const &renderer) noexcept :
+		Renderer const *const pRenderer) noexcept :
 		__device				{ device },
 		__descSetLayout			{ descSetLayout },
 		__deferredDeleter		{ deferredDeleter },
 		__descUpdater			{ descUpdater },
 		__resourcePool			{ resourcePool },
 		__globalDescManager		{ globalDescManager },
-		__renderer				{ renderer }
+		__pRenderer				{ pRenderer }
 	{
 		__pObjectMeshChangeListener =
 			Infra::EventListener<RenderObject const *, Mesh const *, Mesh const *>::bind(
@@ -32,7 +32,7 @@ namespace Render
 			Infra::EventListener<const RenderObject *, bool>::bind(
 				&SubLayer::__onObjectDrawableChanged, this, std::placeholders::_1, std::placeholders::_2);
 
-		if (__renderer.useMaterial())
+		if (__pRenderer->useMaterial())
 		{
 			__createDescPool();
 			__allocDescSets();
@@ -91,7 +91,7 @@ namespace Render
 
 		__bindPipeline(cmdBuffer, rendererResourceManager);
 
-		if (__renderer.useMaterial())
+		if (__pRenderer->useMaterial())
 			__bindDescSets(cmdBuffer, hGlobalDescSet);
 
 		Mesh const *pBoundMesh{ };
@@ -183,7 +183,7 @@ namespace Render
 
 		__registerMesh(pObject, pObject->getMesh().get());
 
-		if (__renderer.useMaterial())
+		if (__pRenderer->useMaterial())
 		{
 			pObject->getMaterialChangeEvent() += __pObjectMaterialChangeListener;
 
@@ -213,7 +213,7 @@ namespace Render
 		if (pMesh)
 			__unregisterMesh(pObject, pMesh.get());
 
-		if (__renderer.useMaterial())
+		if (__pRenderer->useMaterial())
 		{
 			pObject->getMaterialChangeEvent() -= __pObjectMaterialChangeListener;
 
@@ -278,7 +278,7 @@ namespace Render
 			{
 				std::type_index const materialType{ typeid(*pMaterial) };
 
-				auto const slot{ __renderer.getMaterialSlotOf(materialType) };
+				auto const slot{ __pRenderer->getMaterialSlotOf(materialType) };
 				if (slot.has_value())
 				{
 					instanceInfo.materialIds[slot.value()] =
@@ -304,7 +304,7 @@ namespace Render
 
 		auto &instanceInfo{ __instanceInfoHostBuffer[instanceId] };
 
-		auto const slot{ __renderer.getMaterialSlotOf(materialType) };
+		auto const slot{ __pRenderer->getMaterialSlotOf(materialType) };
 		if (slot.has_value())
 		{
 			instanceInfo.materialIds[slot.value()] =
@@ -409,8 +409,8 @@ namespace Render
 		RendererResourceManager &rendererResourceManager,
 		VkRect2D const &renderArea) const
 	{
-		auto &renderPass	{ rendererResourceManager.getRenderPassOf(__renderer) };
-		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__renderer, outputAttachment) };
+		auto &renderPass	{ rendererResourceManager.getRenderPassOf(__pRenderer) };
+		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__pRenderer, outputAttachment) };
 
 		VkRenderPassBeginInfo renderPassBeginInfo{ };
 		renderPassBeginInfo.sType			= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -435,7 +435,7 @@ namespace Render
 		VK::CommandBuffer &cmdBuffer,
 		RendererResourceManager &rendererResourceManager) const
 	{
-		auto &pipeline{ rendererResourceManager.getPipelineOf(__renderer) };
+		auto &pipeline{ rendererResourceManager.getPipelineOf(__pRenderer) };
 		
 		cmdBuffer.vkCmdBindPipeline(
 			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -452,7 +452,7 @@ namespace Render
 
 		cmdBuffer.vkCmdBindDescriptorSets(
 			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
-			__renderer.getPipelineLayout().getHandle(),
+			__pRenderer->getPipelineLayout().getHandle(),
 			0U, static_cast<uint32_t>(descSets.size()), descSets.data(),
 			0U, nullptr);
 	}

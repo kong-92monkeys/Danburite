@@ -55,6 +55,7 @@
     <ClCompile Include="DrawParam.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GlobalDescriptorManager.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="MaterialBufferBuilder.cpp" />
     <ClCompile Include="RendererResourceManager.cpp" />
     <ClCompile Include="RenderObject.cpp" />
