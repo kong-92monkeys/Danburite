@@ -78,7 +78,8 @@ namespace Render
 		__needRedrawEvent.invoke(this);
 	}
 
-	RenderTarget::DrawResult RenderTarget::draw()
+	RenderTarget::DrawResult RenderTarget::draw(
+		VkDescriptorSet const hGlobalDescSet)
 	{
 		auto &imageAcqSemaphore	{ __pImageAcqSemaphoreCirculator->getNext() };
 		auto &completeSemaphore	{ __pCompleteSemaphoreCirculator->getNext() };

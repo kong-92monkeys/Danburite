@@ -25,6 +25,7 @@
     <ClInclude Include="GlobalDescriptorManager.h" />
     <ClInclude Include="MaterialBufferBuilder.h" />
     <ClInclude Include="RendererResourceManager.h" />
+    <ClInclude Include="RenderObject.h" />
     <ClInclude Include="ResourcePool.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />

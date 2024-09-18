@@ -40,6 +40,9 @@
     <Filter Include="RendererResourceManager">
       <UniqueIdentifier>{948c246a-e05f-4159-b80b-5bd88f10123e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RenderObject">
+      <UniqueIdentifier>{5c639e7d-46a9-4b38-99aa-92b56bec4697}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -80,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="RendererResourceManager.h">
       <Filter>RendererResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderObject.h">
+      <Filter>RenderObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

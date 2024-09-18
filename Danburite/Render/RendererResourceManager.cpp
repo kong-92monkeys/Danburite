@@ -12,11 +12,11 @@ namespace Render
 		uint32_t const outputWidth,
 		uint32_t const outputHeight)
 	{
+		__clearResources();
+
 		__outputFormat		= outputFormat;
 		__outputWidth		= outputWidth;
 		__outputHeight		= outputHeight;
-
-		__resources.clear();
 
 		__pRendererDestroyListener = Infra::EventListener<Renderer const *>::bind(
 			&RendererResourceManager::__onRendererDestroyed, this, std::placeholders::_1);
@@ -25,10 +25,14 @@ namespace Render
 	VK::RenderPass &RendererResourceManager::getRenderPassOf(
 		Renderer const &renderer)
 	{
-		if (!(__resources.contains(&renderer)))
+		auto &pResource{ __resources[&renderer] };
+		if (!pResource)
+		{
 			renderer.getDestroyEvent() += __pRendererDestroyListener;
+			pResource = std::make_shared<__RendererResource>();
+		}
 
-		auto &pRetVal{ __resources[&renderer].pRenderPass };
+		auto &pRetVal{ pResource->pRenderPass };
 		if (!pRetVal)
 			pRetVal = renderer.createRenderPass(__outputFormat);
 
@@ -39,10 +43,14 @@ namespace Render
 		Renderer const &renderer,
 		VK::ImageView &outputAttachment)
 	{
-		if (!(__resources.contains(&renderer)))
+		auto &pResource{ __resources[&renderer] };
+		if (!pResource)
+		{
 			renderer.getDestroyEvent() += __pRendererDestroyListener;
+			pResource = std::make_shared<__RendererResource>();
+		}
 
-		auto &pRetVal{ __resources[&renderer].framebuffers[&outputAttachment] };
+		auto &pRetVal{ pResource->framebuffers[&outputAttachment] };
 		if (!pRetVal)
 		{
 			pRetVal = renderer.createFramebuffer(
@@ -56,10 +64,14 @@ namespace Render
 	VK::Pipeline &RendererResourceManager::getPipelineOf(
 		Renderer const &renderer)
 	{
-		if (!(__resources.contains(&renderer)))
+		auto &pResource{ __resources[&renderer] };
+		if (!pResource)
+		{
 			renderer.getDestroyEvent() += __pRendererDestroyListener;
+			pResource = std::make_shared<__RendererResource>();
+		}
 
-		auto &pRetVal{ __resources[&renderer].pPipeline };
+		auto &pRetVal{ pResource->pPipeline };
 		if (!pRetVal)
 		{
 			pRetVal = renderer.createPipeline(
@@ -70,9 +82,24 @@ namespace Render
 		return *pRetVal;
 	}
 
+	void RendererResourceManager::__clearResources() noexcept
+	{
+		for (auto &[_, pResource] : __resources)
+			__deferredDeleter.reserve(std::move(pResource));
+
+		__resources.clear();
+	}
+
 	void RendererResourceManager::__onRendererDestroyed(
 		Renderer const *pRenderer)
 	{
 		__resources.erase(pRenderer);
+	}
+
+	RendererResourceManager::__RendererResource::~__RendererResource() noexcept
+	{
+		pPipeline = nullptr;
+		framebuffers.clear();
+		pRenderPass = nullptr;
 	}
 }

@@ -49,7 +49,8 @@ namespace Render
 			glm::vec4 const &color) noexcept;
 
 		[[nodiscard]]
-		DrawResult draw();
+		DrawResult draw(
+			VkDescriptorSet hGlobalDescSet);
 
 		[[nodiscard]]
 		constexpr glm::vec4 const &getBackgroundColor() const noexcept;

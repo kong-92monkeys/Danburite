@@ -101,6 +101,8 @@ namespace Render
 		__pDescriptorUpdater->update();
 		__pCommandSubmitter->clear();
 
+		auto const hGlobalDescSet{ __pGlobalDescriptorManager->getDescSet() };
+
 		if (!(__pGeneralCommandExecutor->isEmpty()))
 			__pCommandSubmitter->reserve(__pGeneralCommandExecutor->execute());
 
@@ -109,7 +111,7 @@ namespace Render
 			if (!(pRenderTarget->isPresentable()))
 				return;
 
-			__pCommandSubmitter->reserve(pRenderTarget->draw());
+			__pCommandSubmitter->reserve(pRenderTarget->draw(hGlobalDescSet));
 		}
 
 		if (__pCommandSubmitter->isEmpty())
