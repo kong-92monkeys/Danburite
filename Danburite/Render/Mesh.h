@@ -13,7 +13,7 @@ namespace Render
 		Mesh(
 			VK::Device &device,
 			Dev::MemoryAllocator &memoryAllocator,
-			Dev::CommandExecutor &generalCommandExecutor,
+			Dev::CommandExecutor &commandExecutor,
 			Render::ResourcePool &resourcePool) noexcept;
 
 		virtual ~Mesh() noexcept override;
@@ -52,7 +52,7 @@ namespace Render
 	private:
 		VK::Device &__device;
 		Dev::MemoryAllocator &__memoryAllocator;
-		Dev::CommandExecutor &__generalCommandExecutor;
+		Dev::CommandExecutor &__commandExecutor;
 		Render::ResourcePool &__resourcePool;
 
 		std::unordered_map<uint32_t, std::shared_ptr<Dev::MemoryBuffer>> __vertexBuffers;

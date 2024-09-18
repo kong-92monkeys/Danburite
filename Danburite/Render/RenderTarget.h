@@ -25,7 +25,7 @@ namespace Render
 		struct DrawResult
 		{
 		public:
-			std::future<VK::CommandBuffer *> cmdBuffer;
+			VK::CommandBuffer const *pCmdBuffer{ };
 			VK::Swapchain *pSwapchain{ };
 			uint32_t imageIndex{ };
 			VK::Semaphore *pImageAcqSemaphore{ };
@@ -43,10 +43,16 @@ namespace Render
 
 		virtual ~RenderTarget() noexcept override;
 
-		void sync();
+		void addLayer(
+			std::shared_ptr<Layer> const &pLayer);
+
+		void removeLayer(
+			std::shared_ptr<Layer> const &pLayer);
 
 		void setBackgroundColor(
 			glm::vec4 const &color) noexcept;
+
+		void sync();
 
 		[[nodiscard]]
 		DrawResult draw(
@@ -86,6 +92,7 @@ namespace Render
 		VkSurfaceCapabilities2KHR __capabilities{ };
 		VkSurfaceFormatKHR __surfaceFormat{ };
 		VkCompositeAlphaFlagBitsKHR __compositeAlpha{ };
+		VkRect2D __renderArea{ };
 
 		std::unique_ptr<VK::Swapchain> __pSwapchain;
 		std::vector<std::unique_ptr<VK::Image>> __swapchainImages;
@@ -94,13 +101,23 @@ namespace Render
 		std::unique_ptr<VK::RenderPass> __pClearImageRenderPass;
 		std::vector<std::unique_ptr<VK::Framebuffer>> __clearImageFramebuffers;
 
+		std::unique_ptr<Dev::CommandBufferCirculator> __pDrawcallCmdBufferCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pCompleteSemaphoreCirculator;
 
-		std::unique_ptr<Dev::CommandExecutor> __pDrawcallExecutor;
 		std::unique_ptr<RendererResourceManager> __pRendererResourceManager;
 
+		std::unordered_set<std::shared_ptr<Layer>> __layerRefs;
+		std::unordered_set<Layer *> __invalidatedLayers;
+
+		bool __layerSortionInvalidated{ };
+		std::vector<Layer *> __sortedLayers;
+
 		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
+
+		Infra::EventListenerPtr<Layer *> __pLayerInvalidateListener;
+		Infra::EventListenerPtr<Layer const *, int, int> __pLayerPriorityChangeListener;
+		Infra::EventListenerPtr<Layer const *> __pLayerNeedRedrawListener;
 
 		mutable Infra::Event<RenderTarget const *> __needRedrawEvent;
 
@@ -132,6 +149,9 @@ namespace Render
 		uint32_t __acquireNextImage(
 			VK::Semaphore &imageAcqSemaphore);
 
+		[[nodiscard]]
+		VK::CommandBuffer &__beginNextDrawcallCmdBuffer();
+
 		void __beginSwapchainImage(
 			VK::CommandBuffer &cmdBuffer,
 			uint32_t imageIndex);
@@ -139,6 +159,13 @@ namespace Render
 		void __endSwapchainImage(
 			VK::CommandBuffer &cmdBuffer,
 			uint32_t imageIndex);
+
+		void __onLayerPriorityChanged() noexcept;
+
+		void __onLayerInvalidated(
+			Layer *pLayer) noexcept;
+
+		void __onLayerRedrawNeeded() const noexcept;
 	};
 
 	constexpr glm::vec4 const &RenderTarget::getBackgroundColor() const noexcept

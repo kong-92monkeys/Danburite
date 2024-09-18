@@ -5,12 +5,12 @@ namespace Render
 	Mesh::Mesh(
 		VK::Device &device,
 		Dev::MemoryAllocator &memoryAllocator,
-		Dev::CommandExecutor &generalCommandExecutor,
+		Dev::CommandExecutor &commandExecutor,
 		Render::ResourcePool &resourcePool) noexcept :
-		__device					{ device },
-		__memoryAllocator			{ memoryAllocator },
-		__generalCommandExecutor	{ generalCommandExecutor },
-		__resourcePool				{ resourcePool }
+		__device			{ device },
+		__memoryAllocator	{ memoryAllocator },
+		__commandExecutor	{ commandExecutor },
+		__resourcePool		{ resourcePool }
 	{}
 
 	Mesh::~Mesh() noexcept
@@ -179,7 +179,7 @@ namespace Render
 		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
-		__generalCommandExecutor.reserve([=, &dst, &src{ *pStagingBuffer }] (auto &cmdBuffer)
+		__commandExecutor.reserve([=, &dst, &src{ *pStagingBuffer }] (auto &cmdBuffer)
 		{
 			VkMemoryBarrier2 const beforeMemoryBarrier
 			{

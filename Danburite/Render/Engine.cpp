@@ -29,9 +29,6 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
-		__pGeneralCommandExecutor = std::make_unique<Dev::CommandExecutor>(
-			*__pDevice, __queueFamilyIndex);
-
 		__pDescriptorUpdater = std::make_unique<Dev::DescriptorUpdater>(*__pDevice);
 
 		__pResourcePool = std::make_unique<ResourcePool>(
@@ -43,11 +40,9 @@ namespace Render
 			__physicalDevice, *__pDevice, __deferredDeleter,
 			*__pDescriptorUpdater, *__pResourcePool, globalDescBindingInfo);
 
-		/*
-			TODO: Renderer dependent resources
-				- render pass
-				- descriptor layout, pool, set
-		*/
+		__pExecutorCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
+			*__pDevice, __queueFamilyIndex,
+			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
 	}
 
 	Engine::~Engine() noexcept
@@ -55,11 +50,11 @@ namespace Render
 		__deferredDeleter.flush();
 		__pDevice->vkDeviceWaitIdle();
 
+		__pExecutorCmdBufferCirculator = nullptr;
 		__pGlobalDescriptorManager = nullptr;
 		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
 		__pDescriptorUpdater = nullptr;
-		__pGeneralCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
 
 		__pSubLayerDescSetLayout = nullptr;
@@ -90,7 +85,7 @@ namespace Render
 	{
 		return std::make_shared<Mesh>(
 			*__pDevice, *__pMemoryAllocator,
-			*__pGeneralCommandExecutor, *__pResourcePool);
+			__commandExecutor, *__pResourcePool);
 	}
 
 	std::shared_ptr<Texture> Engine::createTexture(
@@ -98,7 +93,7 @@ namespace Render
 		Texture::ImageViewCreateInfo const &imageViewCreateInfo)
 	{
 		return std::make_shared<Texture>(
-			*__pDevice, *__pGeneralCommandExecutor,
+			*__pDevice, __commandExecutor,
 			*__pMemoryAllocator, __deferredDeleter,
 			imageCreateInfo, imageViewCreateInfo);
 	}
@@ -111,22 +106,23 @@ namespace Render
 
 	void Engine::render()
 	{
+		__pGlobalDescriptorManager->validate();
 		__validateReservedRenderTargets();
 
-		__pGlobalDescriptorManager->validate();
 		__pDescriptorUpdater->update();
 		__pCommandSubmitter->clear();
 
-		auto const hGlobalDescSet{ __pGlobalDescriptorManager->getDescSet() };
+		auto &executorCmdBuffer{ __beginNextExecutorCmdBuffer() };
+		__commandExecutor.execute(executorCmdBuffer);
+		executorCmdBuffer.vkEndCommandBuffer();
 
-		if (!(__pGeneralCommandExecutor->isEmpty()))
-			__pCommandSubmitter->reserve(__pGeneralCommandExecutor->execute());
+		__pCommandSubmitter->addGeneralExecution(executorCmdBuffer);
 
 		for (auto const pRenderTarget : __reservedRenderTargets)
-			__pCommandSubmitter->reserve(pRenderTarget->draw(hGlobalDescSet));
-
-		if (__pCommandSubmitter->isEmpty())
-			return;
+		{
+			__pCommandSubmitter->addDrawResult(
+				pRenderTarget->draw(__pGlobalDescriptorManager->getDescSet()));
+		}
 
 		auto &submissionFence{ __getNextSubmissionFence() };
 		__pDevice->vkResetFences(1U, &(submissionFence.getHandle()));
@@ -332,6 +328,23 @@ namespace Render
 		};
 
 		__pSubLayerDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
+	}
+
+	VK::CommandBuffer &Engine::__beginNextExecutorCmdBuffer()
+	{
+		VK::CommandBuffer &retVal{ __pExecutorCmdBufferCirculator->getNext() };
+
+		VkCommandBufferBeginInfo const cbBeginInfo
+		{
+			.sType{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+			.flags{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
+		};
+
+		auto const result{ retVal.vkBeginCommandBuffer(&cbBeginInfo) };
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Cannot begin a executor command buffer." };
+
+		return retVal;
 	}
 
 	VK::Fence &Engine::__getNextSubmissionFence()

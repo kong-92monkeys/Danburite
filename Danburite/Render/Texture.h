@@ -45,7 +45,7 @@ namespace Render
 
 		Texture(
 			VK::Device &device,
-			Dev::CommandExecutor &generalCommandExecutor,
+			Dev::CommandExecutor &commandExecutor,
 			Dev::MemoryAllocator &memoryAllocator,
 			Infra::DeferredDeleter &deferredDeleter,
 			ImageCreateInfo const &imageCreateInfo,
@@ -67,7 +67,7 @@ namespace Render
 
 	private:
 		VK::Device &__device;
-		Dev::CommandExecutor &__generalCommandExecutor;
+		Dev::CommandExecutor &__commandExecutor;
 		Dev::MemoryAllocator &__memoryAllocator;
 		Infra::DeferredDeleter &__deferredDeleter;
 

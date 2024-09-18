@@ -11,27 +11,23 @@ namespace Render
 	public:
 		CommandSubmitter(VK::Queue &queue) noexcept;
 
-		void reserve(
-			std::future<VK::CommandBuffer *> &&submission);
+		void addGeneralExecution(
+			VK::CommandBuffer const &cmdBuffer);
 
-		void reserve(
-			RenderTarget::DrawResult &&submission);
-
-		[[nodiscard]]
-		constexpr bool isEmpty() const noexcept;
+		void addDrawResult(
+			RenderTarget::DrawResult const &result);
 
 		void submit(
 			VK::Fence &fence);
 
 		void present();
-
 		void clear();
 
 	private:
 		VK::Queue &__que;
 
-		std::vector<std::future<VK::CommandBuffer *>> __generalSubmissions;
-		std::vector<RenderTarget::DrawResult> __drawcallSubmissions;
+		std::vector<VK::CommandBuffer const *> __generalExecutions;
+		std::vector<RenderTarget::DrawResult> __drawResults;
 
 		std::vector<VkCommandBufferSubmitInfo> __commandBufferInfos;
 		std::vector<VkSemaphoreSubmitInfo> __waitSemaphoreInfos;
@@ -39,9 +35,4 @@ namespace Render
 
 		std::vector<VkSubmitInfo2> __submitInfos;
 	};
-
-	constexpr bool CommandSubmitter::isEmpty() const noexcept
-	{
-		return (__generalSubmissions.empty() && __drawcallSubmissions.empty());
-	}
 }

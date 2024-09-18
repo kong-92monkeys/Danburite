@@ -54,6 +54,7 @@ namespace Render
 		VK::PhysicalDevice &__physicalDevice;
 
 		Infra::DeferredDeleter __deferredDeleter{ Constants::MAX_IN_FLIGHT_FRAME_COUNT };
+		Dev::CommandExecutor __commandExecutor;
 
 		uint32_t __queueFamilyIndex{ };
 
@@ -62,11 +63,11 @@ namespace Render
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
 
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
-		std::unique_ptr<Dev::CommandExecutor> __pGeneralCommandExecutor;
 		std::unique_ptr<Dev::DescriptorUpdater> __pDescriptorUpdater;
 		std::unique_ptr<ResourcePool> __pResourcePool;
 		std::unique_ptr<CommandSubmitter> __pCommandSubmitter;
 		std::unique_ptr<GlobalDescriptorManager> __pGlobalDescriptorManager;
+		std::unique_ptr<Dev::CommandBufferCirculator> __pExecutorCmdBufferCirculator;
 
 		std::vector<std::unique_ptr<VK::Fence>> __submissionFences;
 		size_t __submissionFenceCursor{ };
@@ -82,6 +83,9 @@ namespace Render
 		void __createPipelineCache();
 		void __createSubmissionFences();
 		void __createSubLayerDescLayout();
+
+		[[nodiscard]]
+		VK::CommandBuffer &__beginNextExecutorCmdBuffer();
 
 		[[nodiscard]]
 		VK::Fence &__getNextSubmissionFence();

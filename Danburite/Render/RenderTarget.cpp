@@ -27,14 +27,15 @@ namespace Render
 		__createClearImageRenderPass();
 		__syncClearImageFramebuffers();
 
+		__pDrawcallCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
+			__device, __que.getFamilyIndex(),
+			VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY, 2U, 30U);
+
 		__pImageAcqSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::DEFERRED_DELETER_QUEUE_SIZE);
 
 		__pCompleteSemaphoreCirculator = std::make_unique<Dev::SemaphoreCirculator>(
 			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::DEFERRED_DELETER_QUEUE_SIZE);
-
-		__pDrawcallExecutor = std::make_unique<Dev::CommandExecutor>(
-			__device, __que.getFamilyIndex());
 
 		auto const &extent{ getExtent() };
 		__pRendererResourceManager = std::make_unique<RendererResourceManager>(__deferredDeleter);
@@ -46,10 +47,10 @@ namespace Render
 		__que.vkQueueWaitIdle();
 
 		__pRendererResourceManager = nullptr;
-		__pDrawcallExecutor = nullptr;
 
 		__pCompleteSemaphoreCirculator = nullptr;
 		__pImageAcqSemaphoreCirculator = nullptr;
+		__pDrawcallCmdBufferCirculator = nullptr;
 
 		__clearImageFramebuffers.clear();
 
@@ -59,6 +60,43 @@ namespace Render
 
 		__pClearImageRenderPass = nullptr;
 		__pSurface = nullptr;
+	}
+
+	void RenderTarget::addLayer(
+		std::shared_ptr<Layer> const &pLayer)
+	{
+		if (!(__layerRefs.emplace(pLayer).second))
+			throw std::runtime_error{ "The layer is already added." };
+
+		pLayer->getInvalidateEvent() += __pLayerInvalidateListener;
+		pLayer->getPriorityChangeEvent() += __pLayerPriorityChangeListener;
+		pLayer->getNeedRedrawEvent() += __pLayerNeedRedrawListener;
+
+		__invalidatedLayers.emplace(pLayer.get());
+		__layerSortionInvalidated = true;
+		_invalidate();
+	}
+
+	void RenderTarget::removeLayer(
+		std::shared_ptr<Layer> const &pLayer)
+	{
+		if (!(__layerRefs.erase(pLayer)))
+			throw std::runtime_error{ "The layer is not added yet." };
+
+		pLayer->getInvalidateEvent() -= __pLayerInvalidateListener;
+		pLayer->getPriorityChangeEvent() -= __pLayerPriorityChangeListener;
+		pLayer->getNeedRedrawEvent() -= __pLayerNeedRedrawListener;
+
+		__invalidatedLayers.erase(pLayer.get());
+		__layerSortionInvalidated = true;
+		_invalidate();
+	}
+
+	void RenderTarget::setBackgroundColor(
+		glm::vec4 const &color) noexcept
+	{
+		__backgroundColor = color;
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::sync()
@@ -74,38 +112,30 @@ namespace Render
 		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
 	}
 
-	void RenderTarget::setBackgroundColor(
-		glm::vec4 const &color) noexcept
-	{
-		__backgroundColor = color;
-		__needRedrawEvent.invoke(this);
-	}
-
 	RenderTarget::DrawResult RenderTarget::draw(
 		VkDescriptorSet const hGlobalDescSet)
 	{
+		auto &cmdBuffer			{ __beginNextDrawcallCmdBuffer() };
 		auto &imageAcqSemaphore	{ __pImageAcqSemaphoreCirculator->getNext() };
 		auto &completeSemaphore	{ __pCompleteSemaphoreCirculator->getNext() };
 
-		uint32_t const imageIdx{ __acquireNextImage(imageAcqSemaphore) };
+		uint32_t const imageIdx	{ __acquireNextImage(imageAcqSemaphore) };
+		auto &outputAttachment	{ *(__swapchainImageViews[imageIdx]) };
 
-		__pDrawcallExecutor->reserve([this, imageIdx] (auto &cmdBuffer)
+		__beginSwapchainImage(cmdBuffer, imageIdx);
+
+		for (auto const pLayer : __sortedLayers)
 		{
-			VkCommandBufferBeginInfo const cbBeginInfo
-			{
-				.sType{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
-				.flags{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
-			};
+			pLayer->draw(
+				cmdBuffer, hGlobalDescSet, outputAttachment,
+				*__pRendererResourceManager, __renderArea);
+		}
 
-			__beginSwapchainImage(cmdBuffer, imageIdx);
-
-			// TODO: draw layers
-
-			__endSwapchainImage(cmdBuffer, imageIdx);
-		});
+		__endSwapchainImage(cmdBuffer, imageIdx);
+		cmdBuffer.vkEndCommandBuffer();
 
 		DrawResult retVal{ };
-		retVal.cmdBuffer			= __pDrawcallExecutor->execute();
+		retVal.pCmdBuffer			= &cmdBuffer;
 		retVal.pSwapchain			= __pSwapchain.get();
 		retVal.imageIndex			= imageIdx;
 		retVal.pImageAcqSemaphore	= &imageAcqSemaphore;
@@ -279,6 +309,10 @@ namespace Render
 
 		if (result != VkResult::VK_SUCCESS)
 			throw std::runtime_error{ "Cannot resolve capabilities." };
+
+		__renderArea.offset.x	= 0;
+		__renderArea.offset.y	= 0;
+		__renderArea.extent		= getExtent();
 	}
 
 	void RenderTarget::__resolveSurfaceFormat()
@@ -446,6 +480,23 @@ namespace Render
 		return retVal;
 	}
 
+	VK::CommandBuffer &RenderTarget::__beginNextDrawcallCmdBuffer()
+	{
+		VK::CommandBuffer &retVal{ __pDrawcallCmdBufferCirculator->getNext() };
+
+		VkCommandBufferBeginInfo const cbBeginInfo
+		{
+			.sType{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+			.flags{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
+		};
+
+		auto const result{ retVal.vkBeginCommandBuffer(&cbBeginInfo) };
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Cannot begin a drawcall command buffer." };
+
+		return retVal;
+	}
+
 	void RenderTarget::__beginSwapchainImage(
 		VK::CommandBuffer &cmdBuffer,
 		uint32_t const imageIndex)
@@ -454,13 +505,9 @@ namespace Render
 		renderPassBeginInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassBeginInfo.renderPass			= __pClearImageRenderPass->getHandle();
 		renderPassBeginInfo.framebuffer			= __clearImageFramebuffers[imageIndex]->getHandle();
+		renderPassBeginInfo.renderArea			= __renderArea;
 		renderPassBeginInfo.clearValueCount		= 1U;
 		renderPassBeginInfo.pClearValues		= reinterpret_cast<VkClearValue *>(&__backgroundColor);
-
-		auto &renderArea{ renderPassBeginInfo.renderArea };
-		renderArea.offset.x		= 0;
-		renderArea.offset.y		= 0;
-		renderArea.extent		= getExtent();
 
 		VkSubpassBeginInfo const subpassBeginInfo
 		{
@@ -508,5 +555,21 @@ namespace Render
 		};
 
 		cmdBuffer.vkCmdPipelineBarrier2(&dependencyInfo);
+	}
+
+	void RenderTarget::__onLayerPriorityChanged() noexcept
+	{
+
+	}
+
+	void RenderTarget::__onLayerInvalidated(
+		Layer *const pLayer) noexcept
+	{
+
+	}
+
+	void RenderTarget::__onLayerRedrawNeeded() const noexcept
+	{
+
 	}
 }
