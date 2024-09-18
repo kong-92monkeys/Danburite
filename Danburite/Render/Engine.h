@@ -62,12 +62,15 @@ namespace Render
 		std::vector<std::unique_ptr<VK::Fence>> __submissionFences;
 		size_t __submissionFenceCursor{ };
 		
+		std::unique_ptr<VK::DescriptorSetLayout> __pSubLayerDescSetLayout;
+
 		void __verifyPhysicalDeviceSupport();
 		void __resolveQueueFamilyIndex();
 		void __createDevice();
 		void __retrieveQueue();
 		void __createPipelineCache();
 		void __createSubmissionFences();
+		void __createSubLayerDescLayout();
 
 		[[nodiscard]]
 		VK::Fence &__getNextSubmissionFence();

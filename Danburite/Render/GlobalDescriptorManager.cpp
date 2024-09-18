@@ -183,7 +183,7 @@ namespace Render
 
 	void GlobalDescriptorManager::__validateDescSet()
 	{
-		__hCurDescSet = __getNextDescSet();
+		__advanceDescSet();
 
 		for (auto const &[type, pBuilder] : __materialBufferBuilders)
 		{
@@ -197,7 +197,7 @@ namespace Render
 			};
 
 			__descriptorUpdater.addBufferInfos(
-				__hCurDescSet, __bindingInfo.materialBufferBindings.at(type), 0U, 1U,
+				getDescSet(), __bindingInfo.materialBufferBindings.at(type), 0U, 1U,
 				VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 		}
 	}
@@ -207,7 +207,7 @@ namespace Render
 		__deferredDeleter.reserve(std::move(__pDescPool));
 
 		__sampledImageDescCount <<= 1U;
-		__descSetCursor = 0U;
+		__descSetCursor = 0ULL;
 
 		__createDescPool();
 		__allocateDescSets();

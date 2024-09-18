@@ -19,6 +19,7 @@ namespace Render
 		__retrieveQueue();
 		__createPipelineCache();
 		__createSubmissionFences();
+		__createSubLayerDescLayout();
 
 		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
 
@@ -61,6 +62,7 @@ namespace Render
 		__pGeneralCommandExecutor = nullptr;
 		__pMemoryAllocator = nullptr;
 
+		__pSubLayerDescSetLayout = nullptr;
 		__submissionFences.clear();
 		__pPipelineCache = nullptr;
 
@@ -97,6 +99,14 @@ namespace Render
 	void Engine::render(
 		std::unordered_set<RenderTarget *> const &renderTargets)
 	{
+		for (auto const pRenderTarget : renderTargets)
+		{
+			if (!(pRenderTarget->isPresentable()))
+				return;
+
+			pRenderTarget->validate();
+		}
+
 		__pGlobalDescriptorManager->validate();
 		__pDescriptorUpdater->update();
 		__pCommandSubmitter->clear();
@@ -289,6 +299,37 @@ namespace Render
 
 		for (size_t iter{ }; iter < Constants::MAX_IN_FLIGHT_FRAME_COUNT; ++iter)
 			__submissionFences.emplace_back(std::make_unique<VK::Fence>(*__pDevice, createInfo));
+	}
+
+	void Engine::__createSubLayerDescLayout()
+	{
+		std::vector<VkDescriptorBindingFlags> bindingFlags;
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+		auto &materialBufferBinding				{ bindings.emplace_back() };
+		materialBufferBinding.binding			= Constants::SUB_LAYER_DESC_INSTANCE_INFO_LOCATION;
+		materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		materialBufferBinding.descriptorCount	= 1U;
+		materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+			
+		bindingFlags.emplace_back(0U);
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo const flagInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO },
+			.bindingCount	{ static_cast<uint32_t>(bindingFlags.size()) },
+			.pBindingFlags	{ bindingFlags.data() }
+		};
+
+		VkDescriptorSetLayoutCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
+			.pNext			{ &flagInfo },
+			.bindingCount	{ static_cast<uint32_t>(bindings.size()) },
+			.pBindings		{ bindings.data() }
+		};
+
+		__pSubLayerDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
 	}
 
 	VK::Fence &Engine::__getNextSubmissionFence()

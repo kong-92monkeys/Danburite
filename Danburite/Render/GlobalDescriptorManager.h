@@ -63,9 +63,7 @@ namespace Render
 		std::shared_ptr<VK::DescriptorPool> __pDescPool;
 
 		std::array<VkDescriptorSet, Constants::MAX_IN_FLIGHT_FRAME_COUNT + 1ULL> __descSets;
-		uint32_t __descSetCursor{ };
-
-		VkDescriptorSet __hCurDescSet{ };
+		size_t __descSetCursor{ };
 
 		std::unordered_map<std::type_index, std::unique_ptr<MaterialBufferBuilder>> __materialBufferBuilders;
 
@@ -81,9 +79,7 @@ namespace Render
 		void __validateMaterialBufferBuilders();
 		void __validateDescSet();
 
-		[[nodiscard]]
-		constexpr VkDescriptorSet __getNextDescSet() noexcept;
-
+		constexpr void __advanceDescSet() noexcept;
 		void __growSampledImageDescCount();
 	};
 
@@ -94,13 +90,11 @@ namespace Render
 
 	constexpr VkDescriptorSet GlobalDescriptorManager::getDescSet() const noexcept
 	{
-		return __hCurDescSet;
+		return __descSets[__descSetCursor];
 	}
 
-	constexpr VkDescriptorSet GlobalDescriptorManager::__getNextDescSet() noexcept
+	constexpr void GlobalDescriptorManager::__advanceDescSet() noexcept
 	{
-		auto const retVal{ __descSets[__descSetCursor] };
-		__descSetCursor = ((__descSetCursor + 1U) % static_cast<uint32_t>(__descSets.size()));
-		return retVal;
+		__descSetCursor = ((__descSetCursor + 1ULL) % __descSets.size());
 	}
 }

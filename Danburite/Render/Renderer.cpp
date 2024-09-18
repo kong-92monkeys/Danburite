@@ -6,6 +6,7 @@ namespace Render
 {
 	Renderer::~Renderer() noexcept
 	{
+		__pDeferredDeleter->reserve(std::move(__pPipelineLayout));
 		__destroyEvent.invoke(this);
 	}
 
@@ -25,6 +26,18 @@ namespace Render
 		auto initResult{ _onInit() };
 
 		__pPipelineLayout	= std::move(initResult.pPipelineLayout);
+	}
+
+	void Renderer::setPriority(
+		int const priority)
+	{
+		if (__priority == priority)
+			return;
+
+		int const prevPriority{ __priority };
+		__priority = priority;
+
+		__priorityChangeEvent.invoke(this, prevPriority, priority);
 	}
 
 	VK::PipelineLayout const &Renderer::getPipelineLayout() const noexcept

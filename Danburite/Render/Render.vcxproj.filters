@@ -43,6 +43,15 @@
     <Filter Include="RenderObject">
       <UniqueIdentifier>{5c639e7d-46a9-4b38-99aa-92b56bec4697}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Layer">
+      <UniqueIdentifier>{8f7878a0-ea41-4b16-9d8b-fafda935fd6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SubLayer">
+      <UniqueIdentifier>{52279b25-04d2-4604-a219-7839ae9f06d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShaderData">
+      <UniqueIdentifier>{4dd4c6fd-ec3c-41f2-9f03-cf7f22dbb499}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -87,6 +96,15 @@
     <ClInclude Include="RenderObject.h">
       <Filter>RenderObject</Filter>
     </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Layer</Filter>
+    </ClInclude>
+    <ClInclude Include="SubLayer.h">
+      <Filter>SubLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderData.h">
+      <Filter>ShaderData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -127,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="RenderObject.cpp">
       <Filter>RenderObject</Filter>
+    </ClCompile>
+    <ClCompile Include="SubLayer.cpp">
+      <Filter>SubLayer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

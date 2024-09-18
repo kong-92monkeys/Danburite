@@ -32,6 +32,11 @@ namespace Render
 			VK::DescriptorSetLayout const &globalDescSetLayout);
 
 		[[nodiscard]]
+		constexpr int getPriority() const noexcept;
+		void setPriority(
+			int priority);
+
+		[[nodiscard]]
 		VK::PipelineLayout const &getPipelineLayout() const noexcept;
 
 		[[nodiscard]]
@@ -58,6 +63,10 @@ namespace Render
 			VK::RenderPass &renderPass,
 			uint32_t outputWidth,
 			uint32_t outputHeight) const = 0;
+
+		[[nodiscard]]
+		constexpr Infra::EventView<Renderer const *, int, int> &
+			getPriorityChangeEvent() const noexcept;
 
 		[[nodiscard]]
 		constexpr Infra::EventView<Renderer const *> &getDestroyEvent() const noexcept;
@@ -98,8 +107,11 @@ namespace Render
 		Infra::DeferredDeleter *__pDeferredDeleter{ };
 		VK::DescriptorSetLayout const *__pGlobalDescSetLayout{ };
 
+		int __priority{ };
+
 		std::shared_ptr<VK::PipelineLayout> __pPipelineLayout;
 
+		mutable Infra::Event<Renderer const *, int, int> __priorityChangeEvent;
 		mutable Infra::Event<Renderer const *> __destroyEvent;
 
 		[[nodiscard]]
@@ -109,6 +121,17 @@ namespace Render
 		[[nodiscard]]
 		static shaderc::CompileOptions __makeCopileOptions() noexcept;
 	};
+
+	constexpr int Renderer::getPriority() const noexcept
+	{
+		return __priority;
+	}
+
+	constexpr Infra::EventView<Renderer const *, int, int> &
+		Renderer::getPriorityChangeEvent() const noexcept
+	{
+		return __priorityChangeEvent;
+	}
 
 	constexpr Infra::EventView<Renderer const *> &Renderer::getDestroyEvent() const noexcept
 	{
