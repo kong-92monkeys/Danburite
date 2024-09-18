@@ -69,6 +69,9 @@ namespace Render
 		__syncSwapchain();
 
 		__syncClearImageFramebuffers();
+
+		auto const &extent{ getExtent() };
+		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
 	}
 
 	void RenderTarget::setBackgroundColor(

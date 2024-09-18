@@ -32,6 +32,10 @@ namespace Render
 		[[nodiscard]]
 		std::shared_ptr<Mesh> createMesh();
 
+		template <std::derived_from<Renderer> $Renderer, typename ...$Args>
+		[[nodiscard]]
+		std::shared_ptr<$Renderer> createRenderer($Args &&...args);
+
 		[[nodiscard]]
 		std::shared_ptr<Texture> createTexture(
 			Texture::ImageCreateInfo const &imageCreateInfo,
@@ -81,4 +85,16 @@ namespace Render
 
 		void __validateReservedRenderTargets();
 	};
+
+	template <std::derived_from<Renderer> $Renderer, typename ...$Args>
+	std::shared_ptr<$Renderer> Engine::createRenderer($Args &&...args)
+	{
+		auto pRetVal{ std::make_shared<$Renderer>(std::forward<$Args>(args)...) };
+		pRetVal->init(
+			__physicalDevice, *__pDevice,
+			*__pPipelineCache, __deferredDeleter,
+			__pGlobalDescriptorManager->getDescSetLayout());
+
+		return pRetVal;
+	}
 }
