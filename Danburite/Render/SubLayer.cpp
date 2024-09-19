@@ -416,6 +416,7 @@ namespace Render
 		renderPassBeginInfo.sType			= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassBeginInfo.renderPass		= renderPass.getHandle();
 		renderPassBeginInfo.framebuffer		= framebuffer.getHandle();
+		renderPassBeginInfo.renderArea		= renderArea;
 
 		VkSubpassBeginInfo const subpassBeginInfo
 		{

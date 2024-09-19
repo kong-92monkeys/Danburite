@@ -9,6 +9,8 @@
 #include "App.h"
 #include "MainFrm.h"
 #include "../System/Env.h"
+#include "../Frameworks/TestRenderer.h"
+#include "../Frameworks/VertexAttribute.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -93,7 +95,9 @@ int CApp::ExitInstance()
 std::unique_ptr<Render::RenderTarget> CApp::createRenderTarget(
 	HWND const hWindow)
 {
-	return __pRenderEngine->createRenderTarget(m_hInstance, hWindow);
+	auto pRetVal{ __pRenderEngine->createRenderTarget(m_hInstance, hWindow) };
+	__setupRenderTarget(*pRetVal);
+	return pRetVal;
 }
 
 void CApp::render(Render::RenderTarget &renderTarget)
@@ -143,6 +147,33 @@ void CApp::__onInitBeforeMainFrame()
 		*__pVulkanContext,
 		__pVulkanContext->getPhysicalDeviceOf(0ULL),
 		globalDescBindingInfo);
+}
+
+void CApp::__setupRenderTarget(
+	Render::RenderTarget &renderTarget)
+{
+	auto pLayer{ __pRenderEngine->createLayer() };
+	renderTarget.addLayer(pLayer);
+
+	auto pRenderObject{ std::make_shared<Render::RenderObject>() };
+	pLayer->addRenderObject(pRenderObject);
+
+	Infra::GenericBuffer posBuffer;
+	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.5f });
+	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, 0.5f });
+	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, 0.5f });
+	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, 0.5f });
+
+	Infra::GenericBuffer indexBuffer;
+	indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
+
+	auto pMesh{ __pRenderEngine->createMesh() };
+	pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
+	pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
+
+	pRenderObject->setRenderer(__pRenderEngine->createRenderer<Frx::TestRenderer>());
+	pRenderObject->setDrawParam(std::make_shared<Render::DrawParamIndexed>(6U, 0U, 0));
+	pRenderObject->setMesh(pMesh);
 }
 
 // CAboutDlg dialog used for App About

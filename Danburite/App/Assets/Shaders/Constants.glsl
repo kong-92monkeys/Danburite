@@ -1,0 +1,17 @@
+#ifndef CONSTANTS_GLSL
+#define CONSTANTS_GLSL
+
+const uint VERTEX_ATTRIB_POS_LOCATION					= 0U;
+const uint VERTEX_ATTRIB_TEXCOORD_LOCATION				= 1U;
+const uint VERTEX_ATTRIB_NORMAL_LOCATION				= 2U;
+const uint VERTEX_ATTRIB_COLOR_LOCATION					= 3U;
+const uint VERTEX_ATTRIB_TANGENT_LOCATION				= 4U;
+
+// Descriptor set locations
+const uint GLOBAL_DESC_SET_LOCATION						= 0U;
+const uint SUB_LAYER_DESC_SET_LOCATION					= 1U;
+
+// Descriptor locations
+const uint SUB_LAYER_DESC_INSTANCE_INFO_LOCATION		= 0U;
+
+#endif

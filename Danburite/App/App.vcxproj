@@ -220,6 +220,10 @@
     <ResourceCompile Include="App.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\Constants.glsl" />
+    <None Include="Assets\Shaders\ShaderData.glsl" />
+    <None Include="Assets\Shaders\Test.frag" />
+    <None Include="Assets\Shaders\Test.vert" />
     <None Include="res\App.rc2" />
   </ItemGroup>
   <ItemGroup>

@@ -100,7 +100,8 @@ namespace Render
 		pRetVal->init(
 			__physicalDevice, *__pDevice,
 			*__pPipelineCache, __deferredDeleter,
-			__pGlobalDescriptorManager->getDescSetLayout());
+			__pGlobalDescriptorManager->getDescSetLayout(),
+			*__pSubLayerDescSetLayout);
 
 		return pRetVal;
 	}

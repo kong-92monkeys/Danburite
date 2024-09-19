@@ -160,11 +160,13 @@ namespace Render
 			VK::CommandBuffer &cmdBuffer,
 			uint32_t imageIndex);
 
-		void __onLayerPriorityChanged() noexcept;
+		void __validateLayers();
+		void __sortLayers();
 
 		void __onLayerInvalidated(
 			Layer *pLayer) noexcept;
 
+		void __onLayerPriorityChanged() noexcept;
 		void __onLayerRedrawNeeded() const noexcept;
 	};
 

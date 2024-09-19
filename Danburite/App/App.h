@@ -52,6 +52,9 @@ private:
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
+
+	void __setupRenderTarget(
+		Render::RenderTarget &renderTarget);
 };
 
 extern CApp theApp;

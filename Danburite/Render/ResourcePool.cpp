@@ -51,7 +51,7 @@ namespace Render
 		VkMemoryPropertyFlags memoryProp{ };
 		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
-		__registerBufferPool(BufferType::DEVICE_LOCAL_VERTEX, bufferUsage, memoryProp);
+		__registerBufferPool(BufferType::DEVICE_LOCAL_INDEX, bufferUsage, memoryProp);
 	}
 
 	void ResourcePool::__registerHostVisibleCoherentStorageBufferPool()
@@ -75,7 +75,7 @@ namespace Render
 		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
 		memoryProp |= VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
-		__registerBufferPool(BufferType::HOST_VISIBLE_COHERENT_STORAGE, bufferUsage, memoryProp);
+		__registerBufferPool(BufferType::STAGING, bufferUsage, memoryProp);
 	}
 
 	void ResourcePool::__registerBufferPool(

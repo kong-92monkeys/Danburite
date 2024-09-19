@@ -95,7 +95,7 @@ namespace Render
 
 	void Layer::_onValidate()
 	{
-		for (const auto pSubLayer : __invalidatedSubLayers)
+		for (auto const pSubLayer : __invalidatedSubLayers)
 			pSubLayer->validate();
 
 		if (__subLayerSortionInvalidated)
@@ -145,6 +145,7 @@ namespace Render
 			pRetVal->getNeedRedrawEvent() += __pSubLayerNeedRedrawListener;
 
 			__subLayerSortionInvalidated = true;
+			_invalidate();
 		}
 
 		return pRetVal.get();

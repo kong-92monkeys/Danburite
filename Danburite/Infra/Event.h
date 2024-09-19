@@ -14,7 +14,7 @@ namespace Infra
 	using EventListenerPtr = std::shared_ptr<EventListener<$Args...>>;
 
 	template <typename ...$Args>
-	using EventCallback = std::function<void(const $Args &...)>;
+	using EventCallback = std::function<void($Args const &...)>;
 
 	template <typename ...$Args>
 	class EventListener : public Unique
@@ -23,14 +23,17 @@ namespace Infra
 		EventListener(EventCallback<$Args...> &&callback) noexcept;
 		virtual ~EventListener() noexcept = default;
 
-		void send(const $Args &...args) const;
+		void send(
+			$Args const &...args) const;
 
 		[[nodiscard]]
-		static EventListenerPtr<$Args...> make(EventCallback<$Args...> &&callback) noexcept;
+		static EventListenerPtr<$Args...> make(
+			EventCallback<$Args...> &&callback) noexcept;
 
 		template <typename ...$Params>
 		[[nodiscard]]
-		static EventListenerPtr<$Args...> bind($Params &&...params) noexcept;
+		static EventListenerPtr<$Args...> bind(
+			$Params &&...params) noexcept;
 
 	private:
 		const EventCallback<$Args...> __callbackFunc;
@@ -40,80 +43,99 @@ namespace Infra
 	class EventView : public Unique
 	{
 	public:
-		virtual void addListener(const EventListenerPtr<$Args...> &pListener) noexcept = 0;
-		virtual void removeListener(const EventListenerPtr<$Args...> &pListener) = 0;
+		virtual void addListener(
+			EventListenerPtr<$Args...> const &pListener) noexcept = 0;
 
-		EventView &operator+=(const EventListenerPtr<$Args...> &pListener) noexcept;
-		EventView &operator-=(const EventListenerPtr<$Args...> &pListener);
+		virtual void removeListener(
+			EventListenerPtr<$Args...> const &pListener) = 0;
+
+		EventView &operator+=(
+			EventListenerPtr<$Args...> const &pListener) noexcept;
+
+		EventView &operator-=(
+			EventListenerPtr<$Args...> const &pListener);
 	};
 
 	template <typename ...$Args>
 	class Event : public EventView<$Args...>
 	{
 	public:
-		virtual void addListener(const EventListenerPtr<$Args...> &pListener) noexcept override;
-		virtual void removeListener(const EventListenerPtr<$Args...> &pListener) override;
+		virtual void addListener(
+			EventListenerPtr<$Args...> const &pListener) noexcept override;
 
-		void invoke(const $Args &...args);
+		virtual void removeListener(
+			EventListenerPtr<$Args...> const &pListener) override;
+
+		void invoke(
+			$Args const &...args);
 
 	private:
 		WeakReferenceSet<EventListener<$Args...>> __listeners;
 	};
 
 	template <typename ...$Args>
-	EventListener<$Args...>::EventListener(EventCallback<$Args...> &&callback) noexcept :
-		__callbackFunc{ std::move(callback) }
+	EventListener<$Args...>::EventListener(
+		EventCallback<$Args...> &&callback) noexcept :
+		__callbackFunc	{ std::move(callback) }
 	{}
 
 	template <typename ...$Args>
-	void EventListener<$Args...>::send(const $Args &...args) const
+	void EventListener<$Args...>::send(
+		$Args const &...args) const
 	{
 		__callbackFunc(args...);
 	}
 
 	template <typename ...$Args>
-	EventListenerPtr<$Args...> EventListener<$Args...>::make(EventCallback<$Args...> &&callback) noexcept
+	EventListenerPtr<$Args...> EventListener<$Args...>::make(
+		EventCallback<$Args...> &&callback) noexcept
 	{
 		return std::make_shared<EventListener<$Args...>>(std::move(callback));
 	}
 
 	template <typename ...$Args>
 	template <typename ...$Params>
-	EventListenerPtr<$Args...> EventListener<$Args...>::bind($Params &&...params) noexcept
+	EventListenerPtr<$Args...> EventListener<$Args...>::bind(
+		$Params &&...params) noexcept
 	{
 		return make(std::bind(std::forward<$Params>(params)...));
 	}
 
 	template <typename ...$Args>
-	EventView<$Args...> &EventView<$Args...>::operator+=(const EventListenerPtr<$Args...> &pListener) noexcept
+	EventView<$Args...> &EventView<$Args...>::operator+=(
+		EventListenerPtr<$Args...> const &pListener) noexcept
 	{
 		addListener(pListener);
 		return *this;
 	}
 
 	template <typename ...$Args>
-	EventView<$Args...> &EventView<$Args...>::operator-=(const EventListenerPtr<$Args...> &pListener)
+	EventView<$Args...> &EventView<$Args...>::operator-=(
+		EventListenerPtr<$Args...> const &pListener)
 	{
 		removeListener(pListener);
 		return *this;
 	}
 
 	template <typename ...$Args>
-	void Event<$Args...>::addListener(const EventListenerPtr<$Args...> &pListener) noexcept
+	void Event<$Args...>::addListener(
+		EventListenerPtr<$Args...> const &pListener) noexcept
 	{
 		__listeners.emplace(pListener);
 	}
 
 	template <typename ...$Args>
-	void Event<$Args...>::removeListener(const EventListenerPtr<$Args...> &pListener)
+	void Event<$Args...>::removeListener(
+		EventListenerPtr<$Args...> const &pListener)
 	{
 		__listeners.erase(pListener);
 	}
 
 	template <typename ...$Args>
-	void Event<$Args...>::invoke(const $Args &...args)
+	void Event<$Args...>::invoke(
+		$Args const &...args)
 	{
-		for (const auto &listener : __listeners)
+		for (auto const &listener : __listeners)
 			listener.send(args...);
 	}
 }

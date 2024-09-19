@@ -16,7 +16,6 @@ namespace Infra
 		{
 		public:
 			Iterator(
-				Container &references,
 				Container::iterator &&iter) noexcept;
 
 			void operator++();
@@ -29,7 +28,6 @@ namespace Infra
 				Iterator const &another) const noexcept;
 
 		private:
-			Container &__references;
 			Container::iterator __iter;
 		};
 
@@ -64,6 +62,9 @@ namespace Infra
 	void WeakReferenceSet<$T>::emplace(
 		std::shared_ptr<$T> const &ptr)
 	{
+		if (!ptr)
+			throw std::runtime_error{ "Cannot emplace a null reference." };
+
 		__references.emplace(ptr.get(), ptr);
 	}
 
@@ -71,47 +72,44 @@ namespace Infra
 	void WeakReferenceSet<$T>::erase(
 		std::shared_ptr<$T> const &ptr)
 	{
+		if (!ptr)
+			throw std::runtime_error{ "Cannot erase a null reference." };
+
 		__references.erase(ptr.get());
 	}
 
 	template <typename $T>
 	WeakReferenceSet<$T>::Iterator WeakReferenceSet<$T>::begin() noexcept
 	{
-		return { __references, __references.begin() };
+		for (auto it{ __references.begin() }; it != __references.end(); )
+		{
+			auto const &[ptr, weakPtr] { *it };
+
+			if (weakPtr.expired())
+				it = __references.erase(it);
+			else
+				++it;
+		}
+
+		return { __references.begin() };
 	}
 
 	template <typename $T>
 	WeakReferenceSet<$T>::Iterator WeakReferenceSet<$T>::end() noexcept
 	{
-		return { __references, __references.end() };
+		return { __references.end() };
 	}
 
 	template <typename $T>
 	WeakReferenceSet<$T>::Iterator::Iterator(
-		Container &references,
 		Container::iterator &&iter) noexcept :
-		__references	{ references },
-		__iter			{ iter }
+		__iter{ std::move(iter) }
 	{}
 
 	template <typename $T>
 	void WeakReferenceSet<$T>::Iterator::operator++()
 	{
-		if (__iter == __references.end())
-			throw std::out_of_range{ "Out of range" };
-
-		while (__iter != __references.end())
-		{
-			const auto &[ptr, weakPtr] { *__iter };
-
-			if (weakPtr.expired())
-				__iter = __references.erase(__iter);
-			else
-			{
-				++__iter;
-				break;
-			}
-		}
+		++__iter;
 	}
 
 	template <typename $T>

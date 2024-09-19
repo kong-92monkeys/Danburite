@@ -26,6 +26,18 @@
     <Filter Include="Logger">
       <UniqueIdentifier>{1fb8033d-603d-4ce7-bbe5-006e86f73967}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{c41f93a2-07c9-492f-8237-a0be4c1c7801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Shaders">
+      <UniqueIdentifier>{8b2b13ad-6a29-4cd8-ad57-16983be9a662}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Materials">
+      <UniqueIdentifier>{b885c91a-3aec-4260-becf-109e727041e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Shaders\Test">
+      <UniqueIdentifier>{93437e74-d959-4d3f-9225-f7bb29a12202}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -84,6 +96,18 @@
   <ItemGroup>
     <None Include="res\App.rc2">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Assets\Shaders\ShaderData.glsl">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\Constants.glsl">
+      <Filter>Assets\Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\Test.frag">
+      <Filter>Assets\Shaders\Test</Filter>
+    </None>
+    <None Include="Assets\Shaders\Test.vert">
+      <Filter>Assets\Shaders\Test</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

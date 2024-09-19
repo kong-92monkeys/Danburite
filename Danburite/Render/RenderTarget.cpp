@@ -19,6 +19,15 @@ namespace Render
 		__que				{ queue },
 		__deferredDeleter	{ deferredDeleter }
 	{
+		__pLayerInvalidateListener = Infra::EventListener<Layer *>::bind(
+			&RenderTarget::__onLayerInvalidated, this, std::placeholders::_1);
+
+		__pLayerPriorityChangeListener = Infra::EventListener<Layer const *, int, int>::bind(
+			&RenderTarget::__onLayerPriorityChanged, this);
+
+		__pLayerNeedRedrawListener = Infra::EventListener<Layer const *>::bind(
+			&RenderTarget::__onLayerRedrawNeeded, this);
+
 		__createSurface(hinstance, hwnd);
 
 		__syncSurface();
@@ -44,6 +53,7 @@ namespace Render
 
 	RenderTarget::~RenderTarget() noexcept
 	{
+		__layerRefs.clear();
 		__que.vkQueueWaitIdle();
 
 		__pRendererResourceManager = nullptr;
@@ -146,7 +156,14 @@ namespace Render
 
 	void RenderTarget::_onValidate()
 	{
-		// TODO: validate layers
+		for (const auto pLayer : __invalidatedLayers)
+			pLayer->validate();
+
+		if (__layerSortionInvalidated)
+			__sortLayers();
+
+		__invalidatedLayers.clear();
+		__layerSortionInvalidated = false;
 	}
 
 	void RenderTarget::__createSurface(
@@ -557,19 +574,34 @@ namespace Render
 		cmdBuffer.vkCmdPipelineBarrier2(&dependencyInfo);
 	}
 
-	void RenderTarget::__onLayerPriorityChanged() noexcept
+	void RenderTarget::__sortLayers()
 	{
+		__sortedLayers.clear();
 
+		for (auto const &pLayer : __layerRefs)
+			__sortedLayers.emplace_back(pLayer.get());
+
+		std::sort(__sortedLayers.begin(), __sortedLayers.end(), [] (auto const lhs, auto const rhs)
+		{
+			return (lhs->getPriority() < rhs->getPriority());
+		});
 	}
 
 	void RenderTarget::__onLayerInvalidated(
 		Layer *const pLayer) noexcept
 	{
+		__invalidatedLayers.emplace(pLayer);
+		_invalidate();
+	}
 
+	void RenderTarget::__onLayerPriorityChanged() noexcept
+	{
+		__layerSortionInvalidated = true;
+		_invalidate();
 	}
 
 	void RenderTarget::__onLayerRedrawNeeded() const noexcept
 	{
-
+		__needRedrawEvent.invoke(this);
 	}
 }
