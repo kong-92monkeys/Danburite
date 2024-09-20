@@ -445,10 +445,17 @@ namespace Render
 	void SubLayer::__bindDescSets(
 		VK::CommandBuffer &cmdBuffer) const
 	{
-		std::array<VkDescriptorSet, 3ULL> descSets{ };
-		descSets[Constants::MATERIALS_DESC_SET_LOCATION]		= __globalDescManager.getMaterialsDescSet();
-		descSets[Constants::SAMPLED_IMAGES_DESC_SET_LOCATION]	= __globalDescManager.getSampledImagesDescSet();
-		descSets[Constants::SUB_LAYER_DESC_SET_LOCATION]		= __getDescSet();
+		std::array const descSets
+		{
+			// MATERIALS_DESC_SET_LOCATION
+			__globalDescManager.getMaterialsDescSet(),
+
+			// SAMPLED_IMAGES_DESC_SET_LOCATION
+			__globalDescManager.getSampledImagesDescSet(),
+
+			// SUB_LAYER_DESC_SET_LOCATION
+			__getDescSet()
+		};
 
 		cmdBuffer.vkCmdBindDescriptorSets(
 			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,

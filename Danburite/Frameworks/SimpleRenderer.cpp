@@ -271,8 +271,14 @@ namespace Frx
 		auto const &globalDescManager{ _getGlobalDescriptorManager() };
 
 		std::vector<VkDescriptorSetLayout> setLayouts;
+
+		// MATERIALS_DESC_SET_LOCATION
 		setLayouts.emplace_back(globalDescManager.getMaterialsDescSetLayout().getHandle());
+
+		// SAMPLED_IMAGES_DESC_SET_LOCATION
 		setLayouts.emplace_back(globalDescManager.getSampledImagesDescSetLayout().getHandle());
+
+		// SUB_LAYER_DESC_SET_LOCATION
 		setLayouts.emplace_back(_getSubLayerDescSetLayout().getHandle());
 
 		VkPipelineLayoutCreateInfo const createInfo
