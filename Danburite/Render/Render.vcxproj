@@ -23,6 +23,7 @@
     <ClInclude Include="DrawParam.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GlobalDescriptorManager.h" />
+    <ClInclude Include="ImageReferenceManager.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="MaterialBufferBuilder.h" />
     <ClInclude Include="RendererResourceManager.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="DrawParam.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GlobalDescriptorManager.cpp" />
+    <ClCompile Include="ImageReferenceManager.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="MaterialBufferBuilder.cpp" />
     <ClCompile Include="RendererResourceManager.cpp" />

@@ -35,12 +35,11 @@ namespace Render
 	private:
 		ResourcePool &__resourcePool;
 
-		Infra::IdAllocator<uint32_t> __materialIdAllocator;
-		std::unordered_map<const Material *, std::pair<size_t, uint32_t>> __materialRefIdMap;
+		Infra::IdAllocator<uint32_t> __idAllocator;
+		std::unordered_map<Material const *, std::pair<size_t, uint32_t>> __refIdMap;
 
-		Infra::GenericBuffer __materialHostBuffer;
-		std::shared_ptr<Dev::MemoryBuffer> __pMaterialBuffer;
-		bool __materialBufferInvalidated{ };
+		Infra::GenericBuffer __hostBuffer;
+		std::shared_ptr<Dev::MemoryBuffer> __pBuffer;
 
 		Infra::EventListenerPtr<Material const *> __pMaterialUpdateListener;
 

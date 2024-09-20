@@ -37,7 +37,7 @@ namespace Render
 		__pCommandSubmitter = std::make_unique<CommandSubmitter>(*__pQueue);
 
 		__pGlobalDescriptorManager = std::make_unique<GlobalDescriptorManager>(
-			__physicalDevice, *__pDevice, __deferredDeleter,
+			__physicalDevice, *__pDevice, __deferredDeleter, __imageReferenceManager,
 			*__pDescriptorUpdater, *__pResourcePool, globalDescBindingInfo);
 
 		__pExecutorCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(

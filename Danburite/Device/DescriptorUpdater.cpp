@@ -7,7 +7,7 @@ namespace Dev
 		__device	{ device }
 	{}
 
-	void DescriptorUpdater::addBufferInfos(
+	void DescriptorUpdater::addInfos(
 		VkDescriptorSet const hDescSet,
 		uint32_t const dstBinding,
 		uint32_t const dstArrayElement,
@@ -15,10 +15,10 @@ namespace Dev
 		VkDescriptorType const descriptorType,
 		VkDescriptorBufferInfo const *const pInfos) noexcept
 	{
-		auto &bufferInfos{ __getBufferInfos() };
+		auto &infos{ __getBufferInfos() };
 
 		for (uint32_t infoIter{ }; infoIter < descriptorCount; ++infoIter)
-			bufferInfos.emplace_back(pInfos[infoIter]);
+			infos.emplace_back(pInfos[infoIter]);
 		
 		auto &write				{ __writes.emplace_back() };
 		write.sType				= VkStructureType::VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -27,7 +27,30 @@ namespace Dev
 		write.dstArrayElement	= dstArrayElement;
 		write.descriptorCount	= descriptorCount;
 		write.descriptorType	= descriptorType;
-		write.pBufferInfo		= bufferInfos.data();
+		write.pBufferInfo		= infos.data();
+	}
+
+	void DescriptorUpdater::addInfos(
+		VkDescriptorSet const hDescSet,
+		uint32_t const dstBinding,
+		uint32_t const dstArrayElement,
+		uint32_t const descriptorCount,
+		VkDescriptorType const descriptorType,
+		VkDescriptorImageInfo const *const pInfos) noexcept
+	{
+		auto &infos{ __getImageInfos() };
+
+		for (uint32_t infoIter{ }; infoIter < descriptorCount; ++infoIter)
+			infos.emplace_back(pInfos[infoIter]);
+		
+		auto &write				{ __writes.emplace_back() };
+		write.sType				= VkStructureType::VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		write.dstSet			= hDescSet;
+		write.dstBinding		= dstBinding;
+		write.dstArrayElement	= dstArrayElement;
+		write.descriptorCount	= descriptorCount;
+		write.descriptorType	= descriptorType;
+		write.pImageInfo		= infos.data();
 	}
 
 	void DescriptorUpdater::update()
@@ -49,6 +72,17 @@ namespace Dev
 
 		auto &retVal{ __bufferInfos[__bufferInfoCount] };
 		++__bufferInfoCount;
+
+		return retVal;
+	}
+
+	std::vector<VkDescriptorImageInfo> &DescriptorUpdater::__getImageInfos() noexcept
+	{
+		if (__imageInfoCount >= __imageInfos.size())
+			__imageInfos.emplace_back();
+
+		auto &retVal{ __imageInfos[__imageInfoCount] };
+		++__imageInfoCount;
 
 		return retVal;
 	}

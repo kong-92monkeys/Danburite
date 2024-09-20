@@ -55,6 +55,7 @@ namespace Render
 
 		Infra::DeferredDeleter __deferredDeleter{ Constants::MAX_IN_FLIGHT_FRAME_COUNT };
 		Dev::CommandExecutor __commandExecutor;
+		ImageReferenceManager __imageReferenceManager;
 
 		uint32_t __queueFamilyIndex{ };
 

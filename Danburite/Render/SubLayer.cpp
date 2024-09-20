@@ -339,7 +339,7 @@ namespace Render
 			.range	{ __pInstanceInfoBuffer->getSize() }
 		};
 
-		__descUpdater.addBufferInfos(
+		__descUpdater.addInfos(
 			__getDescSet(), Constants::SUB_LAYER_DESC_INSTANCE_INFO_LOCATION,
 			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 	}

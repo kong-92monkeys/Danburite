@@ -7,19 +7,27 @@ namespace Render
 		VK::PhysicalDevice &physicalDevice,
 		VK::Device &device,
 		Infra::DeferredDeleter &deferredDeleter,
+		ImageReferenceManager &imageReferenceManager,
 		Dev::DescriptorUpdater &descriptorUpdater,
 		ResourcePool &resourcePool,
 		BindingInfo const &bindingInfo) :
-		__physicalDevice	{ physicalDevice },
-		__device			{ device },
-		__deferredDeleter	{ deferredDeleter },
-		__descriptorUpdater	{ descriptorUpdater },
-		__resourcePool		{ resourcePool },
-		__bindingInfo		{ bindingInfo }
+		__physicalDevice		{ physicalDevice },
+		__device				{ device },
+		__deferredDeleter		{ deferredDeleter },
+		__imageReferenceManager	{ imageReferenceManager },
+		__descriptorUpdater		{ descriptorUpdater },
+		__resourcePool			{ resourcePool },
+		__bindingInfo			{ bindingInfo }
 	{
 		__pMaterialBufferBuilderInvalidateListener =
 			Infra::EventListener<MaterialBufferBuilder *>::bind(
 				&GlobalDescriptorManager::__onMaterialBufferBuilderInvalidated, this, std::placeholders::_1);
+
+		__pSampledImagesDescInfosUpdateListener =
+			Infra::EventListener<ImageReferenceManager const *>::bind(
+				&GlobalDescriptorManager::__onSampledImagesDescInfosUpdated, this);
+
+		__imageReferenceManager.getUpdateEvent() += __pSampledImagesDescInfosUpdateListener;
 
 		__createMaterialsDescSetLayout();
 		__createSampledImagesDescSetLayout();
@@ -48,7 +56,6 @@ namespace Render
 		Material const *const pMaterial)
 	{
 		__materialBufferBuilders.at(typeid(*pMaterial))->addMaterial(pMaterial);
-		_invalidate();
 	}
 
 	void GlobalDescriptorManager::removeMaterial(
@@ -65,12 +72,19 @@ namespace Render
 
 	void GlobalDescriptorManager::_onValidate()
 	{
-		for (auto const pBuilder : __invalidatedMaterialBufferBuilders)
-			pBuilder->validate();
+		if (__materialsDescInvalidated)
+		{
+			for (auto const pBuilder : __invalidatedMaterialBufferBuilders)
+				pBuilder->validate();
 
-		__validateDescSet();
+			__validateMaterialsDescSet();
+		}
+
+		if (__sampledImagesDescInvalidated)
+			__validateSampledImagesDescSet();
 
 		__invalidatedMaterialBufferBuilders.clear();
+		__materialsDescInvalidated = false;
 	}
 
 	void GlobalDescriptorManager::__createMaterialsDescSetLayout()
@@ -175,7 +189,7 @@ namespace Render
 	{
 		auto const &deviceLimits				{ __physicalDevice.getProps().p10->limits };
 		uint32_t const descSetCount				{ static_cast<uint32_t>(__materialsDescSets.size()) };
-		uint32_t const sampledImagePoolSize		{ __sampledImageDescCount * descSetCount };
+		uint32_t const sampledImagePoolSize		{ __sampledImagesDescArrSize * descSetCount };
 
 		if (deviceLimits.maxPerStageDescriptorSampledImages < sampledImagePoolSize)
 			throw std::runtime_error{ "The sampledImagePoolSize is overflowed." };
@@ -226,7 +240,7 @@ namespace Render
 
 		for (uint32_t iter{ }; iter < descSetCount; ++iter)
 		{
-			sampledImageDescCounts.emplace_back(__sampledImageDescCount);
+			sampledImageDescCounts.emplace_back(__sampledImagesDescArrSize);
 			layoutHandles.emplace_back(__pSampledImagesDescSetLayout->getHandle());
 		}
 
@@ -260,9 +274,9 @@ namespace Render
 		}
 	}
 
-	void GlobalDescriptorManager::__validateDescSet()
+	void GlobalDescriptorManager::__validateMaterialsDescSet()
 	{
-		__advanceDescSet();
+		__advanceMaterialsDescSet();
 
 		for (auto const &[type, pBuilder] : __materialBufferBuilders)
 		{
@@ -275,17 +289,33 @@ namespace Render
 				.range	{ materialBuffer.getSize() }
 			};
 
-			__descriptorUpdater.addBufferInfos(
+			__descriptorUpdater.addInfos(
 				getMaterialsDescSet(), __bindingInfo.materialBufferLocations.at(type), 0U, 1U,
 				VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 		}
+	}
+
+	void GlobalDescriptorManager::__validateSampledImagesDescSet()
+	{
+		auto const &descInfos{ __imageReferenceManager.getDescInfos() };
+		if (descInfos.empty())
+			return;
+
+		if (__sampledImagesDescArrSize < descInfos.size())
+			__growSampledImagesDescCount();
+
+		__advanceSampledImagesDescSet();
+
+		__descriptorUpdater.addInfos(
+			getSampledImagesDescSet(), 0U, 0U, static_cast<uint32_t>(descInfos.size()),
+			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descInfos.data());
 	}
 
 	void GlobalDescriptorManager::__growSampledImagesDescCount()
 	{
 		__deferredDeleter.reserve(std::move(__pSampledImagesDescPool));
 
-		__sampledImageDescCount <<= 1U;
+		__sampledImagesDescArrSize <<= 1U;
 
 		__createSampledImagesDescPool();
 		__allocateSampledImagesDescSets();
@@ -295,6 +325,13 @@ namespace Render
 		MaterialBufferBuilder *const pBuilder) noexcept
 	{
 		__invalidatedMaterialBufferBuilders.emplace(pBuilder);
+		__materialsDescInvalidated = true;
+		_invalidate();
+	}
+
+	void GlobalDescriptorManager::__onSampledImagesDescInfosUpdated() noexcept
+	{
+		__sampledImagesDescInvalidated = true;
 		_invalidate();
 	}
 }

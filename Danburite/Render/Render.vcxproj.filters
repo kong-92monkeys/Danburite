@@ -52,6 +52,9 @@
     <Filter Include="ShaderData">
       <UniqueIdentifier>{4dd4c6fd-ec3c-41f2-9f03-cf7f22dbb499}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImageReferenceManager">
+      <UniqueIdentifier>{51cc4afa-8ebb-4481-9402-98df9beb218a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -105,6 +108,9 @@
     <ClInclude Include="ShaderData.h">
       <Filter>ShaderData</Filter>
     </ClInclude>
+    <ClInclude Include="ImageReferenceManager.h">
+      <Filter>ImageReferenceManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -151,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="Layer.cpp">
       <Filter>Layer</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageReferenceManager.cpp">
+      <Filter>ImageReferenceManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
