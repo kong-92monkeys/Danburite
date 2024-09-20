@@ -37,6 +37,7 @@
     <ClInclude Include="ShaderData.h" />
     <ClInclude Include="SubLayer.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Device\Device.vcxproj">
@@ -69,6 +70,7 @@
     <ClCompile Include="CommandSubmitter.cpp" />
     <ClCompile Include="SubLayer.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureUtil.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

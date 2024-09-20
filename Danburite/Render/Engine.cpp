@@ -96,7 +96,7 @@ namespace Render
 	{
 		return std::make_shared<Texture>(
 			*__pDevice, __commandExecutor,
-			*__pMemoryAllocator, __deferredDeleter,
+			*__pMemoryAllocator, __deferredDeleter, *__pResourcePool,
 			imageCreateInfo, imageViewCreateInfo);
 	}
 

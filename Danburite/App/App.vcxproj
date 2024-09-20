@@ -234,6 +234,8 @@
     <None Include="res\App.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Images\smile.jpg" />
+    <Image Include="Assets\Images\wall.jpg" />
     <Image Include="res\App.ico" />
   </ItemGroup>
   <ItemGroup>

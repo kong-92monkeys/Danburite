@@ -5,6 +5,7 @@
 #include "../Device/CommandExecutor.h"
 #include "../Device/MemoryBuffer.h"
 #include "../Device/MemoryImage.h"
+#include "ResourcePool.h"
 
 namespace Render
 {
@@ -48,6 +49,7 @@ namespace Render
 			Dev::CommandExecutor &commandExecutor,
 			Dev::MemoryAllocator &memoryAllocator,
 			Infra::DeferredDeleter &deferredDeleter,
+			ResourcePool &resourcePool,
 			ImageCreateInfo const &imageCreateInfo,
 			ImageViewCreateInfo const &imageViewCreateInfo);
 
@@ -57,7 +59,7 @@ namespace Render
 		VK::ImageView const &getImageView() const noexcept;
 
 		void updateData(
-			ImageRegionInfo const &dst,
+			ImageRegionInfo const &regionInfo,
 			void const *pData,
 			size_t size,
 			VkPipelineStageFlags2 beforeStageMask,
@@ -70,6 +72,7 @@ namespace Render
 		Dev::CommandExecutor &__commandExecutor;
 		Dev::MemoryAllocator &__memoryAllocator;
 		Infra::DeferredDeleter &__deferredDeleter;
+		ResourcePool &__resourcePool;
 
 		std::shared_ptr<Dev::MemoryImage> __pImage;
 		std::shared_ptr<VK::ImageView> __pImageView;
@@ -79,9 +82,5 @@ namespace Render
 
 		void __createImageView(
 			ImageViewCreateInfo const &createInfo);
-
-		[[nodiscard]]
-		std::shared_ptr<Dev::MemoryBuffer> __createStagingBuffer(
-			size_t size);
 	};
 }

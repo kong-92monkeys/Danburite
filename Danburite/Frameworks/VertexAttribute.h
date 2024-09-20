@@ -7,7 +7,7 @@ namespace Frx
 	namespace VertexAttrib
 	{
 		constexpr uint32_t POS_LOCATION			{ 0U };
-		constexpr uint32_t TEXCOORD_LOCATION	{ 1U };
+		constexpr uint32_t UV_LOCATION			{ 1U };
 		constexpr uint32_t NORMAL_LOCATION		{ 2U };
 		constexpr uint32_t COLOR_LOCATION		{ 3U };
 		constexpr uint32_t TANGENT_LOCATION		{ 4U };
@@ -18,7 +18,7 @@ namespace Frx
 		NONE		= 0U,
 
 		POS			= (1U << VertexAttrib::POS_LOCATION),
-		TEXCOORD	= (1U << VertexAttrib::TEXCOORD_LOCATION),
+		UV			= (1U << VertexAttrib::UV_LOCATION),
 		NORMAL		= (1U << VertexAttrib::NORMAL_LOCATION),
 		COLOR		= (1U << VertexAttrib::COLOR_LOCATION),
 		TANGENT		= (1U << VertexAttrib::TANGENT_LOCATION)
@@ -29,12 +29,12 @@ namespace Frx
 		NONE			= 0U,
 
 		POS				= VertexAttribFlagBits::POS,
-		TEXCOORD		= VertexAttribFlagBits::TEXCOORD,
+		UV				= VertexAttribFlagBits::UV,
 		NORMAL			= VertexAttribFlagBits::NORMAL,
 		COLOR			= VertexAttribFlagBits::COLOR,
 		TANGENT			= VertexAttribFlagBits::TANGENT,
 
-		POS_TEXCOORD	= (POS | TEXCOORD),
+		POS_UV			= (POS | UV),
 		POS_NORMAL		= (POS | NORMAL),
 		POS_COLOR		= (POS | COLOR)
 	};

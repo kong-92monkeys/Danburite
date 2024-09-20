@@ -7,12 +7,14 @@ namespace Render
 		Dev::CommandExecutor &commandExecutor,
 		Dev::MemoryAllocator &memoryAllocator,
 		Infra::DeferredDeleter &deferredDeleter,
+		ResourcePool &resourcePool,
 		ImageCreateInfo const &imageCreateInfo,
 		ImageViewCreateInfo const &imageViewCreateInfo) :
 		__device			{ device },
 		__commandExecutor	{ commandExecutor },
 		__memoryAllocator	{ memoryAllocator },
-		__deferredDeleter	{ deferredDeleter }
+		__deferredDeleter	{ deferredDeleter },
+		__resourcePool		{ resourcePool }
 	{
 		__createImage(imageCreateInfo);
 		__createImageView(imageViewCreateInfo);
@@ -30,7 +32,7 @@ namespace Render
 	}
 
 	void Texture::updateData(
-		ImageRegionInfo const &dst,
+		ImageRegionInfo const &regionInfo,
 		void const *pData,
 		size_t const size,
 		VkPipelineStageFlags2 const beforeStageMask,
@@ -38,10 +40,10 @@ namespace Render
 		VkPipelineStageFlags2 const afterStageMask,
 		VkAccessFlags2 const afterAccessMask)
 	{
-		auto pStagingBuffer{ __createStagingBuffer(size) };
+		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
-		__commandExecutor.reserve([=, &dst{ *__pImage }, &src{ *pStagingBuffer }, regionInfo{ dst }](auto &cmdBuffer)
+		__commandExecutor.reserve([=, &dst{ *__pImage }, pSrc{ std::move(pStagingBuffer) }] (auto &cmdBuffer) mutable
 		{
 			VkImageMemoryBarrier2 const beforeMemoryBarrier
 			{
@@ -83,7 +85,7 @@ namespace Render
 			VkCopyBufferToImageInfo2 const copyInfo
 			{
 				.sType			{ VkStructureType::VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2 },
-				.srcBuffer		{ src.getHandle() },
+				.srcBuffer		{ pSrc->getHandle() },
 				.dstImage		{ dst.getHandle() },
 				.dstImageLayout	{ VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL },
 				.regionCount	{ 1U },
@@ -119,6 +121,8 @@ namespace Render
 			cmdBuffer.vkCmdPipelineBarrier2(&beforeBarrier);
 			cmdBuffer.vkCmdCopyBufferToImage2(&copyInfo);
 			cmdBuffer.vkCmdPipelineBarrier2(&afterBarrier);
+
+			__resourcePool.recycleBuffer(ResourcePool::BufferType::STAGING, std::move(pSrc));
 		});
 	}
 
@@ -158,22 +162,5 @@ namespace Render
 		};
 
 		__pImageView = std::make_shared<VK::ImageView>(__device, vkCreateInfo);
-	}
-
-	std::shared_ptr<Dev::MemoryBuffer> Texture::__createStagingBuffer(
-		size_t const size)
-	{
-		VkBufferCreateInfo const bufferCreateInfo
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO },
-			.size			{ size },
-			.usage			{ VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_SRC_BIT },
-			.sharingMode	{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE }
-		};
-
-		return std::make_shared<Dev::MemoryBuffer>(
-			__device, __memoryAllocator, bufferCreateInfo,
-			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 }

@@ -55,6 +55,9 @@
     <Filter Include="ImageReferenceManager">
       <UniqueIdentifier>{51cc4afa-8ebb-4481-9402-98df9beb218a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{98725af5-c9ff-4f63-8e33-6e248579d428}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -111,6 +114,9 @@
     <ClInclude Include="ImageReferenceManager.h">
       <Filter>ImageReferenceManager</Filter>
     </ClInclude>
+    <ClInclude Include="TextureUtil.h">
+      <Filter>Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp">
@@ -160,6 +166,9 @@
     </ClCompile>
     <ClCompile Include="ImageReferenceManager.cpp">
       <Filter>ImageReferenceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureUtil.cpp">
+      <Filter>Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@ namespace Frx
 	};
 
 	template <>
-	struct Vertex<VertexAttribFlags::TEXCOORD>
+	struct Vertex<VertexAttribFlags::UV>
 	{
 	public:
 		glm::vec2 texCoord{ };
@@ -37,7 +37,7 @@ namespace Frx
 	};
 
 	template <>
-	struct Vertex<VertexAttribFlags::POS_TEXCOORD>
+	struct Vertex<VertexAttribFlags::POS_UV>
 	{
 	public:
 		glm::vec3 pos{ };
@@ -61,11 +61,11 @@ namespace Frx
 	};
 
 	using Vertex_P = Vertex<VertexAttribFlags::POS>;
-	using Vertex_T = Vertex<VertexAttribFlags::TEXCOORD>;
+	using Vertex_U = Vertex<VertexAttribFlags::UV>;
 	using Vertex_N = Vertex<VertexAttribFlags::NORMAL>;
 	using Vertex_C = Vertex<VertexAttribFlags::COLOR>;
 
-	using Vertex_PT = Vertex<VertexAttribFlags::POS_TEXCOORD>;
+	using Vertex_PT = Vertex<VertexAttribFlags::POS_UV>;
 	using Vertex_PN = Vertex<VertexAttribFlags::POS_NORMAL>;
 	using Vertex_PC = Vertex<VertexAttribFlags::POS_COLOR>;
 }

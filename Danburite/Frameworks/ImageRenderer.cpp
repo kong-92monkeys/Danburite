@@ -134,6 +134,11 @@ namespace Frx
 		posBindingDesc.stride		= sizeof(Vertex_P);
 		posBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
 
+		auto &uvBindingDesc			{ vertexBindingDescs.emplace_back() };
+		uvBindingDesc.binding		= VertexAttrib::UV_LOCATION;
+		uvBindingDesc.stride		= sizeof(Vertex_U);
+		uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+
 		std::vector<VkVertexInputAttributeDescription> vertexAttribDescs;
 
 		auto &posAttribDesc			{ vertexAttribDescs.emplace_back() };
@@ -141,6 +146,12 @@ namespace Frx
 		posAttribDesc.binding		= VertexAttrib::POS_LOCATION;
 		posAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
 		posAttribDesc.offset		= 0U;
+
+		auto &uvAttribDesc			{ vertexAttribDescs.emplace_back() };
+		uvAttribDesc.location		= VertexAttrib::UV_LOCATION;
+		uvAttribDesc.binding		= VertexAttrib::UV_LOCATION;
+		uvAttribDesc.format			= VkFormat::VK_FORMAT_R32G32_SFLOAT;
+		uvAttribDesc.offset			= 0U;
 
 		VkPipelineVertexInputStateCreateInfo const vertexInputState
 		{

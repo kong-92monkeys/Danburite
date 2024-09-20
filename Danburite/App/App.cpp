@@ -8,10 +8,13 @@
 #include "afxdialogex.h"
 #include "App.h"
 #include "MainFrm.h"
+#include "../Infra/Bitmap.h"
 #include "../System/Env.h"
+#include "../Render/TextureUtil.h"
 #include "../Frameworks/SimpleMaterial.h"
 #include "../Frameworks/ImageMaterial.h"
 #include "../Frameworks/SimpleRenderer.h"
+#include "../Frameworks/ImageRenderer.h"
 #include "../Frameworks/VertexAttribute.h"
 
 #ifdef _DEBUG
@@ -120,9 +123,7 @@ BOOL CApp::OnIdle(LONG lCount)
 
 void CApp::__onInitBeforeMainFrame()
 {
-	auto &env			{ Sys::Env::getInstance() };
-	auto &assetManager	{ env.getAssetManager() };
-
+	auto &assetManager{ Sys::Env::getInstance().getAssetManager() };
 	assetManager.setRootPath("Assets");
 
 	Dev::Context::CreateInfo contextCreateInfo
@@ -167,20 +168,35 @@ void CApp::__setupRenderTarget(
 	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, 0.5f });
 	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, 0.5f });
 
+	Infra::GenericBuffer uvBuffer;
+	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
+	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 1.0f });
+	uvBuffer.typedAdd<glm::vec2>({ 1.0f, 1.0f });
+	uvBuffer.typedAdd<glm::vec2>({ 1.0f, 0.0f });
+
 	Infra::GenericBuffer indexBuffer;
 	indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
 
 	auto pMesh{ __pRenderEngine->createMesh() };
 	pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
+	pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, uvBuffer.getData(), uvBuffer.getSize());
 	pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
 
-	pRenderObject->setRenderer(__pRenderEngine->createRenderer<Frx::SimpleRenderer>());
+	pRenderObject->setRenderer(__pRenderEngine->createRenderer<Frx::ImageRenderer>());
 	pRenderObject->setDrawParam(std::make_shared<Render::DrawParamIndexed>(6U, 0U, 0));
 	pRenderObject->setMesh(pMesh);
 
-	auto pMaterial{ __pRenderEngine->createMaterial<Frx::SimpleMaterial>() };
-	pMaterial->setColor({ 0.2f, 1.0f, 0.2f, 1.0f });
-	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::SimpleMaterial>(pMaterial);
+	auto pTexture
+	{
+		Render::TextureUtil::loadTexture(
+			*__pRenderEngine, "Images/smile.jpg",
+			VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
+			VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT, VK_ACCESS_2_SHADER_SAMPLED_READ_BIT)
+	};
+
+	auto pMaterial{ __pRenderEngine->createMaterial<Frx::ImageMaterial>() };
+	pMaterial->setTexture(pTexture);
+	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::ImageMaterial>(pMaterial);
 }
 
 // CAboutDlg dialog used for App About

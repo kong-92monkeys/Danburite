@@ -3,9 +3,9 @@
 
 #include <Shaders/Constants.glsl>
 
-struct SimpleMaterial
+struct ImageMaterial
 {
-	vec4 color;
+	uint imageId;
 };
 
 #endif

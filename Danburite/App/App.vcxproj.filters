@@ -32,9 +32,6 @@
     <Filter Include="Assets\Shaders">
       <UniqueIdentifier>{8b2b13ad-6a29-4cd8-ad57-16983be9a662}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Materials">
-      <UniqueIdentifier>{b885c91a-3aec-4260-becf-109e727041e8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assets\Shaders\Test">
       <UniqueIdentifier>{93437e74-d959-4d3f-9225-f7bb29a12202}</UniqueIdentifier>
     </Filter>
@@ -43,6 +40,12 @@
     </Filter>
     <Filter Include="Assets\Shaders\Image">
       <UniqueIdentifier>{7eeb30bf-52f8-4665-8bfd-fc73e67f6974}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Shaders\Materials">
+      <UniqueIdentifier>{b885c91a-3aec-4260-becf-109e727041e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets\Images">
+      <UniqueIdentifier>{ef890606-e546-4b16-9ca1-dc07a9f0c632}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -131,15 +134,21 @@
       <Filter>Assets\Shaders\Image</Filter>
     </None>
     <None Include="Assets\Shaders\Materials\ImageMaterial.glsl">
-      <Filter>Assets\Materials</Filter>
+      <Filter>Assets\Shaders\Materials</Filter>
     </None>
     <None Include="Assets\Shaders\Materials\SimpleMaterial.glsl">
-      <Filter>Assets\Materials</Filter>
+      <Filter>Assets\Shaders\Materials</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\App.ico">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Assets\Images\smile.jpg">
+      <Filter>Assets\Images</Filter>
+    </Image>
+    <Image Include="Assets\Images\wall.jpg">
+      <Filter>Assets\Images</Filter>
     </Image>
   </ItemGroup>
 </Project>
