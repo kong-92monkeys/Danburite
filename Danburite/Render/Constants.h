@@ -11,8 +11,9 @@ namespace Render::Constants
 	constexpr size_t DEFERRED_DELETER_QUEUE_SIZE					{ MAX_IN_FLIGHT_FRAME_COUNT + 1ULL };
 
 	// Descriptor set locations
-	constexpr uint32_t GLOBAL_DESC_SET_LOCATION						{ 0U };
-	constexpr uint32_t SUB_LAYER_DESC_SET_LOCATION					{ 1U };
+	constexpr uint32_t MATERIALS_DESC_SET_LOCATION					{ 0U };
+	constexpr uint32_t SAMPLED_IMAGES_DESC_SET_LOCATION				{ 1U };
+	constexpr uint32_t SUB_LAYER_DESC_SET_LOCATION					{ 2U };
 
 	// Descriptor locations
 	constexpr uint32_t SUB_LAYER_DESC_INSTANCE_INFO_LOCATION		{ 0U };

@@ -19,7 +19,6 @@ namespace Render
 		{
 		public:
 			std::unordered_map<std::type_index, uint32_t> materialBufferLocations;
-			uint32_t sampledImagesLocation{ };
 		};
 
 		GlobalDescriptorManager(
@@ -43,10 +42,16 @@ namespace Render
 			Material const *pMaterial) const noexcept;
 
 		[[nodiscard]]
-		constexpr VK::DescriptorSetLayout const &getDescSetLayout() const noexcept;
+		constexpr VK::DescriptorSetLayout const &getMaterialsDescSetLayout() const noexcept;
 
 		[[nodiscard]]
-		constexpr VkDescriptorSet getDescSet() const noexcept;
+		constexpr VK::DescriptorSetLayout const &getSampledImagesDescSetLayout() const noexcept;
+
+		[[nodiscard]]
+		constexpr VkDescriptorSet getMaterialsDescSet() const noexcept;
+
+		[[nodiscard]]
+		constexpr VkDescriptorSet getSampledImagesDescSet() const noexcept;
 
 	protected:
 		virtual void _onValidate() override;
@@ -59,10 +64,14 @@ namespace Render
 		ResourcePool &__resourcePool;
 		BindingInfo const __bindingInfo;
 
-		std::unique_ptr<VK::DescriptorSetLayout> __pDescSetLayout;
-		std::shared_ptr<VK::DescriptorPool> __pDescPool;
+		std::unique_ptr<VK::DescriptorSetLayout> __pMaterialsDescSetLayout;
+		std::unique_ptr<VK::DescriptorSetLayout> __pSampledImagesDescSetLayout;
 
-		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets;
+		std::shared_ptr<VK::DescriptorPool> __pMaterialsDescPool;
+		std::shared_ptr<VK::DescriptorPool> __pSampledImagesDescPool;
+
+		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __materialsDescSets;
+		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __sampledImagesDescSets;
 		size_t __descSetCursor{ };
 
 		std::unordered_map<std::type_index, std::unique_ptr<MaterialBufferBuilder>> __materialBufferBuilders;
@@ -72,32 +81,48 @@ namespace Render
 
 		Infra::EventListenerPtr<MaterialBufferBuilder *> __pMaterialBufferBuilderInvalidateListener;
 
-		void __createDescSetLayout();
-		void __createDescPool();
-		void __allocateDescSets();
+		void __createMaterialsDescSetLayout();
+		void __createSampledImagesDescSetLayout();
+
+		void __createMaterialsDescPool();
+		void __createSampledImagesDescPool();
+
+		void __allocateMaterialsDescSets();
+		void __allocateSampledImagesDescSets();
+
 		void __createMaterialBufferBuilders();
 
 		void __validateDescSet();
 
 		constexpr void __advanceDescSet() noexcept;
-		void __growSampledImageDescCount();
+		void __growSampledImagesDescCount();
 
 		void __onMaterialBufferBuilderInvalidated(
 			MaterialBufferBuilder *pBuilder) noexcept;
 	};
 
-	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getDescSetLayout() const noexcept
+	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getMaterialsDescSetLayout() const noexcept
 	{
-		return *__pDescSetLayout;
+		return *__pMaterialsDescSetLayout;
 	}
 
-	constexpr VkDescriptorSet GlobalDescriptorManager::getDescSet() const noexcept
+	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getSampledImagesDescSetLayout() const noexcept
 	{
-		return __descSets[__descSetCursor];
+		return *__pSampledImagesDescSetLayout;
+	}
+
+	constexpr VkDescriptorSet GlobalDescriptorManager::getMaterialsDescSet() const noexcept
+	{
+		return __materialsDescSets[__descSetCursor];
+	}
+
+	constexpr VkDescriptorSet GlobalDescriptorManager::getSampledImagesDescSet() const noexcept
+	{
+		return __sampledImagesDescSets[__descSetCursor];
 	}
 
 	constexpr void GlobalDescriptorManager::__advanceDescSet() noexcept
 	{
-		__descSetCursor = ((__descSetCursor + 1ULL) % __descSets.size());
+		__descSetCursor = ((__descSetCursor + 1ULL) % __materialsDescSets.size());
 	}
 }

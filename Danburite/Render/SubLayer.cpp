@@ -80,7 +80,6 @@ namespace Render
 
 	void SubLayer::draw(
 		VK::CommandBuffer &cmdBuffer,
-		VkDescriptorSet const hGlobalDescSet,
 		VK::ImageView &outputAttachment,
 		RendererResourceManager &rendererResourceManager,
 		VkRect2D const &renderArea) const
@@ -92,7 +91,7 @@ namespace Render
 		__bindPipeline(cmdBuffer, rendererResourceManager);
 
 		if (__pRenderer->useMaterial())
-			__bindDescSets(cmdBuffer, hGlobalDescSet);
+			__bindDescSets(cmdBuffer);
 
 		Mesh const *pBoundMesh{ };
 		for (auto const &[pMesh, objects] : __mesh2Objects)
@@ -444,12 +443,12 @@ namespace Render
 	}
 
 	void SubLayer::__bindDescSets(
-		VK::CommandBuffer &cmdBuffer,
-		VkDescriptorSet const hGlobalDescSet) const
+		VK::CommandBuffer &cmdBuffer) const
 	{
-		std::array<VkDescriptorSet, 2ULL> descSets{ };
-		descSets[Constants::GLOBAL_DESC_SET_LOCATION]		= hGlobalDescSet;
-		descSets[Constants::SUB_LAYER_DESC_SET_LOCATION]	= __getDescSet();
+		std::array<VkDescriptorSet, 3ULL> descSets{ };
+		descSets[Constants::MATERIALS_DESC_SET_LOCATION]		= __globalDescManager.getMaterialsDescSet();
+		descSets[Constants::SAMPLED_IMAGES_DESC_SET_LOCATION]	= __globalDescManager.getSampledImagesDescSet();
+		descSets[Constants::SUB_LAYER_DESC_SET_LOCATION]		= __getDescSet();
 
 		cmdBuffer.vkCmdBindDescriptorSets(
 			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,

@@ -143,7 +143,6 @@ void CApp::__onInitBeforeMainFrame()
 
 	Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
 	globalDescBindingInfo.materialBufferLocations[typeid(Frx::SimpleMaterial)] = 0U;
-	globalDescBindingInfo.sampledImagesLocation = 1U;
 
 	__pRenderEngine = std::make_unique<Render::Engine>(
 		*__pVulkanContext,
@@ -178,7 +177,7 @@ void CApp::__setupRenderTarget(
 	pRenderObject->setMesh(pMesh);
 
 	auto pMaterial{ std::make_shared<Frx::SimpleMaterial>() };
-	pMaterial->setColor({ 1.0f, 0.2f, 0.2f, 1.0f });
+	pMaterial->setColor({ 0.2f, 1.0f, 0.2f, 1.0f });
 	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::SimpleMaterial>(pMaterial);
 }
 

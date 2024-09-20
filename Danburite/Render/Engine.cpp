@@ -121,10 +121,7 @@ namespace Render
 		__pCommandSubmitter->addGeneralExecution(executorCmdBuffer);
 
 		for (auto const pRenderTarget : __reservedRenderTargets)
-		{
-			__pCommandSubmitter->addDrawResult(
-				pRenderTarget->draw(__pGlobalDescriptorManager->getDescSet()));
-		}
+			__pCommandSubmitter->addDrawResult(pRenderTarget->draw());
 
 		auto &submissionFence{ __getNextSubmissionFence() };
 		__pDevice->vkResetFences(1U, &(submissionFence.getHandle()));

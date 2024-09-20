@@ -13,6 +13,7 @@
 #include "../Vulkan/ImageView.h"
 #include "../Vulkan/ShaderModule.h"
 #include "Material.h"
+#include "GlobalDescriptorManager.h"
 #include <optional>
 #include <shaderc/shaderc.hpp>
 
@@ -29,7 +30,7 @@ namespace Render
 			VK::Device &device,
 			VK::PipelineCache &pipelineCache,
 			Infra::DeferredDeleter &deferredDeleter,
-			VK::DescriptorSetLayout const &globalDescSetLayout,
+			GlobalDescriptorManager const &globalDescriptorManager,
 			VK::DescriptorSetLayout const &subLayerDescSetLayout);
 
 		[[nodiscard]]
@@ -104,7 +105,7 @@ namespace Render
 		constexpr Infra::DeferredDeleter &_getDeferredDeleter() const noexcept;
 
 		[[nodiscard]]
-		constexpr VK::DescriptorSetLayout const &_getGlobalDescSetLayout() const noexcept;
+		constexpr GlobalDescriptorManager const &_getGlobalDescriptorManager() const noexcept;
 
 		[[nodiscard]]
 		constexpr VK::DescriptorSetLayout const &_getSubLayerDescSetLayout() const noexcept;
@@ -114,7 +115,7 @@ namespace Render
 		VK::Device *__pDevice{ };
 		VK::PipelineCache *__pPipelineCache{ };
 		Infra::DeferredDeleter *__pDeferredDeleter{ };
-		VK::DescriptorSetLayout const *__pGlobalDescSetLayout{ };
+		GlobalDescriptorManager const *__pGlobalDescriptorManager{ };
 		VK::DescriptorSetLayout const *__pSubLayerDescSetLayout{ };
 
 		int __priority{ };
@@ -168,9 +169,9 @@ namespace Render
 		return *__pDeferredDeleter;
 	}
 
-	constexpr VK::DescriptorSetLayout const &Renderer::_getGlobalDescSetLayout() const noexcept
+	constexpr GlobalDescriptorManager const &Renderer::_getGlobalDescriptorManager() const noexcept
 	{
-		return *__pGlobalDescSetLayout;
+		return *__pGlobalDescriptorManager;
 	}
 
 	constexpr VK::DescriptorSetLayout const &Renderer::_getSubLayerDescSetLayout() const noexcept

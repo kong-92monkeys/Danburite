@@ -15,14 +15,14 @@ namespace Render
 		VK::Device &device,
 		VK::PipelineCache &pipelineCache,
 		Infra::DeferredDeleter &deferredDeleter,
-		VK::DescriptorSetLayout const &globalDescSetLayout,
+		GlobalDescriptorManager const &globalDescriptorManager,
 		VK::DescriptorSetLayout const &subLayerDescSetLayout)
 	{
 		__pPhysicalDevice			= &physicalDevice;
 		__pDevice					= &device;
 		__pPipelineCache			= &pipelineCache;
 		__pDeferredDeleter			= &deferredDeleter;
-		__pGlobalDescSetLayout		= &globalDescSetLayout;
+		__pGlobalDescriptorManager	= &globalDescriptorManager;
 		__pSubLayerDescSetLayout	= &subLayerDescSetLayout;
 
 		auto initResult{ _onInit() };

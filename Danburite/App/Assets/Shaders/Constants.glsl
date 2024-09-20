@@ -8,14 +8,14 @@ const uint VERTEX_ATTRIB_COLOR_LOCATION					= 3U;
 const uint VERTEX_ATTRIB_TANGENT_LOCATION				= 4U;
 
 // Descriptor set locations
-const uint GLOBAL_DESC_SET_LOCATION						= 0U;
-const uint SUB_LAYER_DESC_SET_LOCATION					= 1U;
+const uint MATERIALS_DESC_SET_LOCATION					= 0U;
+const uint SAMPLED_IMAGES_DESC_SET_LOCATION				= 1U;
+const uint SUB_LAYER_DESC_SET_LOCATION					= 2U;
 
 // Descriptor locations
 
 // Global
 const uint GLOBAL_DESC_SIMPLE_MATERIAL_LOCATION			= 0U;
-const uint GLOBAL_DESC_SAMPLED_IMAGES_LOCATION			= 1U;
 
 // Sub layer
 const uint SUB_LAYER_DESC_INSTANCE_INFO_LOCATION		= 0U;

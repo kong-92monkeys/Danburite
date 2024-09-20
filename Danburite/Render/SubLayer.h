@@ -35,7 +35,6 @@ namespace Render
 
 		void draw(
 			VK::CommandBuffer &cmdBuffer,
-			VkDescriptorSet hGlobalDescSet,
 			VK::ImageView &outputAttachment,
 			RendererResourceManager &rendererResourceManager,
 			VkRect2D const &renderArea) const;
@@ -153,8 +152,7 @@ namespace Render
 			RendererResourceManager &rendererResourceManager) const;
 
 		void __bindDescSets(
-			VK::CommandBuffer &cmdBuffer,
-			VkDescriptorSet hGlobalDescSet) const;
+			VK::CommandBuffer &cmdBuffer) const;
 
 		void __endRenderPass(
 			VK::CommandBuffer &cmdBuffer) const;

@@ -7,7 +7,7 @@
 
 const uint SIMPLE_MATERIAL_SLOT = 0U;
 
-layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DESC_SIMPLE_MATERIAL_LOCATION) readonly buffer SimpleMaterialBuffer
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = GLOBAL_DESC_SIMPLE_MATERIAL_LOCATION) readonly buffer SimpleMaterialBuffer
 {
 	SimpleMaterial simpleMaterials[];
 };

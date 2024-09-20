@@ -268,8 +268,11 @@ namespace Frx
 
 	std::shared_ptr<VK::PipelineLayout> SimpleRenderer::__createPipelineLayout() const
 	{
+		auto const &globalDescManager{ _getGlobalDescriptorManager() };
+
 		std::vector<VkDescriptorSetLayout> setLayouts;
-		setLayouts.emplace_back(_getGlobalDescSetLayout().getHandle());
+		setLayouts.emplace_back(globalDescManager.getMaterialsDescSetLayout().getHandle());
+		setLayouts.emplace_back(globalDescManager.getSampledImagesDescSetLayout().getHandle());
 		setLayouts.emplace_back(_getSubLayerDescSetLayout().getHandle());
 
 		VkPipelineLayoutCreateInfo const createInfo

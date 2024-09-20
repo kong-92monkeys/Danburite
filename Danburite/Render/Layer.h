@@ -31,7 +31,6 @@ namespace Render
 
 		void draw(
 			VK::CommandBuffer &cmdBuffer,
-			VkDescriptorSet hGlobalDescSet,
 			VK::ImageView &outputAttachment,
 			RendererResourceManager &rendererResourceManager,
 			VkRect2D const &renderArea) const;

@@ -122,8 +122,7 @@ namespace Render
 		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
 	}
 
-	RenderTarget::DrawResult RenderTarget::draw(
-		VkDescriptorSet const hGlobalDescSet)
+	RenderTarget::DrawResult RenderTarget::draw()
 	{
 		auto &cmdBuffer			{ __beginNextDrawcallCmdBuffer() };
 		auto &imageAcqSemaphore	{ __pImageAcqSemaphoreCirculator->getNext() };
@@ -137,7 +136,7 @@ namespace Render
 		for (auto const pLayer : __sortedLayers)
 		{
 			pLayer->draw(
-				cmdBuffer, hGlobalDescSet, outputAttachment,
+				cmdBuffer, outputAttachment,
 				*__pRendererResourceManager, __renderArea);
 		}
 

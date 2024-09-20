@@ -77,7 +77,6 @@ namespace Render
 
 	void Layer::draw(
 		VK::CommandBuffer &cmdBuffer,
-		VkDescriptorSet hGlobalDescSet,
 		VK::ImageView &outputAttachment,
 		RendererResourceManager &rendererResourceManager,
 		VkRect2D const &renderArea) const
@@ -88,7 +87,7 @@ namespace Render
 				continue;
 
 			pSubLayer->draw(
-				cmdBuffer, hGlobalDescSet, outputAttachment,
+				cmdBuffer, outputAttachment,
 				rendererResourceManager, renderArea);
 		}
 	}

@@ -55,8 +55,7 @@ namespace Render
 		void sync();
 
 		[[nodiscard]]
-		DrawResult draw(
-			VkDescriptorSet hGlobalDescSet);
+		DrawResult draw();
 
 		[[nodiscard]]
 		constexpr glm::vec4 const &getBackgroundColor() const noexcept;
