@@ -9,7 +9,8 @@
 #include "App.h"
 #include "MainFrm.h"
 #include "../System/Env.h"
-#include "../Frameworks/TestRenderer.h"
+#include "../Frameworks/SimpleMaterial.h"
+#include "../Frameworks/SimpleRenderer.h"
 #include "../Frameworks/VertexAttribute.h"
 
 #ifdef _DEBUG
@@ -141,7 +142,8 @@ void CApp::__onInitBeforeMainFrame()
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
 
 	Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
-	globalDescBindingInfo.sampledImageBinding = 0U;
+	globalDescBindingInfo.materialBufferLocations[typeid(Frx::SimpleMaterial)] = 0U;
+	globalDescBindingInfo.sampledImagesLocation = 1U;
 
 	__pRenderEngine = std::make_unique<Render::Engine>(
 		*__pVulkanContext,
@@ -171,9 +173,13 @@ void CApp::__setupRenderTarget(
 	pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
 	pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
 
-	pRenderObject->setRenderer(__pRenderEngine->createRenderer<Frx::TestRenderer>());
+	pRenderObject->setRenderer(__pRenderEngine->createRenderer<Frx::SimpleRenderer>());
 	pRenderObject->setDrawParam(std::make_shared<Render::DrawParamIndexed>(6U, 0U, 0));
 	pRenderObject->setMesh(pMesh);
+
+	auto pMaterial{ std::make_shared<Frx::SimpleMaterial>() };
+	pMaterial->setColor({ 1.0f, 0.2f, 0.2f, 1.0f });
+	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::SimpleMaterial>(pMaterial);
 }
 
 // CAboutDlg dialog used for App About

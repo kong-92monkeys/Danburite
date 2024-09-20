@@ -38,6 +38,9 @@
     <Filter Include="Assets\Shaders\Test">
       <UniqueIdentifier>{93437e74-d959-4d3f-9225-f7bb29a12202}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Shaders\Simple">
+      <UniqueIdentifier>{935722f8-c792-4327-a43d-3c2d369f77c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -108,6 +111,15 @@
     </None>
     <None Include="Assets\Shaders\Test.vert">
       <Filter>Assets\Shaders\Test</Filter>
+    </None>
+    <None Include="Assets\Shaders\Simple.frag">
+      <Filter>Assets\Shaders\Simple</Filter>
+    </None>
+    <None Include="Assets\Shaders\Simple.vert">
+      <Filter>Assets\Shaders\Simple</Filter>
+    </None>
+    <None Include="SimpleMaterial.glsl">
+      <Filter>Assets\Materials</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

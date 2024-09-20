@@ -47,7 +47,6 @@ namespace Render
 
 	Engine::~Engine() noexcept
 	{
-		__deferredDeleter.flush();
 		__pDevice->vkDeviceWaitIdle();
 
 		__pExecutorCmdBufferCirculator = nullptr;
@@ -55,8 +54,11 @@ namespace Render
 		__pCommandSubmitter = nullptr;
 		__pResourcePool = nullptr;
 		__pDescriptorUpdater = nullptr;
-		__pMemoryAllocator = nullptr;
 
+		__deferredDeleter.flush();
+		// DO NOT DELETE deferredDeleter-dependent modules from now
+
+		__pMemoryAllocator = nullptr;
 		__pSubLayerDescSetLayout = nullptr;
 		__submissionFences.clear();
 		__pPipelineCache = nullptr;

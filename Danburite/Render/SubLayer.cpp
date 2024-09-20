@@ -189,7 +189,7 @@ namespace Render
 
 			for (uint32_t instanceIter{ }; instanceIter < instanceCount; ++instanceIter)
 			{
-				for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
+				for (const auto pMaterial : pObject->getMaterialPackOf(instanceIter))
 					__registerMaterial(pMaterial);
 			}
 
@@ -219,7 +219,7 @@ namespace Render
 
 			for (uint32_t instanceIter{ }; instanceIter < pObject->getInstanceCount(); ++instanceIter)
 			{
-				for (const auto pMaterial : pObject->getMaterialPack(instanceIter))
+				for (const auto pMaterial : pObject->getMaterialPackOf(instanceIter))
 					__unregisterMaterial(pMaterial);
 			}
 		}
@@ -274,7 +274,7 @@ namespace Render
 			auto &instanceInfo{ __instanceInfoHostBuffer[baseId + instanceIter] };
 			instanceInfo.reset();
 
-			for (auto const pMaterial : pObject->getMaterialPack(instanceIter))
+			for (auto const pMaterial : pObject->getMaterialPackOf(instanceIter))
 			{
 				std::type_index const materialType{ typeid(*pMaterial) };
 
@@ -341,7 +341,7 @@ namespace Render
 		};
 
 		__descUpdater.addBufferInfos(
-			__getDescSet(), Constants::SUB_LAYER_DESC_SET_LOCATION,
+			__getDescSet(), Constants::SUB_LAYER_DESC_INSTANCE_INFO_LOCATION,
 			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 	}
 

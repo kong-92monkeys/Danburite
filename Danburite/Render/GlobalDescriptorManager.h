@@ -18,8 +18,8 @@ namespace Render
 		struct BindingInfo
 		{
 		public:
-			std::unordered_map<std::type_index, uint32_t> materialBufferBindings;
-			uint32_t sampledImageBinding{ };
+			std::unordered_map<std::type_index, uint32_t> materialBufferLocations;
+			uint32_t sampledImagesLocation{ };
 		};
 
 		GlobalDescriptorManager(
@@ -66,6 +66,7 @@ namespace Render
 		size_t __descSetCursor{ };
 
 		std::unordered_map<std::type_index, std::unique_ptr<MaterialBufferBuilder>> __materialBufferBuilders;
+		std::unordered_set<MaterialBufferBuilder *> __invalidatedMaterialBufferBuilders;
 
 		uint32_t __sampledImageDescCount{ 16U };
 
@@ -76,11 +77,13 @@ namespace Render
 		void __allocateDescSets();
 		void __createMaterialBufferBuilders();
 
-		void __validateMaterialBufferBuilders();
 		void __validateDescSet();
 
 		constexpr void __advanceDescSet() noexcept;
 		void __growSampledImageDescCount();
+
+		void __onMaterialBufferBuilderInvalidated(
+			MaterialBufferBuilder *pBuilder) noexcept;
 	};
 
 	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getDescSetLayout() const noexcept

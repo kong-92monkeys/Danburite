@@ -4,12 +4,19 @@
 
 namespace Frx
 {
-	class TestRenderer : public Render::Renderer
+	class SimpleRenderer : public Render::Renderer
 	{
 	public:
 		[[nodiscard]]
 		virtual bool isValidMaterialPack(
 			Render::MaterialPack const &materialPack) const noexcept override;
+
+		[[nodiscard]]
+		virtual std::optional<uint32_t> getMaterialSlotOf(
+			std::type_index const &materialType) const noexcept;
+
+		[[nodiscard]]
+		virtual bool useMaterial() const noexcept;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
@@ -29,6 +36,8 @@ namespace Frx
 			uint32_t outputHeight) const override;
 
 	protected:
+		static constexpr uint32_t __SIMPLE_MATERIAL_SLOT{ 0U };
+
 		std::unique_ptr<VK::ShaderModule> __pVertexShader;
 		std::unique_ptr<VK::ShaderModule> __pFragmentShader;
 

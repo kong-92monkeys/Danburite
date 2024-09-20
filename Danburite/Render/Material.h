@@ -55,7 +55,7 @@ namespace Render
 
 		template <std::derived_from<Material> $M>
 		void setMaterial(
-			std::shared_ptr<Material const> pMaterial) noexcept;
+			std::shared_ptr<$M const> pMaterial) noexcept;
 
 		void setMaterial(
 			std::type_index const &type,
@@ -110,7 +110,7 @@ namespace Render
 
 	template <std::derived_from<Material> $M>
 	void MaterialPack::setMaterial(
-		std::shared_ptr<Material const> pMaterial) noexcept
+		std::shared_ptr<$M const> pMaterial) noexcept
 	{
 		setMaterial(typeid(*pMaterial), pMaterial);
 	}

@@ -25,11 +25,11 @@ namespace Render
 		void setDrawParam(std::shared_ptr<DrawParam const> const &pDrawParam);
 
 		[[nodiscard]]
-		constexpr MaterialPack &getMaterialPack(
+		constexpr MaterialPack &getMaterialPackOf(
 			uint32_t instanceIndex) noexcept;
 
 		[[nodiscard]]
-		constexpr MaterialPack const &getMaterialPack(
+		constexpr MaterialPack const &getMaterialPackOf(
 			uint32_t instanceIndex) const noexcept;
 
 		[[nodiscard]]
@@ -114,13 +114,13 @@ namespace Render
 			Material const *pCur);
 	};
 
-	constexpr MaterialPack &RenderObject::getMaterialPack(
+	constexpr MaterialPack &RenderObject::getMaterialPackOf(
 		uint32_t const instanceIndex) noexcept
 	{
 		return *(__materialPacks[instanceIndex]);
 	}
 
-	constexpr MaterialPack const &RenderObject::getMaterialPack(
+	constexpr MaterialPack const &RenderObject::getMaterialPackOf(
 		uint32_t const instanceIndex) const noexcept
 	{
 		return *(__materialPacks[instanceIndex]);

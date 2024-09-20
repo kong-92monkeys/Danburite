@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SimpleMaterial.h" />
+    <ClInclude Include="SimpleRenderer.h" />
     <ClInclude Include="TestRenderer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexAttribute.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SimpleMaterial.cpp" />
+    <ClCompile Include="SimpleRenderer.cpp" />
     <ClCompile Include="TestRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>

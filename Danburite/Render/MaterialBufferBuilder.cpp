@@ -59,7 +59,12 @@ namespace Render
 
 	void MaterialBufferBuilder::_onValidate()
 	{
+		if (!__materialBufferInvalidated)
+			return;
+
 		__validateMaterialBuffer();
+
+		__materialBufferInvalidated = false;
 	}
 
 	void MaterialBufferBuilder::__registerMaterial(
@@ -95,9 +100,6 @@ namespace Render
 
 	void MaterialBufferBuilder::__validateMaterialBuffer()
 	{
-		if (!__materialBufferInvalidated)
-			return;
-
 		if (__pMaterialBuffer)
 		{
 			__resourcePool.recycleBuffer(
@@ -112,8 +114,6 @@ namespace Render
 			bufferSize);
 
 		std::memcpy(__pMaterialBuffer->getData(), __materialHostBuffer.getData(), bufferSize);
-
-		__materialBufferInvalidated = false;
 	}
 
 	void MaterialBufferBuilder::__onMaterialUpdated(

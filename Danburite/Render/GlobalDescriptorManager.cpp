@@ -17,6 +17,10 @@ namespace Render
 		__resourcePool		{ resourcePool },
 		__bindingInfo		{ bindingInfo }
 	{
+		__pMaterialBufferBuilderInvalidateListener =
+			Infra::EventListener<MaterialBufferBuilder *>::bind(
+				&GlobalDescriptorManager::__onMaterialBufferBuilderInvalidated, this, std::placeholders::_1);
+
 		__createDescSetLayout();
 		__createDescPool();
 		__allocateDescSets();
@@ -51,8 +55,12 @@ namespace Render
 
 	void GlobalDescriptorManager::_onValidate()
 	{
-		__validateMaterialBufferBuilders();
+		for (auto const pBuilder : __invalidatedMaterialBufferBuilders)
+			pBuilder->validate();
+
 		__validateDescSet();
+
+		__invalidatedMaterialBufferBuilders.clear();
 	}
 
 	void GlobalDescriptorManager::__createDescSetLayout()
@@ -62,10 +70,10 @@ namespace Render
 		std::vector<VkDescriptorBindingFlags> bindingFlags;
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-		for (auto const &[typeIndex, binding] : __bindingInfo.materialBufferBindings)
+		for (auto const &[typeIndex, location] : __bindingInfo.materialBufferLocations)
 		{
 			auto &materialBufferBinding				{ bindings.emplace_back() };
-			materialBufferBinding.binding			= binding;
+			materialBufferBinding.binding			= location;
 			materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 			materialBufferBinding.descriptorCount	= 1U;
 			materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
@@ -74,7 +82,7 @@ namespace Render
 		}
 
 		auto &sampledImageBinding				{ bindings.emplace_back() };
-		sampledImageBinding.binding				= 0U;
+		sampledImageBinding.binding				= __bindingInfo.sampledImagesLocation;
 		sampledImageBinding.descriptorType		= VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
 		sampledImageBinding.descriptorCount		= deviceLimits.maxPerStageDescriptorSampledImages;
 		sampledImageBinding.stageFlags			= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
@@ -106,7 +114,7 @@ namespace Render
 		auto const &deviceLimits				{ __physicalDevice.getProps().p10->limits };
 
 		uint32_t const descSetCount				{ static_cast<uint32_t>(__descSets.size()) };
-		uint32_t const materialTypeCount		{ static_cast<uint32_t>(__bindingInfo.materialBufferBindings.size()) };
+		uint32_t const materialTypeCount		{ static_cast<uint32_t>(__bindingInfo.materialBufferLocations.size()) };
 		uint32_t const materialBufferPoolSize	{ materialTypeCount * descSetCount };
 		uint32_t const sampledImagePoolSize		{ __sampledImageDescCount * descSetCount };
 
@@ -171,14 +179,13 @@ namespace Render
 
 	void GlobalDescriptorManager::__createMaterialBufferBuilders()
 	{
-		for (auto const &[type, _] : __bindingInfo.materialBufferBindings)
-			__materialBufferBuilders[type] = std::make_unique<MaterialBufferBuilder>(__resourcePool);
-	}
+		for (auto const &[type, _] : __bindingInfo.materialBufferLocations)
+		{
+			auto pBuilder{ std::make_unique<MaterialBufferBuilder>(__resourcePool) };
+			pBuilder->getInvalidateEvent() += __pMaterialBufferBuilderInvalidateListener;
 
-	void GlobalDescriptorManager::__validateMaterialBufferBuilders()
-	{
-		for (auto const &[_, pBuilder] : __materialBufferBuilders)
-			pBuilder->validate();
+			__materialBufferBuilders[type] = std::move(pBuilder);
+		}
 	}
 
 	void GlobalDescriptorManager::__validateDescSet()
@@ -197,7 +204,7 @@ namespace Render
 			};
 
 			__descriptorUpdater.addBufferInfos(
-				getDescSet(), __bindingInfo.materialBufferBindings.at(type), 0U, 1U,
+				getDescSet(), __bindingInfo.materialBufferLocations.at(type), 0U, 1U,
 				VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 		}
 	}
@@ -211,5 +218,12 @@ namespace Render
 
 		__createDescPool();
 		__allocateDescSets();
+	}
+
+	void GlobalDescriptorManager::__onMaterialBufferBuilderInvalidated(
+		MaterialBufferBuilder *const pBuilder) noexcept
+	{
+		__invalidatedMaterialBufferBuilders.emplace(pBuilder);
+		_invalidate();
 	}
 }
