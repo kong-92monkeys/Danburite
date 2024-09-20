@@ -6,7 +6,6 @@
 #include "../Device/DescriptorUpdater.h"
 #include "Constants.h"
 #include "ResourcePool.h"
-#include "ImageReferenceManager.h"
 #include "MaterialBufferBuilder.h"
 #include <array>
 #include <typeindex>

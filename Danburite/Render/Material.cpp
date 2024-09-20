@@ -2,14 +2,29 @@
 
 namespace Render
 {
-	bool MaterialPack::hasMaterialOf(
+	void Material::init(
+		ImageReferenceManager &imageReferenceManager)
+	{
+		__pImageReferenceManager = &imageReferenceManager;
+	}
+
+	bool Material::isValid() const noexcept
+	{
+		return true;
+	}
+
+	bool MaterialPack::hasValidMaterialOf(
 		std::type_index const &type) const noexcept
 	{
 		auto const foundIt{ __materialMap.find(type) };
 		if (foundIt == __materialMap.end())
 			return false;
 
-		return foundIt->second.get();
+		auto const pMaterial{ foundIt->second.get() };
+		if (!pMaterial)
+			return false;
+
+		return pMaterial->isValid();
 	}
 
 	void MaterialPack::setMaterial(

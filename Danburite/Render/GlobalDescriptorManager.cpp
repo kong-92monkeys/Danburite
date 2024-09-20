@@ -280,13 +280,15 @@ namespace Render
 
 		for (auto const &[type, pBuilder] : __materialBufferBuilders)
 		{
-			auto const &materialBuffer{ pBuilder->getMaterialBuffer() };
+			auto const pMaterialBuffer{ pBuilder->getMaterialBuffer() };
+			if (!pMaterialBuffer)
+				continue;
 
 			VkDescriptorBufferInfo const bufferInfo
 			{
-				.buffer	{ materialBuffer.getHandle() },
+				.buffer	{ pMaterialBuffer->getHandle() },
 				.offset	{ 0ULL },
-				.range	{ materialBuffer.getSize() }
+				.range	{ pMaterialBuffer->getSize() }
 			};
 
 			__descriptorUpdater.addInfos(

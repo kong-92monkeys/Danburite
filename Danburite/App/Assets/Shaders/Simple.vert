@@ -2,12 +2,13 @@
 #pragma shader_stage(vertex)
 //? #extension GL_KHR_vulkan_glsl: enable
 
-#include <Shaders/Materials/SimpleMaterial.glsl>
+#include <Shaders/Constants.glsl>
 #include <Shaders/ShaderData.glsl>
+#include <Shaders/Materials/SimpleMaterial.glsl>
 
 const uint SIMPLE_MATERIAL_SLOT = 0U;
 
-layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = GLOBAL_DESC_SIMPLE_MATERIAL_LOCATION) readonly buffer SimpleMaterialBuffer
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = MATERIAL_DESC_SIMPLE_MATERIAL_LOCATION) readonly buffer SimpleMaterialBuffer
 {
 	SimpleMaterial simpleMaterials[];
 };

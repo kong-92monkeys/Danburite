@@ -15,7 +15,8 @@ const uint SUB_LAYER_DESC_SET_LOCATION					= 2U;
 // Descriptor locations
 
 // Global
-const uint GLOBAL_DESC_SIMPLE_MATERIAL_LOCATION			= 0U;
+const uint MATERIAL_DESC_SIMPLE_MATERIAL_LOCATION		= 0U;
+const uint MATERIAL_DESC_IMAGE_MATERIAL_LOCATION		= 1U;
 
 // Sub layer
 const uint SUB_LAYER_DESC_INSTANCE_INFO_LOCATION		= 0U;

@@ -35,14 +35,18 @@ namespace Render
 		[[nodiscard]]
 		std::shared_ptr<Mesh> createMesh();
 
-		template <std::derived_from<Renderer> $Renderer, typename ...$Args>
-		[[nodiscard]]
-		std::shared_ptr<$Renderer> createRenderer($Args &&...args);
-
 		[[nodiscard]]
 		std::shared_ptr<Texture> createTexture(
 			Texture::ImageCreateInfo const &imageCreateInfo,
 			Texture::ImageViewCreateInfo const &imageViewCreateInfo);
+
+		template <std::derived_from<Material> $Material, typename ...$Args>
+		[[nodiscard]]
+		std::shared_ptr<$Material> createMaterial($Args &&...args);
+
+		template <std::derived_from<Renderer> $Renderer, typename ...$Args>
+		[[nodiscard]]
+		std::shared_ptr<$Renderer> createRenderer($Args &&...args);
 
 		void reserveRender(
 			RenderTarget *pRenderTarget) noexcept;
@@ -93,6 +97,15 @@ namespace Render
 
 		void __validateReservedRenderTargets();
 	};
+
+	template <std::derived_from<Material> $Material, typename ...$Args>
+	std::shared_ptr<$Material> Engine::createMaterial($Args &&...args)
+	{
+		auto pRetVal{ std::make_shared<$Material>(std::forward<$Args>(args)...) };
+		pRetVal->init(__imageReferenceManager);
+
+		return pRetVal;
+	}
 
 	template <std::derived_from<Renderer> $Renderer, typename ...$Args>
 	std::shared_ptr<$Renderer> Engine::createRenderer($Args &&...args)

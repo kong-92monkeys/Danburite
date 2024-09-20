@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Infra/Updatable.h"
+#include "ImageReferenceManager.h"
 #include <concepts>
 #include <typeindex>
 #include <unordered_set>
@@ -11,11 +12,24 @@ namespace Render
 	class Material : public Infra::Updatable<Material>
 	{
 	public:
+		void init(
+			ImageReferenceManager &imageReferenceManager);
+
+		[[nodiscard]]
+		virtual bool isValid() const noexcept;
+
 		[[nodiscard]]
 		virtual const std::byte *getData() const noexcept = 0;
 
 		[[nodiscard]]
 		virtual size_t getSize() const noexcept = 0;
+
+	protected:
+		[[nodiscard]]
+		constexpr ImageReferenceManager &_getImageReferenceManager() const noexcept;
+
+	private:
+		ImageReferenceManager *__pImageReferenceManager{ };
 	};
 
 	template <typename $Data>
@@ -47,10 +61,10 @@ namespace Render
 
 		template <std::derived_from<Material> $M>
 		[[nodiscard]]
-		bool hasMaterialOf() const noexcept;
+		bool hasValidMaterialOf() const noexcept;
 
 		[[nodiscard]]
-		bool hasMaterialOf(
+		bool hasValidMaterialOf(
 			std::type_index const &type) const noexcept;
 
 		template <std::derived_from<Material> $M>
@@ -78,6 +92,11 @@ namespace Render
 		mutable Infra::Event<MaterialPack const *, std::type_index, Material const *, Material const *> __materialChangeEvent;
 	};
 
+	constexpr ImageReferenceManager &Material::_getImageReferenceManager() const noexcept
+	{
+		return *__pImageReferenceManager;
+	}
+
 	template <typename $Data>
 	std::byte const *TypedMaterial<$Data>::getData() const noexcept
 	{
@@ -103,9 +122,9 @@ namespace Render
 	}
 
 	template <std::derived_from<Material> $M>
-	bool MaterialPack::hasMaterialOf() const noexcept
+	bool MaterialPack::hasValidMaterialOf() const noexcept
 	{
-		return hasMaterialOf(typeid($M));
+		return hasValidMaterialOf(typeid($M));
 	}
 
 	template <std::derived_from<Material> $M>

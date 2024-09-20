@@ -1,31 +1,31 @@
-#include "SimpleRenderer.h"
-#include "SimpleMaterial.h"
+#include "ImageRenderer.h"
+#include "ImageMaterial.h"
 #include "Vertex.h"
 #include <array>
 
 namespace Frx
 {
-	bool SimpleRenderer::isValidMaterialPack(
+	bool ImageRenderer::isValidMaterialPack(
 		Render::MaterialPack const &materialPack) const noexcept
 	{
-		return materialPack.hasValidMaterialOf<SimpleMaterial>();
+		return materialPack.hasValidMaterialOf<ImageMaterial>();
 	}
 
-	std::optional<uint32_t> SimpleRenderer::getMaterialSlotOf(
+	std::optional<uint32_t> ImageRenderer::getMaterialSlotOf(
 		std::type_index const &materialType) const noexcept
 	{
-		if (materialType == typeid(SimpleMaterial))
-			return __SIMPLE_MATERIAL_SLOT;
+		if (materialType == typeid(ImageMaterial))
+			return __IMAGE_MATERIAL_SLOT;
 
 		return std::nullopt;
 	}
 
-	bool SimpleRenderer::useMaterial() const noexcept
+	bool ImageRenderer::useMaterial() const noexcept
 	{
 		return true;
 	}
 
-	std::unique_ptr<VK::RenderPass> SimpleRenderer::createRenderPass(
+	std::unique_ptr<VK::RenderPass> ImageRenderer::createRenderPass(
 		VkFormat const outputFormat) const
 	{
 		VkAttachmentDescription2 const colorAttachment
@@ -88,7 +88,7 @@ namespace Frx
 		return std::make_unique<VK::RenderPass>(_getDevice(), createInfo);
 	}
 
-	std::unique_ptr<VK::Framebuffer> SimpleRenderer::createFramebuffer(
+	std::unique_ptr<VK::Framebuffer> ImageRenderer::createFramebuffer(
 		VK::RenderPass &renderPass,
 		VK::ImageView &outputAttachment,
 		uint32_t const outputWidth,
@@ -108,7 +108,7 @@ namespace Frx
 		return std::make_unique<VK::Framebuffer>(_getDevice(), createInfo);
 	}
 
-	std::unique_ptr<VK::Pipeline> SimpleRenderer::createPipeline(
+	std::unique_ptr<VK::Pipeline> ImageRenderer::createPipeline(
 		VK::RenderPass &renderPass,
 		uint32_t const outputWidth,
 		uint32_t const outputHeight) const
@@ -255,10 +255,10 @@ namespace Frx
 		return std::make_unique<VK::Pipeline>(_getDevice(), _getPipelineCache().getHandle(), createInfo);
 	}
 
-	Render::Renderer::InitResult SimpleRenderer::_onInit()
+	Render::Renderer::InitResult ImageRenderer::_onInit()
 	{
-		__pVertexShader		= _createShaderModule("Shaders/Simple.vert");
-		__pFragmentShader	= _createShaderModule("Shaders/Simple.frag");
+		__pVertexShader		= _createShaderModule("Shaders/Image.vert");
+		__pFragmentShader	= _createShaderModule("Shaders/Image.frag");
 
 		Render::Renderer::InitResult retVal;
 		retVal.pPipelineLayout	= __createPipelineLayout();
@@ -266,7 +266,7 @@ namespace Frx
 		return retVal;
 	}
 
-	std::shared_ptr<VK::PipelineLayout> SimpleRenderer::__createPipelineLayout() const
+	std::shared_ptr<VK::PipelineLayout> ImageRenderer::__createPipelineLayout() const
 	{
 		auto const &globalDescManager{ _getGlobalDescriptorManager() };
 

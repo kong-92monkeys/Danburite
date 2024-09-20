@@ -27,7 +27,7 @@ namespace Render
 			Material const *pMaterial) const noexcept;
 
 		[[nodiscard]]
-		Dev::MemoryBuffer const &getMaterialBuffer() const noexcept;
+		Dev::MemoryBuffer const *getMaterialBuffer() const noexcept;
 
 	protected:
 		virtual void _onValidate() override;

@@ -10,6 +10,7 @@
 #include "MainFrm.h"
 #include "../System/Env.h"
 #include "../Frameworks/SimpleMaterial.h"
+#include "../Frameworks/ImageMaterial.h"
 #include "../Frameworks/SimpleRenderer.h"
 #include "../Frameworks/VertexAttribute.h"
 
@@ -142,7 +143,8 @@ void CApp::__onInitBeforeMainFrame()
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
 
 	Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
-	globalDescBindingInfo.materialBufferLocations[typeid(Frx::SimpleMaterial)] = 0U;
+	globalDescBindingInfo.materialBufferLocations[typeid(Frx::SimpleMaterial)]	= 0U;
+	globalDescBindingInfo.materialBufferLocations[typeid(Frx::ImageMaterial)]	= 1U;
 
 	__pRenderEngine = std::make_unique<Render::Engine>(
 		*__pVulkanContext,
@@ -176,7 +178,7 @@ void CApp::__setupRenderTarget(
 	pRenderObject->setDrawParam(std::make_shared<Render::DrawParamIndexed>(6U, 0U, 0));
 	pRenderObject->setMesh(pMesh);
 
-	auto pMaterial{ std::make_shared<Frx::SimpleMaterial>() };
+	auto pMaterial{ __pRenderEngine->createMaterial<Frx::SimpleMaterial>() };
 	pMaterial->setColor({ 0.2f, 1.0f, 0.2f, 1.0f });
 	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::SimpleMaterial>(pMaterial);
 }

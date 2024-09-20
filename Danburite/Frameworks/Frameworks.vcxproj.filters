@@ -19,6 +19,12 @@
     <Filter Include="Materials\SimpleMaterial">
       <UniqueIdentifier>{9d56c08c-1786-4ae8-ac52-0a616ddb6de9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials\ImageMaterial">
+      <UniqueIdentifier>{cf0f788b-cbcf-4f87-b58c-e7a56e06f13d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderers\ImageRenderer">
+      <UniqueIdentifier>{ef72d0a5-3437-4774-ada5-f2867f20c1de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
@@ -36,6 +42,12 @@
     <ClInclude Include="SimpleMaterial.h">
       <Filter>Materials\SimpleMaterial</Filter>
     </ClInclude>
+    <ClInclude Include="ImageMaterial.h">
+      <Filter>Materials\ImageMaterial</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageRenderer.h">
+      <Filter>Renderers\ImageRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestRenderer.cpp">
@@ -46,6 +58,12 @@
     </ClCompile>
     <ClCompile Include="SimpleMaterial.cpp">
       <Filter>Materials\SimpleMaterial</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageMaterial.cpp">
+      <Filter>Materials\ImageMaterial</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageRenderer.cpp">
+      <Filter>Renderers\ImageRenderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

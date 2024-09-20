@@ -52,9 +52,9 @@ namespace Render
 		return __refIdMap.at(pMaterial).second;
 	}
 
-	Dev::MemoryBuffer const &MaterialBufferBuilder::getMaterialBuffer() const noexcept
+	Dev::MemoryBuffer const *MaterialBufferBuilder::getMaterialBuffer() const noexcept
 	{
-		return *__pBuffer;
+		return __pBuffer.get();
 	}
 
 	void MaterialBufferBuilder::_onValidate()
