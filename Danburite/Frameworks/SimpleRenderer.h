@@ -36,8 +36,6 @@ namespace Frx
 			uint32_t outputHeight) const override;
 
 	protected:
-		static constexpr uint32_t __SIMPLE_MATERIAL_SLOT{ 0U };
-
 		std::unique_ptr<VK::ShaderModule> __pVertexShader;
 		std::unique_ptr<VK::ShaderModule> __pFragmentShader;
 

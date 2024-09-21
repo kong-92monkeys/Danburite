@@ -17,7 +17,7 @@ namespace Render::TextureUtil
 		Texture::ImageCreateInfo const imageCreateInfo
 		{
 			.imageType		{ VkImageType::VK_IMAGE_TYPE_2D },
-			.format			{ VkFormat::VK_FORMAT_R8G8B8A8_UINT },
+			.format			{ VkFormat::VK_FORMAT_R8G8B8A8_SRGB },
 			.extent			{
 				.width		{ static_cast<uint32_t>(bitmap.getWidth()) },
 				.height		{ static_cast<uint32_t>(bitmap.getHeight()) },
@@ -36,7 +36,7 @@ namespace Render::TextureUtil
 		Texture::ImageViewCreateInfo const imageViewCreateInfo
 		{
 			.viewType				{ VkImageViewType::VK_IMAGE_VIEW_TYPE_2D },
-			.format					{ VkFormat::VK_FORMAT_R8G8B8A8_UINT },
+			.format					{ VkFormat::VK_FORMAT_R8G8B8A8_SRGB },
 			.components				{
 				.r					{ VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY },
 				.g					{ VkComponentSwizzle::VK_COMPONENT_SWIZZLE_IDENTITY },

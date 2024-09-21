@@ -5,7 +5,7 @@
 #include <Shaders/Constants.glsl>
 
 layout(location = VERTEX_ATTRIB_POS_LOCATION) in vec3 inPos;
-layout(location = VERTEX_ATTRIB_TEXCOORD_LOCATION) in vec2 inUV;
+layout(location = VERTEX_ATTRIB_UV_LOCATION) in vec2 inUV;
 
 layout(location = 0) out flat int instanceIndex;
 layout(location = 1) out vec2 outUV;

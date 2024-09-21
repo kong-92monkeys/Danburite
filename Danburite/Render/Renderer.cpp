@@ -15,6 +15,7 @@ namespace Render
 		VK::Device &device,
 		VK::PipelineCache &pipelineCache,
 		Infra::DeferredDeleter &deferredDeleter,
+		Dev::DescriptorUpdater &descriptorUpdater,
 		GlobalDescriptorManager const &globalDescriptorManager,
 		VK::DescriptorSetLayout const &subLayerDescSetLayout)
 	{
@@ -22,6 +23,7 @@ namespace Render
 		__pDevice					= &device;
 		__pPipelineCache			= &pipelineCache;
 		__pDeferredDeleter			= &deferredDeleter;
+		__pDescriptorUpdater		= &descriptorUpdater;
 		__pGlobalDescriptorManager	= &globalDescriptorManager;
 		__pSubLayerDescSetLayout	= &subLayerDescSetLayout;
 
@@ -62,6 +64,11 @@ namespace Render
 	bool Renderer::useMaterial() const noexcept
 	{
 		return false;
+	}
+
+	VkDescriptorSet Renderer::getDescSet() const noexcept
+	{
+		return VK_NULL_HANDLE;
 	}
 
 	std::unique_ptr<VK::ShaderModule> Renderer::_createShaderModule(

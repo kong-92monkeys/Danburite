@@ -1,12 +1,12 @@
 #version 460
 #pragma shader_stage(fragment)
 
+#extension GL_EXT_nonuniform_qualifier : require
+
 #include <Shaders/Constants.glsl>
 #include <Shaders/ShaderData.glsl>
 #include <Shaders/Images.glsl>
 #include <Shaders/Materials/ImageMaterial.glsl>
-
-const uint IMAGE_MATERIAL_SLOT = 0U;
 
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = MATERIAL_DESC_IMAGE_MATERIAL_LOCATION) readonly buffer ImageMaterialBuffer
 {
@@ -18,6 +18,8 @@ layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = SUB_LAYER_DESC_INSTA
     InstanceInfo instanceInfos[];
 };
 
+layout(set = RENDERER_DESC_SET_LOCATION, binding = 0) uniform sampler imageSampler;
+
 layout(location = 0) in flat int instanceIndex;
 layout(location = 1) in vec2 inUV;
 
@@ -25,8 +27,7 @@ layout(location = 0) out vec4 outColor;
 
 void main()
 {
-	const int materialId = instanceInfos[instanceIndex].materialIds[IMAGE_MATERIAL_SLOT];
+	const int materialId = instanceInfos[instanceIndex].materialIds[0];
     const uint imageId = imageMaterials[materialId].imageId;
-//    const vec4 texColor = texture(sampler2D(sampledImages[imageId], albedoTexSampler), inUV);
-    outColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    outColor = texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
 }

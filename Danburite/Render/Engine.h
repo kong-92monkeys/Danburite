@@ -114,6 +114,7 @@ namespace Render
 		pRetVal->init(
 			__physicalDevice, *__pDevice,
 			*__pPipelineCache, __deferredDeleter,
+			*__pDescriptorUpdater,
 			*__pGlobalDescriptorManager,
 			*__pSubLayerDescSetLayout);
 

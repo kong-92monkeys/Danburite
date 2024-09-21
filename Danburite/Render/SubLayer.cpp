@@ -454,14 +454,20 @@ namespace Render
 			__globalDescManager.getSampledImagesDescSet(),
 
 			// SUB_LAYER_DESC_SET_LOCATION
-			__getDescSet()
+			__getDescSet(),
+
+			// RENDERER_DESC_SET_LOCATION
+			__pRenderer->getDescSet()
 		};
+
+		uint32_t descCount{ static_cast<uint32_t>(descSets.size()) };
+		if (!(descSets.back()))
+			--descCount;
 
 		cmdBuffer.vkCmdBindDescriptorSets(
 			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
 			__pRenderer->getPipelineLayout().getHandle(),
-			0U, static_cast<uint32_t>(descSets.size()), descSets.data(),
-			0U, nullptr);
+			0U, descCount, descSets.data(), 0U, nullptr);
 	}
 
 	void SubLayer::__endRenderPass(

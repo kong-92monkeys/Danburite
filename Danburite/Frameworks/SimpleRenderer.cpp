@@ -15,7 +15,7 @@ namespace Frx
 		std::type_index const &materialType) const noexcept
 	{
 		if (materialType == typeid(SimpleMaterial))
-			return __SIMPLE_MATERIAL_SLOT;
+			return 0U;
 
 		return std::nullopt;
 	}

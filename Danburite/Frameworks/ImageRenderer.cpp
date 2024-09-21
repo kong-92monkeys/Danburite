@@ -5,6 +5,15 @@
 
 namespace Frx
 {
+	ImageRenderer::~ImageRenderer() noexcept
+	{
+		auto &deferredDeleter{ _getDeferredDeleter() };
+
+		deferredDeleter.reserve(std::move(__pSampler));
+		deferredDeleter.reserve(std::move(__pDescPool));
+		deferredDeleter.reserve(std::move(__pDescSetLayout));
+	}
+
 	bool ImageRenderer::isValidMaterialPack(
 		Render::MaterialPack const &materialPack) const noexcept
 	{
@@ -15,7 +24,7 @@ namespace Frx
 		std::type_index const &materialType) const noexcept
 	{
 		if (materialType == typeid(ImageMaterial))
-			return __IMAGE_MATERIAL_SLOT;
+			return 0U;
 
 		return std::nullopt;
 	}
@@ -23,6 +32,11 @@ namespace Frx
 	bool ImageRenderer::useMaterial() const noexcept
 	{
 		return true;
+	}
+
+	VkDescriptorSet ImageRenderer::getDescSet() const noexcept
+	{
+		return __hDescSet;
 	}
 
 	std::unique_ptr<VK::RenderPass> ImageRenderer::createRenderPass(
@@ -271,10 +285,120 @@ namespace Frx
 		__pVertexShader		= _createShaderModule("Shaders/Image.vert");
 		__pFragmentShader	= _createShaderModule("Shaders/Image.frag");
 
+		__createDescSetLayout();
+		__createDescPool();
+		__allocateDescSet();
+
+		__createSampler();
+		__updateDescSet();
+
 		Render::Renderer::InitResult retVal;
 		retVal.pPipelineLayout	= __createPipelineLayout();
 
 		return retVal;
+	}
+
+	void ImageRenderer::__createDescSetLayout()
+	{
+		std::vector<VkDescriptorBindingFlags> bindingFlags;
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+		auto &materialBufferBinding				{ bindings.emplace_back() };
+		materialBufferBinding.binding			= 0U;
+		materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
+		materialBufferBinding.descriptorCount	= 1U;
+		materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
+			
+		bindingFlags.emplace_back(0U);
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo const flagInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO },
+			.bindingCount	{ static_cast<uint32_t>(bindingFlags.size()) },
+			.pBindingFlags	{ bindingFlags.data() }
+		};
+
+		VkDescriptorSetLayoutCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
+			.pNext			{ &flagInfo },
+			.bindingCount	{ static_cast<uint32_t>(bindings.size()) },
+			.pBindings		{ bindings.data() }
+		};
+
+		__pDescSetLayout = std::make_shared<VK::DescriptorSetLayout>(_getDevice(), createInfo);
+	}
+
+	void ImageRenderer::__createDescPool()
+	{
+		VkDescriptorPoolSize const poolSize
+		{
+			.type				{ VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER },
+			.descriptorCount	{ 1U }
+		};
+
+		VkDescriptorPoolCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO },
+			.maxSets		{ 1U },
+			.poolSizeCount	{ 1U },
+			.pPoolSizes		{ &poolSize }
+		};
+
+		__pDescPool = std::make_shared<VK::DescriptorPool>(_getDevice(), createInfo);
+	}
+
+	void ImageRenderer::__allocateDescSet()
+	{
+		VkDescriptorSetAllocateInfo const allocInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO },
+			.descriptorPool		{ __pDescPool->getHandle() },
+			.descriptorSetCount	{ 1U },
+			.pSetLayouts		{ &(__pDescSetLayout->getHandle()) }
+		};
+
+		auto const result{ _getDevice().vkAllocateDescriptorSets(&allocInfo, &__hDescSet) };
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Cannot allocate a descriptor set" };
+	}
+
+	void ImageRenderer::__createSampler()
+	{
+		VkSamplerCreateInfo const createInfo
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO },
+			.magFilter					{ VkFilter::VK_FILTER_LINEAR },
+			.minFilter					{ VkFilter::VK_FILTER_LINEAR },
+			.mipmapMode					{ VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST },
+			.addressModeU				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
+			.addressModeV				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
+			.addressModeW				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
+			.mipLodBias					{ 0.0f },
+			.anisotropyEnable			{ VK_FALSE },
+			.maxAnisotropy				{ 1.0f },
+			.compareEnable				{ VK_FALSE },
+			.minLod						{ 0.0f },
+			.maxLod						{ 0.0f },
+			.borderColor				{ VkBorderColor::VK_BORDER_COLOR_INT_OPAQUE_BLACK },
+			.unnormalizedCoordinates	{ VK_FALSE }
+		};
+
+		__pSampler = std::make_shared<VK::Sampler>(_getDevice(), createInfo);
+	}
+
+	void ImageRenderer::__updateDescSet()
+	{
+		auto &descUpdater{ _getDescriptorUpdater() };
+
+		VkDescriptorImageInfo const samplerInfo
+		{
+			.sampler{ __pSampler->getHandle() }
+		};
+
+		descUpdater.addInfos(
+			__hDescSet, 0U, 0U, 1U,
+			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER, &samplerInfo);
 	}
 
 	std::shared_ptr<VK::PipelineLayout> ImageRenderer::__createPipelineLayout() const
@@ -291,6 +415,9 @@ namespace Frx
 
 		// SUB_LAYER_DESC_SET_LOCATION
 		setLayouts.emplace_back(_getSubLayerDescSetLayout().getHandle());
+
+		// RENDERER_DESC_SET_LOCATION
+		setLayouts.emplace_back(__pDescSetLayout->getHandle());
 
 		VkPipelineLayoutCreateInfo const createInfo
 		{

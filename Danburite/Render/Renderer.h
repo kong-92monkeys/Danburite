@@ -30,6 +30,7 @@ namespace Render
 			VK::Device &device,
 			VK::PipelineCache &pipelineCache,
 			Infra::DeferredDeleter &deferredDeleter,
+			Dev::DescriptorUpdater &descriptorUpdater,
 			GlobalDescriptorManager const &globalDescriptorManager,
 			VK::DescriptorSetLayout const &subLayerDescSetLayout);
 
@@ -51,6 +52,9 @@ namespace Render
 
 		[[nodiscard]]
 		virtual bool useMaterial() const noexcept;
+
+		[[nodiscard]]
+		virtual VkDescriptorSet getDescSet() const noexcept;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
@@ -105,6 +109,9 @@ namespace Render
 		constexpr Infra::DeferredDeleter &_getDeferredDeleter() const noexcept;
 
 		[[nodiscard]]
+		constexpr Dev::DescriptorUpdater &_getDescriptorUpdater() const noexcept;
+
+		[[nodiscard]]
 		constexpr GlobalDescriptorManager const &_getGlobalDescriptorManager() const noexcept;
 
 		[[nodiscard]]
@@ -115,6 +122,7 @@ namespace Render
 		VK::Device *__pDevice{ };
 		VK::PipelineCache *__pPipelineCache{ };
 		Infra::DeferredDeleter *__pDeferredDeleter{ };
+		Dev::DescriptorUpdater *__pDescriptorUpdater{ };
 		GlobalDescriptorManager const *__pGlobalDescriptorManager{ };
 		VK::DescriptorSetLayout const *__pSubLayerDescSetLayout{ };
 
@@ -167,6 +175,11 @@ namespace Render
 	constexpr Infra::DeferredDeleter &Renderer::_getDeferredDeleter() const noexcept
 	{
 		return *__pDeferredDeleter;
+	}
+
+	constexpr Dev::DescriptorUpdater &Renderer::_getDescriptorUpdater() const noexcept
+	{
+		return *__pDescriptorUpdater;
 	}
 
 	constexpr GlobalDescriptorManager const &Renderer::_getGlobalDescriptorManager() const noexcept
