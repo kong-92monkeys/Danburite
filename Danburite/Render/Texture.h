@@ -12,6 +12,8 @@ namespace Render
 	class Texture : public Infra::Unique
 	{
 	public:
+		// TODO: Mipmap handling
+
 		struct ImageCreateInfo
 		{
 		public:

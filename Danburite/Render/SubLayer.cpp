@@ -94,7 +94,7 @@ namespace Render
 			__bindDescSets(cmdBuffer);
 
 		Mesh const *pBoundMesh{ };
-		for (auto const &[pMesh, objects] : __mesh2Objects)
+		for (auto const &[pMesh, baseId, pObject] : __drawSequence)
 		{
 			if (pBoundMesh != pMesh)
 			{
@@ -102,16 +102,7 @@ namespace Render
 				pMesh->bind(cmdBuffer);
 			}
 
-			for (auto const pObject : objects)
-			{
-				uint32_t const baseId
-				{
-					static_cast<uint32_t>(
-						__object2Region.at(pObject)->getOffset())
-				};
-
-				pObject->draw(cmdBuffer, baseId);
-			}
+			pObject->draw(cmdBuffer, baseId);
 		}
 
 		__endRenderPass(cmdBuffer);
@@ -128,7 +119,11 @@ namespace Render
 			__validateDescSet();
 		}
 
+		if (__drawSequenceInvalidated)
+			__validateDrawSequence();
+
 		__instanceInfoBufferInvalidated = false;
+		__drawSequenceInvalidated = false;
 	}
 
 	void SubLayer::__createDescPool()
@@ -194,8 +189,10 @@ namespace Render
 
 			__validateInstanceInfoHostBuffer(pObject);
 			__instanceInfoBufferInvalidated = true;
-			_invalidate();
 		}
+
+		__drawSequenceInvalidated = true;
+		_invalidate();
 
 		__needRedrawEvent.invoke(this);
 	}
@@ -222,6 +219,9 @@ namespace Render
 					__unregisterMaterial(pMaterial);
 			}
 		}
+
+		__drawSequenceInvalidated = true;
+		_invalidate();
 
 		__needRedrawEvent.invoke(this);
 	}
@@ -344,18 +344,40 @@ namespace Render
 			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 	}
 
+	void SubLayer::__validateDrawSequence()
+	{
+		__drawSequence.clear();
+
+		for (auto const &[pMesh, objects] : __mesh2Objects)
+		{
+			for (auto const pObject : objects)
+			{
+				uint32_t const baseId
+				{
+					static_cast<uint32_t>(
+						__object2Region.at(pObject)->getOffset())
+				};
+
+				__drawSequence.emplace_back(pMesh, baseId, pObject);
+			}
+		}
+	}
+
 	void SubLayer::__onObjectMeshChanged(
 		RenderObject const *const pObject,
 		Mesh const *const pPrev,
-		Mesh const *const pCur) noexcept
+		Mesh const *const pCur)
 	{
 		__unregisterMesh(pObject, pPrev);
 
-		if (pCur)
-		{
-			__registerMesh(pObject, pCur);
-			__needRedrawEvent.invoke(this);
-		}
+		if (!pCur)
+			return;
+
+		__registerMesh(pObject, pCur);
+		__drawSequenceInvalidated = true;
+		_invalidate();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void SubLayer::__onObjectMaterialChanged(
@@ -363,7 +385,7 @@ namespace Render
 		uint32_t const instanceIndex,
 		std::type_index const &type,
 		Material const *const pPrev,
-		Material const *const pCur) noexcept
+		Material const *const pCur)
 	{
 		if (pPrev)
 			__unregisterMaterial(pPrev);
@@ -383,18 +405,21 @@ namespace Render
 	void SubLayer::__onObjectInstanceCountChanged(
 		RenderObject const *const pObject,
 		uint32_t const prev,
-		uint32_t const cur) noexcept
+		uint32_t const cur)
 	{
 		auto &pRegion{ __object2Region.at(pObject) };
 		pRegion.reset();
 		pRegion = std::make_unique<Infra::Region>(__objectRegionAllocator, cur, 1ULL);
+
+		__drawSequenceInvalidated = true;
+		_invalidate();
 
 		__needRedrawEvent.invoke(this);
 	}
 
 	void SubLayer::__onObjectDrawableChanged(
 		RenderObject const *const pObject,
-		bool const cur) noexcept
+		bool const cur)
 	{
 		if (cur)
 			__registerObject(pObject);

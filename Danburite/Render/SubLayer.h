@@ -49,6 +49,14 @@ namespace Render
 		virtual void _onValidate() override;
 
 	private:
+		struct __ObjectDrawInfo
+		{
+		public:
+			Mesh const *pMesh{ };
+			uint32_t baseId{ };
+			RenderObject const *pObject{ };
+		};
+
 		VK::Device &__device;
 		VK::DescriptorSetLayout &__descSetLayout;
 		Infra::DeferredDeleter &__deferredDeleter;
@@ -70,6 +78,9 @@ namespace Render
 
 		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets{ };
 		uint32_t __descSetCursor{ };
+
+		bool __drawSequenceInvalidated{ };
+		std::vector<__ObjectDrawInfo> __drawSequence;
 
 		Infra::EventListenerPtr<RenderObject const *, Mesh const *, Mesh const *>
 			__pObjectMeshChangeListener;
@@ -120,26 +131,28 @@ namespace Render
 		void __validateInstanceInfoBuffer();
 		void __validateDescSet();
 
+		void __validateDrawSequence();
+
 		void __onObjectMeshChanged(
 			RenderObject const *pObject,
 			Mesh const *pPrev,
-			Mesh const *pCur) noexcept;
+			Mesh const *pCur);
 
 		void __onObjectMaterialChanged(
 			RenderObject const *pObject,
 			uint32_t instanceIndex,
 			std::type_index const &type,
 			Material const *pPrev,
-			Material const *pCur) noexcept;
+			Material const *pCur);
 
 		void __onObjectInstanceCountChanged(
 			RenderObject const *pObject,
 			uint32_t prev,
-			uint32_t cur) noexcept;
+			uint32_t cur);
 
 		void __onObjectDrawableChanged(
 			RenderObject const *pObject,
-			bool cur) noexcept;
+			bool cur);
 
 		void __beginRenderPass(
 			VK::CommandBuffer &cmdBuffer,
