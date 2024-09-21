@@ -68,6 +68,7 @@ namespace Render
 		std::unique_ptr<VK::PipelineCache> __pPipelineCache;
 
 		std::unique_ptr<Dev::MemoryAllocator> __pMemoryAllocator;
+		std::unique_ptr<Dev::SCBBuilder> __pSCBBuilder;
 		std::unique_ptr<Dev::DescriptorUpdater> __pDescriptorUpdater;
 		std::unique_ptr<ResourcePool> __pResourcePool;
 		std::unique_ptr<CommandSubmitter> __pCommandSubmitter;

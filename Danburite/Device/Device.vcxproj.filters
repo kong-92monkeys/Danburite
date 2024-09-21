@@ -43,6 +43,9 @@
     <Filter Include="Utils\ShaderIncluder">
       <UniqueIdentifier>{e5641657-87a4-422d-ada0-c69de3139f67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SCBBuilder">
+      <UniqueIdentifier>{1f6cf382-7b45-4242-a3cb-890277b676d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
@@ -77,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="ShaderIncluder.cpp">
       <Filter>Utils\ShaderIncluder</Filter>
+    </ClCompile>
+    <ClCompile Include="SCBBuilder.cpp">
+      <Filter>SCBBuilder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +121,9 @@
     </ClInclude>
     <ClInclude Include="ShaderIncluder.h">
       <Filter>Utils\ShaderIncluder</Filter>
+    </ClInclude>
+    <ClInclude Include="SCBBuilder.h">
+      <Filter>SCBBuilder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

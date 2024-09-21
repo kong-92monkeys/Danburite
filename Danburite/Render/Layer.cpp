@@ -6,12 +6,14 @@ namespace Render
 		VK::Device &device,
 		VK::DescriptorSetLayout &subLayerDescSetLayout,
 		Infra::DeferredDeleter &deferredDeleter,
+		Dev::SCBBuilder &scbBuilder,
 		Dev::DescriptorUpdater &descUpdater,
 		ResourcePool &resourcePool,
 		GlobalDescriptorManager &globalDescManager) noexcept :
 		__device				{ device },
 		__subLayerDescSetLayout	{ subLayerDescSetLayout },
 		__deferredDeleter		{ deferredDeleter },
+		__scbBuilder			{ scbBuilder },
 		__descUpdater			{ descUpdater },
 		__resourcePool			{ resourcePool },
 		__globalDescManager		{ globalDescManager }
@@ -136,7 +138,7 @@ namespace Render
 		if (!pRetVal)
 		{
 			pRetVal = std::make_unique<SubLayer>(
-				__device, __subLayerDescSetLayout, __deferredDeleter,
+				__device, __subLayerDescSetLayout, __deferredDeleter, __scbBuilder,
 				__descUpdater, __resourcePool, __globalDescManager, pRenderer);
 
 			pRenderer->getPriorityChangeEvent()	+= __pRendererPriorityChangeListener;

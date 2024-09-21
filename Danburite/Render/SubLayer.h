@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Infra/Stateful.h"
+#include "../Device/SCBBuilder.h"
 #include "../Device/DescriptorUpdater.h"
 #include "ResourcePool.h"
 #include "GlobalDescriptorManager.h"
@@ -17,6 +18,7 @@ namespace Render
 			VK::Device &device,
 			VK::DescriptorSetLayout &descSetLayout,
 			Infra::DeferredDeleter &deferredDeleter,
+			Dev::SCBBuilder &scbBuilder,
 			Dev::DescriptorUpdater &descUpdater,
 			ResourcePool &resourcePool,
 			GlobalDescriptorManager &globalDescManager,
@@ -60,6 +62,7 @@ namespace Render
 		VK::Device &__device;
 		VK::DescriptorSetLayout &__descSetLayout;
 		Infra::DeferredDeleter &__deferredDeleter;
+		Dev::SCBBuilder &__scbBuilder;
 		Dev::DescriptorUpdater &__descUpdater;
 		ResourcePool &__resourcePool;
 		GlobalDescriptorManager &__globalDescManager;
@@ -156,13 +159,9 @@ namespace Render
 
 		void __beginRenderPass(
 			VK::CommandBuffer &cmdBuffer,
-			VK::ImageView &outputAttachment,
-			RendererResourceManager &rendererResourceManager,
+			VK::RenderPass &renderPass,
+			VK::Framebuffer &framebuffer,
 			VkRect2D const &renderArea) const;
-
-		void __bindPipeline(
-			VK::CommandBuffer &cmdBuffer,
-			RendererResourceManager &rendererResourceManager) const;
 
 		void __bindDescSets(
 			VK::CommandBuffer &cmdBuffer) const;
@@ -171,8 +170,21 @@ namespace Render
 			VK::CommandBuffer &cmdBuffer) const;
 
 		[[nodiscard]]
+		std::future<VK::CommandBuffer *> __subDraw(
+			VK::RenderPass const &renderPass,
+			VK::Framebuffer const &framebuffer,
+			VK::Pipeline const &pipeline,
+			size_t sequenceBegin,
+			size_t sequenceEnd) const;
+
+		[[nodiscard]]
 		constexpr VkDescriptorSet __getDescSet() const noexcept;
 		constexpr void __advanceDescSet() noexcept;
+
+		static void __beginSecondaryBuffer(
+			VK::CommandBuffer &secondaryBuffer,
+			VK::RenderPass const &renderPass,
+			VK::Framebuffer const &framebuffer);
 	};
 
 	constexpr Renderer const *SubLayer::getRenderer() const noexcept

@@ -29,6 +29,7 @@ namespace Render
 			deviceLimits.minUniformBufferOffsetAlignment,
 			deviceLimits.minStorageBufferOffsetAlignment);
 
+		__pSCBBuilder = std::make_unique<Dev::SCBBuilder>(*__pDevice, __queueFamilyIndex);
 		__pDescriptorUpdater = std::make_unique<Dev::DescriptorUpdater>(*__pDevice);
 
 		__pResourcePool = std::make_unique<ResourcePool>(
@@ -47,6 +48,9 @@ namespace Render
 
 	Engine::~Engine() noexcept
 	{
+		// The SCBBuilder can run its logic lazily, so should be destroyed before vkDeviceWaitIdle()
+		__pSCBBuilder = nullptr;
+
 		__pDevice->vkDeviceWaitIdle();
 
 		__pExecutorCmdBufferCirculator = nullptr;
@@ -79,7 +83,7 @@ namespace Render
 	std::shared_ptr<Layer> Engine::createLayer()
 	{
 		return std::make_shared<Layer>(
-			*__pDevice, *__pSubLayerDescSetLayout, __deferredDeleter,
+			*__pDevice, *__pSubLayerDescSetLayout, __deferredDeleter, *__pSCBBuilder,
 			*__pDescriptorUpdater, *__pResourcePool, *__pGlobalDescriptorManager);
 	}
 

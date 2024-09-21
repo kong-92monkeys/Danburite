@@ -39,6 +39,7 @@
     <ClCompile Include="MemoryChunk.cpp" />
     <ClCompile Include="MemoryBlock.cpp" />
     <ClCompile Include="MemoryImage.cpp" />
+    <ClCompile Include="SCBBuilder.cpp" />
     <ClCompile Include="SemaphoreCirculator.cpp" />
     <ClCompile Include="ShaderIncluder.cpp" />
   </ItemGroup>
@@ -53,6 +54,7 @@
     <ClInclude Include="MemoryChunk.h" />
     <ClInclude Include="MemoryBlock.h" />
     <ClInclude Include="MemoryImage.h" />
+    <ClInclude Include="SCBBuilder.h" />
     <ClInclude Include="SemaphoreCirculator.h" />
     <ClInclude Include="ShaderIncluder.h" />
   </ItemGroup>

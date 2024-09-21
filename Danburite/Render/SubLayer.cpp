@@ -6,6 +6,7 @@ namespace Render
 		VK::Device &device,
 		VK::DescriptorSetLayout &descSetLayout,
 		Infra::DeferredDeleter &deferredDeleter,
+		Dev::SCBBuilder &scbBuilder,
 		Dev::DescriptorUpdater &descUpdater,
 		ResourcePool &resourcePool,
 		GlobalDescriptorManager &globalDescManager,
@@ -13,6 +14,7 @@ namespace Render
 		__device				{ device },
 		__descSetLayout			{ descSetLayout },
 		__deferredDeleter		{ deferredDeleter },
+		__scbBuilder			{ scbBuilder },
 		__descUpdater			{ descUpdater },
 		__resourcePool			{ resourcePool },
 		__globalDescManager		{ globalDescManager },
@@ -84,26 +86,45 @@ namespace Render
 		RendererResourceManager &rendererResourceManager,
 		VkRect2D const &renderArea) const
 	{
-		__beginRenderPass(
-			cmdBuffer, outputAttachment,
-			rendererResourceManager, renderArea);
+		if (__drawSequence.empty())
+			return;
 
-		__bindPipeline(cmdBuffer, rendererResourceManager);
+		auto &renderPass	{ rendererResourceManager.getRenderPassOf(__pRenderer) };
+		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__pRenderer, outputAttachment) };
+		auto &pipeline		{ rendererResourceManager.getPipelineOf(__pRenderer) };
 
-		if (__pRenderer->useMaterial())
-			__bindDescSets(cmdBuffer);
+		size_t const drawSequenceLength		{ __drawSequence.size() };
+		size_t const concurrencyCount		{ __scbBuilder.getCapacity() };
+		size_t const seqUnitLength			{ drawSequenceLength / concurrencyCount };
+		size_t const seqRemainder			{ drawSequenceLength % concurrencyCount };
 
-		Mesh const *pBoundMesh{ };
-		for (auto const &[pMesh, baseId, pObject] : __drawSequence)
+		std::vector<std::future<VK::CommandBuffer *>> subDrawExecutions;
+		std::vector<VkCommandBuffer> secondaryBufferHandles;
+
+		__beginRenderPass(cmdBuffer, renderPass, framebuffer, renderArea);
+
+		size_t sequenceBegin{ };
+		for (size_t coreIter{ }; coreIter < concurrencyCount; ++coreIter)
 		{
-			if (pBoundMesh != pMesh)
-			{
-				pBoundMesh = pMesh;
-				pMesh->bind(cmdBuffer);
-			}
+			size_t sequenceEnd{ sequenceBegin + seqUnitLength };
+			if (coreIter < seqRemainder)
+				++sequenceEnd;
 
-			pObject->draw(cmdBuffer, baseId);
+			if (sequenceBegin >= sequenceEnd)
+				break;
+
+			subDrawExecutions.emplace_back(
+				__subDraw(renderPass, framebuffer, pipeline, sequenceBegin, sequenceEnd));
+
+			sequenceBegin = sequenceEnd;
 		}
+
+		for (auto &secondaryBuffer : subDrawExecutions)
+			secondaryBufferHandles.emplace_back(secondaryBuffer.get()->getHandle());
+
+		cmdBuffer.vkCmdExecuteCommands(
+			static_cast<uint32_t>(secondaryBufferHandles.size()),
+			secondaryBufferHandles.data());
 
 		__endRenderPass(cmdBuffer);
 	}
@@ -429,13 +450,10 @@ namespace Render
 
 	void SubLayer::__beginRenderPass(
 		VK::CommandBuffer &cmdBuffer,
-		VK::ImageView &outputAttachment,
-		RendererResourceManager &rendererResourceManager,
+		VK::RenderPass &renderPass,
+		VK::Framebuffer &framebuffer,
 		VkRect2D const &renderArea) const
 	{
-		auto &renderPass	{ rendererResourceManager.getRenderPassOf(__pRenderer) };
-		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__pRenderer, outputAttachment) };
-
 		VkRenderPassBeginInfo renderPassBeginInfo{ };
 		renderPassBeginInfo.sType			= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassBeginInfo.renderPass		= renderPass.getHandle();
@@ -445,7 +463,7 @@ namespace Render
 		VkSubpassBeginInfo const subpassBeginInfo
 		{
 			.sType		{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_BEGIN_INFO },
-			.contents	{ VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE }
+			.contents	{ VkSubpassContents::VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS }
 		};
 
 		VkSubpassEndInfo const subpassEndInfo
@@ -454,17 +472,6 @@ namespace Render
 		};
 
 		cmdBuffer.vkCmdBeginRenderPass2(&renderPassBeginInfo, &subpassBeginInfo);
-	}
-
-	void SubLayer::__bindPipeline(
-		VK::CommandBuffer &cmdBuffer,
-		RendererResourceManager &rendererResourceManager) const
-	{
-		auto &pipeline{ rendererResourceManager.getPipelineOf(__pRenderer) };
-		
-		cmdBuffer.vkCmdBindPipeline(
-			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
-			pipeline.getHandle());
 	}
 
 	void SubLayer::__bindDescSets(
@@ -504,5 +511,67 @@ namespace Render
 		};
 
 		cmdBuffer.vkCmdEndRenderPass2(&subpassEndInfo);
+	}
+
+	std::future<VK::CommandBuffer *> SubLayer::__subDraw(
+		VK::RenderPass const &renderPass,
+		VK::Framebuffer const &framebuffer,
+		VK::Pipeline const &pipeline,
+		size_t const sequenceBegin,
+		size_t const sequenceEnd) const
+	{
+		return __scbBuilder.build(
+			[this, &renderPass, &framebuffer, &pipeline, sequenceBegin, sequenceEnd] (auto &secondaryBuffer)
+		{
+			__beginSecondaryBuffer(secondaryBuffer, renderPass, framebuffer);
+
+			secondaryBuffer.vkCmdBindPipeline(
+				VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
+				pipeline.getHandle());
+
+			if (__pRenderer->useMaterial())
+				__bindDescSets(secondaryBuffer);
+
+			Mesh const *pBoundMesh{ };
+			for (size_t seqIter{ sequenceBegin }; seqIter < sequenceEnd; ++seqIter)
+			{
+				auto const &[pMesh, baseId, pObject] { __drawSequence[seqIter] };
+				if (pBoundMesh != pMesh)
+				{
+					pBoundMesh = pMesh;
+					pMesh->bind(secondaryBuffer);
+				}
+
+				pObject->draw(secondaryBuffer, baseId);
+			}
+
+			secondaryBuffer.vkEndCommandBuffer();
+		});
+	}
+
+	void SubLayer::__beginSecondaryBuffer(
+		VK::CommandBuffer &secondaryBuffer,
+		VK::RenderPass const &renderPass,
+		VK::Framebuffer const &framebuffer)
+	{
+		VkCommandBufferInheritanceInfo const inheritanceInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO },
+			.renderPass		{ renderPass.getHandle() },
+			.subpass		{ 0U },
+			.framebuffer	{ framebuffer.getHandle() }
+		};
+
+		VkCommandBufferBeginInfo const commandBufferBeginInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+			.flags				{
+				VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT |
+				VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT
+			},
+			.pInheritanceInfo	{ &inheritanceInfo }
+		};
+
+			secondaryBuffer.vkBeginCommandBuffer(&commandBufferBeginInfo);
 	}
 }

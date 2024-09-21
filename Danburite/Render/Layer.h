@@ -11,6 +11,7 @@ namespace Render
 			VK::Device &device,
 			VK::DescriptorSetLayout &subLayerDescSetLayout,
 			Infra::DeferredDeleter &deferredDeleter,
+			Dev::SCBBuilder &scbBuilder,
 			Dev::DescriptorUpdater &descUpdater,
 			ResourcePool &resourcePool,
 			GlobalDescriptorManager &globalDescManager) noexcept;
@@ -51,6 +52,7 @@ namespace Render
 		VK::Device &__device;
 		VK::DescriptorSetLayout &__subLayerDescSetLayout;
 		Infra::DeferredDeleter &__deferredDeleter;
+		Dev::SCBBuilder &__scbBuilder;
 		Dev::DescriptorUpdater &__descUpdater;
 		ResourcePool &__resourcePool;
 		GlobalDescriptorManager &__globalDescManager;
