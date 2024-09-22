@@ -43,14 +43,23 @@
     <Filter Include="Component\Impl">
       <UniqueIdentifier>{1f290f63-051c-435c-9acc-62d6abdc7f42}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Geometry">
-      <UniqueIdentifier>{20af5da8-0d9e-49f0-8101-1fed0c3af2d4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Managed">
       <UniqueIdentifier>{21b5ba1c-1194-4b90-ac0d-50c6b69c2762}</UniqueIdentifier>
     </Filter>
     <Filter Include="Executor">
       <UniqueIdentifier>{73918271-c1c9-40b8-ba4e-99e157976daf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{20af5da8-0d9e-49f0-8101-1fed0c3af2d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Theme">
+      <UniqueIdentifier>{fbbe77aa-b891-452b-85bf-f1801a4ab147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Style">
+      <UniqueIdentifier>{a157de4c-c7a1-4ec6-9dfc-f16a8010ade8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drawable">
+      <UniqueIdentifier>{b18f5fd2-1db1-4007-9475-20949d6a7b41}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,14 +99,23 @@
     <ClInclude Include="Component.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Geometry</Filter>
+    <ClInclude Include="Model.h">
+      <Filter>Model</Filter>
     </ClInclude>
     <ClInclude Include="Managed.h">
       <Filter>Managed</Filter>
     </ClInclude>
     <ClInclude Include="Executor.h">
       <Filter>Executor</Filter>
+    </ClInclude>
+    <ClInclude Include="Theme.h">
+      <Filter>Theme</Filter>
+    </ClInclude>
+    <ClInclude Include="Style.h">
+      <Filter>Style</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawable.h">
+      <Filter>Drawable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -128,11 +146,14 @@
     <ClCompile Include="Component.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="Geometry.cpp">
-      <Filter>Geometry</Filter>
+    <ClCompile Include="Model.cpp">
+      <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="Executor.cpp">
       <Filter>Executor</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>Drawable</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

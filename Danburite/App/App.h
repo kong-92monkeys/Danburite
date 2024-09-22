@@ -50,6 +50,7 @@ private:
 	std::unique_ptr<Render::Engine> __pRenderEngine;
 
 	std::unique_ptr<Render::Layer> __pLayer;
+	std::unique_ptr<Render::RenderObject> __pObject;
 	std::unique_ptr<Render::Mesh> __pMesh;
 	std::unique_ptr<Render::DrawParam> __pDrawParam;
 	std::unique_ptr<Render::Texture> __pTexture;

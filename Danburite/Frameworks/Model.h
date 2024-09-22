@@ -5,14 +5,14 @@
 
 namespace Frx
 {
-	class Geometry : public Infra::Unique
+	class Model : public Infra::Unique
 	{
 	public:
-		Geometry(
+		Model(
 			Executor &rcmdExecutor,
 			Infra::ObjectHolder<Render::Engine> const &pEngine);
 
-		virtual ~Geometry() noexcept override;
+		virtual ~Model() noexcept override;
 
 		void createVertexBuffer(
 			uint32_t bindingIndex,
@@ -42,8 +42,16 @@ namespace Frx
 
 		void clearIndexBuffer();
 
+		[[nodiscard]]
+		constexpr Infra::PointerHolder<Render::Mesh> const &_getMesh() const noexcept;
+
 	private:
 		Executor &__rcmdExecutor;
 		Infra::PointerHolder<Render::Mesh> __pMesh;
 	};
+
+	constexpr Infra::PointerHolder<Render::Mesh> const &Model::_getMesh() const noexcept
+	{
+		return __pMesh;
+	}
 }

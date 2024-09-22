@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../Infra/PointerHolder.h"
-#include "../Render/RenderObject.h"
-#include "Executor.h"
+#include "SceneObject.h"
 
 namespace Frx
 {
@@ -11,7 +10,7 @@ namespace Frx
 	public:
 		void init(
 			Executor &rcmdExecutor,
-			Infra::PointerHolder<Render::RenderObject> const &pRenderObject);
+			SceneObject &sceneObject);
 
 	protected:
 		virtual void _onInit();
@@ -20,12 +19,11 @@ namespace Frx
 		constexpr Executor &_getRcmdExecutor() const noexcept;
 
 		[[nodiscard]]
-		constexpr Infra::PointerHolder<Render::RenderObject> const &
-			_getRenderObject() const noexcept;
+		constexpr SceneObject &_getSceneObject() const noexcept;
 
 	private:
 		Executor *__pRcmdExecutor{ };
-		Infra::PointerHolder<Render::RenderObject> __pRenderObject;
+		SceneObject *__pSceneObject{ };
 	};
 
 	constexpr Executor &Component::_getRcmdExecutor() const noexcept
@@ -33,9 +31,8 @@ namespace Frx
 		return *__pRcmdExecutor;
 	}
 
-	constexpr Infra::PointerHolder<Render::RenderObject> const &
-		Component::_getRenderObject() const noexcept
+	constexpr SceneObject &Component::_getSceneObject() const noexcept
 	{
-		return __pRenderObject;
+		return *__pSceneObject;
 	}
 }

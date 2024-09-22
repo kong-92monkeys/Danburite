@@ -91,6 +91,7 @@ int CApp::ExitInstance()
 	__pTexture = nullptr;
 	__pDrawParam = nullptr;
 	__pMesh = nullptr;
+	__pObject = nullptr;
 	__pLayer = nullptr;
 
 	__pRenderEngine = nullptr;
@@ -161,8 +162,8 @@ void CApp::__setupRenderTarget(
 	__pLayer = std::unique_ptr<Render::Layer>{ __pRenderEngine->createLayer() };
 	renderTarget.addLayer(__pLayer.get());
 
-	auto pRenderObject{ std::make_shared<Render::RenderObject>() };
-	__pLayer->addRenderObject(pRenderObject);
+	__pObject = std::make_unique<Render::RenderObject>();
+	__pLayer->addRenderObject(__pObject.get());
 
 	Infra::GenericBuffer posBuffer;
 	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.5f });
@@ -187,9 +188,9 @@ void CApp::__setupRenderTarget(
 	__pDrawParam = std::make_unique<Render::DrawParamIndexed>(6U, 0U, 0);
 	__pRenderer = std::unique_ptr<Frx::ImageRenderer>{ __pRenderEngine->createRenderer<Frx::ImageRenderer>() };
 
-	pRenderObject->setRenderer(__pRenderer.get());
-	pRenderObject->setDrawParam(__pDrawParam.get());
-	pRenderObject->setMesh(__pMesh.get());
+	__pObject->setRenderer(__pRenderer.get());
+	__pObject->setDrawParam(__pDrawParam.get());
+	__pObject->setMesh(__pMesh.get());
 
 	__pTexture = std::unique_ptr<Render::Texture>
 	{
@@ -200,7 +201,7 @@ void CApp::__setupRenderTarget(
 	};
 
 	__pMaterial = std::unique_ptr<Frx::ImageMaterial>{ __pRenderEngine->createMaterial<Frx::ImageMaterial>() };
-	pRenderObject->getMaterialPackOf(0U).setMaterial(__pMaterial.get());
+	__pObject->getMaterialPackOf(0U).setMaterial(__pMaterial.get());
 
 	__pMaterial->setTexture(__pTexture.get());
 }

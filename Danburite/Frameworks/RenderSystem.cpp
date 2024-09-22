@@ -19,6 +19,16 @@ namespace Frx
 		__rcmdExecutor.destroy(std::move(__pEngine)).wait();
 	}
 
+	std::shared_ptr<Drawable> RenderSystem::createDrawable()
+	{
+		return std::make_shared<Drawable>(__rcmdExecutor);
+	}
+
+	std::shared_ptr<Model> RenderSystem::createModel()
+	{
+		return std::make_shared<Model>(__rcmdExecutor, __pEngine);
+	}
+
 	void RenderSystem::__createEngine(
 		Dev::Context &context,
 		VK::PhysicalDevice const &physicalDevice)

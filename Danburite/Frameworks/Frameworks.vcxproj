@@ -21,8 +21,9 @@
   <ItemGroup>
     <ClInclude Include="Component.h" />
     <ClInclude Include="Display.h" />
+    <ClInclude Include="Drawable.h" />
     <ClInclude Include="Executor.h" />
-    <ClInclude Include="Geometry.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="ImageMaterial.h" />
     <ClInclude Include="Managed.h" />
     <ClInclude Include="RenderSystem.h" />
@@ -32,14 +33,17 @@
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="SimpleRenderer.h" />
     <ClInclude Include="TestRenderer.h" />
+    <ClInclude Include="Style.h" />
+    <ClInclude Include="Theme.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexAttribute.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="Executor.cpp" />
-    <ClCompile Include="Geometry.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="ImageMaterial.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scene.cpp" />

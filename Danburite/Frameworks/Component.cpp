@@ -4,10 +4,10 @@ namespace Frx
 {
 	void Component::init(
 		Executor &rcmdExecutor,
-		Infra::PointerHolder<Render::RenderObject> const &pRenderObject)
+		SceneObject &sceneObject)
 	{
-		__pRcmdExecutor = &rcmdExecutor;
-		__pRenderObject = pRenderObject;
+		__pRcmdExecutor		= &rcmdExecutor;
+		__pSceneObject		= &sceneObject;
 
 		_onInit();
 	}

@@ -22,10 +22,10 @@ namespace Render
 			int priority) noexcept;
 
 		void addRenderObject(
-			std::shared_ptr<RenderObject const> const &pObject);
+			RenderObject const *pObject);
 
 		void removeRenderObject(
-			std::shared_ptr<RenderObject const> const &pObject);
+			RenderObject const *pObject);
 
 		[[nodiscard]]
 		bool isEmpty() const noexcept;
@@ -57,7 +57,7 @@ namespace Render
 		ResourcePool &__resourcePool;
 		GlobalDescriptorManager &__globalDescManager;
 
-		std::unordered_set<std::shared_ptr<RenderObject const>> __objectRefs;
+		std::unordered_set<RenderObject const *> __objects;
 		std::unordered_map<Renderer const *, std::unique_ptr<SubLayer>> __subLayerMap;
 		std::unordered_map<RenderObject const *, SubLayer *> __object2SubLayer;
 

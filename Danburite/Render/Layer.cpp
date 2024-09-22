@@ -49,32 +49,32 @@ namespace Render
 	}
 
 	void Layer::addRenderObject(
-		std::shared_ptr<RenderObject const> const &pObject)
+		RenderObject const *const pObject)
 	{
-		if (!(__objectRefs.emplace(pObject).second))
+		if (!(__objects.emplace(pObject).second))
 			throw std::runtime_error{ "The object is already added." };
 
 		pObject->getRendererChangeEvent() += __pObjectRendererChangeListener;
 
 		if (pObject->getRenderer())
-			__registerObject(pObject.get());
+			__registerObject(pObject);
 	}
 
 	void Layer::removeRenderObject(
-		std::shared_ptr<RenderObject const> const &pObject)
+		RenderObject const *const pObject)
 	{
-		if (!(__objectRefs.erase(pObject)))
+		if (!(__objects.erase(pObject)))
 			throw std::runtime_error{ "The object is not added yet." };
 
 		pObject->getRendererChangeEvent() -= __pObjectRendererChangeListener;
 
 		if (pObject->getRenderer())
-			__unregisterObject(pObject.get());
+			__unregisterObject(pObject);
 	}
 
 	bool Layer::isEmpty() const noexcept
 	{
-		return __objectRefs.empty();
+		return __objects.empty();
 	}
 
 	void Layer::draw(
