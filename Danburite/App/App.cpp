@@ -90,6 +90,10 @@ BOOL CApp::InitInstance()
 
 int CApp::ExitInstance()
 {
+	__pTexture = nullptr;
+	__pMesh = nullptr;
+	__pLayer = nullptr;
+
 	__pRenderEngine = nullptr;
 	__pVulkanContext = nullptr;
 
@@ -102,7 +106,7 @@ std::unique_ptr<Render::RenderTarget> CApp::createRenderTarget(
 {
 	auto pRetVal{ __pRenderEngine->createRenderTarget(m_hInstance, hWindow) };
 	__setupRenderTarget(*pRetVal);
-	return pRetVal;
+	return std::unique_ptr<Render::RenderTarget>{ pRetVal };
 }
 
 void CApp::render(Render::RenderTarget &renderTarget)
@@ -156,11 +160,11 @@ void CApp::__onInitBeforeMainFrame()
 void CApp::__setupRenderTarget(
 	Render::RenderTarget &renderTarget)
 {
-	auto pLayer{ __pRenderEngine->createLayer() };
-	renderTarget.addLayer(pLayer);
+	__pLayer = std::unique_ptr<Render::Layer>{ __pRenderEngine->createLayer() };
+	renderTarget.addLayer(__pLayer.get());
 
 	auto pRenderObject{ std::make_shared<Render::RenderObject>() };
-	pLayer->addRenderObject(pRenderObject);
+	__pLayer->addRenderObject(pRenderObject);
 
 	Infra::GenericBuffer posBuffer;
 	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.5f });
@@ -177,16 +181,16 @@ void CApp::__setupRenderTarget(
 	Infra::GenericBuffer indexBuffer;
 	indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
 
-	auto pMesh{ __pRenderEngine->createMesh() };
-	pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
-	pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, uvBuffer.getData(), uvBuffer.getSize());
-	pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
+	__pMesh = std::unique_ptr<Render::Mesh>{ __pRenderEngine->createMesh() };
+	__pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
+	__pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, uvBuffer.getData(), uvBuffer.getSize());
+	__pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
 
 	pRenderObject->setRenderer(__pRenderEngine->createRenderer<Frx::ImageRenderer>());
 	pRenderObject->setDrawParam(std::make_shared<Render::DrawParamIndexed>(6U, 0U, 0));
-	pRenderObject->setMesh(pMesh);
+	pRenderObject->setMesh(__pMesh.get());
 
-	auto pTexture
+	__pTexture = std::unique_ptr<Render::Texture>
 	{
 		Render::TextureUtil::loadTexture(
 			*__pRenderEngine, "Images/smile.jpg",
@@ -195,7 +199,7 @@ void CApp::__setupRenderTarget(
 	};
 
 	auto pMaterial{ __pRenderEngine->createMaterial<Frx::ImageMaterial>() };
-	pMaterial->setTexture(pTexture);
+	pMaterial->setTexture(__pTexture.get());
 	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::ImageMaterial>(pMaterial);
 }
 

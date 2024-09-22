@@ -16,11 +16,6 @@ namespace Render
 		__materialPacks.emplace_back(std::move(pMaterialPack));
 	}
 
-	std::shared_ptr<Renderer const> const &RenderObject::getRenderer() const noexcept
-	{
-		return __pRenderer;
-	}
-
 	void RenderObject::setRenderer(
 		std::shared_ptr<Renderer const> const &pRenderer)
 	{
@@ -34,27 +29,17 @@ namespace Render
 		__validateDrawable();
 	}
 
-	std::shared_ptr<Mesh const> const &RenderObject::getMesh() const noexcept
-	{
-		return __pMesh;
-	}
-
 	void RenderObject::setMesh(
-		std::shared_ptr<Mesh const> const &pMesh)
+		Mesh const *const pMesh)
 	{
 		if (__pMesh == pMesh)
 			return;
 
-		auto const pPrevMesh{ __pMesh.get() };
+		auto const pPrevMesh{ __pMesh };
 		__pMesh = pMesh;
 
-		__meshChangeEvent.invoke(this, pPrevMesh, pMesh.get());
+		__meshChangeEvent.invoke(this, pPrevMesh, pMesh);
 		__validateDrawable();
-	}
-
-	std::shared_ptr<DrawParam const> const &RenderObject::getDrawParam() const noexcept
-	{
-		return __pDrawParam;
 	}
 
 	void RenderObject::setDrawParam(
@@ -68,11 +53,6 @@ namespace Render
 
 		__drawParamChangeEvent.invoke(this, pPrevDrawParam, pDrawParam.get());
 		__validateDrawable();
-	}
-
-	uint32_t RenderObject::getInstanceCount() const noexcept
-	{
-		return static_cast<uint32_t>(__materialPacks.size());
 	}
 
 	void RenderObject::setInstanceCount(

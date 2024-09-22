@@ -15,12 +15,12 @@ namespace Frx
 	{
 	public:
 		void setTexture(
-			std::shared_ptr<Render::Texture const> const &pTexture) noexcept;
+			Render::Texture const *pTexture) noexcept;
 
 		[[nodiscard]]
 		virtual bool isValid() const noexcept override;
 
 	private:
-		std::shared_ptr<Render::Texture const> __pTexture;
+		Render::Texture const *__pTexture{ };
 	};
 }

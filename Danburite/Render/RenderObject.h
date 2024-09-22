@@ -12,16 +12,17 @@ namespace Render
 		RenderObject();
 
 		[[nodiscard]]
-		std::shared_ptr<Renderer const> const &getRenderer() const noexcept;
+		constexpr std::shared_ptr<Renderer const> const &getRenderer() const noexcept;
 		void setRenderer(
 			std::shared_ptr<Renderer const> const &pRenderer);
 
 		[[nodiscard]]
-		std::shared_ptr<Mesh const> const &getMesh() const noexcept;
-		void setMesh(std::shared_ptr<Mesh const> const &pMesh);
+		constexpr Mesh const *getMesh() const noexcept;
+		void setMesh(
+			Mesh const *pMesh);
 
 		[[nodiscard]]
-		std::shared_ptr<DrawParam const> const &getDrawParam() const noexcept;
+		constexpr std::shared_ptr<DrawParam const> const &getDrawParam() const noexcept;
 		void setDrawParam(std::shared_ptr<DrawParam const> const &pDrawParam);
 
 		[[nodiscard]]
@@ -33,7 +34,7 @@ namespace Render
 			uint32_t instanceIndex) const noexcept;
 
 		[[nodiscard]]
-		uint32_t getInstanceCount() const noexcept;
+		constexpr uint32_t getInstanceCount() const noexcept;
 		void setInstanceCount(const uint32_t count);
 
 		[[nodiscard]]
@@ -73,7 +74,7 @@ namespace Render
 
 	private:
 		std::shared_ptr<Renderer const> __pRenderer;
-		std::shared_ptr<Mesh const> __pMesh;
+		Mesh const *__pMesh{ };
 		std::shared_ptr<DrawParam const> __pDrawParam;
 		std::vector<std::unique_ptr<MaterialPack>> __materialPacks;
 
@@ -113,6 +114,26 @@ namespace Render
 			Material const *pPrev,
 			Material const *pCur);
 	};
+
+	constexpr std::shared_ptr<Renderer const> const &RenderObject::getRenderer() const noexcept
+	{
+		return __pRenderer;
+	}
+
+	constexpr Mesh const *RenderObject::getMesh() const noexcept
+	{
+		return __pMesh;
+	}
+
+	constexpr std::shared_ptr<DrawParam const> const &RenderObject::getDrawParam() const noexcept
+	{
+		return __pDrawParam;
+	}
+
+	constexpr uint32_t RenderObject::getInstanceCount() const noexcept
+	{
+		return static_cast<uint32_t>(__materialPacks.size());
+	}
 
 	constexpr MaterialPack &RenderObject::getMaterialPackOf(
 		uint32_t const instanceIndex) noexcept

@@ -53,7 +53,7 @@ namespace Render
 
 	RenderTarget::~RenderTarget() noexcept
 	{
-		__layerRefs.clear();
+		__layers.clear();
 		__que.vkQueueWaitIdle();
 
 		__pRendererResourceManager = nullptr;
@@ -73,31 +73,31 @@ namespace Render
 	}
 
 	void RenderTarget::addLayer(
-		std::shared_ptr<Layer> const &pLayer)
+		Layer *const pLayer)
 	{
-		if (!(__layerRefs.emplace(pLayer).second))
+		if (!(__layers.emplace(pLayer).second))
 			throw std::runtime_error{ "The layer is already added." };
 
 		pLayer->getInvalidateEvent() += __pLayerInvalidateListener;
 		pLayer->getPriorityChangeEvent() += __pLayerPriorityChangeListener;
 		pLayer->getNeedRedrawEvent() += __pLayerNeedRedrawListener;
 
-		__invalidatedLayers.emplace(pLayer.get());
+		__invalidatedLayers.emplace(pLayer);
 		__layerSortionInvalidated = true;
 		_invalidate();
 	}
 
 	void RenderTarget::removeLayer(
-		std::shared_ptr<Layer> const &pLayer)
+		Layer *const pLayer)
 	{
-		if (!(__layerRefs.erase(pLayer)))
+		if (!(__layers.erase(pLayer)))
 			throw std::runtime_error{ "The layer is not added yet." };
 
 		pLayer->getInvalidateEvent() -= __pLayerInvalidateListener;
 		pLayer->getPriorityChangeEvent() -= __pLayerPriorityChangeListener;
 		pLayer->getNeedRedrawEvent() -= __pLayerNeedRedrawListener;
 
-		__invalidatedLayers.erase(pLayer.get());
+		__invalidatedLayers.erase(pLayer);
 		__layerSortionInvalidated = true;
 		_invalidate();
 	}
@@ -577,8 +577,8 @@ namespace Render
 	{
 		__sortedLayers.clear();
 
-		for (auto const &pLayer : __layerRefs)
-			__sortedLayers.emplace_back(pLayer.get());
+		for (auto const &pLayer : __layers)
+			__sortedLayers.emplace_back(pLayer);
 
 		std::sort(__sortedLayers.begin(), __sortedLayers.end(), [] (auto const lhs, auto const rhs)
 		{

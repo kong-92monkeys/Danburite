@@ -3,24 +3,31 @@
 namespace Frx
 {
 	void ImageMaterial::setTexture(
-		std::shared_ptr<Render::Texture const> const &pTexture) noexcept
+		Render::Texture const *const pTexture) noexcept
 	{
 		if (__pTexture == pTexture)
 			return;
 
+		auto const pPrevTexture{ __pTexture };
 		__pTexture = pTexture;
 
-		auto &imageRefManager	{ _getImageReferenceManager() };
-		auto &imageView			{ __pTexture->getImageView() };
+		auto &imageRefManager{ _getImageReferenceManager() };
 
-		imageRefManager.addImage(&imageView);
-		_getTypedData().imageId = imageRefManager.getIdOf(&imageView);
+		if (pPrevTexture)
+			imageRefManager.removeImage(&(pPrevTexture->getImageView()));
 
+		if (__pTexture)
+		{
+			auto &imageView{ __pTexture->getImageView() };
+			imageRefManager.addImage(&imageView);
+			_getTypedData().imageId = imageRefManager.getIdOf(&imageView);
+		}
+		
 		_invokeUpdateEvent();
 	}
 
 	bool ImageMaterial::isValid() const noexcept
 	{
-		return __pTexture.get();
+		return __pTexture;
 	}
 }

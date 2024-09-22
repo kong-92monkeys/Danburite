@@ -71,37 +71,47 @@ namespace Render
 		__pDevice = nullptr;
 	}
 
-	std::unique_ptr<RenderTarget> Engine::createRenderTarget(
+	RenderTarget *Engine::createRenderTarget(
 		HINSTANCE const hinstance,
 		HWND const hwnd)
 	{
-		return std::make_unique<RenderTarget>(
-			__context.getInstance(), __physicalDevice, *__pDevice, *__pQueue,
-			__deferredDeleter, hinstance, hwnd);
+		return new RenderTarget
+		{
+			__context.getInstance(), __physicalDevice,
+			*__pDevice, *__pQueue, __deferredDeleter,
+			hinstance, hwnd
+		};
 	}
 
-	std::shared_ptr<Layer> Engine::createLayer()
+	Layer *Engine::createLayer()
 	{
-		return std::make_shared<Layer>(
-			*__pDevice, *__pSubLayerDescSetLayout, __deferredDeleter, *__pSCBBuilder,
-			*__pDescriptorUpdater, *__pResourcePool, *__pGlobalDescriptorManager);
+		return new Layer
+		{
+			*__pDevice, *__pSubLayerDescSetLayout, __deferredDeleter,
+			*__pSCBBuilder, *__pDescriptorUpdater, *__pResourcePool,
+			*__pGlobalDescriptorManager
+		};
 	}
 
-	std::shared_ptr<Mesh> Engine::createMesh()
+	Mesh *Engine::createMesh()
 	{
-		return std::make_shared<Mesh>(
+		return new Mesh
+		{
 			*__pDevice, *__pMemoryAllocator,
-			__commandExecutor, *__pResourcePool);
+			__commandExecutor, *__pResourcePool
+		};
 	}
 
-	std::shared_ptr<Texture> Engine::createTexture(
+	Texture *Engine::createTexture(
 		Texture::ImageCreateInfo const &imageCreateInfo,
 		Texture::ImageViewCreateInfo const &imageViewCreateInfo)
 	{
-		return std::make_shared<Texture>(
+		return new Texture
+		{
 			*__pDevice, __commandExecutor,
 			*__pMemoryAllocator, __deferredDeleter, *__pResourcePool,
-			imageCreateInfo, imageViewCreateInfo);
+			imageCreateInfo, imageViewCreateInfo
+		};
 	}
 
 	void Engine::reserveRender(

@@ -2,7 +2,7 @@
 
 namespace Render::TextureUtil
 {
-	std::shared_ptr<Texture> loadTexture(
+	Texture *loadTexture(
 		Engine &engine,
 		std::string_view const &assetPath,
 		VkPipelineStageFlags2 const beforeStageMask,

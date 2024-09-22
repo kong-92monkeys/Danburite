@@ -196,7 +196,7 @@ namespace Render
 		uint32_t const instanceCount{ pObject->getInstanceCount() };
 		__object2Region[pObject] = std::make_unique<Infra::Region>(__objectRegionAllocator, instanceCount, 1ULL);
 
-		__registerMesh(pObject, pObject->getMesh().get());
+		__registerMesh(pObject, pObject->getMesh());
 
 		if (__pRenderer->useMaterial())
 		{
@@ -226,9 +226,9 @@ namespace Render
 
 		__object2Region.erase(pObject);
 
-		auto const &pMesh{ pObject->getMesh() };
+		auto const pMesh{ pObject->getMesh() };
 		if (pMesh)
-			__unregisterMesh(pObject, pMesh.get());
+			__unregisterMesh(pObject, pMesh);
 
 		if (__pRenderer->useMaterial())
 		{

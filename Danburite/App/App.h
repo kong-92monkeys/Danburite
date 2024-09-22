@@ -49,6 +49,10 @@ private:
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Render::Engine> __pRenderEngine;
 
+	std::unique_ptr<Render::Layer> __pLayer;
+	std::unique_ptr<Render::Mesh> __pMesh;
+	std::unique_ptr<Render::Texture> __pTexture;
+
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();

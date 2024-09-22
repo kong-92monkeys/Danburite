@@ -44,10 +44,10 @@ namespace Render
 		virtual ~RenderTarget() noexcept override;
 
 		void addLayer(
-			std::shared_ptr<Layer> const &pLayer);
+			Layer *pLayer);
 
 		void removeLayer(
-			std::shared_ptr<Layer> const &pLayer);
+			Layer *pLayer);
 
 		void setBackgroundColor(
 			glm::vec4 const &color) noexcept;
@@ -106,7 +106,7 @@ namespace Render
 
 		std::unique_ptr<RendererResourceManager> __pRendererResourceManager;
 
-		std::unordered_set<std::shared_ptr<Layer>> __layerRefs;
+		std::unordered_set<Layer *> __layers;
 		std::unordered_set<Layer *> __invalidatedLayers;
 
 		bool __layerSortionInvalidated{ };

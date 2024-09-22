@@ -25,18 +25,18 @@ namespace Render
 		virtual ~Engine() noexcept override;
 
 		[[nodiscard]]
-		std::unique_ptr<RenderTarget> createRenderTarget(
+		RenderTarget *createRenderTarget(
 			HINSTANCE hinstance,
 			HWND hwnd);
 
 		[[nodiscard]]
-		std::shared_ptr<Layer> createLayer();
+		Layer *createLayer();
 
 		[[nodiscard]]
-		std::shared_ptr<Mesh> createMesh();
+		Mesh *createMesh();
 
 		[[nodiscard]]
-		std::shared_ptr<Texture> createTexture(
+		Texture *createTexture(
 			Texture::ImageCreateInfo const &imageCreateInfo,
 			Texture::ImageViewCreateInfo const &imageViewCreateInfo);
 
