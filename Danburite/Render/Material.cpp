@@ -37,7 +37,7 @@ namespace Render
 		if (foundIt == __materialMap.end())
 			return false;
 
-		auto const pMaterial{ foundIt->second.get() };
+		auto const pMaterial{ foundIt->second };
 		if (!pMaterial)
 			return false;
 
@@ -46,27 +46,27 @@ namespace Render
 
 	void MaterialPack::setMaterial(
 		std::type_index const &type,
-		std::shared_ptr<Material const> pMaterial) noexcept
+		Material const *const pMaterial) noexcept
 	{
 		auto &holder{ __materialMap[type] };
 		if (holder == pMaterial)
 			return;
 
-		auto pPrevMaterial{ std::move(holder) };
+		auto const pPrevMaterial{ holder };
 		if (pPrevMaterial)
 		{
 			pPrevMaterial->getValidChangeEvent() -= __pMaterialValidChangeListener;
-			__materials.erase(pPrevMaterial.get());
+			__materials.erase(pPrevMaterial);
 		}
 
-		holder = std::move(pMaterial);
+		holder = pMaterial;
 		if (holder)
 		{
 			holder->getValidChangeEvent() += __pMaterialValidChangeListener;
-			__materials.emplace(holder.get());
+			__materials.emplace(holder);
 		}
 
-		__materialChangeEvent.invoke(this, type, pPrevMaterial.get(), holder.get());
+		__materialChangeEvent.invoke(this, type, pPrevMaterial, holder);
 	}
 
 	std::unordered_set<const Material *>::const_iterator MaterialPack::begin() const noexcept

@@ -42,11 +42,11 @@ namespace Render
 
 		template <std::derived_from<Material> $Material, typename ...$Args>
 		[[nodiscard]]
-		std::shared_ptr<$Material> createMaterial($Args &&...args);
+		$Material *createMaterial($Args &&...args);
 
 		template <std::derived_from<Renderer> $Renderer, typename ...$Args>
 		[[nodiscard]]
-		std::shared_ptr<$Renderer> createRenderer($Args &&...args);
+		$Renderer *createRenderer($Args &&...args);
 
 		void reserveRender(
 			RenderTarget *pRenderTarget) noexcept;
@@ -100,18 +100,18 @@ namespace Render
 	};
 
 	template <std::derived_from<Material> $Material, typename ...$Args>
-	std::shared_ptr<$Material> Engine::createMaterial($Args &&...args)
+	$Material *Engine::createMaterial($Args &&...args)
 	{
-		auto pRetVal{ std::make_shared<$Material>(std::forward<$Args>(args)...) };
+		auto const pRetVal{ new $Material{ std::forward<$Args>(args)... } };
 		pRetVal->init(__imageReferenceManager);
 
 		return pRetVal;
 	}
 
 	template <std::derived_from<Renderer> $Renderer, typename ...$Args>
-	std::shared_ptr<$Renderer> Engine::createRenderer($Args &&...args)
+	$Renderer *Engine::createRenderer($Args &&...args)
 	{
-		auto pRetVal{ std::make_shared<$Renderer>(std::forward<$Args>(args)...) };
+		auto const pRetVal{ new $Renderer{ std::forward<$Args>(args)... } };
 		pRetVal->init(
 			__physicalDevice, *__pDevice,
 			*__pPipelineCache, __deferredDeleter,

@@ -109,7 +109,7 @@ namespace Render
 	void Layer::__registerObject(
 		RenderObject const *const pObject)
 	{
-		auto const pSubLayer{ __getSubLayerOf(pObject->getRenderer().get()) };
+		auto const pSubLayer{ __getSubLayerOf(pObject->getRenderer()) };
 		pSubLayer->addRenderObject(pObject);
 
 		__object2SubLayer[pObject] = pSubLayer;

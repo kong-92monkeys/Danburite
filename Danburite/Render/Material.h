@@ -84,11 +84,11 @@ namespace Render
 
 		template <std::derived_from<Material> $M>
 		void setMaterial(
-			std::shared_ptr<$M const> pMaterial) noexcept;
+			$M const *pMaterial) noexcept;
 
 		void setMaterial(
 			std::type_index const &type,
-			std::shared_ptr<Material const> pMaterial) noexcept;
+			Material const *pMaterial) noexcept;
 
 		[[nodiscard]]
 		std::unordered_set<Material const *>::const_iterator begin() const noexcept;
@@ -105,7 +105,7 @@ namespace Render
 			getMaterialValidChangeEvent() const noexcept;
 
 	private:
-		std::unordered_map<std::type_index, std::shared_ptr<Material const>> __materialMap;
+		std::unordered_map<std::type_index, Material const *> __materialMap;
 		std::unordered_set<Material const *> __materials;
 
 		mutable Infra::Event<MaterialPack const *, std::type_index, Material const *, Material const *> __materialChangeEvent;
@@ -169,7 +169,7 @@ namespace Render
 
 	template <std::derived_from<Material> $M>
 	void MaterialPack::setMaterial(
-		std::shared_ptr<$M const> pMaterial) noexcept
+		$M const *const pMaterial) noexcept
 	{
 		setMaterial(typeid(*pMaterial), pMaterial);
 	}

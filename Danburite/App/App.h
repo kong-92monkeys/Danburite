@@ -8,9 +8,9 @@
 #endif
 
 #include "resource.h"       // main symbols
-#include "../Infra/Event.h"
 #include "../Render/Engine.h"
-#include <unordered_set>
+#include "../Frameworks/ImageMaterial.h"
+#include "../Frameworks/ImageRenderer.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -51,7 +51,10 @@ private:
 
 	std::unique_ptr<Render::Layer> __pLayer;
 	std::unique_ptr<Render::Mesh> __pMesh;
+	std::unique_ptr<Render::DrawParam> __pDrawParam;
 	std::unique_ptr<Render::Texture> __pTexture;
+	std::unique_ptr<Frx::ImageMaterial> __pMaterial;
+	std::unique_ptr<Frx::ImageRenderer> __pRenderer;
 
 	mutable Infra::Event<> __idleEvent;
 

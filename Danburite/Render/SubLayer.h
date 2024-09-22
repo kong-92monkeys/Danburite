@@ -88,6 +88,9 @@ namespace Render
 		Infra::EventListenerPtr<RenderObject const *, Mesh const *, Mesh const *>
 			__pObjectMeshChangeListener;
 
+		Infra::EventListenerPtr<RenderObject const *, DrawParam const *, DrawParam const *>
+			__pObjectDrawParamChangeListener;
+
 		Infra::EventListenerPtr<RenderObject const *, uint32_t, std::type_index, Material const *, Material const *>
 			__pObjectMaterialChangeListener;
 
@@ -140,6 +143,11 @@ namespace Render
 			RenderObject const *pObject,
 			Mesh const *pPrev,
 			Mesh const *pCur);
+
+		void __onObjectDrawParamChanged(
+			RenderObject const *pObject,
+			DrawParam const *pPrev,
+			DrawParam const *pCur);
 
 		void __onObjectMaterialChanged(
 			RenderObject const *pObject,

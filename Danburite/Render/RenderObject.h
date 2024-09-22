@@ -12,9 +12,9 @@ namespace Render
 		RenderObject();
 
 		[[nodiscard]]
-		constexpr std::shared_ptr<Renderer const> const &getRenderer() const noexcept;
+		constexpr Renderer const *getRenderer() const noexcept;
 		void setRenderer(
-			std::shared_ptr<Renderer const> const &pRenderer);
+			Renderer const *pRenderer);
 
 		[[nodiscard]]
 		constexpr Mesh const *getMesh() const noexcept;
@@ -22,8 +22,9 @@ namespace Render
 			Mesh const *pMesh);
 
 		[[nodiscard]]
-		constexpr std::shared_ptr<DrawParam const> const &getDrawParam() const noexcept;
-		void setDrawParam(std::shared_ptr<DrawParam const> const &pDrawParam);
+		constexpr DrawParam const *getDrawParam() const noexcept;
+		void setDrawParam(
+			DrawParam const *pDrawParam);
 
 		[[nodiscard]]
 		constexpr MaterialPack &getMaterialPackOf(
@@ -73,9 +74,9 @@ namespace Render
 			getDrawableChangeEvent() const noexcept;
 
 	private:
-		std::shared_ptr<Renderer const> __pRenderer;
+		Renderer const *__pRenderer{ };
 		Mesh const *__pMesh{ };
-		std::shared_ptr<DrawParam const> __pDrawParam;
+		DrawParam const *__pDrawParam{ };
 		std::vector<std::unique_ptr<MaterialPack>> __materialPacks;
 
 		bool __visible{ true };
@@ -120,7 +121,7 @@ namespace Render
 		void __onMaterialPackMaterialValidChanged();
 	};
 
-	constexpr std::shared_ptr<Renderer const> const &RenderObject::getRenderer() const noexcept
+	constexpr Renderer const *RenderObject::getRenderer() const noexcept
 	{
 		return __pRenderer;
 	}
@@ -130,7 +131,7 @@ namespace Render
 		return __pMesh;
 	}
 
-	constexpr std::shared_ptr<DrawParam const> const &RenderObject::getDrawParam() const noexcept
+	constexpr DrawParam const *RenderObject::getDrawParam() const noexcept
 	{
 		return __pDrawParam;
 	}

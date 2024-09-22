@@ -22,15 +22,15 @@ namespace Render
 	}
 
 	void RenderObject::setRenderer(
-		std::shared_ptr<Renderer const> const &pRenderer)
+		Renderer const *const pRenderer)
 	{
 		if (__pRenderer == pRenderer)
 			return;
 
-		auto const pPrevRenderer{ __pRenderer.get() };
+		auto const pPrevRenderer{ __pRenderer };
 		__pRenderer = pRenderer;
 
-		__rendererChangeEvent.invoke(this, pPrevRenderer, pRenderer.get());
+		__rendererChangeEvent.invoke(this, pPrevRenderer, pRenderer);
 		__validateDrawable();
 	}
 
@@ -48,15 +48,15 @@ namespace Render
 	}
 
 	void RenderObject::setDrawParam(
-		std::shared_ptr<DrawParam const> const &pDrawParam)
+		DrawParam const *const pDrawParam)
 	{
 		if (__pDrawParam == pDrawParam)
 			return;
 
-		auto const pPrevDrawParam{ __pDrawParam.get() };
+		auto const pPrevDrawParam{ __pDrawParam };
 		__pDrawParam = pDrawParam;
 
-		__drawParamChangeEvent.invoke(this, pPrevDrawParam, pDrawParam.get());
+		__drawParamChangeEvent.invoke(this, pPrevDrawParam, pDrawParam);
 		__validateDrawable();
 	}
 
