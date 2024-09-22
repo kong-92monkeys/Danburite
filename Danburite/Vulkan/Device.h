@@ -8,7 +8,7 @@ namespace VK
 	{
 	public:
 		Device(
-			PhysicalDevice &physicalDevice,
+			PhysicalDevice const &physicalDevice,
 			VkDeviceCreateInfo const &createInfo);
 
 		virtual ~Device() noexcept override;
@@ -355,7 +355,7 @@ namespace VK
 			VkCommandBuffer const *pCommandBuffers);
 
 	private:
-		PhysicalDevice &__physicalDevice;
+		PhysicalDevice const &__physicalDevice;
 
 		VK::DeviceProc __deviceProc;
 
@@ -363,7 +363,7 @@ namespace VK
 
 		[[nodiscard]]
 		static VkDevice __create(
-			PhysicalDevice &physicalDevice,
+			PhysicalDevice const &physicalDevice,
 			VkDeviceCreateInfo const &createInfo);
 	};
 }

@@ -33,12 +33,12 @@ namespace VK
 		VkResult vkCreateInstance(
 			VkInstanceCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
-			VkInstance *pInstance);
+			VkInstance *pInstance) const;
 
 		[[nodiscard]]
 		PFN_vkVoidFunction vkGetInstanceProcAddr(
 			VkInstance instance,
-			char const *pName);
+			char const *pName) const;
 
 	private:
 		std::string const __libName;

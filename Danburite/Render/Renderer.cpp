@@ -11,7 +11,7 @@ namespace Render
 	}
 
 	void Renderer::init(
-		VK::PhysicalDevice &physicalDevice,
+		VK::PhysicalDevice const &physicalDevice,
 		VK::Device &device,
 		VK::PipelineCache &pipelineCache,
 		Infra::DeferredDeleter &deferredDeleter,

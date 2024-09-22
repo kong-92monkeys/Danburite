@@ -51,14 +51,14 @@ namespace VK
 	VkResult VulkanLoader::vkCreateInstance(
 		VkInstanceCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
-		VkInstance *const pInstance)
+		VkInstance *const pInstance) const
 	{
 		return __globalProc.vkCreateInstance(pCreateInfo, pAllocator, pInstance);
 	}
 
 	PFN_vkVoidFunction VulkanLoader::vkGetInstanceProcAddr(
 		VkInstance const instance,
-		char const *const pName)
+		char const *const pName) const
 	{
 		return __globalProc.vkGetInstanceProcAddr(instance, pName);
 	}

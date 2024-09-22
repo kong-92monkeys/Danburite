@@ -55,6 +55,9 @@
     <Filter Include="Updatable">
       <UniqueIdentifier>{14c9106b-49cf-4166-9fcc-8ba7c36128b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Placeholder">
+      <UniqueIdentifier>{cfde27f8-9c5e-436e-aea1-088d8abd75c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -110,6 +113,9 @@
     </ClInclude>
     <ClInclude Include="Updatable.h">
       <Filter>Updatable</Filter>
+    </ClInclude>
+    <ClInclude Include="Placeholder.h">
+      <Filter>Placeholder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

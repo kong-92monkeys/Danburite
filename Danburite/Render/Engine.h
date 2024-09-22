@@ -19,7 +19,7 @@ namespace Render
 	public:
 		Engine(
 			Dev::Context &context,
-			VK::PhysicalDevice &physicalDevice,
+			VK::PhysicalDevice const &physicalDevice,
 			GlobalDescriptorManager::BindingInfo const &globalDescBindingInfo);
 
 		virtual ~Engine() noexcept override;
@@ -55,7 +55,7 @@ namespace Render
 
 	private:
 		Dev::Context &__context;
-		VK::PhysicalDevice &__physicalDevice;
+		VK::PhysicalDevice const &__physicalDevice;
 
 		Infra::DeferredDeleter __deferredDeleter{ Constants::MAX_IN_FLIGHT_FRAME_COUNT };
 		Dev::CommandExecutor __commandExecutor;

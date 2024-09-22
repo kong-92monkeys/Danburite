@@ -30,14 +30,14 @@ namespace Dev
 		virtual ~Context() noexcept override;
 
 		[[nodiscard]]
-		constexpr VK::Instance &getInstance() const noexcept;
+		constexpr VK::Instance const &getInstance() const noexcept;
 
 		[[nodiscard]]
 		constexpr size_t getPhysicalDeviceCount() const noexcept;
 
 		[[nodiscard]]
-		constexpr VK::PhysicalDevice &getPhysicalDeviceOf(
-			size_t index) noexcept;
+		constexpr VK::PhysicalDevice const &getPhysicalDeviceOf(
+			size_t index) const noexcept;
 
 	private:
 		std::unique_ptr<VK::VulkanLoader> __pLoader;
@@ -62,7 +62,7 @@ namespace Dev
 			void *pUserData) noexcept;
 	};
 
-	constexpr VK::Instance &Context::getInstance() const noexcept
+	constexpr VK::Instance const &Context::getInstance() const noexcept
 	{
 		return *__pInstance;
 	}
@@ -72,8 +72,8 @@ namespace Dev
 		return __physicalDevices.size();
 	}
 
-	constexpr VK::PhysicalDevice &Context::getPhysicalDeviceOf(
-		size_t const index) noexcept
+	constexpr VK::PhysicalDevice const &Context::getPhysicalDeviceOf(
+		size_t const index) const noexcept
 	{
 		return *(__physicalDevices[index]);
 	}

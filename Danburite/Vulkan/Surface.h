@@ -8,17 +8,17 @@ namespace VK
 	{
 	public:
 		Surface(
-			Instance &instance,
+			Instance const &instance,
 			VkWin32SurfaceCreateInfoKHR const &createInfo);
 
 		virtual ~Surface() noexcept override;
 
 	private:
-		Instance &__instance;
+		Instance const &__instance;
 
 		[[nodiscard]]
 		static VkSurfaceKHR __create(
-			Instance &instance,
+			Instance const &instance,
 			VkWin32SurfaceCreateInfoKHR const &createInfo);
 	};
 }

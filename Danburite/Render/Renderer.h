@@ -26,7 +26,7 @@ namespace Render
 		virtual ~Renderer() noexcept override;
 
 		void init(
-			VK::PhysicalDevice &physicalDevice,
+			VK::PhysicalDevice const &physicalDevice,
 			VK::Device &device,
 			VK::PipelineCache &pipelineCache,
 			Infra::DeferredDeleter &deferredDeleter,
@@ -97,7 +97,7 @@ namespace Render
 			std::string_view const &assetPath) const;
 
 		[[nodiscard]]
-		constexpr VK::PhysicalDevice &_getPhysicalDevice() const noexcept;
+		constexpr VK::PhysicalDevice const &_getPhysicalDevice() const noexcept;
 
 		[[nodiscard]]
 		constexpr VK::Device &_getDevice() const noexcept;
@@ -118,7 +118,7 @@ namespace Render
 		constexpr VK::DescriptorSetLayout const &_getSubLayerDescSetLayout() const noexcept;
 
 	private:
-		VK::PhysicalDevice *__pPhysicalDevice{ };
+		VK::PhysicalDevice const *__pPhysicalDevice{ };
 		VK::Device *__pDevice{ };
 		VK::PipelineCache *__pPipelineCache{ };
 		Infra::DeferredDeleter *__pDeferredDeleter{ };
@@ -157,7 +157,7 @@ namespace Render
 		return __destroyEvent;
 	}
 
-	constexpr VK::PhysicalDevice &Renderer::_getPhysicalDevice() const noexcept
+	constexpr VK::PhysicalDevice const &Renderer::_getPhysicalDevice() const noexcept
 	{
 		return *__pPhysicalDevice;
 	}

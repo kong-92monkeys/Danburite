@@ -33,8 +33,8 @@ namespace Render
 		};
 
 		RenderTarget(
-			VK::Instance &instance,
-			VK::PhysicalDevice &physicalDevice,
+			VK::Instance const &instance,
+			VK::PhysicalDevice const &physicalDevice,
 			VK::Device &device,
 			VK::Queue &queue,
 			Infra::DeferredDeleter &deferredDeleter,
@@ -76,8 +76,8 @@ namespace Render
 		virtual void _onValidate() override;
 
 	private:
-		VK::Instance &__instance;
-		VK::PhysicalDevice &__physicalDevice;
+		VK::Instance const &__instance;
+		VK::PhysicalDevice const &__physicalDevice;
 		VK::Device &__device;
 		VK::Queue &__que;
 		Infra::DeferredDeleter &__deferredDeleter;

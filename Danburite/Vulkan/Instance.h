@@ -9,7 +9,7 @@ namespace VK
 	{
 	public:
 		explicit Instance(
-			VulkanLoader &loader,
+			VulkanLoader const &loader,
 			VkInstanceCreateInfo const &createInfo);
 
 		virtual ~Instance() noexcept override;
@@ -17,11 +17,11 @@ namespace VK
 		VkResult vkCreateDebugUtilsMessengerEXT(
 			VkDebugUtilsMessengerCreateInfoEXT const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
-			VkDebugUtilsMessengerEXT *pMessenger);
+			VkDebugUtilsMessengerEXT *pMessenger) const;
 
 		void vkDestroyDebugUtilsMessengerEXT(
 			VkDebugUtilsMessengerEXT messenger,
-			VkAllocationCallbacks const *pAllocator);
+			VkAllocationCallbacks const *pAllocator) const;
 
 		VkResult vkEnumeratePhysicalDevices(
 			uint32_t *pPhysicalDeviceCount,
@@ -63,48 +63,48 @@ namespace VK
 		VkResult vkCreateWin32SurfaceKHR(
 			VkWin32SurfaceCreateInfoKHR const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
-			VkSurfaceKHR *pSurface);
+			VkSurfaceKHR *pSurface) const;
 
 		void vkDestroySurfaceKHR(
 			VkSurfaceKHR surface,
-			VkAllocationCallbacks const *pAllocator);
+			VkAllocationCallbacks const *pAllocator) const;
 
 		VkResult vkGetPhysicalDeviceSurfaceSupportKHR(
 			VkPhysicalDevice physicalDevice,
 			uint32_t queueFamilyIndex,
 			VkSurfaceKHR surface,
-			VkBool32 *pSupported);
+			VkBool32 *pSupported) const;
 
 		VkResult vkGetPhysicalDeviceSurfacePresentModesKHR(
 			VkPhysicalDevice physicalDevice,
 			VkSurfaceKHR surface,
 			uint32_t *pPresentModeCount,
-			VkPresentModeKHR *pPresentModes);
+			VkPresentModeKHR *pPresentModes) const;
 
 		VkResult vkGetPhysicalDeviceSurfaceCapabilities2KHR(
 			VkPhysicalDevice physicalDevice,
 			VkPhysicalDeviceSurfaceInfo2KHR const *pSurfaceInfo,
-			VkSurfaceCapabilities2KHR *pSurfaceCapabilities);
+			VkSurfaceCapabilities2KHR *pSurfaceCapabilities) const;
 
 		VkResult vkGetPhysicalDeviceSurfaceFormats2KHR(
 			VkPhysicalDevice physicalDevice,
 			VkPhysicalDeviceSurfaceInfo2KHR const *pSurfaceInfo,
 			uint32_t *pSurfaceFormatCount,
-			VkSurfaceFormat2KHR *pSurfaceFormats);
+			VkSurfaceFormat2KHR *pSurfaceFormats) const;
 
 		VkResult vkCreateDevice(
 			VkPhysicalDevice physicalDevice,
 			VkDeviceCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
-			VkDevice *pDevice);
+			VkDevice *pDevice) const;
 
 		[[nodiscard]]
 		PFN_vkVoidFunction vkGetDeviceProcAddr(
 			VkDevice device,
-			char const *pName);
+			char const *pName) const;
 
 	private:
-		VulkanLoader &__loader;
+		VulkanLoader const &__loader;
 
 		VK::InstanceProc __instanceProc;
 
@@ -112,7 +112,7 @@ namespace VK
 
 		[[nodiscard]]
 		static VkInstance __create(
-			VulkanLoader &loader,
+			VulkanLoader const &loader,
 			VkInstanceCreateInfo const &createInfo);
 	};
 }

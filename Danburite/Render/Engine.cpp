@@ -8,7 +8,7 @@ namespace Render
 {
 	Engine::Engine(
 		Dev::Context &context,
-		VK::PhysicalDevice &physicalDevice,
+		VK::PhysicalDevice const &physicalDevice,
 		GlobalDescriptorManager::BindingInfo const &globalDescBindingInfo) :
 		__context			{ context },
 		__physicalDevice	{ physicalDevice }

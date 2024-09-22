@@ -6,8 +6,8 @@
 namespace Render
 {
 	RenderTarget::RenderTarget(
-		VK::Instance &instance,
-		VK::PhysicalDevice &physicalDevice,
+		VK::Instance const &instance,
+		VK::PhysicalDevice const &physicalDevice,
 		VK::Device &device,
 		VK::Queue &queue,
 		Infra::DeferredDeleter &deferredDeleter,

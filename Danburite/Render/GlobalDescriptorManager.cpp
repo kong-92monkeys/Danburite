@@ -4,7 +4,7 @@
 namespace Render
 {
 	GlobalDescriptorManager::GlobalDescriptorManager(
-		VK::PhysicalDevice &physicalDevice,
+		VK::PhysicalDevice const &physicalDevice,
 		VK::Device &device,
 		Infra::DeferredDeleter &deferredDeleter,
 		ImageReferenceManager &imageReferenceManager,

@@ -25,6 +25,15 @@
     <Filter Include="Renderers\ImageRenderer">
       <UniqueIdentifier>{ef72d0a5-3437-4774-ada5-f2867f20c1de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{d3c51bef-1446-42d2-9e96-751c1a04e803}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RenderSystem">
+      <UniqueIdentifier>{a2d285a4-311b-465f-aff5-5cd82bffd764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Display">
+      <UniqueIdentifier>{e7c7bc6d-df17-4693-9455-2fb96f41973d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
@@ -48,6 +57,15 @@
     <ClInclude Include="ImageRenderer.h">
       <Filter>Renderers\ImageRenderer</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderSystem.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Display.h">
+      <Filter>Display</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestRenderer.cpp">
@@ -64,6 +82,15 @@
     </ClCompile>
     <ClCompile Include="ImageRenderer.cpp">
       <Filter>Renderers\ImageRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSystem.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Display.cpp">
+      <Filter>Display</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

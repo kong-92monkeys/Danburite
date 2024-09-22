@@ -26,24 +26,16 @@ namespace VK
 		return foundIt->second;
 	}
 
-	VkFormatProperties3 const &PhysicalDevice::getFormatPropsOf(
-		VkFormat const format) noexcept
+	VkFormatProperties PhysicalDevice::getFormatPropsOf(
+		VkFormat const format) const
 	{
-		auto const foundIt{ __formatPropsMap.find(format) };
-		if (foundIt != __formatPropsMap.end())
-			return foundIt->second;
-
-		auto &retVal{ __formatPropsMap[format] };
-		retVal.sType = VkStructureType::VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_3;
-
 		VkFormatProperties2 props2
 		{
 			.sType{ VkStructureType::VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2 },
-			.pNext{ &retVal }
 		};
 
 		__instance.vkGetPhysicalDeviceFormatProperties2(getHandle(), format, &props2);
-		return retVal;
+		return props2.formatProperties;
 	}
 
 	VkBool32 PhysicalDevice::vkGetPhysicalDeviceWin32PresentationSupportKHR(
@@ -56,7 +48,7 @@ namespace VK
 	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfaceSupportKHR(
 		uint32_t const queueFamilyIndex,
 		VkSurfaceKHR const surface,
-		VkBool32 *const pSupported)
+		VkBool32 *const pSupported) const
 	{
 		return __instance.vkGetPhysicalDeviceSurfaceSupportKHR(
 			getHandle(), queueFamilyIndex, surface, pSupported);
@@ -65,7 +57,7 @@ namespace VK
 	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfacePresentModesKHR(
 		VkSurfaceKHR const surface,
 		uint32_t *const pPresentModeCount,
-		VkPresentModeKHR *const pPresentModes)
+		VkPresentModeKHR *const pPresentModes) const
 	{
 		return __instance.vkGetPhysicalDeviceSurfacePresentModesKHR(
 			getHandle(), surface, pPresentModeCount, pPresentModes);
@@ -73,7 +65,7 @@ namespace VK
 
 	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfaceCapabilities2KHR(
 		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
-		VkSurfaceCapabilities2KHR *const pSurfaceCapabilities)
+		VkSurfaceCapabilities2KHR *const pSurfaceCapabilities) const
 	{
 		return __instance.vkGetPhysicalDeviceSurfaceCapabilities2KHR(
 			getHandle(), pSurfaceInfo, pSurfaceCapabilities);
@@ -82,7 +74,7 @@ namespace VK
 	VkResult PhysicalDevice::vkGetPhysicalDeviceSurfaceFormats2KHR(
 		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
 		uint32_t *const pSurfaceFormatCount,
-		VkSurfaceFormat2KHR *const pSurfaceFormats)
+		VkSurfaceFormat2KHR *const pSurfaceFormats) const
 	{
 		return __instance.vkGetPhysicalDeviceSurfaceFormats2KHR(
 			getHandle(), pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
@@ -91,7 +83,7 @@ namespace VK
 	VkResult PhysicalDevice::vkCreateDevice(
 		VkDeviceCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
-		VkDevice *const pDevice)
+		VkDevice *const pDevice) const
 	{
 		return __instance.vkCreateDevice(
 			getHandle(), pCreateInfo, pAllocator, pDevice);
@@ -99,7 +91,7 @@ namespace VK
 
 	PFN_vkVoidFunction PhysicalDevice::vkGetDeviceProcAddr(
 		VkDevice const device,
-		char const *const pName)
+		char const *const pName) const
 	{
 		return __instance.vkGetDeviceProcAddr(device, pName);
 	}

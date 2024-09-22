@@ -22,7 +22,7 @@ namespace Render
 		};
 
 		GlobalDescriptorManager(
-			VK::PhysicalDevice &physicalDevice,
+			VK::PhysicalDevice const &physicalDevice,
 			VK::Device &device,
 			Infra::DeferredDeleter &deferredDeleter,
 			ImageReferenceManager &imageReferenceManager,
@@ -58,7 +58,7 @@ namespace Render
 		virtual void _onValidate() override;
 
 	private:
-		VK::PhysicalDevice &__physicalDevice;
+		VK::PhysicalDevice const &__physicalDevice;
 		VK::Device &__device;
 		Infra::DeferredDeleter &__deferredDeleter;
 		ImageReferenceManager &__imageReferenceManager;

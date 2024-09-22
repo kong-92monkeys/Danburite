@@ -45,8 +45,8 @@ namespace VK
 			std::string_view const &name) const noexcept;
 
 		[[nodiscard]]
-		VkFormatProperties3 const &getFormatPropsOf(
-			VkFormat format) noexcept;
+		VkFormatProperties getFormatPropsOf(
+			VkFormat format) const;
 
 		[[nodiscard]]
 		VkBool32 vkGetPhysicalDeviceWin32PresentationSupportKHR(
@@ -55,31 +55,31 @@ namespace VK
 		VkResult vkGetPhysicalDeviceSurfaceSupportKHR(
 			uint32_t queueFamilyIndex,
 			VkSurfaceKHR surface,
-			VkBool32 *pSupported);
+			VkBool32 *pSupported) const;
 
 		VkResult vkGetPhysicalDeviceSurfacePresentModesKHR(
 			VkSurfaceKHR surface,
 			uint32_t *pPresentModeCount,
-			VkPresentModeKHR *pPresentModes);
+			VkPresentModeKHR *pPresentModes) const;
 
 		VkResult vkGetPhysicalDeviceSurfaceCapabilities2KHR(
 			VkPhysicalDeviceSurfaceInfo2KHR const *pSurfaceInfo,
-			VkSurfaceCapabilities2KHR *pSurfaceCapabilities);
+			VkSurfaceCapabilities2KHR *pSurfaceCapabilities) const;
 
 		VkResult vkGetPhysicalDeviceSurfaceFormats2KHR(
 			VkPhysicalDeviceSurfaceInfo2KHR const *pSurfaceInfo,
 			uint32_t *pSurfaceFormatCount,
-			VkSurfaceFormat2KHR *pSurfaceFormats);
+			VkSurfaceFormat2KHR *pSurfaceFormats) const;
 
 		VkResult vkCreateDevice(
 			VkDeviceCreateInfo const *pCreateInfo,
 			VkAllocationCallbacks const *pAllocator,
-			VkDevice *pDevice);
+			VkDevice *pDevice) const;
 
 		[[nodiscard]]
 		PFN_vkVoidFunction vkGetDeviceProcAddr(
 			VkDevice device,
-			char const *pName);
+			char const *pName) const;
 
 		[[nodiscard]]
 		constexpr Props const &getProps() const noexcept;
@@ -116,7 +116,6 @@ namespace VK
 		std::unordered_map<std::string_view, VkExtensionProperties const *> __extensionMap;
 
 		VkPhysicalDeviceMemoryProperties2 __memoryProps{ };
-		std::unordered_map<VkFormat, VkFormatProperties3> __formatPropsMap;
 
 		std::vector<VkQueueFamilyProperties2> __queueFamilyProps;
 		std::vector<VkQueueFamilyGlobalPriorityPropertiesKHR> __queueFamilyGlobalPriorityProps;

@@ -4,7 +4,7 @@
 namespace VK
 {
 	Surface::Surface(
-		Instance &instance,
+		Instance const &instance,
 		VkWin32SurfaceCreateInfoKHR const &createInfo) :
 		Handle		{ __create(instance, createInfo) },
 		__instance	{ instance }
@@ -16,7 +16,7 @@ namespace VK
 	}
 
 	VkSurfaceKHR Surface::__create(
-		Instance &instance,
+		Instance const &instance,
 		VkWin32SurfaceCreateInfoKHR const &createInfo)
 	{
 		VkSurfaceKHR retVal{ };

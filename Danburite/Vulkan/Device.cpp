@@ -8,7 +8,7 @@
 namespace VK
 {
 	Device::Device(
-		PhysicalDevice &physicalDevice,
+		PhysicalDevice const &physicalDevice,
 		VkDeviceCreateInfo const &createInfo) :
 		Handle				{ __create(physicalDevice, createInfo) },
 		__physicalDevice	{ physicalDevice }
@@ -773,7 +773,7 @@ namespace VK
 	}
 
 	VkDevice Device::__create(
-		PhysicalDevice &physicalDevice,
+		PhysicalDevice const &physicalDevice,
 		VkDeviceCreateInfo const &createInfo)
 	{
 		VkDevice retVal{ };

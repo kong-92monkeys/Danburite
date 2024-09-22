@@ -8,7 +8,7 @@
 namespace VK
 {
 	Instance::Instance(
-		VulkanLoader &loader,
+		VulkanLoader const &loader,
 		VkInstanceCreateInfo const &createInfo) :
 		Handle{ __create(loader, createInfo) },
 		__loader{ loader }
@@ -24,7 +24,7 @@ namespace VK
 	VkResult Instance::vkCreateDebugUtilsMessengerEXT(
 		VkDebugUtilsMessengerCreateInfoEXT const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
-		VkDebugUtilsMessengerEXT *const pMessenger)
+		VkDebugUtilsMessengerEXT *const pMessenger) const
 	{
 		return __instanceProc.vkCreateDebugUtilsMessengerEXT(
 			getHandle(), pCreateInfo, pAllocator, pMessenger);
@@ -32,7 +32,7 @@ namespace VK
 
 	void Instance::vkDestroyDebugUtilsMessengerEXT(
 		VkDebugUtilsMessengerEXT const messenger,
-		VkAllocationCallbacks const *const pAllocator)
+		VkAllocationCallbacks const *const pAllocator) const
 	{
 		__instanceProc.vkDestroyDebugUtilsMessengerEXT(
 			getHandle(), messenger, pAllocator);
@@ -109,7 +109,7 @@ namespace VK
 	VkResult Instance::vkCreateWin32SurfaceKHR(
 		VkWin32SurfaceCreateInfoKHR const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
-		VkSurfaceKHR *const pSurface)
+		VkSurfaceKHR *const pSurface) const
 	{
 		return __instanceProc.vkCreateWin32SurfaceKHR(
 			getHandle(), pCreateInfo, pAllocator, pSurface);
@@ -117,7 +117,7 @@ namespace VK
 
 	void Instance::vkDestroySurfaceKHR(
 		VkSurfaceKHR const surface,
-		VkAllocationCallbacks const *const pAllocator)
+		VkAllocationCallbacks const *const pAllocator) const
 	{
 		__instanceProc.vkDestroySurfaceKHR(
 			getHandle(), surface, pAllocator);
@@ -127,7 +127,7 @@ namespace VK
 		VkPhysicalDevice const physicalDevice,
 		uint32_t const queueFamilyIndex,
 		VkSurfaceKHR const surface,
-		VkBool32 *const pSupported)
+		VkBool32 *const pSupported) const
 	{
 		return __instanceProc.vkGetPhysicalDeviceSurfaceSupportKHR(
 			physicalDevice, queueFamilyIndex, surface, pSupported);
@@ -137,7 +137,7 @@ namespace VK
 		VkPhysicalDevice const physicalDevice,
 		VkSurfaceKHR const surface,
 		uint32_t *const pPresentModeCount,
-		VkPresentModeKHR *const pPresentModes)
+		VkPresentModeKHR *const pPresentModes) const
 	{
 		return __instanceProc.vkGetPhysicalDeviceSurfacePresentModesKHR(
 			physicalDevice, surface, pPresentModeCount, pPresentModes);
@@ -146,7 +146,7 @@ namespace VK
 	VkResult Instance::vkGetPhysicalDeviceSurfaceCapabilities2KHR(
 		VkPhysicalDevice const physicalDevice,
 		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
-		VkSurfaceCapabilities2KHR *const pSurfaceCapabilities)
+		VkSurfaceCapabilities2KHR *const pSurfaceCapabilities) const
 	{
 		return __instanceProc.vkGetPhysicalDeviceSurfaceCapabilities2KHR(
 			physicalDevice, pSurfaceInfo, pSurfaceCapabilities);
@@ -156,7 +156,7 @@ namespace VK
 		VkPhysicalDevice const physicalDevice,
 		VkPhysicalDeviceSurfaceInfo2KHR const *const pSurfaceInfo,
 		uint32_t *const pSurfaceFormatCount,
-		VkSurfaceFormat2KHR *const pSurfaceFormats)
+		VkSurfaceFormat2KHR *const pSurfaceFormats) const
 	{
 		return __instanceProc.vkGetPhysicalDeviceSurfaceFormats2KHR(
 			physicalDevice, pSurfaceInfo, pSurfaceFormatCount, pSurfaceFormats);
@@ -166,7 +166,7 @@ namespace VK
 		VkPhysicalDevice const physicalDevice,
 		VkDeviceCreateInfo const *const pCreateInfo,
 		VkAllocationCallbacks const *const pAllocator,
-		VkDevice *const pDevice)
+		VkDevice *const pDevice) const
 	{
 		return __instanceProc.vkCreateDevice(
 			physicalDevice, pCreateInfo, pAllocator, pDevice);
@@ -174,7 +174,7 @@ namespace VK
 
 	PFN_vkVoidFunction Instance::vkGetDeviceProcAddr(
 		VkDevice const device,
-		char const *const pName)
+		char const *const pName) const
 	{
 		return __instanceProc.vkGetDeviceProcAddr(
 			device, pName);
@@ -214,7 +214,7 @@ namespace VK
 	}
 
 	VkInstance Instance::__create(
-		VulkanLoader &loader,
+		VulkanLoader const &loader,
 		VkInstanceCreateInfo const &createInfo)
 	{
 		VkInstance retVal{ };
