@@ -12,6 +12,9 @@ namespace Render
 	class Material : public Infra::Updatable<Material>
 	{
 	public:
+		Material(
+			bool initialValidState) noexcept;
+
 		void init(
 			ImageReferenceManager &imageReferenceManager);
 
@@ -36,7 +39,7 @@ namespace Render
 
 	private:
 		ImageReferenceManager *__pImageReferenceManager{ };
-		bool __isValid{ true };
+		bool __isValid;
 
 		mutable Infra::Event<Material const *, bool, bool> __validChangeEvent;
 	};
@@ -45,6 +48,9 @@ namespace Render
 	class TypedMaterial : public Material
 	{
 	public:
+		TypedMaterial(
+			bool initialValidState = true) noexcept;
+
 		[[nodiscard]]
 		virtual const std::byte *getData() const noexcept override final;
 
@@ -65,7 +71,7 @@ namespace Render
 	class MaterialPack : public Infra::Unique
 	{
 	public:
-		MaterialPack() = default;
+		MaterialPack();
 		virtual ~MaterialPack() noexcept override = default;
 
 		template <std::derived_from<Material> $M>
@@ -94,11 +100,20 @@ namespace Render
 		constexpr Infra::EventView<MaterialPack const *, std::type_index, Material const *, Material const *> &
 			getMaterialChangeEvent() const noexcept;
 
+		[[nodiscard]]
+		constexpr Infra::EventView<MaterialPack const *> &
+			getMaterialValidChangeEvent() const noexcept;
+
 	private:
 		std::unordered_map<std::type_index, std::shared_ptr<Material const>> __materialMap;
 		std::unordered_set<Material const *> __materials;
 
 		mutable Infra::Event<MaterialPack const *, std::type_index, Material const *, Material const *> __materialChangeEvent;
+		mutable Infra::Event<MaterialPack const *> __materialValidChangeEvent;
+
+		Infra::EventListenerPtr<Material const *, bool, bool> __pMaterialValidChangeListener;
+
+		void __onMaterialValidChanged();
 	};
 
 	constexpr bool Material::isValid() const noexcept
@@ -115,6 +130,12 @@ namespace Render
 	{
 		return *__pImageReferenceManager;
 	}
+
+	template <typename $Data>
+	TypedMaterial<$Data>::TypedMaterial(
+		bool const initialValidState) noexcept :
+		Material{ initialValidState }
+	{}
 
 	template <typename $Data>
 	std::byte const *TypedMaterial<$Data>::getData() const noexcept
@@ -157,5 +178,11 @@ namespace Render
 		MaterialPack::getMaterialChangeEvent() const noexcept
 	{
 		return __materialChangeEvent;
+	}
+
+	constexpr Infra::EventView<MaterialPack const *> &
+		MaterialPack::getMaterialValidChangeEvent() const noexcept
+	{
+		return __materialValidChangeEvent;
 	}
 }

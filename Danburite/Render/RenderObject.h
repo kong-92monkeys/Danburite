@@ -104,6 +104,9 @@ namespace Render
 		Infra::EventListenerPtr<MaterialPack const *, std::type_index, Material const *, Material const *>
 			__pMaterialPackMaterialChangeListener;
 
+		Infra::EventListenerPtr<MaterialPack const *>
+			__pMaterialPackMaterialValidChangeListener;
+
 		[[nodiscard]]
 		bool __resolveDrawable() const noexcept;
 		void __validateDrawable();
@@ -113,6 +116,8 @@ namespace Render
 			std::type_index const &type,
 			Material const *pPrev,
 			Material const *pCur);
+
+		void __onMaterialPackMaterialValidChanged();
 	};
 
 	constexpr std::shared_ptr<Renderer const> const &RenderObject::getRenderer() const noexcept

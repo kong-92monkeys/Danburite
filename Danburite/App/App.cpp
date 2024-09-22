@@ -199,8 +199,9 @@ void CApp::__setupRenderTarget(
 	};
 
 	auto pMaterial{ __pRenderEngine->createMaterial<Frx::ImageMaterial>() };
-	pMaterial->setTexture(__pTexture.get());
 	pRenderObject->getMaterialPackOf(0U).setMaterial<Frx::ImageMaterial>(pMaterial);
+
+	pMaterial->setTexture(__pTexture.get());
 }
 
 // CAboutDlg dialog used for App About

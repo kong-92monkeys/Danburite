@@ -2,6 +2,11 @@
 
 namespace Render
 {
+	Material::Material(
+		bool const initialValidState) noexcept :
+		__isValid{ initialValidState }
+	{}
+
 	void Material::init(
 		ImageReferenceManager &imageReferenceManager)
 	{
@@ -16,6 +21,13 @@ namespace Render
 
 		__isValid = valid;
 		__validChangeEvent.invoke(this, !valid, valid);
+	}
+
+	MaterialPack::MaterialPack()
+	{
+		__pMaterialValidChangeListener =
+			Infra::EventListener<Material const *, bool, bool>::bind(
+				&MaterialPack::__onMaterialValidChanged, this);
 	}
 
 	bool MaterialPack::hasValidMaterialOf(
@@ -42,11 +54,17 @@ namespace Render
 
 		auto pPrevMaterial{ std::move(holder) };
 		if (pPrevMaterial)
+		{
+			pPrevMaterial->getValidChangeEvent() -= __pMaterialValidChangeListener;
 			__materials.erase(pPrevMaterial.get());
+		}
 
 		holder = std::move(pMaterial);
 		if (holder)
+		{
+			holder->getValidChangeEvent() += __pMaterialValidChangeListener;
 			__materials.emplace(holder.get());
+		}
 
 		__materialChangeEvent.invoke(this, type, pPrevMaterial.get(), holder.get());
 	}
@@ -59,5 +77,10 @@ namespace Render
 	std::unordered_set<const Material *>::const_iterator MaterialPack::end() const noexcept
 	{
 		return __materials.end();
+	}
+
+	void MaterialPack::__onMaterialValidChanged()
+	{
+		__materialValidChangeEvent.invoke(this);
 	}
 }

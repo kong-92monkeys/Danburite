@@ -14,6 +14,8 @@ namespace Frx
 	class ImageMaterial : public Render::TypedMaterial<ImageMaterialData>
 	{
 	public:
+		ImageMaterial() noexcept;
+
 		void setTexture(
 			Render::Texture const *pTexture) noexcept;
 

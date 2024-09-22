@@ -49,10 +49,10 @@ namespace Render
 		void __unregisterMaterial(
 			Material const *pMaterial);
 
-		void __validateMaterialHostBuffer(
+		void __updateHostBuffer(
 			Material const *const pMaterial) noexcept;
 
-		void __validateMaterialBuffer();
+		void __validateBuffer();
 
 		void __onMaterialUpdated(
 			Material const *pMaterial) noexcept;

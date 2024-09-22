@@ -9,8 +9,13 @@ namespace Render
 				&RenderObject::__onMaterialPackMaterialChanged, this,
 				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 
+		__pMaterialPackMaterialValidChangeListener =
+			Infra::EventListener<MaterialPack const *>::bind(
+				&RenderObject::__onMaterialPackMaterialValidChanged, this);
+
 		auto pMaterialPack{ std::make_unique<MaterialPack>() };
 		pMaterialPack->getMaterialChangeEvent() += __pMaterialPackMaterialChangeListener;
+		pMaterialPack->getMaterialValidChangeEvent() += __pMaterialPackMaterialValidChangeListener;
 
 		__materialPack2Index[pMaterialPack.get()] = 0U;
 		__materialPacks.emplace_back(std::move(pMaterialPack));
@@ -143,6 +148,11 @@ namespace Render
 	{
 		uint32_t const instanceIndex{ __materialPack2Index.at(pPack) };
 		__materialChangeEvent.invoke(this, instanceIndex, type, pPrev, pCur);
+		__validateDrawable();
+	}
+
+	void RenderObject::__onMaterialPackMaterialValidChanged()
+	{
 		__validateDrawable();
 	}
 }

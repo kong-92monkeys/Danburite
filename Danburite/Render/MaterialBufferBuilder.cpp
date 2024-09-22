@@ -59,14 +59,14 @@ namespace Render
 
 	void MaterialBufferBuilder::_onValidate()
 	{
-		__validateMaterialBuffer();
+		__validateBuffer();
 	}
 
 	void MaterialBufferBuilder::__registerMaterial(
 		Material const *const pMaterial)
 	{
 		pMaterial->getUpdateEvent() += __pMaterialUpdateListener;
-		__validateMaterialHostBuffer(pMaterial);
+		__updateHostBuffer(pMaterial);
 		_invalidate();
 	}
 
@@ -77,7 +77,7 @@ namespace Render
 		__refIdMap.erase(pMaterial);
 	}
 
-	void MaterialBufferBuilder::__validateMaterialHostBuffer(
+	void MaterialBufferBuilder::__updateHostBuffer(
 		Material const *const pMaterial) noexcept
 	{
 		uint32_t const materialId	{ __refIdMap.at(pMaterial).second };
@@ -90,7 +90,7 @@ namespace Render
 		__hostBuffer.set(memOffset, pMaterial->getData(), materialSize);
 	}
 
-	void MaterialBufferBuilder::__validateMaterialBuffer()
+	void MaterialBufferBuilder::__validateBuffer()
 	{
 		if (__pBuffer)
 		{
@@ -111,7 +111,7 @@ namespace Render
 	void MaterialBufferBuilder::__onMaterialUpdated(
 		Material const *pMaterial) noexcept
 	{
-		__validateMaterialHostBuffer(pMaterial);
+		__updateHostBuffer(pMaterial);
 		_invalidate();
 	}
 }

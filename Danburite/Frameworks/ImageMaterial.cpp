@@ -2,6 +2,10 @@
 
 namespace Frx
 {
+	ImageMaterial::ImageMaterial() noexcept :
+		TypedMaterial{ false }
+	{}
+
 	void ImageMaterial::setTexture(
 		Render::Texture const *const pTexture) noexcept
 	{
@@ -21,9 +25,10 @@ namespace Frx
 			auto &imageView{ __pTexture->getImageView() };
 			imageRefManager.addImage(&imageView);
 			_getTypedData().imageId = imageRefManager.getIdOf(&imageView);
+
+			_invokeUpdateEvent();
 		}
 		
 		_setValid(__pTexture);
-		_invokeUpdateEvent();
 	}
 }
