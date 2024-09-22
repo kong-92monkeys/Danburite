@@ -12,7 +12,7 @@
 
 namespace Render
 {
-	class GlobalDescriptorManager : public Infra::Unique, public Infra::Stateful<GlobalDescriptorManager>
+	class GlobalDescriptorManager : public Infra::Stateful<GlobalDescriptorManager>
 	{
 	public:
 		struct BindingInfo

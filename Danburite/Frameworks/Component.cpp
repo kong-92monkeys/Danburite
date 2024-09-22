@@ -3,11 +3,11 @@
 namespace Frx
 {
 	void Component::init(
-		Infra::ThreadPool &rcmdExecutor,
-		Infra::Placeholder<std::shared_ptr<Render::RenderObject>> const &renderObject)
+		Executor &rcmdExecutor,
+		Infra::PointerHolder<Render::RenderObject> const &pRenderObject)
 	{
 		__pRcmdExecutor = &rcmdExecutor;
-		__pRenderObject = &renderObject;
+		__pRenderObject = pRenderObject;
 
 		_onInit();
 	}

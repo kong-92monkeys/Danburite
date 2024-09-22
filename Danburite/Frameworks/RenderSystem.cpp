@@ -16,10 +16,7 @@ namespace Frx
 
 	RenderSystem::~RenderSystem() noexcept
 	{
-		__rcmdExecutor.run([this]
-		{
-			__engine.reset();
-		}).wait();
+		__rcmdExecutor.destroy(std::move(__pEngine)).wait();
 	}
 
 	void RenderSystem::__createEngine(
@@ -30,6 +27,6 @@ namespace Frx
 		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]	= 0U;
 		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]	= 1U;
 
-		__engine.instantiate(context, physicalDevice, globalDescBindingInfo);
+		__pEngine.create(context, physicalDevice, globalDescBindingInfo);
 	}
 }

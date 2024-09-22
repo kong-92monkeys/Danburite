@@ -3,23 +3,20 @@
 namespace Frx
 {
 	Display::Display(
-		Infra::ThreadPool &rcmdExecutor,
-		Infra::Placeholder<Render::Engine> const &engine,
+		Executor &rcmdExecutor,
+		Infra::ObjectHolder<Render::Engine> const &pEngine,
 		HINSTANCE const hinstance,
 		HWND const hwnd) :
 		__rcmdExecutor	{ rcmdExecutor }
 	{
-		__rcmdExecutor.run([this, &engine, hinstance, hwnd]
+		__rcmdExecutor.run([this, &pEngine, hinstance, hwnd]
 		{
-			__renderTarget.instantiate(engine->createRenderTarget(hinstance, hwnd));
+			__pRenderTarget.emplace(pEngine->createRenderTarget(hinstance, hwnd));
 		}).wait();
 	}
 
 	Display::~Display() noexcept
 	{
-		__rcmdExecutor.run([this]
-		{
-			__renderTarget.reset();
-		}).wait();
+		__rcmdExecutor.destroy(std::move(__pRenderTarget)).wait();
 	}
 }

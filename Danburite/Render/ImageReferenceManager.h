@@ -6,7 +6,7 @@
 
 namespace Render
 {
-	class ImageReferenceManager : public Infra::Unique, public Infra::Updatable<ImageReferenceManager>
+	class ImageReferenceManager : public Infra::Updatable<ImageReferenceManager>
 	{
 	public:
 		void addImage(

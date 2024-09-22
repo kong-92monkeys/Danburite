@@ -5,7 +5,7 @@
 namespace Infra
 {
 	template <typename $T>
-	class Updatable
+	class Updatable : public Unique
 	{
 	public:
 		[[nodiscard]]

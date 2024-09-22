@@ -4,7 +4,7 @@
 
 namespace Render
 {
-	class Layer : public Infra::Unique, public Infra::Stateful<Layer>
+	class Layer : public Infra::Stateful<Layer>
 	{
 	public:
 		Layer(

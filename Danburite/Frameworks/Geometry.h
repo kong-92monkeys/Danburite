@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/Placeholder.h"
+#include "Executor.h"
 #include "../Render/Engine.h"
 
 namespace Frx
@@ -9,13 +9,41 @@ namespace Frx
 	{
 	public:
 		Geometry(
-			Infra::ThreadPool &rcmdExecutor,
-			Infra::Placeholder<Render::Engine> const &engine);
+			Executor &rcmdExecutor,
+			Infra::ObjectHolder<Render::Engine> const &pEngine);
 
 		virtual ~Geometry() noexcept override;
 
+		void createVertexBuffer(
+			uint32_t bindingIndex,
+			void const *pData,
+			size_t size);
+
+		void updateVertexBuffer(
+			uint32_t bindingIndex,
+			void const *pData,
+			size_t size,
+			size_t offset);
+
+		void clearVertexBuffer(
+			uint32_t bindingIndex);
+
+		void clearVertexBuffers();
+
+		void createIndexBuffer(
+			VkIndexType type,
+			void const *pData,
+			size_t size);
+
+		void updateIndexBuffer(
+			void const *pData,
+			size_t size,
+			size_t offset);
+
+		void clearIndexBuffer();
+
 	private:
-		Infra::ThreadPool &__rcmdExecutor;
-		Infra::Placeholder<std::shared_ptr<Render::RenderTarget>> __renderTarget;
+		Executor &__rcmdExecutor;
+		Infra::PointerHolder<Render::Mesh> __pMesh;
 	};
 }

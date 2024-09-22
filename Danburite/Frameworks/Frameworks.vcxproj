@@ -21,8 +21,10 @@
   <ItemGroup>
     <ClInclude Include="Component.h" />
     <ClInclude Include="Display.h" />
+    <ClInclude Include="Executor.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="ImageMaterial.h" />
+    <ClInclude Include="Managed.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneObject.h" />
@@ -36,6 +38,8 @@
   <ItemGroup>
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="Executor.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="ImageMaterial.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scene.cpp" />

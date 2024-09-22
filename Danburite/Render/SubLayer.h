@@ -11,7 +11,7 @@
 
 namespace Render
 {
-	class SubLayer : public Infra::Unique, public Infra::Stateful<SubLayer>
+	class SubLayer : public Infra::Stateful<SubLayer>
 	{
 	public:
 		SubLayer(

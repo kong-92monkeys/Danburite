@@ -5,7 +5,7 @@
 namespace Infra
 {
 	template <typename $T>
-	class Stateful
+	class Stateful : public Unique
 	{
 	public:
 		void validate();

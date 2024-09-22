@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/Placeholder.h"
+#include "Executor.h"
 #include "../Render/Engine.h"
 
 namespace Frx
@@ -9,15 +9,15 @@ namespace Frx
 	{
 	public:
 		Display(
-			Infra::ThreadPool &rcmdExecutor,
-			Infra::Placeholder<Render::Engine> const &engine,
+			Executor &rcmdExecutor,
+			Infra::ObjectHolder<Render::Engine> const &pEngine,
 			HINSTANCE hinstance,
 			HWND hwnd);
 
 		virtual ~Display() noexcept override;
 
 	private:
-		Infra::ThreadPool &__rcmdExecutor;
-		Infra::Placeholder<std::unique_ptr<Render::RenderTarget>> __renderTarget;
+		Executor &__rcmdExecutor;
+		Infra::PointerHolder<Render::RenderTarget> __pRenderTarget;
 	};
 }

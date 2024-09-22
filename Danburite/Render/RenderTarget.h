@@ -19,7 +19,7 @@
 
 namespace Render
 {
-	class RenderTarget : public Infra::Unique, public Infra::Stateful<RenderTarget>
+	class RenderTarget : public Infra::Stateful<RenderTarget>
 	{
 	public:
 		struct DrawResult

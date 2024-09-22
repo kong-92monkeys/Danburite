@@ -46,6 +46,12 @@
     <Filter Include="Geometry">
       <UniqueIdentifier>{20af5da8-0d9e-49f0-8101-1fed0c3af2d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Managed">
+      <UniqueIdentifier>{21b5ba1c-1194-4b90-ac0d-50c6b69c2762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Executor">
+      <UniqueIdentifier>{73918271-c1c9-40b8-ba4e-99e157976daf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
@@ -87,6 +93,12 @@
     <ClInclude Include="Geometry.h">
       <Filter>Geometry</Filter>
     </ClInclude>
+    <ClInclude Include="Managed.h">
+      <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="Executor.h">
+      <Filter>Executor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestRenderer.cpp">
@@ -115,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Executor.cpp">
+      <Filter>Executor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

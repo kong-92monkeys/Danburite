@@ -8,7 +8,7 @@
 
 namespace Render
 {
-	class MaterialBufferBuilder : public Infra::Unique, public Infra::Stateful<MaterialBufferBuilder>
+	class MaterialBufferBuilder : public Infra::Stateful<MaterialBufferBuilder>
 	{
 	public:
 		MaterialBufferBuilder(

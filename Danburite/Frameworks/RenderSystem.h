@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/Placeholder.h"
+#include "Executor.h"
 #include "../Render/Engine.h"
 
 namespace Frx
@@ -15,9 +15,8 @@ namespace Frx
 		virtual ~RenderSystem() noexcept override;
 
 	private:
-		Infra::ThreadPool __rcmdExecutor{ 1ULL };
-
-		Infra::Placeholder<Render::Engine> __engine;
+		Executor __rcmdExecutor;
+		Infra::ObjectHolder<Render::Engine> __pEngine;
 
 		void __createEngine(
 			Dev::Context &context,

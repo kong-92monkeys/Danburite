@@ -30,7 +30,8 @@
     <ClInclude Include="DeferredRecycler.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MathUtil.h" />
-    <ClInclude Include="Placeholder.h" />
+    <ClInclude Include="ObjectHolder.h" />
+    <ClInclude Include="PointerHolder.h" />
     <ClInclude Include="RegionAllocator.h" />
     <ClInclude Include="Stateful.h" />
     <ClInclude Include="ThreadPool.h" />
