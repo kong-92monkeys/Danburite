@@ -8,22 +8,18 @@ namespace Frx
 		Dev::Context &context,
 		VK::PhysicalDevice const &physicalDevice)
 	{
-		__rcmdExecutor.silentRun([this, &context, &physicalDevice]
+		__rcmdExecutor.run([this, &context, &physicalDevice]
 		{
 			__createEngine(context, physicalDevice);
-		});
-
-		__rcmdExecutor.waitIdle();
+		}).wait();
 	}
 
 	RenderSystem::~RenderSystem() noexcept
 	{
-		__rcmdExecutor.silentRun([this]
+		__rcmdExecutor.run([this]
 		{
-			__pEngine.reset();
-		});
-
-		__rcmdExecutor.waitIdle();
+			__engine.reset();
+		}).wait();
 	}
 
 	void RenderSystem::__createEngine(
@@ -34,6 +30,6 @@ namespace Frx
 		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]	= 0U;
 		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]	= 1U;
 
-		__pEngine.instantiate(context, physicalDevice, globalDescBindingInfo);
+		__engine.instantiate(context, physicalDevice, globalDescBindingInfo);
 	}
 }

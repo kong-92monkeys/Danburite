@@ -10,7 +10,7 @@ namespace Frx
 	public:
 		Display(
 			Infra::ThreadPool &rcmdExecutor,
-			Infra::Placeholder<Render::Engine> const &pEngine,
+			Infra::Placeholder<Render::Engine> const &engine,
 			HINSTANCE hinstance,
 			HWND hwnd);
 
@@ -18,6 +18,6 @@ namespace Frx
 
 	private:
 		Infra::ThreadPool &__rcmdExecutor;
-		Infra::Placeholder<Render::RenderTarget> __pRenderTarget;
+		Infra::Placeholder<std::unique_ptr<Render::RenderTarget>> __renderTarget;
 	};
 }

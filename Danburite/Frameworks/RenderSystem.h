@@ -17,7 +17,7 @@ namespace Frx
 	private:
 		Infra::ThreadPool __rcmdExecutor{ 1ULL };
 
-		Infra::Placeholder<Render::Engine> __pEngine;
+		Infra::Placeholder<Render::Engine> __engine;
 
 		void __createEngine(
 			Dev::Context &context,
