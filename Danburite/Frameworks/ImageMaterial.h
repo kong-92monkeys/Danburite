@@ -17,9 +17,6 @@ namespace Frx
 		void setTexture(
 			Render::Texture const *pTexture) noexcept;
 
-		[[nodiscard]]
-		virtual bool isValid() const noexcept override;
-
 	private:
 		Render::Texture const *__pTexture{ };
 	};

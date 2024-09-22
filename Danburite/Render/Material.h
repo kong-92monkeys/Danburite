@@ -16,7 +16,7 @@ namespace Render
 			ImageReferenceManager &imageReferenceManager);
 
 		[[nodiscard]]
-		virtual bool isValid() const noexcept;
+		constexpr bool isValid() const noexcept;
 
 		[[nodiscard]]
 		virtual const std::byte *getData() const noexcept = 0;
@@ -24,12 +24,21 @@ namespace Render
 		[[nodiscard]]
 		virtual size_t getSize() const noexcept = 0;
 
+		[[nodiscard]]
+		constexpr Infra::EventView<Material const *, bool, bool> &getValidChangeEvent() const noexcept;
+
 	protected:
+		void _setValid(
+			bool valid);
+
 		[[nodiscard]]
 		constexpr ImageReferenceManager &_getImageReferenceManager() const noexcept;
 
 	private:
 		ImageReferenceManager *__pImageReferenceManager{ };
+		bool __isValid{ true };
+
+		mutable Infra::Event<Material const *, bool, bool> __validChangeEvent;
 	};
 
 	template <typename $Data>
@@ -91,6 +100,16 @@ namespace Render
 
 		mutable Infra::Event<MaterialPack const *, std::type_index, Material const *, Material const *> __materialChangeEvent;
 	};
+
+	constexpr bool Material::isValid() const noexcept
+	{
+		return __isValid;
+	}
+
+	constexpr Infra::EventView<Material const *, bool, bool> &Material::getValidChangeEvent() const noexcept
+	{
+		return __validChangeEvent;
+	}
 
 	constexpr ImageReferenceManager &Material::_getImageReferenceManager() const noexcept
 	{

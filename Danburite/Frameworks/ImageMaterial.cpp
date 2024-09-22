@@ -23,11 +23,7 @@ namespace Frx
 			_getTypedData().imageId = imageRefManager.getIdOf(&imageView);
 		}
 		
+		_setValid(__pTexture);
 		_invokeUpdateEvent();
-	}
-
-	bool ImageMaterial::isValid() const noexcept
-	{
-		return __pTexture;
 	}
 }

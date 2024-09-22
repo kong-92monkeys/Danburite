@@ -8,9 +8,14 @@ namespace Render
 		__pImageReferenceManager = &imageReferenceManager;
 	}
 
-	bool Material::isValid() const noexcept
+	void Material::_setValid(
+		bool const valid)
 	{
-		return true;
+		if (__isValid == valid)
+			return;
+
+		__isValid = valid;
+		__validChangeEvent.invoke(this, !valid, valid);
 	}
 
 	bool MaterialPack::hasValidMaterialOf(
