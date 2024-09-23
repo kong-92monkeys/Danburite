@@ -80,8 +80,6 @@ namespace Render
 		[[nodiscard]]
 		constexpr Infra::EventView<Renderer const *> &getDestroyEvent() const noexcept;
 
-		// TODO: Managing its own descriptors
-
 	protected:
 		struct InitResult
 		{

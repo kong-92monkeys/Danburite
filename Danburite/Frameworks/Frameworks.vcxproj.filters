@@ -85,6 +85,9 @@
     <Filter Include="Component\Impl\TransformComponent">
       <UniqueIdentifier>{ce95d671-532c-48af-9ce4-4e73d265af22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Canvas">
+      <UniqueIdentifier>{8d28480c-a140-4193-ab17-fd18390cb1a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
@@ -141,6 +144,9 @@
     <ClInclude Include="Drawable.h">
       <Filter>Drawable</Filter>
     </ClInclude>
+    <ClInclude Include="Canvas.h">
+      <Filter>Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestRenderer.cpp">
@@ -181,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="SceneObject.cpp">
       <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Canvas.cpp">
+      <Filter>Canvas</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

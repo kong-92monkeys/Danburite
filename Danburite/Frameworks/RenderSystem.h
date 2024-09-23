@@ -1,10 +1,12 @@
 #pragma once
 
-#include "SceneObject.h"
-#include "Drawable.h"
+#include "Display.h"
+#include "Canvas.h"
 #include "Model.h"
 #include "Style.h"
 #include "Theme.h"
+#include "Drawable.h"
+#include "SceneObject.h"
 
 namespace Frx
 {
@@ -17,8 +19,15 @@ namespace Frx
 
 		virtual ~RenderSystem() noexcept override;
 
+		// TODO: 카메라 정보 넘기는 방법 고민해보기
+
 		[[nodiscard]]
-		std::shared_ptr<Drawable> createDrawable();
+		std::unique_ptr<Display> createDisplay(
+			HINSTANCE hinstance,
+			HWND hwnd);
+
+		[[nodiscard]]
+		std::shared_ptr<Canvas> createCanvas();
 
 		[[nodiscard]]
 		std::shared_ptr<Model> createModel();
@@ -30,6 +39,12 @@ namespace Frx
 		template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
 		[[nodiscard]]
 		std::shared_ptr<Theme<$Renderer>> createTheme($Args &&...args);
+
+		[[nodiscard]]
+		std::shared_ptr<Drawable> createDrawable();
+
+		[[nodiscard]]
+		std::shared_ptr<SceneObject> createSceneObject();
 
 	private:
 		Executor __rcmdExecutor;
