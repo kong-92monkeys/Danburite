@@ -61,6 +61,30 @@
     <Filter Include="Drawable">
       <UniqueIdentifier>{b18f5fd2-1db1-4007-9475-20949d6a7b41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component\Impl\DrawableComponent">
+      <UniqueIdentifier>{a85e377a-d878-465f-be4b-477a79319dd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\CameraComponent">
+      <UniqueIdentifier>{db6f8d03-35ee-4d7d-8100-7ec25f917a35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\ModelComponent">
+      <UniqueIdentifier>{e819d28f-d55b-4f3e-bff6-6b2e871b6c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\ThemeComponent">
+      <UniqueIdentifier>{66d4caae-3d30-4506-9a17-8516d09de404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\StyleComponent">
+      <UniqueIdentifier>{ee50b67b-4445-4fcd-a6b4-beb4848d2d8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\DrawParamComponent">
+      <UniqueIdentifier>{ce5582ce-2344-4f9b-bba7-5fc3387a84f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\LayerComponent">
+      <UniqueIdentifier>{e06c6631-2f2e-485c-9c2a-9c002a38ece7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Impl\TransformComponent">
+      <UniqueIdentifier>{ce95d671-532c-48af-9ce4-4e73d265af22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
@@ -154,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="Drawable.cpp">
       <Filter>Drawable</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneObject.cpp">
+      <Filter>SceneObject</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

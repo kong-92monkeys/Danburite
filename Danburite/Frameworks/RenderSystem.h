@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SceneObject.h"
 #include "Drawable.h"
 #include "Model.h"
 #include "Style.h"
@@ -18,8 +19,6 @@ namespace Frx
 
 		[[nodiscard]]
 		std::shared_ptr<Drawable> createDrawable();
-
-		// TODO: draw param 대응 이름 찾기
 
 		[[nodiscard]]
 		std::shared_ptr<Model> createModel();
