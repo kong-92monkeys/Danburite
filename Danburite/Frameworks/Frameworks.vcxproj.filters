@@ -31,9 +31,6 @@
     <Filter Include="RenderSystem">
       <UniqueIdentifier>{a2d285a4-311b-465f-aff5-5cd82bffd764}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Display">
-      <UniqueIdentifier>{e7c7bc6d-df17-4693-9455-2fb96f41973d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SceneObject">
       <UniqueIdentifier>{5acd7e5f-e61a-4626-8029-fefa21a70564}</UniqueIdentifier>
     </Filter>
@@ -42,9 +39,6 @@
     </Filter>
     <Filter Include="Component\Impl">
       <UniqueIdentifier>{1f290f63-051c-435c-9acc-62d6abdc7f42}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Managed">
-      <UniqueIdentifier>{21b5ba1c-1194-4b90-ac0d-50c6b69c2762}</UniqueIdentifier>
     </Filter>
     <Filter Include="Executor">
       <UniqueIdentifier>{73918271-c1c9-40b8-ba4e-99e157976daf}</UniqueIdentifier>
@@ -58,35 +52,8 @@
     <Filter Include="Style">
       <UniqueIdentifier>{a157de4c-c7a1-4ec6-9dfc-f16a8010ade8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Drawable">
-      <UniqueIdentifier>{b18f5fd2-1db1-4007-9475-20949d6a7b41}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\DrawableComponent">
-      <UniqueIdentifier>{a85e377a-d878-465f-be4b-477a79319dd2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\CameraComponent">
-      <UniqueIdentifier>{db6f8d03-35ee-4d7d-8100-7ec25f917a35}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\ModelComponent">
-      <UniqueIdentifier>{e819d28f-d55b-4f3e-bff6-6b2e871b6c7e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\ThemeComponent">
-      <UniqueIdentifier>{66d4caae-3d30-4506-9a17-8516d09de404}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\StyleComponent">
-      <UniqueIdentifier>{ee50b67b-4445-4fcd-a6b4-beb4848d2d8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\DrawParamComponent">
-      <UniqueIdentifier>{ce5582ce-2344-4f9b-bba7-5fc3387a84f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\LayerComponent">
-      <UniqueIdentifier>{e06c6631-2f2e-485c-9c2a-9c002a38ece7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl\TransformComponent">
-      <UniqueIdentifier>{ce95d671-532c-48af-9ce4-4e73d265af22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Canvas">
-      <UniqueIdentifier>{8d28480c-a140-4193-ab17-fd18390cb1a3}</UniqueIdentifier>
+    <Filter Include="Placeholder">
+      <UniqueIdentifier>{4ecb4434-8a9d-4f6c-835b-7a519ce06898}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -117,35 +84,17 @@
     <ClInclude Include="RenderSystem.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Display.h">
-      <Filter>Display</Filter>
-    </ClInclude>
     <ClInclude Include="SceneObject.h">
       <Filter>SceneObject</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Managed.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
     <ClInclude Include="Executor.h">
       <Filter>Executor</Filter>
     </ClInclude>
-    <ClInclude Include="Theme.h">
-      <Filter>Theme</Filter>
-    </ClInclude>
-    <ClInclude Include="Style.h">
-      <Filter>Style</Filter>
-    </ClInclude>
-    <ClInclude Include="Drawable.h">
-      <Filter>Drawable</Filter>
-    </ClInclude>
-    <ClInclude Include="Canvas.h">
-      <Filter>Canvas</Filter>
+    <ClInclude Include="Placeholder.h">
+      <Filter>Placeholder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -170,26 +119,14 @@
     <ClCompile Include="RenderSystem.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Display.cpp">
-      <Filter>Display</Filter>
-    </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="Executor.cpp">
       <Filter>Executor</Filter>
     </ClCompile>
-    <ClCompile Include="Drawable.cpp">
-      <Filter>Drawable</Filter>
-    </ClCompile>
     <ClCompile Include="SceneObject.cpp">
       <Filter>SceneObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Canvas.cpp">
-      <Filter>Canvas</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

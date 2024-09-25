@@ -16,29 +16,70 @@ namespace Frx
 
 	RenderSystem::~RenderSystem() noexcept
 	{
-		__rcmdExecutor.destroy(std::move(__pEngine)).wait();
+		__rcmdExecutor.run([this]
+		{
+			__pEngine = nullptr;
+		}).wait();
 	}
 
-	std::unique_ptr<Display> RenderSystem::createDisplay(
+	Placeholder<Render::RenderTarget> RenderSystem::createRenderTarget(
 		HINSTANCE const hinstance,
 		HWND const hwnd)
 	{
-		return std::make_unique<Display>(__rcmdExecutor, __pEngine, hinstance, hwnd);
+		auto const pProm	{ new std::promise<Render::RenderTarget *> };
+		auto fut			{ pProm->get_future() };
+
+		__rcmdExecutor.silentRun([this, pProm, hinstance, hwnd]
+		{
+			pProm->set_value(__pEngine->createRenderTarget(hinstance, hwnd));
+			delete pProm;
+		});
+
+		return { __rcmdExecutor, std::move(fut) };
 	}
 
-	std::shared_ptr<Canvas> RenderSystem::createCanvas()
+	Placeholder<Render::Layer> RenderSystem::createLayer()
 	{
-		return std::make_shared<Canvas>(__rcmdExecutor, __pEngine);
+		auto const pProm	{ new std::promise<Render::Layer *> };
+		auto fut			{ pProm->get_future() };
+
+		__rcmdExecutor.silentRun([this, pProm]
+		{
+			pProm->set_value(__pEngine->createLayer());
+			delete pProm;
+		});
+
+		return { __rcmdExecutor, std::move(fut) };
 	}
 
-	std::shared_ptr<Model> RenderSystem::createModel()
+	Placeholder<Render::Mesh> RenderSystem::createMesh()
 	{
-		return std::make_shared<Model>(__rcmdExecutor, __pEngine);
+		auto const pProm	{ new std::promise<Render::Mesh *> };
+		auto fut			{ pProm->get_future() };
+
+		__rcmdExecutor.silentRun([this, pProm]
+		{
+			pProm->set_value(__pEngine->createMesh());
+			delete pProm;
+		});
+
+		return { __rcmdExecutor, std::move(fut) };
 	}
 
-	std::shared_ptr<Drawable> RenderSystem::createDrawable()
+	Placeholder<Render::Texture> RenderSystem::createTexture(
+		Render::Texture::ImageCreateInfo const &imageCreateInfo,
+		Render::Texture::ImageViewCreateInfo const &imageViewCreateInfo)
 	{
-		return std::make_shared<Drawable>(__rcmdExecutor);
+		auto const pProm	{ new std::promise<Render::Texture *> };
+		auto fut			{ pProm->get_future() };
+
+		__rcmdExecutor.silentRun([this, pProm, imageCreateInfo, imageViewCreateInfo]
+		{
+			pProm->set_value(__pEngine->createTexture(imageCreateInfo, imageViewCreateInfo));
+			delete pProm;
+		});
+
+		return { __rcmdExecutor, std::move(fut) };
 	}
 
 	std::shared_ptr<SceneObject> RenderSystem::createSceneObject()
@@ -54,6 +95,6 @@ namespace Frx
 		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]	= 0U;
 		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]	= 1U;
 
-		__pEngine.create(context, physicalDevice, globalDescBindingInfo);
+		__pEngine = std::make_unique<Render::Engine>(context, physicalDevice, globalDescBindingInfo);
 	}
 }

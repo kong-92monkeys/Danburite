@@ -1,11 +1,7 @@
 #pragma once
 
-#include "Display.h"
-#include "Canvas.h"
-#include "Model.h"
-#include "Style.h"
-#include "Theme.h"
-#include "Drawable.h"
+#include "../Render/Engine.h"
+#include "Placeholder.h"
 #include "SceneObject.h"
 
 namespace Frx
@@ -19,36 +15,39 @@ namespace Frx
 
 		virtual ~RenderSystem() noexcept override;
 
-		// TODO: 카메라 정보 넘기는 방법 고민해보기
-
 		[[nodiscard]]
-		std::unique_ptr<Display> createDisplay(
+		Placeholder<Render::RenderTarget> createRenderTarget(
 			HINSTANCE hinstance,
 			HWND hwnd);
 
 		[[nodiscard]]
-		std::shared_ptr<Canvas> createCanvas();
+		Placeholder<Render::Layer> createLayer();
 
 		[[nodiscard]]
-		std::shared_ptr<Model> createModel();
+		Placeholder<Render::Mesh> createMesh();
+
+		[[nodiscard]]
+		Placeholder<Render::Texture> createTexture(
+			Render::Texture::ImageCreateInfo const &imageCreateInfo,
+			Render::Texture::ImageViewCreateInfo const &imageViewCreateInfo);
 
 		template <std::derived_from<Render::Material> $Material, typename ...$Args>
 		[[nodiscard]]
-		std::shared_ptr<Style<$Material>> createStyle($Args &&...args);
+		Placeholder<$Material> createMaterial($Args &&...args);
 
 		template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
 		[[nodiscard]]
-		std::shared_ptr<Theme<$Renderer>> createTheme($Args &&...args);
-
-		[[nodiscard]]
-		std::shared_ptr<Drawable> createDrawable();
+		Placeholder<$Renderer> createRenderer($Args &&...args);
 
 		[[nodiscard]]
 		std::shared_ptr<SceneObject> createSceneObject();
 
+		[[nodiscard]]
+		constexpr Executor &getRcmdExecutor() noexcept;
+
 	private:
 		Executor __rcmdExecutor;
-		Infra::ObjectHolder<Render::Engine> __pEngine;
+		std::unique_ptr<Render::Engine> __pEngine;
 
 		void __createEngine(
 			Dev::Context &context,
@@ -56,16 +55,37 @@ namespace Frx
 	};
 
 	template <std::derived_from<Render::Material> $Material, typename ...$Args>
-	std::shared_ptr<Style<$Material>> RenderSystem::createStyle($Args &&...args)
+	Placeholder<$Material> RenderSystem::createMaterial($Args &&...args)
 	{
-		return std::make_shared<Style<$Material>>(
-			__rcmdExecutor, __pEngine, std::forward<$Args>(args)...);
+		auto const pProm	{ new std::promise<$Material *> };
+		auto fut			{ pProm->get_future() };
+
+		__rcmdExecutor.silentRun([this, pProm, &args...] () mutable
+		{
+			pProm->set_value(__pEngine->createMaterial<$Material>(std::forward<$Args>(args)...));
+			delete pProm;
+		});
+
+		return { __rcmdExecutor, std::move(fut) };
 	}
 
 	template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
-	std::shared_ptr<Theme<$Renderer>> RenderSystem::createTheme($Args &&...args)
+	Placeholder<$Renderer> RenderSystem::createRenderer($Args &&...args)
 	{
-		return std::make_shared<Theme<$Renderer>>(
-			__rcmdExecutor, __pEngine, std::forward<$Args>(args)...);
+		auto const pProm	{ new std::promise<$Renderer *> };
+		auto fut			{ pProm->get_future() };
+
+		__rcmdExecutor.silentRun([this, pProm, &args...] () mutable
+		{
+			pProm->set_value(__pEngine->createRenderer<$Renderer>(std::forward<$Args>(args)...));
+			delete pProm;
+		});
+
+		return { __rcmdExecutor, std::move(fut) };
+	}
+
+	constexpr Executor &RenderSystem::getRcmdExecutor() noexcept
+	{
+		return __rcmdExecutor;
 	}
 }
