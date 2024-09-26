@@ -99,7 +99,7 @@ namespace Render
 
 			auto const result{ __que.vkQueuePresentKHR(&presentInfo) };
 			if (result != VkResult::VK_SUCCESS)
-				throw std::runtime_error{ "Failed to present the draw drawResult." };
+				throw PresentException{ "Failed to present the draw result.", result };
 		}
 	}
 
@@ -108,4 +108,10 @@ namespace Render
 		__generalExecutions.clear();
 		__drawResults.clear();
 	}
+
+	CommandSubmitter::PresentException::PresentException(
+		char const *const _Message,
+		VkResult const result) noexcept :
+		exception{ _Message }, __result{ result }
+	{}
 }

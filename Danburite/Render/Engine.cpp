@@ -150,10 +150,19 @@ namespace Render
 		__pDevice->vkResetFences(1U, &(submissionFence.getHandle()));
 
 		__pCommandSubmitter->submit(submissionFence);
-		__pCommandSubmitter->present();
 
+		try
+		{
+			__pCommandSubmitter->present();
+			__reservedRenderTargets.clear();
+		}
+		catch (CommandSubmitter::PresentException const &e)
+		{
+			if (e.getResult() != VkResult::VK_ERROR_OUT_OF_DATE_KHR)
+				throw;
+		}
+		
 		__deferredDeleter.advance();
-		__reservedRenderTargets.clear();
 	}
 
 	void Engine::__verifyPhysicalDeviceSupport()
