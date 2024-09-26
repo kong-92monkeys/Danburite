@@ -53,6 +53,12 @@
     <Filter Include="Scenes\TestScene">
       <UniqueIdentifier>{0f9846c9-70e7-48e6-8d96-781e10a1375c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Shaders\Phong">
+      <UniqueIdentifier>{cdd31695-bd9c-4bbc-a20a-32932a731e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\PhongTestScene">
+      <UniqueIdentifier>{84d270a3-8eec-4214-bfa9-1acb0b1dc3eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -85,6 +91,9 @@
     <ClInclude Include="TestScene.h">
       <Filter>Scenes\TestScene</Filter>
     </ClInclude>
+    <ClInclude Include="PhongTestScene.h">
+      <Filter>Scenes\PhongTestScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -107,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="TestScene.cpp">
       <Filter>Scenes\TestScene</Filter>
+    </ClCompile>
+    <ClCompile Include="PhongTestScene.cpp">
+      <Filter>Scenes\PhongTestScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -149,6 +161,18 @@
       <Filter>Assets\Shaders\Materials</Filter>
     </None>
     <None Include="Assets\Shaders\Materials\SimpleMaterial.glsl">
+      <Filter>Assets\Shaders\Materials</Filter>
+    </None>
+    <None Include="Assets\Shaders\Materials\TransformMaterial.glsl">
+      <Filter>Assets\Shaders\Materials</Filter>
+    </None>
+    <None Include="Assets\Shaders\Phong.frag">
+      <Filter>Assets\Shaders\Phong</Filter>
+    </None>
+    <None Include="Assets\Shaders\Phong.vert">
+      <Filter>Assets\Shaders\Phong</Filter>
+    </None>
+    <None Include="Assets\Shaders\Materials\PhongMaterial.glsl">
       <Filter>Assets\Shaders\Materials</Filter>
     </None>
   </ItemGroup>

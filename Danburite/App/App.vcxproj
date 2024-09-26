@@ -202,6 +202,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="PhongTestScene.h" />
     <ClInclude Include="TestScene.h" />
   </ItemGroup>
   <ItemGroup>
@@ -216,6 +217,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PhongTestScene.cpp" />
     <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -223,8 +225,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Constants.glsl" />
+    <None Include="Assets\Shaders\Materials\PhongMaterial.glsl" />
+    <None Include="Assets\Shaders\Phong.frag" />
+    <None Include="Assets\Shaders\Phong.vert" />
     <None Include="Assets\Shaders\Images.glsl" />
     <None Include="Assets\Shaders\Materials\ImageMaterial.glsl" />
+    <None Include="Assets\Shaders\Materials\TransformMaterial.glsl" />
     <None Include="Assets\Shaders\Materials\SimpleMaterial.glsl" />
     <None Include="Assets\Shaders\ShaderData.glsl" />
     <None Include="Assets\Shaders\Image.frag" />

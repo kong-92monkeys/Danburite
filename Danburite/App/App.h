@@ -9,7 +9,7 @@
 
 #include "resource.h"       // main symbols
 #include "../Frameworks/RenderSystem.h"
-#include "TestScene.h"
+#include "PhongTestScene.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -47,9 +47,7 @@ public:
 private:
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
-	std::unique_ptr<TestScene> __pTestScene;
-
-	std::unique_ptr<Frx::Display> __pDisplay;
+	std::unique_ptr<PhongTestScene> __pScene;
 
 	mutable Infra::Event<> __idleEvent;
 

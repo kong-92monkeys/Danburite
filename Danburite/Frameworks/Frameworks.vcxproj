@@ -20,9 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.h" />
+    <ClInclude Include="PhongMaterial.h" />
     <ClInclude Include="ImageMaterial.h" />
+    <ClInclude Include="PhongRenderer.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="TransformMaterial.h" />
     <ClInclude Include="SimpleMaterial.h" />
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="SimpleRenderer.h" />
@@ -32,9 +35,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="PhongMaterial.cpp" />
     <ClCompile Include="ImageMaterial.cpp" />
+    <ClCompile Include="PhongRenderer.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="TransformMaterial.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
     <ClCompile Include="SimpleRenderer.cpp" />

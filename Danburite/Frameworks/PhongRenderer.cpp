@@ -1,0 +1,452 @@
+#include "PhongRenderer.h"
+#include "TransformMaterial.h"
+#include "PhongMaterial.h"
+#include "Vertex.h"
+#include <array>
+
+namespace Frx
+{
+	PhongRenderer::~PhongRenderer() noexcept
+	{
+		auto &deferredDeleter{ _getDeferredDeleter() };
+
+		deferredDeleter.reserve(std::move(__pSampler));
+		deferredDeleter.reserve(std::move(__pDescPool));
+		deferredDeleter.reserve(std::move(__pDescSetLayout));
+	}
+
+	bool PhongRenderer::isValidMaterialPack(
+		Render::MaterialPack const &materialPack) const noexcept
+	{
+		if (!(materialPack.hasValidMaterialOf<TransformMaterial>()))
+			return false;
+
+		if (!(materialPack.hasValidMaterialOf<PhongMaterial>()))
+			return false;
+
+		return true;
+	}
+
+	std::optional<uint32_t> PhongRenderer::getMaterialSlotOf(
+		std::type_index const &materialType) const noexcept
+	{
+		if (materialType == typeid(TransformMaterial))
+			return 0U;
+
+		if (materialType == typeid(PhongMaterial))
+			return 1U;
+
+		return std::nullopt;
+	}
+
+	bool PhongRenderer::useMaterial() const noexcept
+	{
+		return true;
+	}
+
+	VkDescriptorSet PhongRenderer::getDescSet() const noexcept
+	{
+		return __hDescSet;
+	}
+
+	std::unique_ptr<VK::RenderPass> PhongRenderer::createRenderPass(
+		VkFormat const outputFormat) const
+	{
+		VkAttachmentDescription2 const colorAttachment
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2 },
+			.format				{ outputFormat },
+			.samples			{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
+			.loadOp				{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_LOAD },
+			.storeOp			{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE },
+			.stencilLoadOp		{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE },
+			.stencilStoreOp		{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE },
+			.initialLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+			.finalLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }
+		};
+
+		VkAttachmentReference2 const colorAttachmentRef
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2 },
+			.attachment		{ 0U },
+			.layout			{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT }
+		};
+
+		VkSubpassDescription2 const subpass
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
+			.pipelineBindPoint		{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
+			.colorAttachmentCount	{ 1U },
+			.pColorAttachments		{ &colorAttachmentRef }
+		};
+
+		VkMemoryBarrier2 const memoryBarrier
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
+			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.srcAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT },
+			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.dstAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT }
+		};
+
+		VkSubpassDependency2 const dependency
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2 },
+			.pNext			{ &memoryBarrier },
+			.srcSubpass		{ VK_SUBPASS_EXTERNAL },
+			.dstSubpass		{ 0U }
+		};
+
+		VkRenderPassCreateInfo2 const createInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2 },
+			.attachmentCount	{ 1U },
+			.pAttachments		{ &colorAttachment },
+			.subpassCount		{ 1U },
+			.pSubpasses			{ &subpass },
+			.dependencyCount	{ 1U },
+			.pDependencies		{ &dependency }
+		};
+
+		return std::make_unique<VK::RenderPass>(_getDevice(), createInfo);
+	}
+
+	std::unique_ptr<VK::Framebuffer> PhongRenderer::createFramebuffer(
+		VK::RenderPass &renderPass,
+		VK::ImageView &outputAttachment,
+		uint32_t const outputWidth,
+		uint32_t const outputHeight) const
+	{
+		VkFramebufferCreateInfo const createInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO },
+			.renderPass			{ renderPass.getHandle() },
+			.attachmentCount	{ 1U },
+			.pAttachments		{ &(outputAttachment.getHandle()) },
+			.width				{ outputWidth },
+			.height				{ outputHeight },
+			.layers				{ 1U }
+		};
+		
+		return std::make_unique<VK::Framebuffer>(_getDevice(), createInfo);
+	}
+
+	std::unique_ptr<VK::Pipeline> PhongRenderer::createPipeline(
+		VK::RenderPass &renderPass,
+		uint32_t const outputWidth,
+		uint32_t const outputHeight) const
+	{
+		std::vector<VkPipelineShaderStageCreateInfo> stages;
+
+		auto &vertexShaderInfo	{ stages.emplace_back() };
+		vertexShaderInfo.sType	= VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		vertexShaderInfo.stage	= VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
+		vertexShaderInfo.module	= __pVertexShader->getHandle();
+		vertexShaderInfo.pName	= "main";
+
+		auto &fragShaderInfo	{ stages.emplace_back() };
+		fragShaderInfo.sType	= VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		fragShaderInfo.stage	= VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
+		fragShaderInfo.module	= __pFragmentShader->getHandle();
+		fragShaderInfo.pName	= "main";
+
+		std::vector<VkVertexInputBindingDescription> vertexBindingDescs;
+
+		auto &posBindingDesc		{ vertexBindingDescs.emplace_back() };
+		posBindingDesc.binding		= VertexAttrib::POS_LOCATION;
+		posBindingDesc.stride		= sizeof(Vertex_P);
+		posBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+
+		auto &uvBindingDesc			{ vertexBindingDescs.emplace_back() };
+		uvBindingDesc.binding		= VertexAttrib::UV_LOCATION;
+		uvBindingDesc.stride		= sizeof(Vertex_U);
+		uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+
+		auto &colorBindingDesc		{ vertexBindingDescs.emplace_back() };
+		colorBindingDesc.binding	= VertexAttrib::COLOR_LOCATION;
+		colorBindingDesc.stride		= sizeof(Vertex_C);
+		colorBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+
+		std::vector<VkVertexInputAttributeDescription> vertexAttribDescs;
+
+		auto &posAttribDesc			{ vertexAttribDescs.emplace_back() };
+		posAttribDesc.location		= VertexAttrib::POS_LOCATION;
+		posAttribDesc.binding		= VertexAttrib::POS_LOCATION;
+		posAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
+		posAttribDesc.offset		= 0U;
+
+		auto &uvAttribDesc			{ vertexAttribDescs.emplace_back() };
+		uvAttribDesc.location		= VertexAttrib::UV_LOCATION;
+		uvAttribDesc.binding		= VertexAttrib::UV_LOCATION;
+		uvAttribDesc.format			= VkFormat::VK_FORMAT_R32G32_SFLOAT;
+		uvAttribDesc.offset			= 0U;
+
+		auto &colorAttribDesc		{ vertexAttribDescs.emplace_back() };
+		colorAttribDesc.location	= VertexAttrib::COLOR_LOCATION;
+		colorAttribDesc.binding		= VertexAttrib::COLOR_LOCATION;
+		colorAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT;
+		colorAttribDesc.offset		= 0U;
+
+		VkPipelineVertexInputStateCreateInfo const vertexInputState
+		{
+			.sType								{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO },
+			.vertexBindingDescriptionCount		{ static_cast<uint32_t>(vertexBindingDescs.size()) },
+			.pVertexBindingDescriptions			{ vertexBindingDescs.data() },
+			.vertexAttributeDescriptionCount	{ static_cast<uint32_t>(vertexAttribDescs.size()) },
+			.pVertexAttributeDescriptions		{ vertexAttribDescs.data() }
+		};
+		
+		VkPipelineInputAssemblyStateCreateInfo const inputAssemblyState
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO },
+			.topology					{ VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST },
+			.primitiveRestartEnable		{ VK_FALSE }
+		};
+
+		VkViewport const viewports
+		{
+			.x			{ 0.0f },
+			.y			{ 0.0f },
+			.width		{ static_cast<float>(outputWidth) },
+			.height		{ static_cast<float>(outputHeight) },
+			.minDepth	{ 0.0f },
+			.maxDepth	{ 1.0f }
+		};
+
+		VkRect2D const scissors
+		{
+			.offset		{
+				.x		{ 0 },
+				.y		{ 0 }
+			},
+			.extent		{
+				.width	{ outputWidth },
+				.height	{ outputHeight }
+			}
+		};
+
+		VkPipelineViewportStateCreateInfo const viewportState
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO },
+			.viewportCount	{ 1U },
+			.pViewports		{ &viewports },
+			.scissorCount	{ 1U },
+			.pScissors		{ &scissors }
+		};
+
+		VkPipelineRasterizationStateCreateInfo const rasterizationState
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO },
+			.depthClampEnable			{ VK_FALSE },
+			.rasterizerDiscardEnable	{ VK_FALSE },
+			.polygonMode				{ VkPolygonMode::VK_POLYGON_MODE_FILL },
+			.cullMode					{ VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT },
+			.frontFace					{ VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE },
+			.depthBiasEnable			{ VK_FALSE },
+			.lineWidth					{ 1.0f }
+		};
+
+		VkPipelineMultisampleStateCreateInfo const multisampleState
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO },
+			.rasterizationSamples		{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
+			.sampleShadingEnable		{ VK_FALSE },
+			.minSampleShading			{ 1.0f },
+			.pSampleMask				{ nullptr },
+			.alphaToCoverageEnable		{ VK_FALSE },
+			.alphaToOneEnable			{ VK_FALSE }
+		};
+
+		VkPipelineColorBlendAttachmentState const blendAttachment
+		{
+			.blendEnable			{ VK_FALSE },
+			.colorWriteMask			{
+				VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT |
+				VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT |
+				VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT |
+				VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT
+			}
+		};
+
+		VkPipelineColorBlendStateCreateInfo const colorBlendState
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO },
+			.logicOpEnable		{ VK_FALSE },
+			.attachmentCount	{ 1U },
+			.pAttachments		{ &blendAttachment }
+		};
+
+		VkGraphicsPipelineCreateInfo const createInfo
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO },
+			.stageCount					{ static_cast<uint32_t>(stages.size()) },
+			.pStages					{ stages.data() },
+			.pVertexInputState			{ &vertexInputState },
+			.pInputAssemblyState		{ &inputAssemblyState },
+			.pTessellationState			{ nullptr },
+			.pViewportState				{ &viewportState },
+			.pRasterizationState		{ &rasterizationState },
+			.pMultisampleState			{ &multisampleState },
+			.pDepthStencilState			{ nullptr },
+			.pColorBlendState			{ &colorBlendState },
+			.pDynamicState				{ nullptr },
+			.layout						{ getPipelineLayout().getHandle() },
+			.renderPass					{ renderPass.getHandle() },
+			.subpass					{ 0U },
+			.basePipelineHandle			{ VK_NULL_HANDLE },
+			.basePipelineIndex			{ -1 }
+		};
+
+		return std::make_unique<VK::Pipeline>(_getDevice(), _getPipelineCache().getHandle(), createInfo);
+	}
+
+	Render::Renderer::InitResult PhongRenderer::_onInit()
+	{
+		__pVertexShader		= _createShaderModule("Shaders/Phong.vert");
+		__pFragmentShader	= _createShaderModule("Shaders/Phong.frag");
+
+		__createDescSetLayout();
+		__createDescPool();
+		__allocateDescSet();
+
+		__createSampler();
+		__updateDescSet();
+
+		Render::Renderer::InitResult retVal;
+		retVal.pPipelineLayout	= __createPipelineLayout();
+
+		return retVal;
+	}
+
+	void PhongRenderer::__createDescSetLayout()
+	{
+		std::vector<VkDescriptorBindingFlags> bindingFlags;
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+		auto &materialBufferBinding				{ bindings.emplace_back() };
+		materialBufferBinding.binding			= 0U;
+		materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
+		materialBufferBinding.descriptorCount	= 1U;
+		materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
+			
+		bindingFlags.emplace_back(0U);
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo const flagInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO },
+			.bindingCount	{ static_cast<uint32_t>(bindingFlags.size()) },
+			.pBindingFlags	{ bindingFlags.data() }
+		};
+
+		VkDescriptorSetLayoutCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
+			.pNext			{ &flagInfo },
+			.bindingCount	{ static_cast<uint32_t>(bindings.size()) },
+			.pBindings		{ bindings.data() }
+		};
+
+		__pDescSetLayout = std::make_shared<VK::DescriptorSetLayout>(_getDevice(), createInfo);
+	}
+
+	void PhongRenderer::__createDescPool()
+	{
+		VkDescriptorPoolSize const poolSize
+		{
+			.type				{ VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER },
+			.descriptorCount	{ 1U }
+		};
+
+		VkDescriptorPoolCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO },
+			.maxSets		{ 1U },
+			.poolSizeCount	{ 1U },
+			.pPoolSizes		{ &poolSize }
+		};
+
+		__pDescPool = std::make_shared<VK::DescriptorPool>(_getDevice(), createInfo);
+	}
+
+	void PhongRenderer::__allocateDescSet()
+	{
+		VkDescriptorSetAllocateInfo const allocInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO },
+			.descriptorPool		{ __pDescPool->getHandle() },
+			.descriptorSetCount	{ 1U },
+			.pSetLayouts		{ &(__pDescSetLayout->getHandle()) }
+		};
+
+		auto const result{ _getDevice().vkAllocateDescriptorSets(&allocInfo, &__hDescSet) };
+		if (result != VkResult::VK_SUCCESS)
+			throw std::runtime_error{ "Cannot allocate a descriptor set" };
+	}
+
+	void PhongRenderer::__createSampler()
+	{
+		VkSamplerCreateInfo const createInfo
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO },
+			.magFilter					{ VkFilter::VK_FILTER_LINEAR },
+			.minFilter					{ VkFilter::VK_FILTER_LINEAR },
+			.mipmapMode					{ VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST },
+			.addressModeU				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
+			.addressModeV				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
+			.addressModeW				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
+			.mipLodBias					{ 0.0f },
+			.anisotropyEnable			{ VK_FALSE },
+			.maxAnisotropy				{ 1.0f },
+			.compareEnable				{ VK_FALSE },
+			.minLod						{ 0.0f },
+			.maxLod						{ 0.0f },
+			.borderColor				{ VkBorderColor::VK_BORDER_COLOR_INT_OPAQUE_BLACK },
+			.unnormalizedCoordinates	{ VK_FALSE }
+		};
+
+		__pSampler = std::make_shared<VK::Sampler>(_getDevice(), createInfo);
+	}
+
+	void PhongRenderer::__updateDescSet()
+	{
+		auto &descUpdater{ _getDescriptorUpdater() };
+
+		VkDescriptorImageInfo const samplerInfo
+		{
+			.sampler{ __pSampler->getHandle() }
+		};
+
+		descUpdater.addInfos(
+			__hDescSet, 0U, 0U, 1U,
+			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER, &samplerInfo);
+	}
+
+	std::shared_ptr<VK::PipelineLayout> PhongRenderer::__createPipelineLayout() const
+	{
+		auto const &globalDescManager{ _getGlobalDescriptorManager() };
+
+		std::vector<VkDescriptorSetLayout> setLayouts;
+
+		// MATERIALS_DESC_SET_LOCATION
+		setLayouts.emplace_back(globalDescManager.getMaterialsDescSetLayout().getHandle());
+
+		// SAMPLED_IMAGES_DESC_SET_LOCATION
+		setLayouts.emplace_back(globalDescManager.getSampledImagesDescSetLayout().getHandle());
+
+		// SUB_LAYER_DESC_SET_LOCATION
+		setLayouts.emplace_back(_getSubLayerDescSetLayout().getHandle());
+
+		// RENDERER_DESC_SET_LOCATION
+		setLayouts.emplace_back(__pDescSetLayout->getHandle());
+
+		VkPipelineLayoutCreateInfo const createInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO },
+			.setLayoutCount		{ static_cast<uint32_t>(setLayouts.size()) },
+			.pSetLayouts		{ setLayouts.data() }
+		};
+
+		return std::make_shared<VK::PipelineLayout>(_getDevice(), createInfo);
+	}
+}

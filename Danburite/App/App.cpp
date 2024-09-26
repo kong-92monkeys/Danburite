@@ -83,7 +83,7 @@ BOOL CApp::InitInstance()
 
 int CApp::ExitInstance()
 {
-	__pTestScene = nullptr;
+	__pScene = nullptr;
 	__pRenderSystem = nullptr;
 	__pVulkanContext = nullptr;
 
@@ -100,7 +100,7 @@ std::unique_ptr<Frx::Display> CApp::createDisplay(
 void CApp::setSceneDisplay(
 	Frx::Display *const pDisplay)
 {
-	__pTestScene->setDisplay(pDisplay);
+	__pScene->setDisplay(pDisplay);
 }
 
 BOOL CApp::OnIdle(LONG lCount)
@@ -134,7 +134,7 @@ void CApp::__onInitBeforeMainFrame()
 	__pRenderSystem = std::make_unique<Frx::RenderSystem>(
 		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 
-	__pTestScene = __pRenderSystem->createScene<TestScene>();
+	__pScene = __pRenderSystem->createScene<PhongTestScene>();
 }
 
 // CAboutDlg dialog used for App About

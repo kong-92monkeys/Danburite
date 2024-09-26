@@ -37,6 +37,15 @@
     <Filter Include="Display">
       <UniqueIdentifier>{bda9a928-264f-431f-b362-095e90fe66f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials\TransformMaterial">
+      <UniqueIdentifier>{b8436973-4c02-40d7-b7ba-016897218101}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderers\PhongRenderer">
+      <UniqueIdentifier>{c8c9b92b-722f-4301-9d09-e1196ec1e743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Materials\PhongMaterial">
+      <UniqueIdentifier>{f70e395d-4f4e-4378-951c-6492a12aea7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TestRenderer.h">
@@ -69,6 +78,15 @@
     <ClInclude Include="Display.h">
       <Filter>Display</Filter>
     </ClInclude>
+    <ClInclude Include="TransformMaterial.h">
+      <Filter>Materials\TransformMaterial</Filter>
+    </ClInclude>
+    <ClInclude Include="PhongRenderer.h">
+      <Filter>Renderers\PhongRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PhongMaterial.h">
+      <Filter>Materials\PhongMaterial</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TestRenderer.cpp">
@@ -94,6 +112,15 @@
     </ClCompile>
     <ClCompile Include="Display.cpp">
       <Filter>Display</Filter>
+    </ClCompile>
+    <ClCompile Include="TransformMaterial.cpp">
+      <Filter>Materials\TransformMaterial</Filter>
+    </ClCompile>
+    <ClCompile Include="PhongRenderer.cpp">
+      <Filter>Renderers\PhongRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="PhongMaterial.cpp">
+      <Filter>Materials\PhongMaterial</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

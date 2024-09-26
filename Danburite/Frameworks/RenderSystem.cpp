@@ -1,6 +1,8 @@
 #include "RenderSystem.h"
 #include "ImageMaterial.h"
 #include "SimpleMaterial.h"
+#include "TransformMaterial.h"
+#include "PhongMaterial.h"
 #include <new>
 
 namespace Frx
@@ -43,9 +45,13 @@ namespace Frx
 		Dev::Context &context,
 		VK::PhysicalDevice const &physicalDevice)
 	{
+		// NOTE: Need to sync with Constants.glsl
+
 		Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
-		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]	= 0U;
-		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]	= 1U;
+		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]		= 0U;
+		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]		= 1U;
+		globalDescBindingInfo.materialBufferLocations[typeid(TransformMaterial)]	= 2U;
+		globalDescBindingInfo.materialBufferLocations[typeid(PhongMaterial)]		= 3U;
 
 		new (__enginePlaceholder.data()) Render::Engine{ context, physicalDevice, globalDescBindingInfo };
 	}
