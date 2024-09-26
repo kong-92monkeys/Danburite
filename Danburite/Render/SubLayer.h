@@ -88,9 +88,6 @@ namespace Render
 		Infra::EventListenerPtr<RenderObject const *, Mesh const *, Mesh const *>
 			__pObjectMeshChangeListener;
 
-		Infra::EventListenerPtr<RenderObject const *, DrawParam const *, DrawParam const *>
-			__pObjectDrawParamChangeListener;
-
 		Infra::EventListenerPtr<RenderObject const *, uint32_t, std::type_index, Material const *, Material const *>
 			__pObjectMaterialChangeListener;
 
@@ -99,6 +96,9 @@ namespace Render
 
 		Infra::EventListenerPtr<RenderObject const *, bool>
 			__pObjectDrawableChangeListener;
+
+		Infra::EventListenerPtr<RenderObject const *>
+			__pObjectNeedRedrawListener;
 
 		mutable Infra::Event<SubLayer const *> __needRedrawEvent;
 
@@ -144,11 +144,6 @@ namespace Render
 			Mesh const *pPrev,
 			Mesh const *pCur);
 
-		void __onObjectDrawParamChanged(
-			RenderObject const *pObject,
-			DrawParam const *pPrev,
-			DrawParam const *pCur);
-
 		void __onObjectMaterialChanged(
 			RenderObject const *pObject,
 			uint32_t instanceIndex,
@@ -164,6 +159,8 @@ namespace Render
 		void __onObjectDrawableChanged(
 			RenderObject const *pObject,
 			bool cur);
+
+		void __onObjectNeedRedraw();
 
 		void __beginRenderPass(
 			VK::CommandBuffer &cmdBuffer,

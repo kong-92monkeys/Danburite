@@ -9,13 +9,18 @@ namespace Render
 				&RenderObject::__onMaterialPackMaterialChanged, this,
 				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 
-		__pMaterialPackMaterialValidChangeListener =
+		__pMaterialUpdateListener =
 			Infra::EventListener<MaterialPack const *>::bind(
-				&RenderObject::__onMaterialPackMaterialValidChanged, this);
+				&RenderObject::__onMaterialUpdated, this);
+
+		__pMaterialValidChangeListener =
+			Infra::EventListener<MaterialPack const *>::bind(
+				&RenderObject::__onMaterialValidChanged, this);
 
 		auto pMaterialPack{ std::make_unique<MaterialPack>() };
 		pMaterialPack->getMaterialChangeEvent() += __pMaterialPackMaterialChangeListener;
-		pMaterialPack->getMaterialValidChangeEvent() += __pMaterialPackMaterialValidChangeListener;
+		pMaterialPack->getMaterialUpdateEvent() += __pMaterialUpdateListener;
+		pMaterialPack->getMaterialValidChangeEvent() += __pMaterialValidChangeListener;
 
 		__materialPack2Index[pMaterialPack.get()] = 0U;
 		__materialPacks.emplace_back(std::move(pMaterialPack));
@@ -32,6 +37,8 @@ namespace Render
 
 		__rendererChangeEvent.invoke(this, pPrevRenderer, pRenderer);
 		__validateDrawable();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderObject::setMesh(
@@ -45,6 +52,8 @@ namespace Render
 
 		__meshChangeEvent.invoke(this, pPrevMesh, pMesh);
 		__validateDrawable();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderObject::setDrawParam(
@@ -58,6 +67,8 @@ namespace Render
 
 		__drawParamChangeEvent.invoke(this, pPrevDrawParam, pDrawParam);
 		__validateDrawable();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderObject::setInstanceCount(
@@ -97,6 +108,8 @@ namespace Render
 
 		if (prevCount < count)
 			__validateDrawable();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderObject::setVisible(
@@ -107,6 +120,8 @@ namespace Render
 
 		__visible = visible;
 		__validateDrawable();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderObject::draw(
@@ -149,9 +164,16 @@ namespace Render
 		uint32_t const instanceIndex{ __materialPack2Index.at(pPack) };
 		__materialChangeEvent.invoke(this, instanceIndex, type, pPrev, pCur);
 		__validateDrawable();
+
+		__needRedrawEvent.invoke(this);
 	}
 
-	void RenderObject::__onMaterialPackMaterialValidChanged()
+	void RenderObject::__onMaterialUpdated()
+	{
+		__needRedrawEvent.invoke(this);
+	}
+
+	void RenderObject::__onMaterialValidChanged()
 	{
 		__validateDrawable();
 	}

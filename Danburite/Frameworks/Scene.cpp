@@ -2,6 +2,11 @@
 
 namespace Frx
 {
+	Scene::Scene() noexcept
+	{
+		setUpdateFrequency(60.0);
+	}
+
 	Scene::~Scene() noexcept
 	{
 		__scmdExecutor.run([this]
@@ -57,6 +62,11 @@ namespace Frx
 
 	void Scene::__scmd_onIdle()
 	{
+		auto const curTime{ std::chrono::steady_clock::now() };
+		if (__updateInterval >= (curTime - __lastUpdateTime))
+			return;
+
+		__lastUpdateTime = curTime;
 		__scmd_update();
 	}
 }

@@ -25,11 +25,6 @@ namespace Render
 				&SubLayer::__onObjectMeshChanged, this,
 				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
-		__pObjectDrawParamChangeListener =
-			Infra::EventListener<RenderObject const *, DrawParam const *, DrawParam const *>::bind(
-				&SubLayer::__onObjectDrawParamChanged, this,
-				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
 		__pObjectInstanceCountChangeListener =
 			Infra::EventListener<RenderObject const *, uint32_t, uint32_t>::bind(
 				&SubLayer::__onObjectInstanceCountChanged, this,
@@ -38,6 +33,10 @@ namespace Render
 		__pObjectDrawableChangeListener =
 			Infra::EventListener<const RenderObject *, bool>::bind(
 				&SubLayer::__onObjectDrawableChanged, this, std::placeholders::_1, std::placeholders::_2);
+
+		__pObjectNeedRedrawListener =
+			Infra::EventListener<const RenderObject *>::bind(
+				&SubLayer::__onObjectNeedRedraw, this);
 
 		if (__pRenderer->useMaterial())
 		{
@@ -196,8 +195,8 @@ namespace Render
 		RenderObject const *const pObject)
 	{
 		pObject->getMeshChangeEvent() += __pObjectMeshChangeListener;
-		pObject->getDrawParamChangeEvent() += __pObjectDrawParamChangeListener;
 		pObject->getInstanceCountChangeEvent() += __pObjectInstanceCountChangeListener;
+		pObject->getNeedRedrawEvent() += __pObjectNeedRedrawListener;
 
 		uint32_t const instanceCount{ pObject->getInstanceCount() };
 		__object2Region[pObject] = std::make_unique<Infra::Region>(__objectRegionAllocator, instanceCount, 1ULL);
@@ -228,8 +227,8 @@ namespace Render
 		RenderObject const *pObject)
 	{
 		pObject->getMeshChangeEvent() -= __pObjectMeshChangeListener;
-		pObject->getDrawParamChangeEvent() -= __pObjectDrawParamChangeListener;
 		pObject->getInstanceCountChangeEvent() -= __pObjectInstanceCountChangeListener;
+		pObject->getNeedRedrawEvent() -= __pObjectNeedRedrawListener;
 
 		__object2Region.erase(pObject);
 
@@ -404,19 +403,6 @@ namespace Render
 		__registerMesh(pObject, pCur);
 		__drawSequenceInvalidated = true;
 		_invalidate();
-
-		__needRedrawEvent.invoke(this);
-	}
-
-	void SubLayer::__onObjectDrawParamChanged(
-		RenderObject const *const pObject,
-		DrawParam const *const pPrev,
-		DrawParam const *const pCur)
-	{
-		if (!pCur)
-			return;
-
-		__needRedrawEvent.invoke(this);
 	}
 
 	void SubLayer::__onObjectMaterialChanged(
@@ -436,8 +422,6 @@ namespace Render
 			__validateInstanceInfoHostBuffer(pObject, instanceIndex, type, pCur);
 			__instanceInfoBufferInvalidated = true;
 			_invalidate();
-
-			__needRedrawEvent.invoke(this);
 		}
 	}
 
@@ -452,8 +436,6 @@ namespace Render
 
 		__drawSequenceInvalidated = true;
 		_invalidate();
-
-		__needRedrawEvent.invoke(this);
 	}
 
 	void SubLayer::__onObjectDrawableChanged(
@@ -464,6 +446,11 @@ namespace Render
 			__registerObject(pObject);
 		else
 			__unregisterObject(pObject);
+	}
+
+	void SubLayer::__onObjectNeedRedraw()
+	{
+		__needRedrawEvent.invoke(this);
 	}
 
 	void SubLayer::__beginRenderPass(

@@ -14,6 +14,7 @@ public:
 
 protected:
 	virtual void _scmd_onInit() override;
+	virtual void _scmd_onUpdate() override;
 
 private:
 	std::unique_ptr<Render::Mesh> __rcmd_pMesh;
@@ -24,6 +25,8 @@ private:
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
+
+	glm::mat4 __rcmd_transform{ 1.0f };
 
 	Frx::Display *__rcmd_pDisplay{ };
 };

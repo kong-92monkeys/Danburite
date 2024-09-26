@@ -87,7 +87,6 @@ void PhongTestScene::_scmd_onInit()
 		};
 
 		__rcmd_pTransformMaterial = std::unique_ptr<Frx::TransformMaterial>{ renderEngine.createMaterial<Frx::TransformMaterial>() };
-		__rcmd_pTransformMaterial->setTransform(glm::rotate(glm::mat4{ 1.0f }, glm::quarter_pi<float>(), glm::vec3{ 0.0f, 0.0f, 1.0f }));
 
 		__rcmd_pPhongMaterial = std::unique_ptr<Frx::PhongMaterial>{ renderEngine.createMaterial<Frx::PhongMaterial>() };
 		__rcmd_pPhongMaterial->setAlbedoTexture(__rcmd_pAlbedoTexture.get());
@@ -101,5 +100,15 @@ void PhongTestScene::_scmd_onInit()
 
 		__rcmd_pLayer = std::unique_ptr<Render::Layer>{ renderEngine.createLayer() };
 		__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
+	});
+}
+
+void PhongTestScene::_scmd_onUpdate()
+{
+	_getRcmdExecutor().silentRun([this, deltaTime{ _getTime().deltaTime }]
+	{
+		auto const angle{ deltaTime.count() * 1.0e-9 };
+		__rcmd_transform = glm::rotate(__rcmd_transform, static_cast<float>(angle), glm::vec3{ 0.0f, 0.0f, 1.0f });
+		__rcmd_pTransformMaterial->setTransform(__rcmd_transform);
 	});
 }

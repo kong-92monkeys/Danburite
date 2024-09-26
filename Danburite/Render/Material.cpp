@@ -25,6 +25,10 @@ namespace Render
 
 	MaterialPack::MaterialPack()
 	{
+		__pMaterialUpdateListener =
+			Infra::EventListener<Material const *>::bind(
+				&MaterialPack::__onMaterialUpdated, this);
+
 		__pMaterialValidChangeListener =
 			Infra::EventListener<Material const *, bool, bool>::bind(
 				&MaterialPack::__onMaterialValidChanged, this);
@@ -56,12 +60,14 @@ namespace Render
 		if (pPrevMaterial)
 		{
 			pPrevMaterial->getValidChangeEvent() -= __pMaterialValidChangeListener;
+			pPrevMaterial->getUpdateEvent() -= __pMaterialUpdateListener;
 			__materials.erase(pPrevMaterial);
 		}
 
 		holder = pMaterial;
 		if (holder)
 		{
+			holder->getUpdateEvent() += __pMaterialUpdateListener;
 			holder->getValidChangeEvent() += __pMaterialValidChangeListener;
 			__materials.emplace(holder);
 		}
@@ -77,6 +83,11 @@ namespace Render
 	std::unordered_set<const Material *>::const_iterator MaterialPack::end() const noexcept
 	{
 		return __materials.end();
+	}
+
+	void MaterialPack::__onMaterialUpdated()
+	{
+		__materialUpdateEvent.invoke(this);
 	}
 
 	void MaterialPack::__onMaterialValidChanged()

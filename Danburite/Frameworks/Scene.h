@@ -16,11 +16,18 @@ namespace Frx
 			std::chrono::steady_clock::duration deltaTime{ };
 		};
 
+		Scene() noexcept;
 		virtual ~Scene() noexcept override;
 
 		void init(
 			Infra::Executor &rcmdExecutor,
 			Render::Engine &renderEngine);
+
+		constexpr void setUpdateInterval(
+			double timeMS) noexcept;
+
+		constexpr void setUpdateFrequency(
+			double frequency) noexcept;
 
 	protected:
 		virtual void _scmd_onInit();
@@ -48,6 +55,9 @@ namespace Frx
 		Infra::Executor *__pRcmdExecutor{ };
 		Render::Engine *__pRenderEngine{ };
 
+		std::chrono::steady_clock::duration __updateInterval{ std::chrono::steady_clock::duration::zero() };
+		std::chrono::time_point<std::chrono::steady_clock> __lastUpdateTime;
+
 		Infra::EventListenerPtr<Infra::Executor *> __pExecutorIdleListener;
 
 		void __updateTime() noexcept;
@@ -55,6 +65,18 @@ namespace Frx
 		void __scmd_update();
 		void __scmd_onIdle();
 	};
+
+	constexpr void Scene::setUpdateInterval(
+		double const timeMS) noexcept
+	{
+		__updateInterval = std::chrono::steady_clock::duration{ static_cast<int64_t>(timeMS * 1.0e6) };
+	}
+
+	constexpr void Scene::setUpdateFrequency(
+		double const frequency) noexcept
+	{
+		setUpdateInterval(1000.0 / frequency);
+	}
 
 	constexpr Scene::Time const &Scene::_getTime() const noexcept
 	{

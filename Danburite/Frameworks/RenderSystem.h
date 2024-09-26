@@ -16,6 +16,9 @@ namespace Frx
 
 		virtual ~RenderSystem() noexcept override;
 
+		constexpr void setFrameTime(
+			double timeMS) noexcept;
+
 		constexpr void setFps(
 			double fps) noexcept;
 
@@ -47,10 +50,16 @@ namespace Frx
 		Render::Engine &__getRenderEngine() noexcept;
 	};
 
+	constexpr void RenderSystem::setFrameTime(
+		double const timeMS) noexcept
+	{
+		__frameTime = std::chrono::steady_clock::duration{ static_cast<int64_t>(timeMS * 1.0e6) };
+	}
+
 	constexpr void RenderSystem::setFps(
 		double const fps) noexcept
 	{
-		__frameTime = std::chrono::steady_clock::duration{ static_cast<int64_t>(1.0e9 / fps) };
+		setFrameTime(1000.0 / fps);
 	}
 
 	template <std::derived_from<Scene> $Scene, typename ...$Args>

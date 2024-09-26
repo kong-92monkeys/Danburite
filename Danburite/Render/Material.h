@@ -102,6 +102,10 @@ namespace Render
 
 		[[nodiscard]]
 		constexpr Infra::EventView<MaterialPack const *> &
+			getMaterialUpdateEvent() const noexcept;
+
+		[[nodiscard]]
+		constexpr Infra::EventView<MaterialPack const *> &
 			getMaterialValidChangeEvent() const noexcept;
 
 	private:
@@ -109,10 +113,13 @@ namespace Render
 		std::unordered_set<Material const *> __materials;
 
 		mutable Infra::Event<MaterialPack const *, std::type_index, Material const *, Material const *> __materialChangeEvent;
+		mutable Infra::Event<MaterialPack const *> __materialUpdateEvent;
 		mutable Infra::Event<MaterialPack const *> __materialValidChangeEvent;
 
+		Infra::EventListenerPtr<Material const *> __pMaterialUpdateListener;
 		Infra::EventListenerPtr<Material const *, bool, bool> __pMaterialValidChangeListener;
 
+		void __onMaterialUpdated();
 		void __onMaterialValidChanged();
 	};
 
@@ -178,6 +185,12 @@ namespace Render
 		MaterialPack::getMaterialChangeEvent() const noexcept
 	{
 		return __materialChangeEvent;
+	}
+
+	constexpr Infra::EventView<MaterialPack const *> &
+		MaterialPack::getMaterialUpdateEvent() const noexcept
+	{
+		return __materialUpdateEvent;
 	}
 
 	constexpr Infra::EventView<MaterialPack const *> &

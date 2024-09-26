@@ -73,6 +73,10 @@ namespace Render
 		constexpr Infra::EventView<RenderObject const *, bool> &
 			getDrawableChangeEvent() const noexcept;
 
+		[[nodiscard]]
+		constexpr Infra::EventView<RenderObject const *> &
+			getNeedRedrawEvent() const noexcept;
+
 	private:
 		Renderer const *__pRenderer{ };
 		Mesh const *__pMesh{ };
@@ -102,11 +106,17 @@ namespace Render
 		mutable Infra::Event<RenderObject const *, bool>
 			__drawableChangeEvent;
 
+		mutable Infra::Event<RenderObject const *>
+			__needRedrawEvent;
+
 		Infra::EventListenerPtr<MaterialPack const *, std::type_index, Material const *, Material const *>
 			__pMaterialPackMaterialChangeListener;
 
 		Infra::EventListenerPtr<MaterialPack const *>
-			__pMaterialPackMaterialValidChangeListener;
+			__pMaterialUpdateListener;
+
+		Infra::EventListenerPtr<MaterialPack const *>
+			__pMaterialValidChangeListener;
 
 		[[nodiscard]]
 		bool __resolveDrawable() const noexcept;
@@ -118,7 +128,8 @@ namespace Render
 			Material const *pPrev,
 			Material const *pCur);
 
-		void __onMaterialPackMaterialValidChanged();
+		void __onMaterialUpdated();
+		void __onMaterialValidChanged();
 	};
 
 	constexpr Renderer const *RenderObject::getRenderer() const noexcept
@@ -197,5 +208,11 @@ namespace Render
 		RenderObject::getDrawableChangeEvent() const noexcept
 	{
 		return __drawableChangeEvent;
+	}
+
+	constexpr Infra::EventView<RenderObject const *> &
+		RenderObject::getNeedRedrawEvent() const noexcept
+	{
+		return __needRedrawEvent;
 	}
 }
