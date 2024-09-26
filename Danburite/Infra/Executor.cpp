@@ -10,12 +10,6 @@ namespace Infra
 	Executor::~Executor() noexcept
 	{
 		__running = false;
-
-		{
-			std::lock_guard loopLock{ __loopMutex };
-			__loopCV.notify_all();
-		}
-
 		__thread.join();
 	}
 
@@ -39,7 +33,6 @@ namespace Infra
 		{
 			std::lock_guard loopLock{ __loopMutex };
 			__jobInfos.emplace_back(std::move(jobInfo));
-			__loopCV.notify_all();
 		}
 
 		return retVal;
@@ -56,7 +49,6 @@ namespace Infra
 		{
 			std::lock_guard loopLock{ __loopMutex };
 			__jobInfos.emplace_back(std::move(jobInfo));
-			__loopCV.notify_all();
 		}
 	}
 
@@ -65,18 +57,9 @@ namespace Infra
 		std::unique_lock loopLock{ __loopMutex, std::defer_lock };
 		std::vector<__JobInfo> inFlightJobInfos;
 
-		while (true)
+		while (__running)
 		{
 			loopLock.lock();
-
-			__loopCV.wait(loopLock, [this]
-			{
-				return (!__running || __jobInfos.size());
-			});
-
-			if (!__running)
-				break;
-
 			inFlightJobInfos.swap(__jobInfos);
 			loopLock.unlock();
 

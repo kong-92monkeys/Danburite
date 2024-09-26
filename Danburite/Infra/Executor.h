@@ -5,7 +5,6 @@
 #include <optional>
 #include <thread>
 #include <mutex>
-#include <condition_variable>
 
 namespace Infra
 {
@@ -42,7 +41,6 @@ namespace Infra
 		std::thread __thread;
 		std::mutex __loopMutex;
 		std::vector<__JobInfo> __jobInfos;
-		std::condition_variable __loopCV;
 
 		bool __running{ true };
 
