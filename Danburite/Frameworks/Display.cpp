@@ -25,8 +25,8 @@ namespace Frx
 	{
 		__rcmdExecutor.run([this]
 		{
+			__renderEngine.cancelRender(__pRenderTarget);
 			delete __pRenderTarget;
-			__pRenderTargetNeedRedrawListener = nullptr;
 		}).wait();
 	}
 

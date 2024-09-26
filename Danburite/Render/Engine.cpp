@@ -120,6 +120,12 @@ namespace Render
 		__reservedRenderTargets.emplace(pRenderTarget);
 	}
 
+	void Engine::cancelRender(
+		RenderTarget *const pRenderTarget) noexcept
+	{
+		__reservedRenderTargets.erase(pRenderTarget);
+	}
+
 	void Engine::render()
 	{
 		if (__reservedRenderTargets.empty())

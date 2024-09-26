@@ -51,6 +51,9 @@ namespace Render
 		void reserveRender(
 			RenderTarget *pRenderTarget) noexcept;
 
+		void cancelRender(
+			RenderTarget *pRenderTarget) noexcept;
+
 		void render();
 
 	private:
