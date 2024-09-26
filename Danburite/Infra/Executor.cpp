@@ -67,8 +67,6 @@ namespace Infra
 
 		while (true)
 		{
-			auto const beginningTime{ std::chrono::steady_clock::now() };
-
 			loopLock.lock();
 
 			__loopCV.wait(loopLock, [this]
@@ -89,10 +87,6 @@ namespace Infra
 			}
 
 			inFlightJobInfos.clear();
-
-			auto const delay{ (beginningTime + __loopInterval) - std::chrono::steady_clock::now() };
-			std::this_thread::sleep_for(delay);
-
 			__idleEvent.invoke(this);
 		}
 	}

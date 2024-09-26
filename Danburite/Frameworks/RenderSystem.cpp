@@ -50,6 +50,11 @@ namespace Frx
 
 	void RenderSystem::__rcmd_onIdle()
 	{
+		auto const curTime{ std::chrono::steady_clock::now() };
+		if (__frameTime >= (curTime - __lastRenderTime))
+			return;
+
+		__lastRenderTime = curTime;
 		__getRenderEngine().render();
 	}
 

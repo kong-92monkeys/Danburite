@@ -3,6 +3,7 @@
 #include "Display.h"
 #include "Scene.h"
 #include <limits>
+#include <chrono>
 
 namespace Frx
 {
@@ -29,7 +30,10 @@ namespace Frx
 
 	private:
 		Infra::Executor __rcmdExecutor;
-		std::array<std::byte, sizeof(Render::Engine)> __enginePlaceholder;
+		std::array<std::byte, sizeof(Render::Engine)> __enginePlaceholder{ };
+
+		std::chrono::steady_clock::duration __frameTime;
+		std::chrono::time_point<std::chrono::steady_clock> __lastRenderTime;
 
 		Infra::EventListenerPtr<Infra::Executor *> __pExecutorIdleListener;
 
@@ -46,8 +50,7 @@ namespace Frx
 	constexpr void RenderSystem::setFps(
 		double const fps) noexcept
 	{
-		__rcmdExecutor.setLoopInterval(
-			Infra::Executor::Duration{ static_cast<int64_t>(1.0e9 / fps) });
+		__frameTime = std::chrono::steady_clock::duration{ static_cast<int64_t>(1.0e9 / fps) };
 	}
 
 	template <std::derived_from<Scene> $Scene, typename ...$Args>

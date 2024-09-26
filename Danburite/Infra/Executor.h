@@ -6,7 +6,6 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <chrono>
 
 namespace Infra
 {
@@ -14,7 +13,6 @@ namespace Infra
 	{
 	public:
 		using Job = std::function<void()>;
-		using Duration = std::chrono::steady_clock::duration;
 
 		Executor();
 		virtual ~Executor() noexcept override;
@@ -27,9 +25,6 @@ namespace Infra
 
 		void silentRun(
 			Job &&job);
-
-		constexpr void setLoopInterval(
-			Duration const &interval);
 
 		[[nodiscard]]
 		constexpr Infra::EventView<Executor *> &exec_getIdleEvent() noexcept;
@@ -49,20 +44,12 @@ namespace Infra
 		std::vector<__JobInfo> __jobInfos;
 		std::condition_variable __loopCV;
 
-		Duration __loopInterval;
-
 		bool __running{ true };
 
 		Infra::Event<Executor *> __idleEvent;
 
 		void __loop();
 	};
-
-	constexpr void Executor::setLoopInterval(
-		Duration const &interval)
-	{
-		__loopInterval = interval;
-	}
 
 	constexpr Infra::EventView<Executor *> &Executor::exec_getIdleEvent() noexcept
 	{
