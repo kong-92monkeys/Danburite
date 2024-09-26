@@ -26,7 +26,7 @@ namespace Dev
 			return nullptr;
 
 		auto const &memDedicatedReq{ buffer.getMemoryDedicatedRequirements() };
-		//if (memDedicatedReq.prefersDedicatedAllocation || memDedicatedReq.requiresDedicatedAllocation)
+		if (memDedicatedReq.prefersDedicatedAllocation || memDedicatedReq.requiresDedicatedAllocation)
 		{
 			VkMemoryAllocateInfo const memoryAllocInfo
 			{

@@ -28,7 +28,7 @@ namespace Infra
 				size_t const from	{ MathUtil::ceilAlign(itOffset + itSize, alignment) };
 				size_t const to		{ (nextIt == __regions.end()) ? __size : nextIt->first };
 
-				if ((to - from) >= size)
+				if (to >= (from + size))
 				{
 					retVal = from;
 					break;
