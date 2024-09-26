@@ -19,27 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="Executor.h" />
+    <ClInclude Include="Display.h" />
     <ClInclude Include="ImageMaterial.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneObject.h" />
     <ClInclude Include="SimpleMaterial.h" />
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="SimpleRenderer.h" />
-    <ClInclude Include="Placeholder.h" />
     <ClInclude Include="TestRenderer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexAttribute.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Executor.cpp" />
+    <ClCompile Include="Display.cpp" />
     <ClCompile Include="ImageMaterial.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
     <ClCompile Include="SimpleRenderer.cpp" />

@@ -45,7 +45,6 @@ namespace Render
 		__priority = priority;
 
 		__priorityChangeEvent.invoke(this, prevPriority, priority);
-		__needRedrawEvent.invoke(this);
 	}
 
 	void Layer::addRenderObject(

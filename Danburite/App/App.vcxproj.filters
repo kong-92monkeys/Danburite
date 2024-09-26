@@ -47,6 +47,12 @@
     <Filter Include="Assets\Images">
       <UniqueIdentifier>{ef890606-e546-4b16-9ca1-dc07a9f0c632}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{fd2d54f0-bab0-4bbd-9bba-040b68686e94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\TestScene">
+      <UniqueIdentifier>{0f9846c9-70e7-48e6-8d96-781e10a1375c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -76,6 +82,9 @@
     <ClInclude Include="ListBoxLoggerImpl.h">
       <Filter>Logger</Filter>
     </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>Scenes\TestScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -95,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="ListBoxLoggerImpl.cpp">
       <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Scenes\TestScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

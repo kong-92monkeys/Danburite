@@ -1,6 +1,7 @@
 #include "RenderSystem.h"
 #include "ImageMaterial.h"
 #include "SimpleMaterial.h"
+#include <new>
 
 namespace Frx
 {
@@ -10,6 +11,11 @@ namespace Frx
 	{
 		__rcmdExecutor.run([this, &context, &physicalDevice]
 		{
+			__pExecutorIdleListener =
+				Infra::EventListener<Infra::Executor *>::bind(
+					&RenderSystem::__rcmd_onIdle, this);
+
+			__rcmdExecutor.exec_getIdleEvent() += __pExecutorIdleListener;
 			__createEngine(context, physicalDevice);
 		}).wait();
 	}
@@ -18,73 +24,17 @@ namespace Frx
 	{
 		__rcmdExecutor.run([this]
 		{
-			__pEngine = nullptr;
+			__rcmdExecutor.exec_getIdleEvent() -= __pExecutorIdleListener;
+			__getRenderEngine().~Engine();
 		}).wait();
 	}
 
-	Placeholder<Render::RenderTarget> RenderSystem::createRenderTarget(
+	std::unique_ptr<Display> RenderSystem::createDisplay(
 		HINSTANCE const hinstance,
 		HWND const hwnd)
 	{
-		auto const pProm	{ new std::promise<Render::RenderTarget *> };
-		auto fut			{ pProm->get_future() };
-
-		__rcmdExecutor.silentRun([this, pProm, hinstance, hwnd]
-		{
-			pProm->set_value(__pEngine->createRenderTarget(hinstance, hwnd));
-			delete pProm;
-		});
-
-		return { __rcmdExecutor, std::move(fut) };
-	}
-
-	Placeholder<Render::Layer> RenderSystem::createLayer()
-	{
-		auto const pProm	{ new std::promise<Render::Layer *> };
-		auto fut			{ pProm->get_future() };
-
-		__rcmdExecutor.silentRun([this, pProm]
-		{
-			pProm->set_value(__pEngine->createLayer());
-			delete pProm;
-		});
-
-		return { __rcmdExecutor, std::move(fut) };
-	}
-
-	Placeholder<Render::Mesh> RenderSystem::createMesh()
-	{
-		auto const pProm	{ new std::promise<Render::Mesh *> };
-		auto fut			{ pProm->get_future() };
-
-		__rcmdExecutor.silentRun([this, pProm]
-		{
-			pProm->set_value(__pEngine->createMesh());
-			delete pProm;
-		});
-
-		return { __rcmdExecutor, std::move(fut) };
-	}
-
-	Placeholder<Render::Texture> RenderSystem::createTexture(
-		Render::Texture::ImageCreateInfo const &imageCreateInfo,
-		Render::Texture::ImageViewCreateInfo const &imageViewCreateInfo)
-	{
-		auto const pProm	{ new std::promise<Render::Texture *> };
-		auto fut			{ pProm->get_future() };
-
-		__rcmdExecutor.silentRun([this, pProm, imageCreateInfo, imageViewCreateInfo]
-		{
-			pProm->set_value(__pEngine->createTexture(imageCreateInfo, imageViewCreateInfo));
-			delete pProm;
-		});
-
-		return { __rcmdExecutor, std::move(fut) };
-	}
-
-	std::shared_ptr<SceneObject> RenderSystem::createSceneObject()
-	{
-		return std::make_shared<SceneObject>(__rcmdExecutor);
+		return std::make_unique<Display>(
+			__rcmdExecutor, __getRenderEngine(), hinstance, hwnd);
 	}
 
 	void RenderSystem::__createEngine(
@@ -95,6 +45,16 @@ namespace Frx
 		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]	= 0U;
 		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]	= 1U;
 
-		__pEngine = std::make_unique<Render::Engine>(context, physicalDevice, globalDescBindingInfo);
+		new (__enginePlaceholder.data()) Render::Engine{ context, physicalDevice, globalDescBindingInfo };
+	}
+
+	void RenderSystem::__rcmd_onIdle()
+	{
+		__getRenderEngine().render();
+	}
+
+	Render::Engine &RenderSystem::__getRenderEngine() noexcept
+	{
+		return *(reinterpret_cast<Render::Engine *>(__enginePlaceholder.data()));
 	}
 }

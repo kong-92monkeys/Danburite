@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Render/Engine.h"
-#include "Placeholder.h"
-#include "SceneObject.h"
+#include "Display.h"
+#include "Scene.h"
+#include <limits>
 
 namespace Frx
 {
@@ -15,77 +15,46 @@ namespace Frx
 
 		virtual ~RenderSystem() noexcept override;
 
+		constexpr void setFps(
+			double fps) noexcept;
+
 		[[nodiscard]]
-		Placeholder<Render::RenderTarget> createRenderTarget(
+		std::unique_ptr<Display> createDisplay(
 			HINSTANCE hinstance,
 			HWND hwnd);
 
+		template <std::derived_from<Scene> $Scene, typename ...$Args>
 		[[nodiscard]]
-		Placeholder<Render::Layer> createLayer();
-
-		[[nodiscard]]
-		Placeholder<Render::Mesh> createMesh();
-
-		[[nodiscard]]
-		Placeholder<Render::Texture> createTexture(
-			Render::Texture::ImageCreateInfo const &imageCreateInfo,
-			Render::Texture::ImageViewCreateInfo const &imageViewCreateInfo);
-
-		template <std::derived_from<Render::Material> $Material, typename ...$Args>
-		[[nodiscard]]
-		Placeholder<$Material> createMaterial($Args &&...args);
-
-		template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
-		[[nodiscard]]
-		Placeholder<$Renderer> createRenderer($Args &&...args);
-
-		[[nodiscard]]
-		std::shared_ptr<SceneObject> createSceneObject();
-
-		[[nodiscard]]
-		constexpr Executor &getRcmdExecutor() noexcept;
+		std::unique_ptr<$Scene> createScene($Args &&...args);
 
 	private:
-		Executor __rcmdExecutor;
-		std::unique_ptr<Render::Engine> __pEngine;
+		Infra::Executor __rcmdExecutor;
+		std::array<std::byte, sizeof(Render::Engine)> __enginePlaceholder;
+
+		Infra::EventListenerPtr<Infra::Executor *> __pExecutorIdleListener;
 
 		void __createEngine(
 			Dev::Context &context,
 			VK::PhysicalDevice const &physicalDevice);
+
+		void __rcmd_onIdle();
+
+		[[nodiscard]]
+		Render::Engine &__getRenderEngine() noexcept;
 	};
 
-	template <std::derived_from<Render::Material> $Material, typename ...$Args>
-	Placeholder<$Material> RenderSystem::createMaterial($Args &&...args)
+	constexpr void RenderSystem::setFps(
+		double const fps) noexcept
 	{
-		auto const pProm	{ new std::promise<$Material *> };
-		auto fut			{ pProm->get_future() };
-
-		__rcmdExecutor.silentRun([this, pProm, &args...] () mutable
-		{
-			pProm->set_value(__pEngine->createMaterial<$Material>(std::forward<$Args>(args)...));
-			delete pProm;
-		});
-
-		return { __rcmdExecutor, std::move(fut) };
+		__rcmdExecutor.setLoopInterval(
+			Infra::Executor::Duration{ static_cast<int64_t>(1.0e9 / fps) });
 	}
 
-	template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
-	Placeholder<$Renderer> RenderSystem::createRenderer($Args &&...args)
+	template <std::derived_from<Scene> $Scene, typename ...$Args>
+	std::unique_ptr<$Scene> RenderSystem::createScene($Args &&...args)
 	{
-		auto const pProm	{ new std::promise<$Renderer *> };
-		auto fut			{ pProm->get_future() };
-
-		__rcmdExecutor.silentRun([this, pProm, &args...] () mutable
-		{
-			pProm->set_value(__pEngine->createRenderer<$Renderer>(std::forward<$Args>(args)...));
-			delete pProm;
-		});
-
-		return { __rcmdExecutor, std::move(fut) };
-	}
-
-	constexpr Executor &RenderSystem::getRcmdExecutor() noexcept
-	{
-		return __rcmdExecutor;
+		auto pScene{ std::make_unique<$Scene>(std::forward<$Args>(args)...) };
+		pScene->init(__rcmdExecutor, __getRenderEngine());
+		return pScene;
 	}
 }

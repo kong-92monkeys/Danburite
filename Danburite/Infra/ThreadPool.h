@@ -48,7 +48,7 @@ namespace Infra
 		{
 		public:
 			Job job;
-			std::optional<std::promise<void>> promise;
+			std::optional<std::promise<void>> optPromise;
 
 			void signal() noexcept;
 		};

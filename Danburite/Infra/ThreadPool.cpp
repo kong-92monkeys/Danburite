@@ -62,7 +62,7 @@ namespace Infra
 		__JobInfo jobInfo
 		{
 			.job		{ std::move(job) },
-			.promise	{ std::move(promise) }
+			.optPromise	{ std::move(promise) }
 		};
 
 		{
@@ -146,7 +146,10 @@ namespace Infra
 
 	void ThreadPool::__JobInfo::signal() noexcept
 	{
-		if (promise.has_value())
-			promise.value().set_value();
+		if (!(optPromise.has_value()))
+			return;
+
+		auto &promise{ optPromise.value() };
+		promise.set_value();
 	}
 }

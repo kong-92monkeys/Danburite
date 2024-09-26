@@ -55,6 +55,9 @@
     <Filter Include="Updatable">
       <UniqueIdentifier>{14c9106b-49cf-4166-9fcc-8ba7c36128b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Executor">
+      <UniqueIdentifier>{618fa274-ab4c-4622-85fd-c5c67800f410}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -111,6 +114,9 @@
     <ClInclude Include="Updatable.h">
       <Filter>Updatable</Filter>
     </ClInclude>
+    <ClInclude Include="Executor.h">
+      <Filter>Executor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger.cpp">
@@ -133,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>ThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Executor.cpp">
+      <Filter>Executor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

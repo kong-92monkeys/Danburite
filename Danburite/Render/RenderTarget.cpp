@@ -100,6 +100,8 @@ namespace Render
 		__invalidatedLayers.erase(pLayer);
 		__layerSortionInvalidated = true;
 		_invalidate();
+
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::setBackgroundColor(
@@ -597,6 +599,7 @@ namespace Render
 	{
 		__layerSortionInvalidated = true;
 		_invalidate();
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::__onLayerRedrawNeeded() const noexcept

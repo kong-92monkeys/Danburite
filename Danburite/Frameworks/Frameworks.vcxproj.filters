@@ -31,29 +31,11 @@
     <Filter Include="RenderSystem">
       <UniqueIdentifier>{a2d285a4-311b-465f-aff5-5cd82bffd764}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SceneObject">
-      <UniqueIdentifier>{5acd7e5f-e61a-4626-8029-fefa21a70564}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component">
-      <UniqueIdentifier>{d11bd272-20d5-4bc1-9a5f-70650f7dfd08}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Impl">
-      <UniqueIdentifier>{1f290f63-051c-435c-9acc-62d6abdc7f42}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Executor">
       <UniqueIdentifier>{73918271-c1c9-40b8-ba4e-99e157976daf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Model">
-      <UniqueIdentifier>{20af5da8-0d9e-49f0-8101-1fed0c3af2d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Theme">
-      <UniqueIdentifier>{fbbe77aa-b891-452b-85bf-f1801a4ab147}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Style">
-      <UniqueIdentifier>{a157de4c-c7a1-4ec6-9dfc-f16a8010ade8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Placeholder">
-      <UniqueIdentifier>{4ecb4434-8a9d-4f6c-835b-7a519ce06898}</UniqueIdentifier>
+    <Filter Include="Display">
+      <UniqueIdentifier>{bda9a928-264f-431f-b362-095e90fe66f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,17 +66,8 @@
     <ClInclude Include="RenderSystem.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="SceneObject.h">
-      <Filter>SceneObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Executor.h">
-      <Filter>Executor</Filter>
-    </ClInclude>
-    <ClInclude Include="Placeholder.h">
-      <Filter>Placeholder</Filter>
+    <ClInclude Include="Display.h">
+      <Filter>Display</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,14 +92,8 @@
     <ClCompile Include="RenderSystem.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Executor.cpp">
-      <Filter>Executor</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneObject.cpp">
-      <Filter>SceneObject</Filter>
+    <ClCompile Include="Display.cpp">
+      <Filter>Display</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

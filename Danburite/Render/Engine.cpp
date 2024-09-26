@@ -122,6 +122,9 @@ namespace Render
 
 	void Engine::render()
 	{
+		if (__reservedRenderTargets.empty())
+			return;
+
 		__pGlobalDescriptorManager->validate();
 		__validateReservedRenderTargets();
 

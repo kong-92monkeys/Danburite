@@ -159,7 +159,6 @@ namespace Render
 			VK::CommandBuffer &cmdBuffer,
 			uint32_t imageIndex);
 
-		void __validateLayers();
 		void __sortLayers();
 
 		void __onLayerInvalidated(
