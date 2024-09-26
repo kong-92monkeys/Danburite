@@ -9,6 +9,8 @@ namespace Frx
 		Dev::Context &context,
 		VK::PhysicalDevice const &physicalDevice)
 	{
+		setFps(60.0);
+
 		__rcmdExecutor.run([this, &context, &physicalDevice]
 		{
 			__pExecutorIdleListener =

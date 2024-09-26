@@ -32,7 +32,7 @@ namespace Frx
 		Infra::Executor __rcmdExecutor;
 		std::array<std::byte, sizeof(Render::Engine)> __enginePlaceholder{ };
 
-		std::chrono::steady_clock::duration __frameTime{ };
+		std::chrono::steady_clock::duration __frameTime{ std::chrono::steady_clock::duration::zero() };
 		std::chrono::time_point<std::chrono::steady_clock> __lastRenderTime;
 
 		Infra::EventListenerPtr<Infra::Executor *> __pExecutorIdleListener;

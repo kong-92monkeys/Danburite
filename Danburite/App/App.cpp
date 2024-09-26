@@ -134,7 +134,6 @@ void CApp::__onInitBeforeMainFrame()
 	__pRenderSystem = std::make_unique<Frx::RenderSystem>(
 		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 
-	__pRenderSystem->setFps(1);
 	__pTestScene = __pRenderSystem->createScene<TestScene>();
 }
 
