@@ -8,9 +8,8 @@
 #endif
 
 #include "resource.h"       // main symbols
-#include "../Render/Engine.h"
-#include "../Frameworks/ImageMaterial.h"
-#include "../Frameworks/ImageRenderer.h"
+#include "../Frameworks/RenderSystem.h"
+#include "TestScene.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -36,38 +35,30 @@ public:
 
 public:
 	[[nodiscard]]
-	std::unique_ptr<Render::RenderTarget> createRenderTarget(
-		HWND hWindow);
+	std::unique_ptr<Frx::Display> createDisplay(
+		HWND hwnd);
 
-	void render(
-		Render::RenderTarget &renderTarget);
+	void setSceneDisplay(
+		Frx::Display *pDisplay);
 
 	[[nodiscard]]
 	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
 
 private:
 	std::unique_ptr<Dev::Context> __pVulkanContext;
-	std::unique_ptr<Render::Engine> __pRenderEngine;
+	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
+	std::unique_ptr<TestScene> __pTestScene;
 
-	std::unique_ptr<Render::Layer> __pLayer;
-	std::unique_ptr<Render::RenderObject> __pObject;
-	std::unique_ptr<Render::Mesh> __pMesh;
-	std::unique_ptr<Render::DrawParam> __pDrawParam;
-	std::unique_ptr<Render::Texture> __pTexture;
-	std::unique_ptr<Frx::ImageMaterial> __pMaterial;
-	std::unique_ptr<Frx::ImageRenderer> __pRenderer;
+	std::unique_ptr<Frx::Display> __pDisplay;
 
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
-
-	void __setupRenderTarget(
-		Render::RenderTarget &renderTarget);
 };
-
-extern CApp theApp;
 
 constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept
 {
 	return __idleEvent;
 }
+
+extern CApp theApp;

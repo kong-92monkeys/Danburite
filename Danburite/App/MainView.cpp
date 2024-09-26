@@ -53,7 +53,7 @@ BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs)
 void CMainView::OnPaint() 
 {
 	// TODO: Add your message handler code here
-	theApp.render(*__pRenderTarget);
+	__pDisplay->draw();
 	ValidateRect(nullptr);
 }
 
@@ -63,13 +63,8 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
-	__pRenderTarget = theApp.createRenderTarget(GetSafeHwnd());
-
-	__pRenderTargetNeedRedrawListener =
-		Infra::EventListener<Render::RenderTarget const *>::bind(
-			&CMainView::__onRenderTargetRedrawNeeded, this);
-
-	__pRenderTarget->setBackgroundColor(glm::vec4{ 0.01f, 0.015f, 0.015f, 1.0f });
+	__pDisplay = theApp.createDisplay(GetSafeHwnd());
+	theApp.setSceneDisplay(__pDisplay.get());
 
 	return 0;
 }
@@ -79,7 +74,8 @@ void CMainView::OnDestroy()
 	CWnd::OnDestroy();
 
 	// TODO: Add your message handler code here
-	__pRenderTarget = nullptr;
+	theApp.setSceneDisplay(nullptr);
+	__pDisplay = nullptr;
 }
 
 void CMainView::OnSize(UINT nType, int cx, int cy)
@@ -87,7 +83,7 @@ void CMainView::OnSize(UINT nType, int cx, int cy)
 	CWnd::OnSize(nType, cx, cy);
 
 	// TODO: Add your message handler code here
-	__pRenderTarget->sync();
+	__pDisplay->sync();
 }
 
 BOOL CMainView::OnEraseBkgnd(CDC *pDC)
@@ -95,9 +91,4 @@ BOOL CMainView::OnEraseBkgnd(CDC *pDC)
 	// TODO: Add your message handler code here and/or call default
 	// To prevent from erasing window
 	return TRUE;
-}
-
-void CMainView::__onRenderTargetRedrawNeeded() noexcept
-{
-	Invalidate(FALSE);
 }

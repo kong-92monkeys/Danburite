@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Render/RenderTarget.h"
+#include "../Frameworks/Display.h"
 
 // CMainView window
 
@@ -30,9 +30,6 @@ public:
 public:
 	virtual ~CMainView();
 
-	[[nodiscard]]
-	constexpr Render::RenderTarget &getRenderTarget() noexcept;
-
 	// Generated message map functions
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -45,14 +42,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	std::unique_ptr<Render::RenderTarget> __pRenderTarget;
-
-	Infra::EventListenerPtr<Render::RenderTarget const *> __pRenderTargetNeedRedrawListener;
-
-	void __onRenderTargetRedrawNeeded() noexcept;
+	std::unique_ptr<Frx::Display> __pDisplay;
 };
-
-constexpr Render::RenderTarget &CMainView::getRenderTarget() noexcept
-{
-	return *__pRenderTarget;
-}

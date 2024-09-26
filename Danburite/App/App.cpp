@@ -8,10 +8,7 @@
 #include "afxdialogex.h"
 #include "App.h"
 #include "MainFrm.h"
-#include "../Infra/Bitmap.h"
 #include "../System/Env.h"
-#include "../Render/TextureUtil.h"
-#include "../Frameworks/VertexAttribute.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -86,40 +83,30 @@ BOOL CApp::InitInstance()
 
 int CApp::ExitInstance()
 {
-	__pRenderer = nullptr;
-	__pMaterial = nullptr;
-	__pTexture = nullptr;
-	__pDrawParam = nullptr;
-	__pMesh = nullptr;
-	__pObject = nullptr;
-	__pLayer = nullptr;
-
-	__pRenderEngine = nullptr;
+	__pTestScene = nullptr;
+	__pRenderSystem = nullptr;
 	__pVulkanContext = nullptr;
 
 	//TODO: handle additional resources you may have added
 	return CWinApp::ExitInstance();
 }
 
-std::unique_ptr<Render::RenderTarget> CApp::createRenderTarget(
-	HWND const hWindow)
+std::unique_ptr<Frx::Display> CApp::createDisplay(
+	HWND const hwnd)
 {
-	auto pRetVal{ __pRenderEngine->createRenderTarget(m_hInstance, hWindow) };
-	__setupRenderTarget(*pRetVal);
-	return std::unique_ptr<Render::RenderTarget>{ pRetVal };
+	return __pRenderSystem->createDisplay(m_hInstance, hwnd);
 }
 
-void CApp::render(Render::RenderTarget &renderTarget)
+void CApp::setSceneDisplay(
+	Frx::Display *const pDisplay)
 {
-	__pRenderEngine->reserveRender(&renderTarget);
+	__pTestScene->setDisplay(pDisplay);
 }
 
 BOOL CApp::OnIdle(LONG lCount)
 {
 	// TODO: Add your specialized code here and/or call the base class
 	__idleEvent.invoke();
-	__pRenderEngine->render();
-
 	return CWinApp::OnIdle(lCount);
 }
 
@@ -143,67 +130,11 @@ void CApp::__onInitBeforeMainFrame()
 	contextCreateInfo.debugMode = true;
 #endif
 
-	std::unordered_map<std::type_index, uint32_t> materialTypeIds;
-
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
+	__pRenderSystem = std::make_unique<Frx::RenderSystem>(
+		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 
-	Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
-	globalDescBindingInfo.materialBufferLocations[typeid(Frx::ImageMaterial)]	= 1U;
-
-	__pRenderEngine = std::make_unique<Render::Engine>(
-		*__pVulkanContext,
-		__pVulkanContext->getPhysicalDeviceOf(0ULL),
-		globalDescBindingInfo);
-}
-
-void CApp::__setupRenderTarget(
-	Render::RenderTarget &renderTarget)
-{
-	__pLayer = std::unique_ptr<Render::Layer>{ __pRenderEngine->createLayer() };
-	renderTarget.addLayer(__pLayer.get());
-
-	__pObject = std::make_unique<Render::RenderObject>();
-	__pLayer->addRenderObject(__pObject.get());
-
-	Infra::GenericBuffer posBuffer;
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.5f });
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, 0.5f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, 0.5f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, 0.5f });
-
-	Infra::GenericBuffer uvBuffer;
-	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
-	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 1.0f });
-	uvBuffer.typedAdd<glm::vec2>({ 1.0f, 1.0f });
-	uvBuffer.typedAdd<glm::vec2>({ 1.0f, 0.0f });
-
-	Infra::GenericBuffer indexBuffer;
-	indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
-
-	__pMesh = std::unique_ptr<Render::Mesh>{ __pRenderEngine->createMesh() };
-	__pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
-	__pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, uvBuffer.getData(), uvBuffer.getSize());
-	__pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
-
-	__pDrawParam = std::make_unique<Render::DrawParamIndexed>(6U, 0U, 0);
-	__pRenderer = std::unique_ptr<Frx::ImageRenderer>{ __pRenderEngine->createRenderer<Frx::ImageRenderer>() };
-
-	__pObject->setRenderer(__pRenderer.get());
-	__pObject->setDrawParam(__pDrawParam.get());
-	__pObject->setMesh(__pMesh.get());
-
-	__pTexture = std::unique_ptr<Render::Texture>
-	{
-		Render::TextureUtil::loadTexture(
-			*__pRenderEngine, "Images/smile.jpg",
-			VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
-			VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT, VK_ACCESS_2_SHADER_SAMPLED_READ_BIT)
-	};
-
-	__pMaterial = std::unique_ptr<Frx::ImageMaterial>{ __pRenderEngine->createMaterial<Frx::ImageMaterial>() };
-	__pObject->getMaterialPackOf(0U).setMaterial(__pMaterial.get());
-
-	__pMaterial->setTexture(__pTexture.get());
+	__pTestScene = __pRenderSystem->createScene<TestScene>();
 }
 
 // CAboutDlg dialog used for App About

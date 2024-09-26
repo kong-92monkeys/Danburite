@@ -1,4 +1,6 @@
 #include "TextureUtil.h"
+#include "../Infra/Bitmap.h"
+#include "../System/Env.h"
 
 namespace Render::TextureUtil
 {

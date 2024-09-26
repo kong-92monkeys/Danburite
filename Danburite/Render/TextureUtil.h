@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Infra/Bitmap.h"
-#include "../System/Env.h"
 #include "Engine.h"
 
 namespace Render::TextureUtil
