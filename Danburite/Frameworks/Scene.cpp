@@ -34,6 +34,12 @@ namespace Frx
 		__pScmdExecutor = nullptr;
 	}
 
+	double Scene::_scmd_getFps() const noexcept
+	{
+		auto const rcmdFrameCount{ __rcmdFrameCount.load(std::memory_order::acquire) };
+		return (static_cast<double>(rcmdFrameCount) / (__time.elapsedTime.count() * 1e-9));
+	}
+
 	std::unique_ptr<Render::Layer> Scene::_rcmd_createLayer()
 	{
 		return std::unique_ptr<Render::Layer>{ __pRenderEngine->createLayer() };

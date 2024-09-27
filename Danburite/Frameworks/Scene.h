@@ -37,6 +37,9 @@ namespace Frx
 		void _stopScmdLoop() noexcept;
 
 		[[nodiscard]]
+		double _scmd_getFps() const noexcept;
+
+		[[nodiscard]]
 		std::unique_ptr<Render::Layer> _rcmd_createLayer();
 
 		[[nodiscard]]
