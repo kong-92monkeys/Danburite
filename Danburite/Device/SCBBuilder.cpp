@@ -14,7 +14,8 @@ namespace Dev
 	std::future<VK::CommandBuffer *> SCBBuilder::build(
 		std::function<void(VK::CommandBuffer &)> &&logic)
 	{
-		auto *const pPromise{ new std::promise<VK::CommandBuffer *> };
+		auto const pPromise	{ new std::promise<VK::CommandBuffer *> };
+		auto retVal			{ pPromise->get_future() };
 
 		__threadPool.silentRun(
 			[logic{ std::move(logic) }, &cmdBuffer{ __pCirculator->getNext() }, pPromise]
@@ -24,6 +25,6 @@ namespace Dev
 			delete pPromise;
 		});
 
-		return pPromise->get_future();
+		return retVal;
 	}
 }
