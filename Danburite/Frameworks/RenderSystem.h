@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Infra/SingleThreadPool.h"
 #include "Display.h"
 #include "Scene.h"
 #include <limits>
@@ -16,12 +17,6 @@ namespace Frx
 
 		virtual ~RenderSystem() noexcept override;
 
-		constexpr void setFrameTime(
-			double timeMS) noexcept;
-
-		constexpr void setFps(
-			double fps) noexcept;
-
 		[[nodiscard]]
 		std::unique_ptr<Display> createDisplay(
 			HINSTANCE hinstance,
@@ -32,35 +27,16 @@ namespace Frx
 		std::unique_ptr<$Scene> createScene($Args &&...args);
 
 	private:
-		Infra::Executor __rcmdExecutor;
+		Infra::SingleThreadPool __rcmdExecutor;
 		std::array<std::byte, sizeof(Render::Engine)> __enginePlaceholder{ };
-
-		std::chrono::steady_clock::duration __frameTime{ std::chrono::steady_clock::duration::zero() };
-		std::chrono::time_point<std::chrono::steady_clock> __lastRenderTime;
-
-		Infra::EventListenerPtr<Infra::Executor *> __pExecutorIdleListener;
 
 		void __createEngine(
 			Dev::Context &context,
 			VK::PhysicalDevice const &physicalDevice);
 
-		void __rcmd_onIdle();
-
 		[[nodiscard]]
 		Render::Engine &__getRenderEngine() noexcept;
 	};
-
-	constexpr void RenderSystem::setFrameTime(
-		double const timeMS) noexcept
-	{
-		__frameTime = std::chrono::steady_clock::duration{ static_cast<int64_t>(timeMS * 1.0e6) };
-	}
-
-	constexpr void RenderSystem::setFps(
-		double const fps) noexcept
-	{
-		setFrameTime(1000.0 / fps);
-	}
 
 	template <std::derived_from<Scene> $Scene, typename ...$Args>
 	std::unique_ptr<$Scene> RenderSystem::createScene($Args &&...args)

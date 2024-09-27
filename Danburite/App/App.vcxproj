@@ -203,7 +203,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="PhongTestScene.h" />
-    <ClInclude Include="TestScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
@@ -218,7 +217,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PhongTestScene.cpp" />
-    <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc" />

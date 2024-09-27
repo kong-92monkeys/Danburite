@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/Executor.h"
+#include "../Infra/ThreadPool.h"
 #include "../Render/Engine.h"
 
 namespace Frx
@@ -9,7 +9,7 @@ namespace Frx
 	{
 	public:
 		Display(
-			Infra::Executor &rcmdExecutor,
+			Infra::ThreadPool &rcmdExecutor,
 			Render::Engine &renderEngine,
 			HINSTANCE hinstance,
 			HWND hwnd);
@@ -23,7 +23,7 @@ namespace Frx
 		constexpr Render::RenderTarget &rcmd_getRenderTarget() noexcept;
 
 	private:
-		Infra::Executor &__rcmdExecutor;
+		Infra::ThreadPool &__rcmdExecutor;
 		Render::Engine &__renderEngine;
 
 		Render::RenderTarget *__pRenderTarget{ };

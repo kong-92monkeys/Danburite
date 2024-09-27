@@ -50,9 +50,6 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{fd2d54f0-bab0-4bbd-9bba-040b68686e94}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes\TestScene">
-      <UniqueIdentifier>{0f9846c9-70e7-48e6-8d96-781e10a1375c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assets\Shaders\Phong">
       <UniqueIdentifier>{cdd31695-bd9c-4bbc-a20a-32932a731e80}</UniqueIdentifier>
     </Filter>
@@ -88,9 +85,6 @@
     <ClInclude Include="ListBoxLoggerImpl.h">
       <Filter>Logger</Filter>
     </ClInclude>
-    <ClInclude Include="TestScene.h">
-      <Filter>Scenes\TestScene</Filter>
-    </ClInclude>
     <ClInclude Include="PhongTestScene.h">
       <Filter>Scenes\PhongTestScene</Filter>
     </ClInclude>
@@ -113,9 +107,6 @@
     </ClCompile>
     <ClCompile Include="ListBoxLoggerImpl.cpp">
       <Filter>Logger</Filter>
-    </ClCompile>
-    <ClCompile Include="TestScene.cpp">
-      <Filter>Scenes\TestScene</Filter>
     </ClCompile>
     <ClCompile Include="PhongTestScene.cpp">
       <Filter>Scenes\PhongTestScene</Filter>

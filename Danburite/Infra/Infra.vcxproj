@@ -22,7 +22,7 @@
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Event.h" />
-    <ClInclude Include="Executor.h" />
+    <ClInclude Include="Looper.h" />
     <ClInclude Include="GenericBuffer.h" />
     <ClInclude Include="GLM.h" />
     <ClInclude Include="Handle.h" />
@@ -31,7 +31,9 @@
     <ClInclude Include="DeferredRecycler.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MathUtil.h" />
+    <ClInclude Include="MultiThreadPool.h" />
     <ClInclude Include="RegionAllocator.h" />
+    <ClInclude Include="SingleThreadPool.h" />
     <ClInclude Include="Stateful.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Unique.h" />
@@ -42,12 +44,13 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Bitmap.cpp" />
-    <ClCompile Include="Executor.cpp" />
+    <ClCompile Include="Looper.cpp" />
     <ClCompile Include="GenericBuffer.cpp" />
     <ClCompile Include="DeferredDeleter.cpp" />
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="MultiThreadPool.cpp" />
     <ClCompile Include="RegionAllocator.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="SingleThreadPool.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

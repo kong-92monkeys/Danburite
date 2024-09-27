@@ -31,9 +31,6 @@
     <Filter Include="RenderSystem">
       <UniqueIdentifier>{a2d285a4-311b-465f-aff5-5cd82bffd764}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Executor">
-      <UniqueIdentifier>{73918271-c1c9-40b8-ba4e-99e157976daf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Display">
       <UniqueIdentifier>{bda9a928-264f-431f-b362-095e90fe66f6}</UniqueIdentifier>
     </Filter>

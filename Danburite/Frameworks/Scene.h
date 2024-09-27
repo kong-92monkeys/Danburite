@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../Infra/Executor.h"
+#include "../Infra/Looper.h"
 #include "../Render/Engine.h"
 #include <chrono>
+#include <any>
 
 namespace Frx
 {
@@ -17,11 +18,14 @@ namespace Frx
 		};
 
 		Scene() noexcept;
-		virtual ~Scene() noexcept override;
+		virtual ~Scene() noexcept override = default;
 
 		void init(
-			Infra::Executor &rcmdExecutor,
+			Infra::ThreadPool &rcmdExecutor,
 			Render::Engine &renderEngine);
+
+		constexpr void setMaxFrameDelay(
+			uint64_t maxDelay);
 
 		constexpr void setUpdateInterval(
 			double timeMS) noexcept;
@@ -30,41 +34,94 @@ namespace Frx
 			double frequency) noexcept;
 
 	protected:
+		void _stopScmdLoop() noexcept;
+
+		[[nodiscard]]
+		std::unique_ptr<Render::Layer> _rcmd_createLayer();
+
+		[[nodiscard]]
+		std::unique_ptr<Render::Mesh> _rcmd_createMesh();
+
+		[[nodiscard]]
+		std::unique_ptr<Render::Texture> _rcmd_createTexture(
+			std::string_view const &assetPath,
+			VkPipelineStageFlags2 beforeStageMask,
+			VkAccessFlags2 beforeAccessMask,
+			VkPipelineStageFlags2 afterStageMask,
+			VkAccessFlags2 afterAccessMask);
+
+		template <std::derived_from<Render::Material> $Material, typename ...$Args>
+		[[nodiscard]]
+		std::unique_ptr<$Material> _rcmd_createMaterial($Args &&...args);
+
+		template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
+		[[nodiscard]]
+		std::unique_ptr<$Renderer> _rcmd_createRenderer($Args &&...args);
+
+		[[nodiscard]]
+		std::future<void> _scmd_run(
+			Infra::ThreadPool::Job &&job);
+
+		void _scmd_silentRun(
+			Infra::ThreadPool::Job &&job);
+
+		[[nodiscard]]
+		std::future<void> _rcmd_run(
+			Infra::ThreadPool::Job &&job);
+
+		void _rcmd_silentRun(
+			Infra::ThreadPool::Job &&job);
+
 		virtual void _scmd_onInit();
-		virtual void _scmd_onUpdate();
 
 		[[nodiscard]]
-		constexpr Time const &_getTime() const noexcept;
+		virtual std::any _scmd_onUpdate(
+			Time const &time);
 
-		[[nodiscard]]
-		constexpr Infra::Executor &_getScmdExecutor() noexcept;
-
-		[[nodiscard]]
-		constexpr Infra::Executor &_getRcmdExecutor() const noexcept;
-
-		[[nodiscard]]
-		constexpr Render::Engine &_getRenderEngine() const noexcept;
+		virtual void _rcmd_onInit();
+		virtual void _rcmd_onUpdate(
+			std::any const &updateParam);
 
 	private:
-		Infra::Executor __scmdExecutor;
+		std::unique_ptr<Infra::Looper> __pScmdExecutor{ std::make_unique<Infra::Looper>() };
 
 		std::chrono::time_point<std::chrono::steady_clock> __beginningTime;
 
 		Time __time;
 
-		Infra::Executor *__pRcmdExecutor{ };
+		Infra::ThreadPool *__pRcmdExecutor{ };
 		Render::Engine *__pRenderEngine{ };
+
+		uint64_t __maxFrameDelay{ 3ULL };
+		uint64_t __scmdFrameCount{ };
+		std::atomic_uint64_t __rcmdFrameCount{ };
 
 		std::chrono::steady_clock::duration __updateInterval{ std::chrono::steady_clock::duration::zero() };
 		std::chrono::time_point<std::chrono::steady_clock> __lastUpdateTime;
 
-		Infra::EventListenerPtr<Infra::Executor *> __pExecutorIdleListener;
+		Infra::EventListenerPtr<Infra::Looper *> __pScmdIdleListener;
 
 		void __updateTime() noexcept;
 
-		void __scmd_update();
+		[[nodiscard]]
+		std::any __scmd_update();
+		void __rcmd_update(
+			std::any const &updateParam);
+
 		void __scmd_onIdle();
+
+		[[nodiscard]]
+		bool __scmd_checkFrameDelay() const noexcept;
+
+		[[nodiscard]]
+		bool __scmd_checkUpdateInterval() noexcept;
 	};
+
+	constexpr void Scene::setMaxFrameDelay(
+		uint64_t const maxDelay)
+	{
+		__maxFrameDelay = maxDelay;
+	}
 
 	constexpr void Scene::setUpdateInterval(
 		double const timeMS) noexcept
@@ -78,23 +135,23 @@ namespace Frx
 		setUpdateInterval(1000.0 / frequency);
 	}
 
-	constexpr Scene::Time const &Scene::_getTime() const noexcept
+	template <std::derived_from<Render::Material> $Material, typename ...$Args>
+	std::unique_ptr<$Material> Scene::_rcmd_createMaterial($Args &&...args)
 	{
-		return __time;
+		return std::unique_ptr<$Material>
+		{
+			__pRenderEngine->createMaterial<$Material>(
+				std::forward<$Args>(args)...)
+		};
 	}
 
-	constexpr Infra::Executor &Scene::_getScmdExecutor() noexcept
+	template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
+	std::unique_ptr<$Renderer> Scene::_rcmd_createRenderer($Args &&...args)
 	{
-		return __scmdExecutor;
-	}
-
-	constexpr Infra::Executor &Scene::_getRcmdExecutor() const noexcept
-	{
-		return *__pRcmdExecutor;
-	}
-
-	constexpr Render::Engine &Scene::_getRenderEngine() const noexcept
-	{
-		return *__pRenderEngine;
+		return std::unique_ptr<$Renderer>
+		{
+			__pRenderEngine->createRenderer<$Renderer>(
+				std::forward<$Args>(args)...)
+		};
 	}
 }

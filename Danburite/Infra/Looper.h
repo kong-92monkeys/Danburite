@@ -1,32 +1,32 @@
 #pragma once
 
-#include "../Infra/Event.h"
-#include <future>
-#include <optional>
+#include "Event.h"
+#include "ThreadPool.h"
 #include <thread>
 #include <mutex>
+#include <vector>
 
 namespace Infra
 {
-	class Executor : public Infra::Unique
+	class Looper : public ThreadPool
 	{
 	public:
 		using Job = std::function<void()>;
 
-		Executor();
-		virtual ~Executor() noexcept override;
+		Looper();
+		virtual ~Looper() noexcept override;
 
-		void waitIdle();
-
-		[[nodiscard]]
-		std::future<void> run(
-			Job &&job);
-
-		void silentRun(
-			Job &&job);
+		virtual void waitIdle() override;
 
 		[[nodiscard]]
-		constexpr Infra::EventView<Executor *> &exec_getIdleEvent() noexcept;
+		virtual std::future<void> run(
+			Job &&job) override;
+
+		virtual void silentRun(
+			Job &&job) override;
+
+		[[nodiscard]]
+		constexpr EventView<Looper *> &in_getIdleEvent() noexcept;
 
 	private:
 		struct __JobInfo
@@ -44,12 +44,12 @@ namespace Infra
 
 		bool __running{ true };
 
-		Infra::Event<Executor *> __idleEvent;
+		Event<Looper *> __idleEvent;
 
 		void __loop();
 	};
 
-	constexpr Infra::EventView<Executor *> &Executor::exec_getIdleEvent() noexcept
+	constexpr EventView<Looper *> &Looper::in_getIdleEvent() noexcept
 	{
 		return __idleEvent;
 	}

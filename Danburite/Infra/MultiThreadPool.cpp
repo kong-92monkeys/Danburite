@@ -1,8 +1,8 @@
-#include "ThreadPool.h"
+#include "MultiThreadPool.h"
 
 namespace Infra
 {
-	ThreadPool::ThreadPool(
+	MultiThreadPool::MultiThreadPool(
 		size_t const poolSize)
 	{
 		__slotInfos.resize(poolSize);
@@ -14,13 +14,13 @@ namespace Infra
 			pSlotInfo = std::make_unique<__SlotInfo>();
 
 			auto &thread{ pSlotInfo->thread };
-			thread = std::thread{ &ThreadPool::__loop, this, slotIt };
+			thread = std::thread{ &MultiThreadPool::__loop, this, slotIt };
 
 			__threadIds[slotIt] = thread.get_id();
 		}
 	}
 
-	ThreadPool::~ThreadPool() noexcept
+	MultiThreadPool::~MultiThreadPool() noexcept
 	{
 		__running = false;
 
@@ -35,20 +35,34 @@ namespace Infra
 			pSlotInfo->thread.join();
 	}
 
-	void ThreadPool::waitIdle(
-		size_t const threadIndex)
-	{
-		run(threadIndex, [] { }).wait();
-	}
-
-	void ThreadPool::waitIdle()
+	void MultiThreadPool::waitIdle()
 	{
 		size_t const poolSize{ getPoolSize() };
 		for (size_t slotIter{ }; slotIter < poolSize; ++slotIter)
 			run(slotIter, [] { }).wait();
 	}
 
-	std::future<void> ThreadPool::run(
+	std::future<void> MultiThreadPool::run(
+		Job &&job)
+	{
+		__randomSlotIndex = ((__randomSlotIndex + 1ULL) % getPoolSize());
+		return run(__randomSlotIndex, std::move(job));
+	}
+
+	void MultiThreadPool::silentRun(
+		Job &&job)
+	{
+		__randomSlotIndex = ((__randomSlotIndex + 1ULL) % getPoolSize());
+		silentRun(__randomSlotIndex, std::move(job));
+	}
+
+	void MultiThreadPool::waitIdle(
+		size_t const threadIndex)
+	{
+		run(threadIndex, [] { }).wait();
+	}
+
+	std::future<void> MultiThreadPool::run(
 		size_t const threadIndex,
 		Job &&job)
 	{
@@ -74,14 +88,7 @@ namespace Infra
 		return retVal;
 	}
 
-	std::future<void> ThreadPool::run(
-		Job &&job)
-	{
-		__randomSlotIndex = ((__randomSlotIndex + 1ULL) % getPoolSize());
-		return run(__randomSlotIndex, std::move(job));
-	}
-
-	void ThreadPool::silentRun(
+	void MultiThreadPool::silentRun(
 		size_t const threadIndex,
 		Job &&job)
 	{
@@ -101,14 +108,7 @@ namespace Infra
 		}
 	}
 
-	void ThreadPool::silentRun(
-		Job &&job)
-	{
-		__randomSlotIndex = ((__randomSlotIndex + 1ULL) % getPoolSize());
-		silentRun(__randomSlotIndex, std::move(job));
-	}
-
-	void ThreadPool::__loop(
+	void MultiThreadPool::__loop(
 		size_t const threadIndex)
 	{
 		auto const &pSlotInfo		{ __slotInfos[threadIndex] };
@@ -144,7 +144,7 @@ namespace Infra
 		}
 	}
 
-	void ThreadPool::__JobInfo::signal() noexcept
+	void MultiThreadPool::__JobInfo::signal() noexcept
 	{
 		if (!(optPromise.has_value()))
 			return;

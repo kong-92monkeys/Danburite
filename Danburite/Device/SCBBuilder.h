@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/ThreadPool.h"
+#include "../Infra/MultiThreadPool.h"
 #include "CommandBufferCirculator.h"
 
 namespace Dev
@@ -20,7 +20,7 @@ namespace Dev
 		constexpr size_t getCapacity() const noexcept;
 
 	private:
-		Infra::ThreadPool __threadPool;
+		Infra::MultiThreadPool __threadPool;
 
 		std::unique_ptr<CommandBufferCirculator> __pCirculator;
 	};

@@ -1,24 +1,30 @@
-#include "Executor.h"
+#include "SingleThreadPool.h"
 
 namespace Infra
 {
-	Executor::Executor()
+	SingleThreadPool::SingleThreadPool()
 	{
-		__thread = std::thread{ &Executor::__loop, this };
+		__thread = std::thread{ &SingleThreadPool::__loop, this };
 	}
 
-	Executor::~Executor() noexcept
+	SingleThreadPool::~SingleThreadPool() noexcept
 	{
 		__running = false;
+
+		{
+			std::lock_guard loopLock{ __loopMutex };
+			__loopCV.notify_all();
+		}
+
 		__thread.join();
 	}
 
-	void Executor::waitIdle()
+	void SingleThreadPool::waitIdle()
 	{
 		run([] { }).wait();
 	}
 
-	std::future<void> Executor::run(
+	std::future<void> SingleThreadPool::run(
 		Job &&job)
 	{
 		std::promise<void> promise;
@@ -33,12 +39,13 @@ namespace Infra
 		{
 			std::lock_guard loopLock{ __loopMutex };
 			__jobInfos.emplace_back(std::move(jobInfo));
+			__loopCV.notify_all();
 		}
 
 		return retVal;
 	}
 
-	void Executor::silentRun(
+	void SingleThreadPool::silentRun(
 		Job &&job)
 	{
 		__JobInfo jobInfo
@@ -49,17 +56,27 @@ namespace Infra
 		{
 			std::lock_guard loopLock{ __loopMutex };
 			__jobInfos.emplace_back(std::move(jobInfo));
+			__loopCV.notify_all();
 		}
 	}
 
-	void Executor::__loop()
+	void SingleThreadPool::__loop()
 	{
 		std::unique_lock loopLock{ __loopMutex, std::defer_lock };
 		std::vector<__JobInfo> inFlightJobInfos;
 
-		while (__running)
+		while (true)
 		{
 			loopLock.lock();
+
+			__loopCV.wait(loopLock, [this]
+			{
+				return (!__running || __jobInfos.size());
+			});
+
+			if (!__running)
+				break;
+
 			inFlightJobInfos.swap(__jobInfos);
 			loopLock.unlock();
 
@@ -70,11 +87,10 @@ namespace Infra
 			}
 
 			inFlightJobInfos.clear();
-			__idleEvent.invoke(this);
 		}
 	}
 
-	void Executor::__JobInfo::signal() noexcept
+	void SingleThreadPool::__JobInfo::signal() noexcept
 	{
 		if (!(optPromise.has_value()))
 			return;

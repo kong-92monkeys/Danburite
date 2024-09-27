@@ -58,6 +58,15 @@
     <Filter Include="Executor">
       <UniqueIdentifier>{618fa274-ab4c-4622-85fd-c5c67800f410}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ThreadPool\SingleThreadPool">
+      <UniqueIdentifier>{213be4c2-3df8-4381-8e9f-49c0079e7bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThreadPool\MultiThreadPool">
+      <UniqueIdentifier>{2ab2af56-4cce-48fa-95eb-47fb4b9ac1a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThreadPool\Looper">
+      <UniqueIdentifier>{af96ce23-b0c7-47fa-ad96-1dfe19b4283b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Unique.h">
@@ -114,8 +123,14 @@
     <ClInclude Include="Updatable.h">
       <Filter>Updatable</Filter>
     </ClInclude>
-    <ClInclude Include="Executor.h">
-      <Filter>Executor</Filter>
+    <ClInclude Include="SingleThreadPool.h">
+      <Filter>ThreadPool\SingleThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiThreadPool.h">
+      <Filter>ThreadPool\MultiThreadPool</Filter>
+    </ClInclude>
+    <ClInclude Include="Looper.h">
+      <Filter>ThreadPool\Looper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -137,11 +152,14 @@
     <ClCompile Include="RegionAllocator.cpp">
       <Filter>RegionAllocator</Filter>
     </ClCompile>
-    <ClCompile Include="ThreadPool.cpp">
-      <Filter>ThreadPool</Filter>
+    <ClCompile Include="MultiThreadPool.cpp">
+      <Filter>ThreadPool\MultiThreadPool</Filter>
     </ClCompile>
-    <ClCompile Include="Executor.cpp">
-      <Filter>Executor</Filter>
+    <ClCompile Include="SingleThreadPool.cpp">
+      <Filter>ThreadPool\SingleThreadPool</Filter>
+    </ClCompile>
+    <ClCompile Include="Looper.cpp">
+      <Filter>ThreadPool\Looper</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

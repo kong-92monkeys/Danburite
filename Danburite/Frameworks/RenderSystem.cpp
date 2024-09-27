@@ -11,15 +11,8 @@ namespace Frx
 		Dev::Context &context,
 		VK::PhysicalDevice const &physicalDevice)
 	{
-		setFps(60.0);
-
 		__rcmdExecutor.run([this, &context, &physicalDevice]
 		{
-			__pExecutorIdleListener =
-				Infra::EventListener<Infra::Executor *>::bind(
-					&RenderSystem::__rcmd_onIdle, this);
-
-			__rcmdExecutor.exec_getIdleEvent() += __pExecutorIdleListener;
 			__createEngine(context, physicalDevice);
 		}).wait();
 	}
@@ -28,7 +21,6 @@ namespace Frx
 	{
 		__rcmdExecutor.run([this]
 		{
-			__rcmdExecutor.exec_getIdleEvent() -= __pExecutorIdleListener;
 			__getRenderEngine().~Engine();
 		}).wait();
 	}
@@ -54,16 +46,6 @@ namespace Frx
 		globalDescBindingInfo.materialBufferLocations[typeid(PhongMaterial)]		= 3U;
 
 		new (__enginePlaceholder.data()) Render::Engine{ context, physicalDevice, globalDescBindingInfo };
-	}
-
-	void RenderSystem::__rcmd_onIdle()
-	{
-		auto const curTime{ std::chrono::steady_clock::now() };
-		if (__frameTime >= (curTime - __lastRenderTime))
-			return;
-
-		__lastRenderTime = curTime;
-		__getRenderEngine().render();
 	}
 
 	Render::Engine &RenderSystem::__getRenderEngine() noexcept
