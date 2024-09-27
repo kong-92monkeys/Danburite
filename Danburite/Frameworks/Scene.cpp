@@ -132,8 +132,8 @@ namespace Frx
 		if (!(__scmd_checkFrameDelay()))
 			return;
 
-		/*if (!(__scmd_checkUpdateInterval()))
-			return;*/
+		if (!(__scmd_checkUpdateInterval()))
+			return;
 		
 		auto updateParam{ __scmd_update() };
 		_rcmd_silentRun([this, updateParam{ std::move(updateParam) }]

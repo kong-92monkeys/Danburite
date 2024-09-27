@@ -63,6 +63,7 @@ namespace Dev
 
 		__writes.clear();
 		__bufferInfoCount = 0ULL;
+		__imageInfoCount = 0ULL;
 	}
 
 	std::vector<VkDescriptorBufferInfo> &DescriptorUpdater::__getBufferInfos() noexcept
@@ -73,6 +74,7 @@ namespace Dev
 		auto &retVal{ __bufferInfos[__bufferInfoCount] };
 		++__bufferInfoCount;
 
+		retVal.clear();
 		return retVal;
 	}
 
@@ -84,6 +86,7 @@ namespace Dev
 		auto &retVal{ __imageInfos[__imageInfoCount] };
 		++__imageInfoCount;
 
+		retVal.clear();
 		return retVal;
 	}
 }

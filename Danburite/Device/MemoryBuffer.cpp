@@ -11,7 +11,7 @@ namespace Dev
 		__pBuffer = std::make_unique<VK::Buffer>(device, bufferCreateInfo);
 		__pMemory = memoryAllocator.allocateBufferMemory(*__pBuffer, memoryProp);
 
-		const VkBindBufferMemoryInfo bindInfo
+		VkBindBufferMemoryInfo const bindInfo
 		{
 			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO },
 			.buffer			{ __pBuffer->getHandle() },
