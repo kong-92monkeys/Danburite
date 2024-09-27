@@ -1,4 +1,5 @@
 #include "CommandSubmitter.h"
+#include "SwapchainException.h"
 
 namespace Render
 {
@@ -99,7 +100,7 @@ namespace Render
 
 			auto const result{ __que.vkQueuePresentKHR(&presentInfo) };
 			if (result != VkResult::VK_SUCCESS)
-				throw PresentException{ "Failed to present the draw result.", result };
+				throw SwapchainException{ "Failed to present the draw result.", result };
 		}
 	}
 
@@ -108,10 +109,4 @@ namespace Render
 		__generalExecutions.clear();
 		__drawResults.clear();
 	}
-
-	CommandSubmitter::PresentException::PresentException(
-		char const *const _Message,
-		VkResult const result) noexcept :
-		exception{ _Message }, __result{ result }
-	{}
 }

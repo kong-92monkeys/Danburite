@@ -2,6 +2,7 @@
 #include "Constants.h"
 #include <stdexcept>
 #include <algorithm>
+#include "SwapchainException.h"
 
 namespace Render
 {
@@ -126,12 +127,12 @@ namespace Render
 
 	RenderTarget::DrawResult RenderTarget::draw()
 	{
-		auto &cmdBuffer			{ __beginNextDrawcallCmdBuffer() };
 		auto &imageAcqSemaphore	{ __pImageAcqSemaphoreCirculator->getNext() };
-		auto &completeSemaphore	{ __pCompleteSemaphoreCirculator->getNext() };
-
 		uint32_t const imageIdx	{ __acquireNextImage(imageAcqSemaphore) };
+
+		auto &completeSemaphore	{ __pCompleteSemaphoreCirculator->getNext() };
 		auto &outputAttachment	{ *(__swapchainImageViews[imageIdx]) };
+		auto &cmdBuffer			{ __beginNextDrawcallCmdBuffer() };
 
 		__beginSwapchainImage(cmdBuffer, imageIdx);
 
@@ -493,7 +494,7 @@ namespace Render
 
 		auto const result{ __device.vkAcquireNextImage2KHR(&imageAcqInfo, &retVal) };
 		if (result != VkResult::VK_SUCCESS)
-			throw std::runtime_error{ "Failed to acquire the swapchain image." };
+			throw SwapchainException{ "Failed to acquire the swapchain image.", result };
 
 		return retVal;
 	}

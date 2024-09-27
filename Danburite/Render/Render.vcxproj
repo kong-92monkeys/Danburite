@@ -36,6 +36,7 @@
     <ClInclude Include="CommandSubmitter.h" />
     <ClInclude Include="ShaderData.h" />
     <ClInclude Include="SubLayer.h" />
+    <ClInclude Include="SwapchainException.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureUtil.h" />
   </ItemGroup>
@@ -69,6 +70,7 @@
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="CommandSubmitter.cpp" />
     <ClCompile Include="SubLayer.cpp" />
+    <ClCompile Include="SwapchainException.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureUtil.cpp" />
   </ItemGroup>

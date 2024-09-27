@@ -58,6 +58,12 @@
     <Filter Include="Util">
       <UniqueIdentifier>{98725af5-c9ff-4f63-8e33-6e248579d428}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Util\TextureUtil">
+      <UniqueIdentifier>{5b7e7e54-fee6-42b8-933e-db7683d84b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\SwapchainException">
+      <UniqueIdentifier>{6c5c8623-bb91-4379-86bd-fea33ef60549}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -115,7 +121,10 @@
       <Filter>ImageReferenceManager</Filter>
     </ClInclude>
     <ClInclude Include="TextureUtil.h">
-      <Filter>Util</Filter>
+      <Filter>Util\TextureUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapchainException.h">
+      <Filter>Util\SwapchainException</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -168,7 +177,10 @@
       <Filter>ImageReferenceManager</Filter>
     </ClCompile>
     <ClCompile Include="TextureUtil.cpp">
-      <Filter>Util</Filter>
+      <Filter>Util\TextureUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapchainException.cpp">
+      <Filter>Util\SwapchainException</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

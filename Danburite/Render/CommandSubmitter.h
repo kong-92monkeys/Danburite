@@ -9,20 +9,6 @@ namespace Render
 	class CommandSubmitter : public Infra::Unique
 	{
 	public:
-		class PresentException : public std::exception
-		{
-		public:
-			PresentException(
-				char const *_Message,
-				VkResult result) noexcept;
-
-			[[nodiscard]]
-			constexpr VkResult getResult() const noexcept;
-
-		private:
-			VkResult __result{ };
-		};
-
 		CommandSubmitter(VK::Queue &queue) noexcept;
 
 		void addGeneralExecution(
@@ -49,9 +35,4 @@ namespace Render
 
 		std::vector<VkSubmitInfo2> __submitInfos;
 	};
-
-	constexpr VkResult CommandSubmitter::PresentException::getResult() const noexcept
-	{
-		return __result;
-	}
 }

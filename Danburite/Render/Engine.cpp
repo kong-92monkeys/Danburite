@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "../Device/ConversionUtil.h"
+#include "SwapchainException.h"
 #include "Constants.h"
 #include <stdexcept>
 #include <format>
@@ -143,8 +144,16 @@ namespace Render
 
 		__pCommandSubmitter->addGeneralExecution(executorCmdBuffer);
 
-		for (auto const pRenderTarget : __reservedRenderTargets)
-			__pCommandSubmitter->addDrawResult(pRenderTarget->draw());
+		try
+		{
+			for (auto const pRenderTarget : __reservedRenderTargets)
+				__pCommandSubmitter->addDrawResult(pRenderTarget->draw());
+		}
+		catch (SwapchainException const &e)
+		{
+			if (e.getResult() != VkResult::VK_ERROR_OUT_OF_DATE_KHR)
+				throw;
+		}
 
 		auto &submissionFence{ __getNextSubmissionFence() };
 		__pDevice->vkResetFences(1U, &(submissionFence.getHandle()));
@@ -154,15 +163,15 @@ namespace Render
 		try
 		{
 			__pCommandSubmitter->present();
-			__reservedRenderTargets.clear();
 		}
-		catch (CommandSubmitter::PresentException const &e)
+		catch (SwapchainException const &e)
 		{
 			if (e.getResult() != VkResult::VK_ERROR_OUT_OF_DATE_KHR)
 				throw;
 		}
 		
 		__deferredDeleter.advance();
+		__reservedRenderTargets.clear();
 	}
 
 	void Engine::__verifyPhysicalDeviceSupport()
