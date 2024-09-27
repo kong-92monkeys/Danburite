@@ -34,7 +34,7 @@ namespace Frx
 			double frequency) noexcept;
 
 	protected:
-		void _stopScmdLoop() noexcept;
+		void _stopLoop() noexcept;
 
 		[[nodiscard]]
 		double _scmd_getFps() const noexcept;

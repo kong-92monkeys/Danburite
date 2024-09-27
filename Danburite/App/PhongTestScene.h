@@ -3,6 +3,7 @@
 #include "../Frameworks/PhongRenderer.h"
 #include "../Frameworks/TransformMaterial.h"
 #include "../Frameworks/PhongMaterial.h"
+#include "../Frameworks/Transform.h"
 
 class PhongTestScene : public Frx::Scene
 {
@@ -31,7 +32,7 @@ private:
 	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
 
-	glm::mat4 __scmd_transform{ 1.0f };
+	Frx::Transform __transform;
 
 	Frx::Display *__rcmd_pDisplay{ };
 };

@@ -5,7 +5,7 @@ namespace Frx
 {
 	Scene::Scene() noexcept
 	{
-		//setUpdateFrequency(60.0);
+		setUpdateFrequency(60.0);
 	}
 
 	void Scene::init(
@@ -29,7 +29,7 @@ namespace Frx
 		});
 	}
 
-	void Scene::_stopScmdLoop() noexcept
+	void Scene::_stopLoop() noexcept
 	{
 		__pScmdExecutor = nullptr;
 	}

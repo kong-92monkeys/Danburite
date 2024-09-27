@@ -5,7 +5,7 @@
 
 PhongTestScene::~PhongTestScene() noexcept
 {
-	_stopScmdLoop();
+	_stopLoop();
 	_rcmd_run([this]
 	{
 		if (__rcmd_pDisplay)
@@ -45,9 +45,14 @@ void PhongTestScene::setDisplay(
 std::any PhongTestScene::_scmd_onUpdate(
 	Time const &time)
 {
-	auto const angle{ time.deltaTime.count() * 1.0e-9 };
-	__scmd_transform = glm::rotate(__scmd_transform, static_cast<float>(angle), glm::vec3{ 0.0f, 0.0f, 1.0f });
-	return __scmd_transform;
+	float const delta	{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
+	float const elapsed	{ static_cast<float>(time.elapsedTime.count() * 2.0e-9) };
+
+	__transform.getOrientation().rotate(delta, glm::vec3{ 0.0f, 0.0f, 1.0f });
+	__transform.getScale().set(glm::sin(elapsed) * 0.6f + 1.0f);
+	__transform.validate();
+
+	return __transform.getMatrix();
 }
 
 void PhongTestScene::_rcmd_onInit()
