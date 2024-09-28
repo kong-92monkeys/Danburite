@@ -4,7 +4,7 @@
         "name": "VK_LAYER_KHRONOS_validation",
         "type": "GLOBAL",
         "library_path": ".\\VkLayer_khronos_validation.dll",
-        "api_version": "1.3.295",
+        "api_version": "1.3.296",
         "implementation_version": "1",
         "description": "Khronos Validation Layer",
         "introduction": "The main, comprehensive Khronos validation layer.\n\nVulkan is an Explicit API, enabling direct control over how GPUs actually work. By design, minimal error checking is done inside a Vulkan driver. Applications have full control and responsibility for correct operation. Any errors in how Vulkan is used can result in a crash. \n\nThe Khronos Valiation Layer can be enabled to assist development by enabling developers to verify their applications correctly use the Vulkan API.",
@@ -137,6 +137,14 @@
                             "value": [
                                 "error"
                             ]
+                        },
+                        {
+                            "key": "debug_action",
+                            "value": "VK_DBG_LAYER_ACTION_LOG_MSG"
+                        },
+                        {
+                            "key": "enable_message_limit",
+                            "value": true
                         }
                     ]
                 },
@@ -211,6 +219,14 @@
                             "value": [
                                 "error"
                             ]
+                        },
+                        {
+                            "key": "debug_action",
+                            "value": "VK_DBG_LAYER_ACTION_LOG_MSG"
+                        },
+                        {
+                            "key": "enable_message_limit",
+                            "value": true
                         }
                     ]
                 },
@@ -288,6 +304,14 @@
                                 "warn",
                                 "perf"
                             ]
+                        },
+                        {
+                            "key": "debug_action",
+                            "value": "VK_DBG_LAYER_ACTION_LOG_MSG"
+                        },
+                        {
+                            "key": "enable_message_limit",
+                            "value": true
                         }
                     ]
                 },
@@ -363,6 +387,14 @@
                             "value": [
                                 "error"
                             ]
+                        },
+                        {
+                            "key": "debug_action",
+                            "value": "VK_DBG_LAYER_ACTION_LOG_MSG"
+                        },
+                        {
+                            "key": "enable_message_limit",
+                            "value": true
                         }
                     ]
                 },
@@ -440,6 +472,14 @@
                             "value": [
                                 "error"
                             ]
+                        },
+                        {
+                            "key": "debug_action",
+                            "value": "VK_DBG_LAYER_ACTION_LOG_MSG"
+                        },
+                        {
+                            "key": "enable_message_limit",
+                            "value": true
                         }
                     ]
                 },
@@ -511,8 +551,17 @@
                         {
                             "key": "report_flags",
                             "value": [
-                                "error"
+                                "error",
+                                "info"
                             ]
+                        },
+                        {
+                            "key": "debug_action",
+                            "value": ""
+                        },
+                        {
+                            "key": "enable_message_limit",
+                            "value": false
                         }
                     ]
                 }
@@ -819,7 +868,7 @@
                                         {
                                             "key": "printf_verbose",
                                             "label": "Printf verbose",
-                                            "description": "Set the verbosity of debug printf messages",
+                                            "description": "Will print out handles, instruction location, position in command buffer, and more",
                                             "type": "BOOL",
                                             "default": false,
                                             "platforms": [
@@ -839,7 +888,7 @@
                                         {
                                             "key": "printf_buffer_size",
                                             "label": "Printf buffer size",
-                                            "description": "Set the size in bytes of the buffer used by debug printf",
+                                            "description": "Set the size in bytes of the buffer per draw/dispatch/traceRays to hold the messages",
                                             "type": "INT",
                                             "default": 1024,
                                             "range": {
@@ -1067,8 +1116,8 @@
                                                     "key": "gpuav_indirect_draws_buffers",
                                                     "label": "Indirect draws parameters",
                                                     "type": "BOOL",
-                                                    "default": true,
-                                                    "description": "Validate buffers containing draw parameters used in indirect draw commands",
+                                                    "default": false,
+                                                    "description": "(Warning - still experimental) Validate buffers containing draw parameters used in indirect draw commands",
                                                     "platforms": [
                                                         "WINDOWS",
                                                         "LINUX"
@@ -1087,8 +1136,8 @@
                                                     "key": "gpuav_indirect_dispatches_buffers",
                                                     "label": "Indirect dispatches parameters",
                                                     "type": "BOOL",
-                                                    "default": true,
-                                                    "description": "Validate buffers containing dispatch parameters used in indirect dispatch commands",
+                                                    "default": false,
+                                                    "description": "(Warning - still experimental) Validate buffers containing dispatch parameters used in indirect dispatch commands",
                                                     "platforms": [
                                                         "WINDOWS",
                                                         "LINUX"
@@ -1107,8 +1156,8 @@
                                                     "key": "gpuav_indirect_trace_rays_buffers",
                                                     "label": "Indirect trace rays parameters",
                                                     "type": "BOOL",
-                                                    "default": true,
-                                                    "description": "Validate buffers containing ray tracing parameters used in indirect ray tracing commands",
+                                                    "default": false,
+                                                    "description": "(Warning - still experimental) Validate buffers containing ray tracing parameters used in indirect ray tracing commands",
                                                     "platforms": [
                                                         "WINDOWS",
                                                         "LINUX"
