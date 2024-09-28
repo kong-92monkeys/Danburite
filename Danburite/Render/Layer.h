@@ -32,7 +32,8 @@ namespace Render
 
 		void draw(
 			VK::CommandBuffer &cmdBuffer,
-			VK::ImageView &outputAttachment,
+			VK::ImageView &colorAttachment,
+			VK::ImageView *pDepthStencilAttachment,
 			RendererResourceManager &rendererResourceManager,
 			VkRect2D const &renderArea) const;
 

@@ -27,20 +27,23 @@ namespace Frx
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
-			VkFormat outputFormat) const override;
+			VkFormat colorFormat,
+			VkFormat depthStencilFormat,
+			VkImageLayout depthStencilImageLayout) const override;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::Framebuffer> createFramebuffer(
 			VK::RenderPass &renderPass,
-			VK::ImageView &outputAttachment,
-			uint32_t outputWidth,
-			uint32_t outputHeight) const override;
+			VK::ImageView &colorAttachment,
+			VK::ImageView *pDepthStencilAttachment,
+			uint32_t surfaceWidth,
+			uint32_t surfaceHeight) const override;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::Pipeline> createPipeline(
 			VK::RenderPass &renderPass,
-			uint32_t outputWidth,
-			uint32_t outputHeight) const override;
+			uint32_t surfaceWidth,
+			uint32_t surfaceHeight) const override;
 
 	protected:
 		[[nodiscard]]

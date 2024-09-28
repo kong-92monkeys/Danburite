@@ -11,9 +11,11 @@ namespace Render
 			Infra::DeferredDeleter &deferredDeleter) noexcept;
 
 		void invalidate(
-			VkFormat outputFormat,
-			uint32_t outputWidth,
-			uint32_t outputHeight);
+			VkFormat colorFormat,
+			VkFormat depthStencilFormat,
+			VkImageLayout depthStencilImageLayout,
+			uint32_t surfaceWidth,
+			uint32_t surfaceHeight);
 
 		[[nodiscard]]
 		VK::RenderPass &getRenderPassOf(
@@ -22,7 +24,8 @@ namespace Render
 		[[nodiscard]]
 		VK::Framebuffer &getFramebufferOf(
 			Renderer const *pRenderer,
-			VK::ImageView &outputAttachment);
+			VK::ImageView &colorAttachment,
+			VK::ImageView *pDepthStencilAttachment);
 
 		[[nodiscard]]
 		VK::Pipeline &getPipelineOf(
@@ -41,7 +44,10 @@ namespace Render
 
 		Infra::DeferredDeleter &__deferredDeleter;
 
-		VkFormat __outputFormat{ };
+		VkFormat __colorFormat{ };
+		VkFormat __depthStencilFormat{ };
+		VkImageLayout __depthStencilImageLayout{ };
+
 		uint32_t __outputWidth{ };
 		uint32_t __outputHeight{ };
 

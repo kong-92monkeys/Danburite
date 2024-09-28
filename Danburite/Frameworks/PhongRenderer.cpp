@@ -50,20 +50,33 @@ namespace Frx
 	}
 
 	std::unique_ptr<VK::RenderPass> PhongRenderer::createRenderPass(
-		VkFormat const outputFormat) const
+		VkFormat const colorFormat,
+		VkFormat const depthStencilFormat,
+		VkImageLayout const depthStencilImageLayout) const
 	{
-		VkAttachmentDescription2 const colorAttachment
-		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2 },
-			.format				{ outputFormat },
-			.samples			{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
-			.loadOp				{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_LOAD },
-			.storeOp			{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE },
-			.stencilLoadOp		{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE },
-			.stencilStoreOp		{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE },
-			.initialLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-			.finalLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }
-		};
+		std::vector<VkAttachmentDescription2> attachmentDescs;
+
+		auto &colorAttachment			{ attachmentDescs.emplace_back() };
+		colorAttachment.sType			= VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+		colorAttachment.format			= colorFormat;
+		colorAttachment.samples			= VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp			= VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_LOAD;
+		colorAttachment.storeOp			= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment.stencilLoadOp	= VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp	= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout	= VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		colorAttachment.finalLayout		= VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		auto &depthAttachment			{ attachmentDescs.emplace_back() };
+		depthAttachment.sType			= VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+		depthAttachment.format			= depthStencilFormat;
+		depthAttachment.samples			= VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+		depthAttachment.loadOp			= VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_LOAD;
+		depthAttachment.storeOp			= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
+		depthAttachment.stencilLoadOp	= VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		depthAttachment.stencilStoreOp	= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		depthAttachment.initialLayout	= depthStencilImageLayout;
+		depthAttachment.finalLayout		= depthStencilImageLayout;
 
 		VkAttachmentReference2 const colorAttachmentRef
 		{
@@ -73,21 +86,44 @@ namespace Frx
 			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT }
 		};
 
+		VkAttachmentReference2 const depthAttachmentRef
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2 },
+			.attachment		{ 1U },
+			.layout			{ depthStencilImageLayout },
+			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT }
+		};
+
 		VkSubpassDescription2 const subpass
 		{
-			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
-			.pipelineBindPoint		{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
-			.colorAttachmentCount	{ 1U },
-			.pColorAttachments		{ &colorAttachmentRef }
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
+			.pipelineBindPoint			{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
+			.colorAttachmentCount		{ 1U },
+			.pColorAttachments			{ &colorAttachmentRef },
+			.pDepthStencilAttachment	{ &depthAttachmentRef }
 		};
 
 		VkMemoryBarrier2 const memoryBarrier
 		{
 			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
-			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
-			.srcAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT },
-			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
-			.dstAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT }
+			.srcStageMask	{
+				VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT |
+				VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT |
+				VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT
+			},
+			.srcAccessMask	{
+				VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT |
+				VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+			},
+			.dstStageMask	{
+				VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT |
+				VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT
+			},
+			.dstAccessMask	{
+				VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT |
+				VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+				VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+			}
 		};
 
 		VkSubpassDependency2 const dependency
@@ -101,8 +137,8 @@ namespace Frx
 		VkRenderPassCreateInfo2 const createInfo
 		{
 			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2 },
-			.attachmentCount	{ 1U },
-			.pAttachments		{ &colorAttachment },
+			.attachmentCount	{ static_cast<uint32_t>(attachmentDescs.size()) },
+			.pAttachments		{ attachmentDescs.data() },
 			.subpassCount		{ 1U },
 			.pSubpasses			{ &subpass },
 			.dependencyCount	{ 1U },
@@ -114,18 +150,25 @@ namespace Frx
 
 	std::unique_ptr<VK::Framebuffer> PhongRenderer::createFramebuffer(
 		VK::RenderPass &renderPass,
-		VK::ImageView &outputAttachment,
-		uint32_t const outputWidth,
-		uint32_t const outputHeight) const
+		VK::ImageView &colorAttachment,
+		VK::ImageView *const pDepthStencilAttachment,
+		uint32_t const surfaceWidth,
+		uint32_t const surfaceHeight) const
 	{
+		std::vector<VkImageView> attachments;
+		attachments.emplace_back(colorAttachment.getHandle());
+
+		if (pDepthStencilAttachment)
+			attachments.emplace_back(pDepthStencilAttachment->getHandle());
+
 		VkFramebufferCreateInfo const createInfo
 		{
 			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO },
 			.renderPass			{ renderPass.getHandle() },
-			.attachmentCount	{ 1U },
-			.pAttachments		{ &(outputAttachment.getHandle()) },
-			.width				{ outputWidth },
-			.height				{ outputHeight },
+			.attachmentCount	{ static_cast<uint32_t>(attachments.size()) },
+			.pAttachments		{ attachments.data() },
+			.width				{ surfaceWidth },
+			.height				{ surfaceHeight },
 			.layers				{ 1U }
 		};
 		
@@ -134,8 +177,8 @@ namespace Frx
 
 	std::unique_ptr<VK::Pipeline> PhongRenderer::createPipeline(
 		VK::RenderPass &renderPass,
-		uint32_t const outputWidth,
-		uint32_t const outputHeight) const
+		uint32_t const surfaceWidth,
+		uint32_t const surfaceHeight) const
 	{
 		std::vector<VkPipelineShaderStageCreateInfo> stages;
 
@@ -208,8 +251,8 @@ namespace Frx
 		{
 			.x			{ 0.0f },
 			.y			{ 0.0f },
-			.width		{ static_cast<float>(outputWidth) },
-			.height		{ static_cast<float>(outputHeight) },
+			.width		{ static_cast<float>(surfaceWidth) },
+			.height		{ static_cast<float>(surfaceHeight) },
 			.minDepth	{ 0.0f },
 			.maxDepth	{ 1.0f }
 		};
@@ -221,8 +264,8 @@ namespace Frx
 				.y		{ 0 }
 			},
 			.extent		{
-				.width	{ outputWidth },
-				.height	{ outputHeight }
+				.width	{ surfaceWidth },
+				.height	{ surfaceHeight }
 			}
 		};
 
@@ -258,6 +301,16 @@ namespace Frx
 			.alphaToOneEnable			{ VK_FALSE }
 		};
 
+		VkPipelineDepthStencilStateCreateInfo const depthStencilState
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO },
+			.depthTestEnable		{ VK_TRUE },
+			.depthWriteEnable		{ VK_TRUE },
+			.depthCompareOp			{ VkCompareOp::VK_COMPARE_OP_LESS },
+			.depthBoundsTestEnable	{ VK_FALSE },
+			.stencilTestEnable		{ VK_FALSE }
+		};
+
 		VkPipelineColorBlendAttachmentState const blendAttachment
 		{
 			.blendEnable			{ VK_FALSE },
@@ -288,7 +341,7 @@ namespace Frx
 			.pViewportState				{ &viewportState },
 			.pRasterizationState		{ &rasterizationState },
 			.pMultisampleState			{ &multisampleState },
-			.pDepthStencilState			{ nullptr },
+			.pDepthStencilState			{ &depthStencilState },
 			.pColorBlendState			{ &colorBlendState },
 			.pDynamicState				{ nullptr },
 			.layout						{ getPipelineLayout().getHandle() },

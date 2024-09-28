@@ -60,8 +60,11 @@ namespace Render
 			__device, VkSemaphoreType::VK_SEMAPHORE_TYPE_BINARY, Constants::DEFERRED_DELETER_QUEUE_SIZE);
 
 		auto const &extent{ getExtent() };
+		
 		__pRendererResourceManager = std::make_unique<RendererResourceManager>(__deferredDeleter);
-		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
+		__pRendererResourceManager->invalidate(
+			__surfaceFormat.format, __depthStencilFormat, __depthStencilImageLayout,
+			extent.width, extent.height);
 	}
 
 	RenderTarget::~RenderTarget() noexcept
@@ -154,7 +157,10 @@ namespace Render
 		__syncClearFramebuffers();
 
 		auto const &extent{ getExtent() };
-		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
+
+		__pRendererResourceManager->invalidate(
+			__surfaceFormat.format, __depthStencilFormat, __depthStencilImageLayout,
+			extent.width, extent.height);
 	}
 
 	RenderTarget::DrawResult RenderTarget::draw()
@@ -171,7 +177,7 @@ namespace Render
 		for (auto const pLayer : __sortedLayers)
 		{
 			pLayer->draw(
-				cmdBuffer, outputAttachment,
+				cmdBuffer, outputAttachment, __pDepthStencilImageView.get(),
 				*__pRendererResourceManager, __renderArea);
 		}
 
@@ -555,14 +561,24 @@ namespace Render
 				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE
 			);
 
+			depthStencilAttachment.storeOp			= (
+				__useDepthBuffer ?
+				VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE :
+				VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE
+			);
+
 			depthStencilAttachment.stencilLoadOp	= (
 				__useStencilBuffer ?
 				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR :
 				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE
 			);
 
-			depthStencilAttachment.storeOp			= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			depthStencilAttachment.stencilStoreOp	= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			depthStencilAttachment.stencilStoreOp = (
+				__useStencilBuffer ?
+				VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE :
+				VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE
+			);
+
 			depthStencilAttachment.initialLayout	= VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
 			depthStencilAttachment.finalLayout		= __depthStencilImageLayout;
 		}
@@ -600,22 +616,16 @@ namespace Render
 			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
 			.srcAccessMask	{ VK_ACCESS_2_NONE },
 			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
-			.dstAccessMask	{
-				VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT |
-				VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT
-			}
+			.dstAccessMask	{ VK_ACCESS_2_NONE }
 		};
 
 		if (__useDepthBuffer || __useStencilBuffer)
 		{
 			memoryBarrier.srcStageMask		|= VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
 			memoryBarrier.srcStageMask		|= VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
-			memoryBarrier.srcAccessMask		|= VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
 			memoryBarrier.dstStageMask		|= VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
 			memoryBarrier.dstStageMask		|= VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
-			memoryBarrier.dstAccessMask		|= VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
-			memoryBarrier.dstAccessMask		|= VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		}
 
 		VkSubpassDependency2 const dependency
@@ -648,7 +658,9 @@ namespace Render
 		{
 			std::vector<VkImageView> attachments;
 			attachments.emplace_back(pSwapchainImageView->getHandle());
-			attachments.emplace_back(__pDepthStencilImageView->getHandle());
+
+			if (__pDepthStencilImageView)
+				attachments.emplace_back(__pDepthStencilImageView->getHandle());
 
 			VkFramebufferCreateInfo const createInfo
 			{

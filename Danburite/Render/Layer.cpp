@@ -78,7 +78,8 @@ namespace Render
 
 	void Layer::draw(
 		VK::CommandBuffer &cmdBuffer,
-		VK::ImageView &outputAttachment,
+		VK::ImageView &colorAttachment,
+		VK::ImageView *const pDepthStencilAttachment,
 		RendererResourceManager &rendererResourceManager,
 		VkRect2D const &renderArea) const
 	{
@@ -88,7 +89,7 @@ namespace Render
 				continue;
 
 			pSubLayer->draw(
-				cmdBuffer, outputAttachment,
+				cmdBuffer, colorAttachment, pDepthStencilAttachment,
 				rendererResourceManager, renderArea);
 		}
 	}

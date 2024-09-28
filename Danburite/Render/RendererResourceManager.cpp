@@ -8,15 +8,20 @@ namespace Render
 	{}
 
 	void RendererResourceManager::invalidate(
-		VkFormat const outputFormat,
-		uint32_t const outputWidth,
-		uint32_t const outputHeight)
+		VkFormat const colorFormat,
+		VkFormat const depthStencilFormat,
+		VkImageLayout const depthStencilImageLayout,
+		uint32_t const surfaceWidth,
+		uint32_t const surfaceHeight)
 	{
 		__clearResources();
 
-		__outputFormat		= outputFormat;
-		__outputWidth		= outputWidth;
-		__outputHeight		= outputHeight;
+		__colorFormat				= colorFormat;
+		__depthStencilFormat		= depthStencilFormat;
+		__depthStencilImageLayout	= depthStencilImageLayout;
+
+		__outputWidth				= surfaceWidth;
+		__outputHeight				= surfaceHeight;
 
 		__pRendererDestroyListener = Infra::EventListener<Renderer const *>::bind(
 			&RendererResourceManager::__onRendererDestroyed, this, std::placeholders::_1);
@@ -34,14 +39,18 @@ namespace Render
 
 		auto &pRetVal{ pResource->pRenderPass };
 		if (!pRetVal)
-			pRetVal = pRenderer->createRenderPass(__outputFormat);
+		{
+			pRetVal = pRenderer->createRenderPass(
+				__colorFormat, __depthStencilFormat, __depthStencilImageLayout);
+		}
 
 		return *pRetVal;
 	}
 
 	VK::Framebuffer &RendererResourceManager::getFramebufferOf(
 		Renderer const *const pRenderer,
-		VK::ImageView &outputAttachment)
+		VK::ImageView &colorAttachment,
+		VK::ImageView *const pDepthStencilAttachment)
 	{
 		auto &pResource{ __resources[pRenderer] };
 		if (!pResource)
@@ -50,11 +59,11 @@ namespace Render
 			pResource = std::make_shared<__RendererResource>();
 		}
 
-		auto &pRetVal{ pResource->framebuffers[&outputAttachment] };
+		auto &pRetVal{ pResource->framebuffers[&colorAttachment] };
 		if (!pRetVal)
 		{
 			pRetVal = pRenderer->createFramebuffer(
-				getRenderPassOf(pRenderer), outputAttachment,
+				getRenderPassOf(pRenderer), colorAttachment, pDepthStencilAttachment,
 				__outputWidth, __outputHeight);
 		}
 

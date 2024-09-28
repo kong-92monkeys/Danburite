@@ -86,7 +86,8 @@ namespace Render
 
 	void SubLayer::draw(
 		VK::CommandBuffer &cmdBuffer,
-		VK::ImageView &outputAttachment,
+		VK::ImageView &colorAttachment,
+		VK::ImageView *const pDepthStencilAttachment,
 		RendererResourceManager &rendererResourceManager,
 		VkRect2D const &renderArea) const
 	{
@@ -94,7 +95,7 @@ namespace Render
 			return;
 
 		auto &renderPass	{ rendererResourceManager.getRenderPassOf(__pRenderer) };
-		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__pRenderer, outputAttachment) };
+		auto &framebuffer	{ rendererResourceManager.getFramebufferOf(__pRenderer, colorAttachment, pDepthStencilAttachment) };
 		auto &pipeline		{ rendererResourceManager.getPipelineOf(__pRenderer) };
 
 		size_t const drawSequenceLength		{ __drawSequence.size() };

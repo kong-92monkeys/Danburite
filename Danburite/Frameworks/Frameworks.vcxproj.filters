@@ -7,23 +7,14 @@
     <Filter Include="Materials">
       <UniqueIdentifier>{a143e88c-8899-49cf-b2e7-e30688ddec8a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderers\TestRenderer">
-      <UniqueIdentifier>{e27bec54-51b5-46f9-b18b-15ca092b01e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Vertex">
       <UniqueIdentifier>{ad2c5361-8bb6-4e0f-863d-67d9b89f3c61}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderers\SimpleRenderer">
-      <UniqueIdentifier>{396cfebf-33bd-449f-b8dd-ef12f6a3bdfc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Materials\SimpleMaterial">
       <UniqueIdentifier>{9d56c08c-1786-4ae8-ac52-0a616ddb6de9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Materials\ImageMaterial">
       <UniqueIdentifier>{cf0f788b-cbcf-4f87-b58c-e7a56e06f13d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Renderers\ImageRenderer">
-      <UniqueIdentifier>{ef72d0a5-3437-4774-ada5-f2867f20c1de}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{d3c51bef-1446-42d2-9e96-751c1a04e803}</UniqueIdentifier>
@@ -57,26 +48,17 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestRenderer.h">
-      <Filter>Renderers\TestRenderer</Filter>
-    </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Vertex</Filter>
     </ClInclude>
     <ClInclude Include="VertexAttribute.h">
       <Filter>Vertex</Filter>
     </ClInclude>
-    <ClInclude Include="SimpleRenderer.h">
-      <Filter>Renderers\SimpleRenderer</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleMaterial.h">
       <Filter>Materials\SimpleMaterial</Filter>
     </ClInclude>
     <ClInclude Include="ImageMaterial.h">
       <Filter>Materials\ImageMaterial</Filter>
-    </ClInclude>
-    <ClInclude Include="ImageRenderer.h">
-      <Filter>Renderers\ImageRenderer</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Scene</Filter>
@@ -110,20 +92,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestRenderer.cpp">
-      <Filter>Renderers\TestRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="SimpleRenderer.cpp">
-      <Filter>Renderers\SimpleRenderer</Filter>
-    </ClCompile>
     <ClCompile Include="SimpleMaterial.cpp">
       <Filter>Materials\SimpleMaterial</Filter>
     </ClCompile>
     <ClCompile Include="ImageMaterial.cpp">
       <Filter>Materials\ImageMaterial</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageRenderer.cpp">
-      <Filter>Renderers\ImageRenderer</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Scene</Filter>

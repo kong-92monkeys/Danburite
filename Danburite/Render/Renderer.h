@@ -58,20 +58,23 @@ namespace Render
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(
-			VkFormat outputFormat) const = 0;
+			VkFormat colorFormat,
+			VkFormat depthStencilFormat,
+			VkImageLayout depthStencilImageLayout) const = 0;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::Framebuffer> createFramebuffer(
 			VK::RenderPass &renderPass,
-			VK::ImageView &outputAttachment,
-			uint32_t outputWidth,
-			uint32_t outputHeight) const = 0;
+			VK::ImageView &colorAttachment,
+			VK::ImageView *pDepthStencilAttachment,
+			uint32_t surfaceWidth,
+			uint32_t surfaceHeight) const = 0;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::Pipeline> createPipeline(
 			VK::RenderPass &renderPass,
-			uint32_t outputWidth,
-			uint32_t outputHeight) const = 0;
+			uint32_t surfaceWidth,
+			uint32_t surfaceHeight) const = 0;
 
 		[[nodiscard]]
 		constexpr Infra::EventView<Renderer const *, int, int> &

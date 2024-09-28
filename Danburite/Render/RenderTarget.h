@@ -104,8 +104,8 @@ namespace Render
 		std::vector<std::unique_ptr<VK::Image>> __swapchainImages;
 		std::vector<std::unique_ptr<VK::ImageView>> __swapchainImageViews;
 
-		VkFormat __depthStencilFormat{ };
-		VkImageLayout __depthStencilImageLayout{ };
+		VkFormat __depthStencilFormat{ VkFormat::VK_FORMAT_UNDEFINED };
+		VkImageLayout __depthStencilImageLayout{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED };
 		VkImageAspectFlags __depthStencilAspectMask{ };
 		std::unique_ptr<Dev::MemoryImage> __pDepthStencilImage;
 		std::unique_ptr<VK::ImageView> __pDepthStencilImageView;

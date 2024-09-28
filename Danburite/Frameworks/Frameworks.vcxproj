@@ -27,9 +27,6 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformMaterial.h" />
     <ClInclude Include="SimpleMaterial.h" />
-    <ClInclude Include="ImageRenderer.h" />
-    <ClInclude Include="SimpleRenderer.h" />
-    <ClInclude Include="TestRenderer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexAttribute.h" />
   </ItemGroup>
@@ -46,9 +43,6 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TransformMaterial.cpp" />
     <ClCompile Include="SimpleMaterial.cpp" />
-    <ClCompile Include="ImageRenderer.cpp" />
-    <ClCompile Include="SimpleRenderer.cpp" />
-    <ClCompile Include="TestRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Device\Device.vcxproj">
