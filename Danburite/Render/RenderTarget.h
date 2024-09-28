@@ -39,7 +39,8 @@ namespace Render
 			VK::Queue &queue,
 			Infra::DeferredDeleter &deferredDeleter,
 			HINSTANCE hinstance,
-			HWND hwnd);
+			HWND hwnd,
+			bool useDepthStencilBuffer);
 
 		virtual ~RenderTarget() noexcept override;
 
@@ -81,6 +82,7 @@ namespace Render
 		VK::Device &__device;
 		VK::Queue &__que;
 		Infra::DeferredDeleter &__deferredDeleter;
+		bool const __useDepthStencilBuffer;
 
 		std::unique_ptr<VK::Surface> __pSurface;
 
@@ -97,8 +99,12 @@ namespace Render
 		std::vector<std::unique_ptr<VK::Image>> __swapchainImages;
 		std::vector<std::unique_ptr<VK::ImageView>> __swapchainImageViews;
 
-		std::unique_ptr<VK::RenderPass> __pClearImageRenderPass;
-		std::vector<std::unique_ptr<VK::Framebuffer>> __clearImageFramebuffers;
+		VkFormat __depthStencilFormat{ };
+		std::vector<std::unique_ptr<VK::Image>> __depthStencilImages;
+		std::vector<std::unique_ptr<VK::ImageView>> __depthStencilImageViews;
+
+		std::unique_ptr<VK::RenderPass> __pClearRenderPass;
+		std::vector<std::unique_ptr<VK::Framebuffer>> __clearFramebuffers;
 
 		std::unique_ptr<Dev::CommandBufferCirculator> __pDrawcallCmdBufferCirculator;
 		std::unique_ptr<Dev::SemaphoreCirculator> __pImageAcqSemaphoreCirculator;
@@ -124,11 +130,11 @@ namespace Render
 			HINSTANCE hinstance,
 			HWND hwnd);
 
-		void __createClearImageRenderPass();
 
 		void __syncSurface();
 		void __syncSwapchain();
-		void __syncClearImageFramebuffers();
+		void __syncDepthStencilBuffers();
+		void __syncClearFramebuffers();
 
 		void __verifySurfaceSupport();
 		void __resolvePresentMode() noexcept;
@@ -142,7 +148,12 @@ namespace Render
 		void __enumerateSwapchainImages();
 		void __createSwapchainImageViews();
 
-		void __createClearImageFramebuffers();
+		void __resolveDepthStencilFormat();
+		void __createDepthStencilImages();
+		void __createDepthStencilImageViews();
+
+		void __createClearRenderPass();
+		void __createClearFramebuffers();
 
 		[[nodiscard]]
 		uint32_t __acquireNextImage(

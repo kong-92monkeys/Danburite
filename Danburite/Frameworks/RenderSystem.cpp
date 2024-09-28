@@ -27,10 +27,12 @@ namespace Frx
 
 	std::unique_ptr<Display> RenderSystem::createDisplay(
 		HINSTANCE const hinstance,
-		HWND const hwnd)
+		HWND const hwnd,
+		bool const useDepthStencilBuffer)
 	{
 		return std::make_unique<Display>(
-			__rcmdExecutor, __getRenderEngine(), hinstance, hwnd);
+			__rcmdExecutor, __getRenderEngine(),
+			hinstance, hwnd, useDepthStencilBuffer);
 	}
 
 	void RenderSystem::__createEngine(

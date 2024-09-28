@@ -92,9 +92,11 @@ int CApp::ExitInstance()
 }
 
 std::unique_ptr<Frx::Display> CApp::createDisplay(
-	HWND const hwnd)
+	HWND const hwnd,
+	bool const useDepthStencilBuffer)
 {
-	return __pRenderSystem->createDisplay(m_hInstance, hwnd);
+	return __pRenderSystem->createDisplay(
+		m_hInstance, hwnd, useDepthStencilBuffer);
 }
 
 void CApp::setSceneDisplay(

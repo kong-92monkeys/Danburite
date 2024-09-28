@@ -6,17 +6,23 @@ namespace Frx
 		Infra::ThreadPool &rcmdExecutor,
 		Render::Engine &renderEngine,
 		HINSTANCE const hinstance,
-		HWND const hwnd) :
+		HWND const hwnd,
+		bool const useDepthStencilBuffer) :
 		__rcmdExecutor	{ rcmdExecutor },
 		__renderEngine	{ renderEngine }
 	{
-		__rcmdExecutor.run([this, hinstance, hwnd]
+		__rcmdExecutor.run([this, hinstance, hwnd, useDepthStencilBuffer]
 		{
 			__pRenderTargetNeedRedrawListener =
 				Infra::EventListener<Render::RenderTarget const *>::bind(
 				&Display::__rcmd_onRenderTargetNeedRedraw, this);
 
-			__pRenderTarget = __renderEngine.createRenderTarget(hinstance, hwnd);
+			__pRenderTarget = std::unique_ptr<Render::RenderTarget>
+			{
+				__renderEngine.createRenderTarget(
+					hinstance, hwnd, useDepthStencilBuffer)
+			};
+
 			__pRenderTarget->getNeedRedrawEvent() += __pRenderTargetNeedRedrawListener;
 		}).wait();
 	}
@@ -25,8 +31,8 @@ namespace Frx
 	{
 		__rcmdExecutor.run([this]
 		{
-			__renderEngine.cancelRender(__pRenderTarget);
-			delete __pRenderTarget;
+			__renderEngine.cancelRender(__pRenderTarget.get());
+			__pRenderTarget = nullptr;
 		}).wait();
 	}
 
@@ -42,7 +48,7 @@ namespace Frx
 	{
 		__rcmdExecutor.silentRun([this]
 		{
-			__renderEngine.reserveRender(__pRenderTarget);
+			__renderEngine.reserveRender(__pRenderTarget.get());
 		});
 	}
 
@@ -50,7 +56,7 @@ namespace Frx
 	{
 		__rcmdExecutor.silentRun([this]
 		{
-			__renderEngine.reserveRender(__pRenderTarget);
+			__renderEngine.reserveRender(__pRenderTarget.get());
 		});
 	}
 }

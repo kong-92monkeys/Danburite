@@ -27,7 +27,8 @@ namespace Render
 		[[nodiscard]]
 		RenderTarget *createRenderTarget(
 			HINSTANCE hinstance,
-			HWND hwnd);
+			HWND hwnd,
+			bool useDepthStencilBuffer);
 
 		[[nodiscard]]
 		Layer *createLayer();

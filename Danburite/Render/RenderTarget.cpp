@@ -13,12 +13,14 @@ namespace Render
 		VK::Queue &queue,
 		Infra::DeferredDeleter &deferredDeleter,
 		HINSTANCE const hinstance,
-		HWND const hwnd) :
-		__instance			{ instance },
-		__physicalDevice	{ physicalDevice },
-		__device			{ device },
-		__que				{ queue },
-		__deferredDeleter	{ deferredDeleter }
+		HWND const hwnd,
+		bool const useDepthStencilBuffer) :
+		__instance				{ instance },
+		__physicalDevice		{ physicalDevice },
+		__device				{ device },
+		__que					{ queue },
+		__deferredDeleter		{ deferredDeleter },
+		__useDepthStencilBuffer	{ useDepthStencilBuffer }
 	{
 		__pLayerInvalidateListener = Infra::EventListener<Layer *>::bind(
 			&RenderTarget::__onLayerInvalidated, this, std::placeholders::_1);
@@ -34,8 +36,14 @@ namespace Render
 		__syncSurface();
 		__syncSwapchain();
 
-		__createClearImageRenderPass();
-		__syncClearImageFramebuffers();
+		if (__useDepthStencilBuffer)
+		{
+			__resolveDepthStencilFormat();
+			__syncDepthStencilBuffers();
+		}
+
+		__createClearRenderPass();
+		__syncClearFramebuffers();
 
 		__pDrawcallCmdBufferCirculator = std::make_unique<Dev::CommandBufferCirculator>(
 			__device, __que.getFamilyIndex(),
@@ -63,13 +71,16 @@ namespace Render
 		__pImageAcqSemaphoreCirculator = nullptr;
 		__pDrawcallCmdBufferCirculator = nullptr;
 
-		__clearImageFramebuffers.clear();
+		__clearFramebuffers.clear();
+
+		__depthStencilImageViews.clear();
+		__depthStencilImages.clear();
 
 		__swapchainImageViews.clear();
 		__swapchainImages.clear();
 		__pSwapchain = nullptr;
 
-		__pClearImageRenderPass = nullptr;
+		__pClearRenderPass = nullptr;
 		__pSurface = nullptr;
 	}
 
@@ -118,8 +129,11 @@ namespace Render
 
 		__syncSurface();
 		__syncSwapchain();
+		
+		if (__useDepthStencilBuffer)
+			__syncDepthStencilBuffers();
 
-		__syncClearImageFramebuffers();
+		__syncClearFramebuffers();
 
 		auto const &extent{ getExtent() };
 		__pRendererResourceManager->invalidate(__surfaceFormat.format, extent.width, extent.height);
@@ -188,68 +202,6 @@ namespace Render
 		__surfaceInfo.surface		= __pSurface->getHandle();
 	}
 
-	void RenderTarget::__createClearImageRenderPass()
-	{
-		VkAttachmentDescription2 const colorAttachment
-		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2 },
-			.format				{ __surfaceFormat.format },
-			.samples			{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
-			.loadOp				{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR },
-			.storeOp			{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE },
-			.stencilLoadOp		{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE },
-			.stencilStoreOp		{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE },
-			.initialLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED },
-			.finalLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }
-		};
-
-		VkAttachmentReference2 const colorAttachmentRef
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2 },
-			.attachment		{ 0U },
-			.layout			{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT }
-		};
-
-		VkSubpassDescription2 const subpass
-		{
-			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
-			.pipelineBindPoint		{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
-			.colorAttachmentCount	{ 1U },
-			.pColorAttachments		{ &colorAttachmentRef }
-		};
-
-		VkMemoryBarrier2 const memoryBarrier
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
-			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
-			.srcAccessMask	{ VK_ACCESS_2_NONE },
-			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
-			.dstAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT }
-		};
-
-		VkSubpassDependency2 const dependency
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2 },
-			.pNext			{ &memoryBarrier },
-			.srcSubpass		{ VK_SUBPASS_EXTERNAL },
-			.dstSubpass		{ 0U }
-		};
-
-		VkRenderPassCreateInfo2 const createInfo
-		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2 },
-			.attachmentCount	{ 1U },
-			.pAttachments		{ &colorAttachment },
-			.subpassCount		{ 1U },
-			.pSubpasses			{ &subpass },
-			.dependencyCount	{ 1U },
-			.pDependencies		{ &dependency }
-		};
-
-		__pClearImageRenderPass = std::make_unique<VK::RenderPass>(__device, createInfo);
-	}
-
 	void RenderTarget::__syncSurface()
 	{
 		__verifySurfaceSupport();
@@ -274,10 +226,19 @@ namespace Render
 		__createSwapchainImageViews();
 	}
 
-	void RenderTarget::__syncClearImageFramebuffers()
+	void RenderTarget::__syncDepthStencilBuffers()
 	{
-		__clearImageFramebuffers.clear();
-		__createClearImageFramebuffers();
+		__depthStencilImageViews.clear();
+		__depthStencilImages.clear();
+
+		__createDepthStencilImages();
+		__createDepthStencilImageViews();
+	}
+
+	void RenderTarget::__syncClearFramebuffers()
+	{
+		__clearFramebuffers.clear();
+		__createClearFramebuffers();
 	}
 
 	void RenderTarget::__verifySurfaceSupport()
@@ -457,7 +418,89 @@ namespace Render
 		}
 	}
 
-	void RenderTarget::__createClearImageFramebuffers()
+	void RenderTarget::__resolveDepthStencilFormat()
+	{
+		auto const formatProp{ __physicalDevice.getFormatPropsOf(VkFormat::VK_FORMAT_D32_SFLOAT_S8_UINT) };
+
+		if (!(formatProp.optimalTilingFeatures & VkFormatFeatureFlagBits::VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT))
+			throw std::runtime_error{ "Cannot resolve the depth stencil format." };
+
+		__depthStencilFormat = VkFormat::VK_FORMAT_D32_SFLOAT_S8_UINT;
+	}
+
+	void RenderTarget::__createDepthStencilImages()
+	{
+
+	}
+
+	void RenderTarget::__createDepthStencilImageViews()
+	{
+
+	}
+
+	void RenderTarget::__createClearRenderPass()
+	{
+		VkAttachmentDescription2 const colorAttachment
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2 },
+			.format				{ __surfaceFormat.format },
+			.samples			{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
+			.loadOp				{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR },
+			.storeOp			{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE },
+			.stencilLoadOp		{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE },
+			.stencilStoreOp		{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE },
+			.initialLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED },
+			.finalLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }
+		};
+
+		VkAttachmentReference2 const colorAttachmentRef
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2 },
+			.attachment		{ 0U },
+			.layout			{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT }
+		};
+
+		VkSubpassDescription2 const subpass
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
+			.pipelineBindPoint		{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
+			.colorAttachmentCount	{ 1U },
+			.pColorAttachments		{ &colorAttachmentRef }
+		};
+
+		VkMemoryBarrier2 const memoryBarrier
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
+			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.srcAccessMask	{ VK_ACCESS_2_NONE },
+			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
+			.dstAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT }
+		};
+
+		VkSubpassDependency2 const dependency
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DEPENDENCY_2 },
+			.pNext			{ &memoryBarrier },
+			.srcSubpass		{ VK_SUBPASS_EXTERNAL },
+			.dstSubpass		{ 0U }
+		};
+
+		VkRenderPassCreateInfo2 const createInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2 },
+			.attachmentCount	{ 1U },
+			.pAttachments		{ &colorAttachment },
+			.subpassCount		{ 1U },
+			.pSubpasses			{ &subpass },
+			.dependencyCount	{ 1U },
+			.pDependencies		{ &dependency }
+		};
+
+		__pClearRenderPass = std::make_unique<VK::RenderPass>(__device, createInfo);
+	}
+
+	void RenderTarget::__createClearFramebuffers()
 	{
 		auto const &extent{ getExtent() };
 
@@ -466,7 +509,7 @@ namespace Render
 			VkFramebufferCreateInfo const createInfo
 			{
 				.sType				{ VkStructureType::VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO },
-				.renderPass			{ __pClearImageRenderPass->getHandle() },
+				.renderPass			{ __pClearRenderPass->getHandle() },
 				.attachmentCount	{ 1U },
 				.pAttachments		{ &(pImageView->getHandle()) },
 				.width				{ extent.width },
@@ -474,7 +517,7 @@ namespace Render
 				.layers				{ 1U }
 			};
 
-			__clearImageFramebuffers.emplace_back(std::make_unique<VK::Framebuffer>(__device, createInfo));
+			__clearFramebuffers.emplace_back(std::make_unique<VK::Framebuffer>(__device, createInfo));
 		}
 	}
 
@@ -522,8 +565,8 @@ namespace Render
 	{
 		VkRenderPassBeginInfo renderPassBeginInfo{ };
 		renderPassBeginInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassBeginInfo.renderPass			= __pClearImageRenderPass->getHandle();
-		renderPassBeginInfo.framebuffer			= __clearImageFramebuffers[imageIndex]->getHandle();
+		renderPassBeginInfo.renderPass			= __pClearRenderPass->getHandle();
+		renderPassBeginInfo.framebuffer			= __clearFramebuffers[imageIndex]->getHandle();
 		renderPassBeginInfo.renderArea			= __renderArea;
 		renderPassBeginInfo.clearValueCount		= 1U;
 		renderPassBeginInfo.pClearValues		= reinterpret_cast<VkClearValue *>(&__backgroundColor);

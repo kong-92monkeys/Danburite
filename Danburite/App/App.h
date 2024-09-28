@@ -36,7 +36,8 @@ public:
 public:
 	[[nodiscard]]
 	std::unique_ptr<Frx::Display> createDisplay(
-		HWND hwnd);
+		HWND hwnd,
+		bool useDepthStencilBuffer);
 
 	void setSceneDisplay(
 		Frx::Display *pDisplay);

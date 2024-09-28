@@ -12,7 +12,8 @@ namespace Frx
 			Infra::ThreadPool &rcmdExecutor,
 			Render::Engine &renderEngine,
 			HINSTANCE hinstance,
-			HWND hwnd);
+			HWND hwnd,
+			bool useDepthStencilBuffer);
 
 		virtual ~Display() noexcept override;
 
@@ -26,7 +27,7 @@ namespace Frx
 		Infra::ThreadPool &__rcmdExecutor;
 		Render::Engine &__renderEngine;
 
-		Render::RenderTarget *__pRenderTarget{ };
+		std::unique_ptr<Render::RenderTarget> __pRenderTarget;
 		Infra::EventListenerPtr<Render::RenderTarget const *> __pRenderTargetNeedRedrawListener;
 
 		void __rcmd_onRenderTargetNeedRedraw();
