@@ -46,6 +46,9 @@
     <Filter Include="Transform\Orientation">
       <UniqueIdentifier>{7416da2f-ecfd-4552-ba0a-63399bd14113}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PrimitiveBuilder">
+      <UniqueIdentifier>{a0127a16-4b87-428a-baf9-6f222270fd09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -90,6 +93,9 @@
     <ClInclude Include="Transform.h">
       <Filter>Transform</Filter>
     </ClInclude>
+    <ClInclude Include="PrimitiveBuilder.h">
+      <Filter>PrimitiveBuilder</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimpleMaterial.cpp">
@@ -127,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Transform</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimitiveBuilder.cpp">
+      <Filter>PrimitiveBuilder</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

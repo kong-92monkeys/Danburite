@@ -22,7 +22,6 @@ namespace VK
 			VkPhysicalDeviceVulkan12Properties const *p12{ };
 			VkPhysicalDeviceVulkan13Properties const *p13{ };
 			VkPhysicalDeviceRobustness2PropertiesEXT const *pRobustness2{ };
-			VkPhysicalDeviceNestedCommandBufferPropertiesEXT const *pNestedCommandBuffer{ };
 		};
 
 		struct Features
@@ -33,7 +32,7 @@ namespace VK
 			VkPhysicalDeviceVulkan12Features const *p12{ };
 			VkPhysicalDeviceVulkan13Features const *p13{ };
 			VkPhysicalDeviceRobustness2FeaturesEXT const *pRobustness2{ };
-			VkPhysicalDeviceNestedCommandBufferFeaturesEXT const *pNestedCommandBuffer{ };
+			VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT const *pVertexInputDynamicState{ };
 		};
 
 		PhysicalDevice(
@@ -102,7 +101,6 @@ namespace VK
 		VkPhysicalDeviceVulkan12Properties __props12{ };
 		VkPhysicalDeviceVulkan13Properties __props13{ };
 		VkPhysicalDeviceRobustness2PropertiesEXT __propsRobustness2{ };
-		VkPhysicalDeviceNestedCommandBufferPropertiesEXT __propsNestedCommandBuffer{ };
 
 		Features __featureInterface{ };
 		VkPhysicalDeviceFeatures2 __features2{ };
@@ -110,7 +108,7 @@ namespace VK
 		VkPhysicalDeviceVulkan12Features __features12{ };
 		VkPhysicalDeviceVulkan13Features __features13{ };
 		VkPhysicalDeviceRobustness2FeaturesEXT __featuresRobustness2{ };
-		VkPhysicalDeviceNestedCommandBufferFeaturesEXT __featuresNestedCommandBuffer{ };
+		VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT __featuresVertexInputDynamicState{ };
 
 		std::vector<VkExtensionProperties> __extensions;
 		std::unordered_map<std::string_view, VkExtensionProperties const *> __extensionMap;

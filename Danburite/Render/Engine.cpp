@@ -203,7 +203,7 @@ namespace Render
 			physicalDeviceFeatures.p13->synchronization2 &&
 
 			physicalDeviceFeatures.pRobustness2->nullDescriptor &&
-			physicalDeviceFeatures.pNestedCommandBuffer->nestedCommandBuffer
+			physicalDeviceFeatures.pVertexInputDynamicState->vertexInputDynamicState
 		};
 
 		if (!featureSupported)
@@ -248,40 +248,47 @@ namespace Render
 		VkPhysicalDeviceVulkan12Features features12{ };
 		VkPhysicalDeviceVulkan13Features features13{ };
 		VkPhysicalDeviceRobustness2FeaturesEXT featuresRobustness{ };
-		VkPhysicalDeviceNestedCommandBufferFeaturesEXT featuresNestedCommandBuffer{ };
+		VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT featuresVertexInputDynamicState{ };
 
+		// next chaining
 		features.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-		features.features.samplerAnisotropy = VK_TRUE;
 		features.pNext = &features11;
 
 		features11.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
 		features11.pNext = &features12;
 
 		features12.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-		features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
-		features12.descriptorBindingPartiallyBound = VK_TRUE;
-		features12.runtimeDescriptorArray = VK_TRUE;
-		features12.separateDepthStencilLayouts = VK_TRUE;
 		features12.pNext = &features13;
 		
 		features13.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-		features13.pipelineCreationCacheControl = VK_TRUE;
-		features13.synchronization2 = VK_TRUE;
 		features13.pNext = &featuresRobustness;
 
 		featuresRobustness.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-		featuresRobustness.nullDescriptor = VK_TRUE;
-		featuresRobustness.pNext = &featuresNestedCommandBuffer;
+		featuresRobustness.pNext = &featuresVertexInputDynamicState;
 
-		featuresNestedCommandBuffer.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NESTED_COMMAND_BUFFER_FEATURES_EXT;
-		featuresNestedCommandBuffer.nestedCommandBuffer = VK_TRUE;
-		featuresNestedCommandBuffer.pNext = nullptr;
+		featuresVertexInputDynamicState.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT;
+		featuresVertexInputDynamicState.pNext = nullptr;
 
+		// feature enabling
+		features.features.samplerAnisotropy							= VK_TRUE;
+		
+		features12.descriptorBindingVariableDescriptorCount			= VK_TRUE;
+		features12.descriptorBindingPartiallyBound					= VK_TRUE;
+		features12.runtimeDescriptorArray							= VK_TRUE;
+		features12.separateDepthStencilLayouts						= VK_TRUE;
+		
+		features13.pipelineCreationCacheControl						= VK_TRUE;
+		features13.synchronization2									= VK_TRUE;
+		
+		featuresRobustness.nullDescriptor							= VK_TRUE;
+		featuresVertexInputDynamicState.vertexInputDynamicState		= VK_TRUE;
+
+		// extension enabling
 		std::vector<char const *> extensions;
 		extensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 		extensions.emplace_back(VK_KHR_MAINTENANCE_5_EXTENSION_NAME);
 		extensions.emplace_back(VK_EXT_ROBUSTNESS_2_EXTENSION_NAME);
-		extensions.emplace_back(VK_EXT_NESTED_COMMAND_BUFFER_EXTENSION_NAME);
+		extensions.emplace_back(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
 		//extensions.emplace_back(VK_EXT_IMAGE_COMPRESSION_CONTROL_EXTENSION_NAME);
 
 		for (auto const extension : extensions)

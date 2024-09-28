@@ -115,55 +115,51 @@ namespace VK
 		__propInterface.p12						= &__props12;
 		__propInterface.p13						= &__props13;
 		__propInterface.pRobustness2			= &__propsRobustness2;
-		__propInterface.pNestedCommandBuffer	= &__propsNestedCommandBuffer;
 
-		__props2.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-		__props2.pNext						= &__props11;
+		__props2.sType							= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+		__props2.pNext							= &__props11;
 
-		__props11.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
-		__props11.pNext						= &__props12;
+		__props11.sType							= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_PROPERTIES;
+		__props11.pNext							= &__props12;
 
-		__props12.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
-		__props12.pNext						= &__props13;
+		__props12.sType							= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_PROPERTIES;
+		__props12.pNext							= &__props13;
 
-		__props13.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
-		__props13.pNext						= &__propsRobustness2;
+		__props13.sType							= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_PROPERTIES;
+		__props13.pNext							= &__propsRobustness2;
 
-		__propsRobustness2.sType			= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT;
-		__propsRobustness2.pNext			= &__propsNestedCommandBuffer;
-
-		__propsNestedCommandBuffer.sType	= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NESTED_COMMAND_BUFFER_PROPERTIES_EXT;
-		__propsNestedCommandBuffer.pNext	= nullptr;
+		__propsRobustness2.sType				= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_PROPERTIES_EXT;
+		__propsRobustness2.pNext				= nullptr;
 
 		__instance.vkGetPhysicalDeviceProperties2(getHandle(), &__props2);
 	}
 
 	void PhysicalDevice::__resolveFeatures() noexcept
 	{
-		__featureInterface.p10					= &(__features2.features);
-		__featureInterface.p11					= &__features11;
-		__featureInterface.p12					= &__features12;
-		__featureInterface.p13					= &__features13;
-		__featureInterface.pRobustness2			= &__featuresRobustness2;
-		__featureInterface.pNestedCommandBuffer = &__featuresNestedCommandBuffer;
+		__featureInterface.p10							= &(__features2.features);
+		__featureInterface.p11							= &__features11;
+		__featureInterface.p12							= &__features12;
+		__featureInterface.p13							= &__features13;
+		__featureInterface.pRobustness2					= &__featuresRobustness2;
+		__featureInterface.pVertexInputDynamicState		= &__featuresVertexInputDynamicState;
 
-		__features2.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-		__features2.pNext						= &__features11;
+		__features2.sType								= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		__features2.pNext								= &__features11;
 
-		__features11.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
-		__features11.pNext						= &__features12;
+		__features11.sType								= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+		__features11.pNext								= &__features12;
 
-		__features12.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-		__features12.pNext						= &__features13;
+		__features12.sType								= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+		__features12.pNext								= &__features13;
 
-		__features13.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-		__features13.pNext						= &__featuresRobustness2;
+		__features13.sType								= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+		__features13.pNext								= &__featuresRobustness2;
 
-		__featuresRobustness2.sType				= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-		__featuresRobustness2.pNext				= &__featuresNestedCommandBuffer;
+		__featuresRobustness2.sType						= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
+		__featuresRobustness2.pNext						= &__featuresVertexInputDynamicState;
 
-		__featuresNestedCommandBuffer.sType		= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_NESTED_COMMAND_BUFFER_FEATURES_EXT;
-		__featuresNestedCommandBuffer.pNext		= nullptr;
+		__featuresVertexInputDynamicState.sType			= VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT;
+		__featuresVertexInputDynamicState.pNext			= nullptr;
 
 		__instance.vkGetPhysicalDeviceFeatures2(getHandle(), &__features2);
 	}
