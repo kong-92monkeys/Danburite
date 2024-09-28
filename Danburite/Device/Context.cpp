@@ -71,8 +71,8 @@ namespace Dev
 			layers.emplace_back("VK_LAYER_KHRONOS_validation");
 			extensions.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
-			enabledFeatures.emplace_back(VkValidationFeatureEnableEXT::VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT);
-			// enabledFeatures.emplace_back(VkValidationFeatureEnableEXT::VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT);
+			/*enabledFeatures.emplace_back(VkValidationFeatureEnableEXT::VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT);
+			enabledFeatures.emplace_back(VkValidationFeatureEnableEXT::VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT);*/
 
 			validationFeatures.sType							= VkStructureType::VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
 			validationFeatures.pNext							= &__debugMessengerCreateInfo;
@@ -146,7 +146,6 @@ namespace Dev
 		void *const pUserData) noexcept
 	{
 		Infra::Logger::Severity logSeverity{ };
-
 		switch (messageSeverity)
 		{
 			case VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:

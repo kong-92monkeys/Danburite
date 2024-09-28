@@ -609,6 +609,6 @@ namespace Render
 			.pInheritanceInfo	{ &inheritanceInfo }
 		};
 
-			secondaryBuffer.vkBeginCommandBuffer(&commandBufferBeginInfo);
+		secondaryBuffer.vkBeginCommandBuffer(&commandBufferBeginInfo);
 	}
 }
