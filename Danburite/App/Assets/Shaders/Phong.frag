@@ -8,12 +8,12 @@
 #include <Shaders/Images.glsl>
 #include <Shaders/Materials/PhongMaterial.glsl>
 
-layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = MATERIAL_DESC_PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
 {
 	PhongMaterial phongMaterials[];
 };
 
-layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = SUB_LAYER_DESC_INSTANCE_INFO_LOCATION) readonly buffer InstanceInfoBuffer
+layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = INSTANCE_INFO_BUFFER_LOCATION) readonly buffer InstanceInfoBuffer
 {
     InstanceInfo instanceInfos[];
 };

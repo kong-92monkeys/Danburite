@@ -122,15 +122,15 @@ void CApp::__onInitBeforeMainFrame()
 
 	Dev::Context::CreateInfo contextCreateInfo
 	{
-		.loaderLibName			{ "vulkan_loader_dedicated-1.dll" },
-		.engineName				{ "Danburite" },
-		.engineVersion			{ 1U, 0U, 0U, 0U },
-		.appName				{ "Danburite Sample App" },
-		.appVersion				{ 1U, 0U, 0U, 0U }
+		.loaderLibName		{ "vulkan_loader_dedicated-1.dll" },
+		.engineName			{ "Danburite" },
+		.engineVersion		{ 1U, 0U, 0U, 0U },
+		.appName			{ "Danburite Sample App" },
+		.appVersion			{ 1U, 0U, 0U, 0U }
 	};
 
 #ifndef NDEBUG
-	//contextCreateInfo.debugMode = true;
+	contextCreateInfo.debugMode = true;
 #endif
 
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);

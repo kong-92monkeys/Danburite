@@ -1,6 +1,5 @@
 #include "RenderSystem.h"
-#include "ImageMaterial.h"
-#include "SimpleMaterial.h"
+#include "Constants.h"
 #include "TransformMaterial.h"
 #include "PhongMaterial.h"
 #include <new>
@@ -43,10 +42,8 @@ namespace Frx
 		// NOTE: Need to sync with Constants.glsl
 
 		Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
-		globalDescBindingInfo.materialBufferLocations[typeid(SimpleMaterial)]		= 0U;
-		globalDescBindingInfo.materialBufferLocations[typeid(ImageMaterial)]		= 1U;
-		globalDescBindingInfo.materialBufferLocations[typeid(TransformMaterial)]	= 2U;
-		globalDescBindingInfo.materialBufferLocations[typeid(PhongMaterial)]		= 3U;
+		globalDescBindingInfo.materialBufferLocations[typeid(TransformMaterial)]	= Constants::TRANSFORM_MATERIAL_LOCATION;
+		globalDescBindingInfo.materialBufferLocations[typeid(PhongMaterial)]		= Constants::PHONG_MATERIAL_LOCATION;
 
 		new (__enginePlaceholder.data()) Render::Engine{ context, physicalDevice, globalDescBindingInfo };
 	}

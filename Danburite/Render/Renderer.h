@@ -32,6 +32,7 @@ namespace Render
 			Infra::DeferredDeleter &deferredDeleter,
 			Dev::DescriptorUpdater &descriptorUpdater,
 			GlobalDescriptorManager const &globalDescriptorManager,
+			VK::DescriptorSetLayout const &layerDescSetLayout,
 			VK::DescriptorSetLayout const &subLayerDescSetLayout);
 
 		[[nodiscard]]
@@ -125,6 +126,9 @@ namespace Render
 		constexpr GlobalDescriptorManager const &_getGlobalDescriptorManager() const noexcept;
 
 		[[nodiscard]]
+		constexpr VK::DescriptorSetLayout const &_getLayerDescSetLayout() const noexcept;
+
+		[[nodiscard]]
 		constexpr VK::DescriptorSetLayout const &_getSubLayerDescSetLayout() const noexcept;
 
 	private:
@@ -134,6 +138,7 @@ namespace Render
 		Infra::DeferredDeleter *__pDeferredDeleter{ };
 		Dev::DescriptorUpdater *__pDescriptorUpdater{ };
 		GlobalDescriptorManager const *__pGlobalDescriptorManager{ };
+		VK::DescriptorSetLayout const *__pLayerDescSetLayout{ };
 		VK::DescriptorSetLayout const *__pSubLayerDescSetLayout{ };
 
 		int __priority{ };
@@ -195,6 +200,11 @@ namespace Render
 	constexpr GlobalDescriptorManager const &Renderer::_getGlobalDescriptorManager() const noexcept
 	{
 		return *__pGlobalDescriptorManager;
+	}
+
+	constexpr VK::DescriptorSetLayout const &Renderer::_getLayerDescSetLayout() const noexcept
+	{
+		return *__pLayerDescSetLayout;
 	}
 
 	constexpr VK::DescriptorSetLayout const &Renderer::_getSubLayerDescSetLayout() const noexcept

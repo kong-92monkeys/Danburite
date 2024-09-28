@@ -10,12 +10,6 @@
     <Filter Include="Vertex">
       <UniqueIdentifier>{ad2c5361-8bb6-4e0f-863d-67d9b89f3c61}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Materials\SimpleMaterial">
-      <UniqueIdentifier>{9d56c08c-1786-4ae8-ac52-0a616ddb6de9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Materials\ImageMaterial">
-      <UniqueIdentifier>{cf0f788b-cbcf-4f87-b58c-e7a56e06f13d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{d3c51bef-1446-42d2-9e96-751c1a04e803}</UniqueIdentifier>
     </Filter>
@@ -49,6 +43,9 @@
     <Filter Include="PrimitiveBuilder">
       <UniqueIdentifier>{a0127a16-4b87-428a-baf9-6f222270fd09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Constants">
+      <UniqueIdentifier>{01c69329-62fb-49fc-8052-6af83b27253f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -56,12 +53,6 @@
     </ClInclude>
     <ClInclude Include="VertexAttribute.h">
       <Filter>Vertex</Filter>
-    </ClInclude>
-    <ClInclude Include="SimpleMaterial.h">
-      <Filter>Materials\SimpleMaterial</Filter>
-    </ClInclude>
-    <ClInclude Include="ImageMaterial.h">
-      <Filter>Materials\ImageMaterial</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Scene</Filter>
@@ -96,14 +87,11 @@
     <ClInclude Include="PrimitiveBuilder.h">
       <Filter>PrimitiveBuilder</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Constants</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SimpleMaterial.cpp">
-      <Filter>Materials\SimpleMaterial</Filter>
-    </ClCompile>
-    <ClCompile Include="ImageMaterial.cpp">
-      <Filter>Materials\ImageMaterial</Filter>
-    </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>

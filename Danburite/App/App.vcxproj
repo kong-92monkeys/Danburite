@@ -193,12 +193,8 @@
     <None Include="Assets\Shaders\Phong.frag" />
     <None Include="Assets\Shaders\Phong.vert" />
     <None Include="Assets\Shaders\Images.glsl" />
-    <None Include="Assets\Shaders\Materials\ImageMaterial.glsl" />
     <None Include="Assets\Shaders\Materials\TransformMaterial.glsl" />
-    <None Include="Assets\Shaders\Materials\SimpleMaterial.glsl" />
     <None Include="Assets\Shaders\ShaderData.glsl" />
-    <None Include="Assets\Shaders\Image.frag" />
-    <None Include="Assets\Shaders\Image.vert" />
     <None Include="Assets\Shaders\Simple.frag" />
     <None Include="Assets\Shaders\Simple.vert" />
     <None Include="Assets\Shaders\Test.frag" />

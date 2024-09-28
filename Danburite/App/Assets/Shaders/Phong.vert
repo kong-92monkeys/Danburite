@@ -6,12 +6,12 @@
 #include <Shaders/ShaderData.glsl>
 #include <Shaders/Materials/TransformMaterial.glsl>
 
-layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = MATERIAL_DESC_TRANSFORM_MATERIAL_LOCATION) readonly buffer TransformMaterialBuffer
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = TRANSFORM_MATERIAL_LOCATION) readonly buffer TransformMaterialBuffer
 {
 	TransformMaterial transformMaterials[];
 };
 
-layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = SUB_LAYER_DESC_INSTANCE_INFO_LOCATION) readonly buffer InstanceInfoBuffer
+layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = INSTANCE_INFO_BUFFER_LOCATION) readonly buffer InstanceInfoBuffer
 {
     InstanceInfo instanceInfos[];
 };

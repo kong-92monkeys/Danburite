@@ -3,6 +3,6 @@
 
 #include <Shaders/Constants.glsl>
 
-layout(set = MATERIAL_DESC_IMAGE_MATERIAL_LOCATION, binding = 0) uniform texture2D sampledImages[];
+layout(set = SAMPLED_IMAGES_DESC_SET_LOCATION, binding = SAMPLED_IMAGES_LOCATION) uniform texture2D sampledImages[];
 
 #endif

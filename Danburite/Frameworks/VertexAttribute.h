@@ -4,6 +4,8 @@
 
 namespace Frx
 {
+	// NOTE: Need to sync with Constants.glsl
+
 	namespace VertexAttrib
 	{
 		constexpr uint32_t POS_LOCATION			{ 0U };

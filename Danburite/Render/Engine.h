@@ -83,6 +83,7 @@ namespace Render
 		std::vector<std::unique_ptr<VK::Fence>> __submissionFences;
 		size_t __submissionFenceCursor{ };
 		
+		std::unique_ptr<VK::DescriptorSetLayout> __pLayerDescSetLayout;
 		std::unique_ptr<VK::DescriptorSetLayout> __pSubLayerDescSetLayout;
 
 		std::unordered_set<RenderTarget *> __reservedRenderTargets;
@@ -93,6 +94,7 @@ namespace Render
 		void __retrieveQueue();
 		void __createPipelineCache();
 		void __createSubmissionFences();
+		void __createLayerDescLayout();
 		void __createSubLayerDescLayout();
 
 		[[nodiscard]]
@@ -122,6 +124,7 @@ namespace Render
 			*__pPipelineCache, __deferredDeleter,
 			*__pDescriptorUpdater,
 			*__pGlobalDescriptorManager,
+			*__pLayerDescSetLayout,
 			*__pSubLayerDescSetLayout);
 
 		return pRetVal;

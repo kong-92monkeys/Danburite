@@ -20,6 +20,7 @@ namespace Render
 		__retrieveQueue();
 		__createPipelineCache();
 		__createSubmissionFences();
+		__createLayerDescLayout();
 		__createSubLayerDescLayout();
 
 		auto const &deviceLimits{ __physicalDevice.getProps().p10->limits };
@@ -64,6 +65,7 @@ namespace Render
 		// DO NOT DELETE deferredDeleter-dependent modules from now
 
 		__pMemoryAllocator = nullptr;
+		__pLayerDescSetLayout = nullptr;
 		__pSubLayerDescSetLayout = nullptr;
 		__submissionFences.clear();
 		__pPipelineCache = nullptr;
@@ -90,9 +92,9 @@ namespace Render
 	{
 		return new Layer
 		{
-			*__pDevice, *__pSubLayerDescSetLayout, __deferredDeleter,
-			*__pSCBBuilder, *__pDescriptorUpdater, *__pResourcePool,
-			*__pGlobalDescriptorManager
+			*__pDevice, *__pLayerDescSetLayout, *__pSubLayerDescSetLayout,
+			__deferredDeleter, *__pSCBBuilder, *__pDescriptorUpdater,
+			*__pResourcePool, *__pGlobalDescriptorManager
 		};
 	}
 
@@ -350,16 +352,47 @@ namespace Render
 			__submissionFences.emplace_back(std::make_unique<VK::Fence>(*__pDevice, createInfo));
 	}
 
+	void Engine::__createLayerDescLayout()
+	{
+		std::vector<VkDescriptorBindingFlags> bindingFlags;
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+		auto &layerDataBufferBinding				{ bindings.emplace_back() };
+		layerDataBufferBinding.binding				= Constants::LAYER_DATA_BUFFER_LOCATION;
+		layerDataBufferBinding.descriptorType		= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		layerDataBufferBinding.descriptorCount		= 1U;
+		layerDataBufferBinding.stageFlags			= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+			
+		bindingFlags.emplace_back(0U);
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo const flagInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO },
+			.bindingCount	{ static_cast<uint32_t>(bindingFlags.size()) },
+			.pBindingFlags	{ bindingFlags.data() }
+		};
+
+		VkDescriptorSetLayoutCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
+			.pNext			{ &flagInfo },
+			.bindingCount	{ static_cast<uint32_t>(bindings.size()) },
+			.pBindings		{ bindings.data() }
+		};
+
+		__pLayerDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(*__pDevice, createInfo);
+	}
+
 	void Engine::__createSubLayerDescLayout()
 	{
 		std::vector<VkDescriptorBindingFlags> bindingFlags;
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-		auto &materialBufferBinding				{ bindings.emplace_back() };
-		materialBufferBinding.binding			= Constants::SUB_LAYER_DESC_INSTANCE_INFO_LOCATION;
-		materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-		materialBufferBinding.descriptorCount	= 1U;
-		materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+		auto &instanceInfoBufferBinding				{ bindings.emplace_back() };
+		instanceInfoBufferBinding.binding			= Constants::INSTANCE_INFO_BUFFER_LOCATION;
+		instanceInfoBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		instanceInfoBufferBinding.descriptorCount	= 1U;
+		instanceInfoBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
 			
 		bindingFlags.emplace_back(0U);
 

@@ -1,6 +1,7 @@
 #include "PhongRenderer.h"
 #include "TransformMaterial.h"
 #include "PhongMaterial.h"
+#include "Constants.h"
 #include "Vertex.h"
 #include <array>
 
@@ -421,11 +422,11 @@ namespace Frx
 		std::vector<VkDescriptorBindingFlags> bindingFlags;
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-		auto &materialBufferBinding				{ bindings.emplace_back() };
-		materialBufferBinding.binding			= 0U;
-		materialBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
-		materialBufferBinding.descriptorCount	= 1U;
-		materialBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
+		auto &imageSamplerBinding				{ bindings.emplace_back() };
+		imageSamplerBinding.binding				= Constants::PHONG_RENDERER_IMAGE_SAMLER_LOCATION;
+		imageSamplerBinding.descriptorType		= VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
+		imageSamplerBinding.descriptorCount		= 1U;
+		imageSamplerBinding.stageFlags			= VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT;
 			
 		bindingFlags.emplace_back(0U);
 
@@ -515,7 +516,8 @@ namespace Frx
 		};
 
 		descUpdater.addInfos(
-			__hDescSet, 0U, 0U, 1U,
+			__hDescSet,
+			Constants::PHONG_RENDERER_IMAGE_SAMLER_LOCATION, 0U, 1U,
 			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER, &samplerInfo);
 	}
 
@@ -523,19 +525,23 @@ namespace Frx
 	{
 		auto const &globalDescManager{ _getGlobalDescriptorManager() };
 
-		std::vector<VkDescriptorSetLayout> setLayouts;
+		std::array const setLayouts
+		{
+			// MATERIALS_DESC_SET_LOCATION
+			globalDescManager.getMaterialsDescSetLayout().getHandle(),
+			
+			// SAMPLED_IMAGES_DESC_SET_LOCATION
+			globalDescManager.getSampledImagesDescSetLayout().getHandle(),
 
-		// MATERIALS_DESC_SET_LOCATION
-		setLayouts.emplace_back(globalDescManager.getMaterialsDescSetLayout().getHandle());
-
-		// SAMPLED_IMAGES_DESC_SET_LOCATION
-		setLayouts.emplace_back(globalDescManager.getSampledImagesDescSetLayout().getHandle());
-
-		// SUB_LAYER_DESC_SET_LOCATION
-		setLayouts.emplace_back(_getSubLayerDescSetLayout().getHandle());
-
-		// RENDERER_DESC_SET_LOCATION
-		setLayouts.emplace_back(__pDescSetLayout->getHandle());
+			// LAYER_DESC_SET_LOCATION
+			_getLayerDescSetLayout().getHandle(),
+			
+			// SUB_LAYER_DESC_SET_LOCATION
+			_getSubLayerDescSetLayout().getHandle(),
+			
+			// RENDERER_DESC_SET_LOCATION
+			__pDescSetLayout->getHandle()
+		};
 
 		VkPushConstantRange const pushConstantRange
 		{

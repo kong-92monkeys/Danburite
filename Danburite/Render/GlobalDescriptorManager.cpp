@@ -309,8 +309,10 @@ namespace Render
 		__advanceSampledImagesDescSet();
 
 		__descriptorUpdater.addInfos(
-			getSampledImagesDescSet(), 0U, 0U, static_cast<uint32_t>(descInfos.size()),
-			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descInfos.data());
+			getSampledImagesDescSet(), Constants::SAMPLED_IMAGES_LOCATION,
+			0U, static_cast<uint32_t>(descInfos.size()),
+			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,
+			descInfos.data());
 	}
 
 	void GlobalDescriptorManager::__growSampledImagesDescCount()

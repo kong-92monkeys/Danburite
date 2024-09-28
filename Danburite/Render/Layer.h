@@ -9,6 +9,7 @@ namespace Render
 	public:
 		Layer(
 			VK::Device &device,
+			VK::DescriptorSetLayout &layerDescSetLayout,
 			VK::DescriptorSetLayout &subLayerDescSetLayout,
 			Infra::DeferredDeleter &deferredDeleter,
 			Dev::SCBBuilder &scbBuilder,
@@ -16,10 +17,16 @@ namespace Render
 			ResourcePool &resourcePool,
 			GlobalDescriptorManager &globalDescManager) noexcept;
 
+		virtual ~Layer() noexcept override;
+
 		[[nodiscard]]
 		constexpr int getPriority() const noexcept;
 		void setPriority(
 			int priority) noexcept;
+
+		void setData(
+			void const *pData,
+			size_t size);
 
 		void addRenderObject(
 			RenderObject const *pObject);
@@ -50,6 +57,7 @@ namespace Render
 
 	private:
 		VK::Device &__device;
+		VK::DescriptorSetLayout &__layerDescSetLayout;
 		VK::DescriptorSetLayout &__subLayerDescSetLayout;
 		Infra::DeferredDeleter &__deferredDeleter;
 		Dev::SCBBuilder &__scbBuilder;
@@ -67,6 +75,14 @@ namespace Render
 		std::vector<SubLayer const *> __sortedSubLayers;
 
 		int __priority{ };
+
+		bool __dataBufferUpdated{ };
+		std::shared_ptr<Dev::MemoryBuffer> __pDataBuffer;
+
+		std::shared_ptr<VK::DescriptorPool> __pDescPool;
+
+		std::array<VkDescriptorSet, Constants::DEFERRED_DELETER_QUEUE_SIZE> __descSets{ };
+		uint32_t __descSetCursor{ };
 
 		Infra::EventListenerPtr<RenderObject const *, Renderer const *, Renderer const *>
 			__pObjectRendererChangeListener;
@@ -86,6 +102,9 @@ namespace Render
 		mutable Infra::Event<Layer const *>
 			__needRedrawEvent;
 
+		void __createDescPool();
+		void __allocDescSets();
+
 		void __registerObject(
 			RenderObject const *pObject);
 
@@ -97,6 +116,7 @@ namespace Render
 			Renderer const *pRenderer) noexcept;
 
 		void __sortSubLayers();
+		void __validateDescSet();
 
 		void __onObjectRendererChanged(
 			RenderObject const *pObject,
@@ -109,6 +129,10 @@ namespace Render
 			SubLayer *pSubLayer) noexcept;
 
 		void __onSubLayerRedrawNeeded() const noexcept;
+
+		[[nodiscard]]
+		constexpr VkDescriptorSet __getDescSet() const noexcept;
+		constexpr void __advanceDescSet() noexcept;
 	};
 
 	constexpr int Layer::getPriority() const noexcept
@@ -124,5 +148,15 @@ namespace Render
 	constexpr Infra::EventView<Layer const *> &Layer::getNeedRedrawEvent() const noexcept
 	{
 		return __needRedrawEvent;
+	}
+
+	constexpr VkDescriptorSet Layer::__getDescSet() const noexcept
+	{
+		return __descSets[__descSetCursor];
+	}
+
+	constexpr void Layer::__advanceDescSet() noexcept
+	{
+		__descSetCursor = ((__descSetCursor + 1ULL) % __descSets.size());
 	}
 }

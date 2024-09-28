@@ -93,7 +93,8 @@ namespace Render
 		VK::ImageView &colorAttachment,
 		VK::ImageView *const pDepthStencilAttachment,
 		RendererResourceManager &rendererResourceManager,
-		VkRect2D const &renderArea) const
+		VkRect2D const &renderArea,
+		VkDescriptorSet const hLayerDescSet) const
 	{
 		if (__drawSequence.empty())
 			return;
@@ -123,7 +124,7 @@ namespace Render
 				break;
 
 			subDrawExecutions.emplace_back(
-				__subDraw(renderPass, framebuffer, pipeline, sequenceBegin, sequenceEnd));
+				__subDraw(renderPass, framebuffer, pipeline, sequenceBegin, sequenceEnd, hLayerDescSet));
 
 			sequenceBegin = sequenceEnd;
 		}
@@ -375,8 +376,9 @@ namespace Render
 		};
 
 		__descUpdater.addInfos(
-			__getDescSet(), Constants::SUB_LAYER_DESC_INSTANCE_INFO_LOCATION,
-			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
+			__getDescSet(), Constants::INSTANCE_INFO_BUFFER_LOCATION,
+			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			&bufferInfo);
 	}
 
 	void SubLayer::__validateDrawSequence()
@@ -504,7 +506,8 @@ namespace Render
 	}
 
 	void SubLayer::__bindDescSets(
-		VK::CommandBuffer &cmdBuffer) const
+		VK::CommandBuffer &cmdBuffer,
+		VkDescriptorSet const hLayerDescSet) const
 	{
 		std::array const descSets
 		{
@@ -513,6 +516,9 @@ namespace Render
 
 			// SAMPLED_IMAGES_DESC_SET_LOCATION
 			__globalDescManager.getSampledImagesDescSet(),
+
+			// LAYER_DESC_SET_LOCATION
+			hLayerDescSet,
 
 			// SUB_LAYER_DESC_SET_LOCATION
 			__getDescSet(),
@@ -547,10 +553,11 @@ namespace Render
 		VK::Framebuffer const &framebuffer,
 		VK::Pipeline const &pipeline,
 		size_t const sequenceBegin,
-		size_t const sequenceEnd) const
+		size_t const sequenceEnd,
+		VkDescriptorSet const hLayerDescSet) const
 	{
 		return __scbBuilder.build(
-			[this, &renderPass, &framebuffer, &pipeline, sequenceBegin, sequenceEnd] (auto &secondaryBuffer)
+			[this, &renderPass, &framebuffer, &pipeline, sequenceBegin, sequenceEnd, hLayerDescSet] (auto &secondaryBuffer)
 		{
 			__beginSecondaryBuffer(secondaryBuffer, renderPass, framebuffer);
 
@@ -559,7 +566,7 @@ namespace Render
 				pipeline.getHandle());
 
 			if (__pRenderer->useMaterial())
-				__bindDescSets(secondaryBuffer);
+				__bindDescSets(secondaryBuffer, hLayerDescSet);
 
 			Mesh const *pBoundMesh{ };
 			uint32_t boundVertexAttribFlags{ };

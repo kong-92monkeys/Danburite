@@ -16,18 +16,26 @@ const uint VERTEX_ATTRIB_TANGENT_BIT					= (1U << VERTEX_ATTRIB_TANGENT_LOCATION
 // Descriptor set locations
 const uint MATERIALS_DESC_SET_LOCATION					= 0U;
 const uint SAMPLED_IMAGES_DESC_SET_LOCATION				= 1U;
-const uint SUB_LAYER_DESC_SET_LOCATION					= 2U;
-const uint RENDERER_DESC_SET_LOCATION					= 3U;
+const uint LAYER_DESC_SET_LOCATION						= 2U;
+const uint SUB_LAYER_DESC_SET_LOCATION					= 3U;
+const uint RENDERER_DESC_SET_LOCATION					= 4U;
 
 // Descriptor locations
 
-// Global
-const uint MATERIAL_DESC_SIMPLE_MATERIAL_LOCATION		= 0U;
-const uint MATERIAL_DESC_IMAGE_MATERIAL_LOCATION		= 1U;
-const uint MATERIAL_DESC_TRANSFORM_MATERIAL_LOCATION	= 2U;
-const uint MATERIAL_DESC_PHONG_MATERIAL_LOCATION		= 3U;
+// Material desc set
+const uint TRANSFORM_MATERIAL_LOCATION				= 0U;
+const uint PHONG_MATERIAL_LOCATION					= 1U;
 
-// Sub layer
-const uint SUB_LAYER_DESC_INSTANCE_INFO_LOCATION		= 0U;
+// Sampled images desc set
+const uint SAMPLED_IMAGES_LOCATION					= 0U;
+
+// Layer desc set
+const uint LAYER_DATA_BUFFER_LOCATION				= 0U;
+
+// Sub layer desc set
+const uint INSTANCE_INFO_BUFFER_LOCATION			= 0U;
+
+// Renderer desc set
+const uint PHONG_RENDERER_IMAGE_SAMLER_LOCATION		= 0U;
 
 #endif

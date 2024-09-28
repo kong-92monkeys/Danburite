@@ -15,10 +15,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Orientation.h" />
     <ClInclude Include="PhongMaterial.h" />
-    <ClInclude Include="ImageMaterial.h" />
     <ClInclude Include="PhongRenderer.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="PrimitiveBuilder.h" />
@@ -27,7 +27,6 @@
     <ClInclude Include="Scale.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformMaterial.h" />
-    <ClInclude Include="SimpleMaterial.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexAttribute.h" />
   </ItemGroup>
@@ -35,7 +34,6 @@
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="Orientation.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
-    <ClCompile Include="ImageMaterial.cpp" />
     <ClCompile Include="PhongRenderer.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="PrimitiveBuilder.cpp" />
@@ -44,7 +42,6 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="TransformMaterial.cpp" />
-    <ClCompile Include="SimpleMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Device\Device.vcxproj">
