@@ -654,6 +654,19 @@ namespace VK
 			commandBuffer, commandBufferCount, pCommandBuffers);
 	}
 
+	void Device::vkCmdSetVertexInputEXT(
+		VkCommandBuffer const commandBuffer,
+		uint32_t const vertexBindingDescriptionCount,
+		VkVertexInputBindingDescription2EXT const *const pVertexBindingDescriptions,
+		uint32_t const vertexAttributeDescriptionCount,
+		VkVertexInputAttributeDescription2EXT const *const pVertexAttributeDescriptions)
+	{
+		__deviceProc.vkCmdSetVertexInputEXT(
+			commandBuffer,
+			vertexBindingDescriptionCount, pVertexBindingDescriptions,
+			vertexAttributeDescriptionCount, pVertexAttributeDescriptions);
+	}
+
 	void Device::__loadDeviceProc() noexcept
 	{
 		// Device
@@ -758,6 +771,7 @@ namespace VK
 		LOAD_DEVICE_PROC(vkCmdBindIndexBuffer);
 		LOAD_DEVICE_PROC(vkCmdBindDescriptorSets);
 		LOAD_DEVICE_PROC(vkCmdExecuteCommands);
+		LOAD_DEVICE_PROC(vkCmdSetVertexInputEXT);
 
 		// Memory
 		LOAD_DEVICE_PROC(vkAllocateMemory);

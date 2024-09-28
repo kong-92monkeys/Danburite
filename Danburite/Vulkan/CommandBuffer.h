@@ -83,6 +83,12 @@ namespace VK
 			uint32_t commandBufferCount,
 			VkCommandBuffer const *pCommandBuffers);
 
+		void vkCmdSetVertexInputEXT(
+			uint32_t vertexBindingDescriptionCount,
+			VkVertexInputBindingDescription2EXT const *pVertexBindingDescriptions,
+			uint32_t vertexAttributeDescriptionCount,
+			VkVertexInputAttributeDescription2EXT const *pVertexAttributeDescriptions);
+
 	private:
 		Device &__device;
 	};

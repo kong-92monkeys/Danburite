@@ -146,4 +146,16 @@ namespace VK
 		__device.vkCmdExecuteCommands(
 			getHandle(), commandBufferCount, pCommandBuffers);
 	}
+
+	void CommandBuffer::vkCmdSetVertexInputEXT(
+		uint32_t const vertexBindingDescriptionCount,
+		VkVertexInputBindingDescription2EXT const *const pVertexBindingDescriptions,
+		uint32_t const vertexAttributeDescriptionCount,
+		VkVertexInputAttributeDescription2EXT const *const pVertexAttributeDescriptions)
+	{
+		__device.vkCmdSetVertexInputEXT(
+			getHandle(),
+			vertexBindingDescriptionCount, pVertexBindingDescriptions,
+			vertexAttributeDescriptionCount, pVertexAttributeDescriptions);
+	}
 }

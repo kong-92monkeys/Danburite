@@ -57,6 +57,7 @@ namespace Render
 			VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT);
 
 		__validateCmdParams();
+		__enableVertexAttribFlag(bindingIndex);
 	}
 
 	void Mesh::updateVertexBuffer(
@@ -85,6 +86,7 @@ namespace Render
 			std::move(pVertexBuffer));
 
 		__validateCmdParams();
+		__disableVertexAttribFlag(bindingIndex);
 	}
 
 	void Mesh::clearVertexBuffers()
@@ -100,6 +102,7 @@ namespace Render
 		}
 
 		__validateCmdParams();
+		__resetVertexAttribFlags();
 	}
 
 	void Mesh::createIndexBuffer(

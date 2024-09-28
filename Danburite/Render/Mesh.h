@@ -49,12 +49,16 @@ namespace Render
 		void bind(
 			VK::CommandBuffer &cmdBuffer) const;
 
+		[[nodiscard]]
+		constexpr uint32_t getVertexAttribFlags() const noexcept;
+
 	private:
 		VK::Device &__device;
 		Dev::MemoryAllocator &__memoryAllocator;
 		Dev::CommandExecutor &__commandExecutor;
 		Render::ResourcePool &__resourcePool;
 
+		uint32_t __vertexAttribFlags{ };
 		std::unordered_map<uint32_t, std::shared_ptr<Dev::MemoryBuffer>> __vertexBuffers;
 
 		std::vector<VkBuffer> __cmdParam_vertexBufferHandles;
@@ -74,5 +78,35 @@ namespace Render
 			VkAccessFlags2 afterAccessMask);
 
 		void __validateCmdParams() noexcept;
+
+		constexpr void __enableVertexAttribFlag(
+			uint32_t bindingIndex) noexcept;
+
+		constexpr void __disableVertexAttribFlag(
+			uint32_t bindingIndex) noexcept;
+
+		constexpr void __resetVertexAttribFlags() noexcept;
 	};
+
+	constexpr uint32_t Mesh::getVertexAttribFlags() const noexcept
+	{
+		return __vertexAttribFlags;
+	}
+
+	constexpr void Mesh::__enableVertexAttribFlag(
+		uint32_t const bindingIndex) noexcept
+	{
+		__vertexAttribFlags |= (1U << bindingIndex);
+	}
+
+	constexpr void Mesh::__disableVertexAttribFlag(
+		uint32_t const bindingIndex) noexcept
+	{
+		__vertexAttribFlags &= ~(1U << bindingIndex);
+	}
+
+	constexpr void Mesh::__resetVertexAttribFlags() noexcept
+	{
+		__vertexAttribFlags = 0U;
+	}
 }
