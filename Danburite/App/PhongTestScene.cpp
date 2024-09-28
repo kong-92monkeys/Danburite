@@ -106,6 +106,9 @@ void PhongTestScene::_rcmd_onInit()
 	__rcmd_pObject->getMaterialPackOf(0U).setMaterial(__rcmd_pPhongMaterial.get());
 
 	__rcmd_pLayer = _rcmd_createLayer();
+
+	glm::mat4 layerTransform{ glm::scale(glm::mat4{ 1.0f }, glm::vec3{ 0.3f, 0.3f, 0.3f }) };
+	__rcmd_pLayer->setData(&layerTransform, sizeof(layerTransform));
 	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
 }
 
