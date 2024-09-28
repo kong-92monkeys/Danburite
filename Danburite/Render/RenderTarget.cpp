@@ -120,10 +120,24 @@ namespace Render
 		__needRedrawEvent.invoke(this);
 	}
 
-	void RenderTarget::setBackgroundColor(
+	void RenderTarget::setClearColor(
 		glm::vec4 const &color) noexcept
 	{
-		__backgroundColor = color;
+		std::memcpy(__clearColor.float32, &color, sizeof(color));
+		__needRedrawEvent.invoke(this);
+	}
+
+	void RenderTarget::setClearDepth(
+		float const depth) noexcept
+	{
+		__clearDepthStencil.depth = depth;
+		__needRedrawEvent.invoke(this);
+	}
+
+	void RenderTarget::setClearStencil(
+		uint32_t const stencil) noexcept
+	{
+		__clearDepthStencil.stencil = stencil;
 		__needRedrawEvent.invoke(this);
 	}
 
@@ -235,6 +249,9 @@ namespace Render
 		__pDepthStencilImageView = nullptr;
 		__pDepthStencilImage = nullptr;
 
+		if (!(isPresentable()))
+			return;
+
 		__createDepthStencilImage();
 		__createDepthStencilImageView();
 	}
@@ -242,6 +259,10 @@ namespace Render
 	void RenderTarget::__syncClearFramebuffers()
 	{
 		__clearFramebuffers.clear();
+
+		if (!(isPresentable()))
+			return;
+
 		__createClearFramebuffers();
 	}
 
@@ -623,14 +644,18 @@ namespace Render
 	{
 		auto const &extent{ getExtent() };
 
-		for (auto const &pImageView : __swapchainImageViews)
+		for (auto const &pSwapchainImageView : __swapchainImageViews)
 		{
+			std::vector<VkImageView> attachments;
+			attachments.emplace_back(pSwapchainImageView->getHandle());
+			attachments.emplace_back(__pDepthStencilImageView->getHandle());
+
 			VkFramebufferCreateInfo const createInfo
 			{
 				.sType				{ VkStructureType::VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO },
 				.renderPass			{ __pClearRenderPass->getHandle() },
-				.attachmentCount	{ 1U },
-				.pAttachments		{ &(pImageView->getHandle()) },
+				.attachmentCount	{ static_cast<uint32_t>(attachments.size()) },
+				.pAttachments		{ attachments.data() },
 				.width				{ extent.width },
 				.height				{ extent.height },
 				.layers				{ 1U }
@@ -667,8 +692,8 @@ namespace Render
 
 		VkCommandBufferBeginInfo const cbBeginInfo
 		{
-			.sType{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
-			.flags{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO },
+			.flags	{ VkCommandBufferUsageFlagBits::VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT }
 		};
 
 		auto const result{ retVal.vkBeginCommandBuffer(&cbBeginInfo) };
@@ -682,13 +707,21 @@ namespace Render
 		VK::CommandBuffer &cmdBuffer,
 		uint32_t const imageIndex)
 	{
-		VkRenderPassBeginInfo renderPassBeginInfo{ };
-		renderPassBeginInfo.sType				= VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassBeginInfo.renderPass			= __pClearRenderPass->getHandle();
-		renderPassBeginInfo.framebuffer			= __clearFramebuffers[imageIndex]->getHandle();
-		renderPassBeginInfo.renderArea			= __renderArea;
-		renderPassBeginInfo.clearValueCount		= 1U;
-		renderPassBeginInfo.pClearValues		= reinterpret_cast<VkClearValue *>(&__backgroundColor);
+		std::vector<VkClearValue> clearValues;
+		clearValues.emplace_back().color = __clearColor;
+
+		if (__useDepthBuffer || __useStencilBuffer)
+			clearValues.emplace_back().depthStencil = __clearDepthStencil;
+
+		VkRenderPassBeginInfo const renderPassBeginInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO },
+			.renderPass			{ __pClearRenderPass->getHandle() },
+			.framebuffer		{ __clearFramebuffers[imageIndex]->getHandle() },
+			.renderArea			{ __renderArea },
+			.clearValueCount	{ static_cast<uint32_t>(clearValues.size()) },
+			.pClearValues		{ clearValues.data() }
+		};
 
 		VkSubpassBeginInfo const subpassBeginInfo
 		{

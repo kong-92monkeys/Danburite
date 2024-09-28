@@ -49,16 +49,19 @@ namespace Render
 		void removeLayer(
 			Layer *pLayer);
 
-		void setBackgroundColor(
+		void setClearColor(
 			glm::vec4 const &color) noexcept;
+
+		void setClearDepth(
+			float depth) noexcept;
+
+		void setClearStencil(
+			uint32_t stencil) noexcept;
 
 		void sync();
 
 		[[nodiscard]]
 		DrawResult draw();
-
-		[[nodiscard]]
-		constexpr glm::vec4 const &getBackgroundColor() const noexcept;
 
 		[[nodiscard]]
 		constexpr VkExtent2D const &getExtent() const noexcept;
@@ -122,7 +125,16 @@ namespace Render
 		bool __layerSortionInvalidated{ };
 		std::vector<Layer *> __sortedLayers;
 
-		glm::vec4 __backgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
+		VkClearColorValue __clearColor
+		{
+			.float32	{ 0.0f, 0.0f, 0.0f, 1.0f }
+		};
+
+		VkClearDepthStencilValue __clearDepthStencil
+		{
+			.depth		{ 1.0f },
+			.stencil	{ 0U }
+		};
 
 		Infra::EventListenerPtr<Layer *> __pLayerInvalidateListener;
 		Infra::EventListenerPtr<Layer const *, int, int> __pLayerPriorityChangeListener;
@@ -181,11 +193,6 @@ namespace Render
 		void __onLayerPriorityChanged() noexcept;
 		void __onLayerRedrawNeeded() const noexcept;
 	};
-
-	constexpr glm::vec4 const &RenderTarget::getBackgroundColor() const noexcept
-	{
-		return __backgroundColor;
-	}
 
 	constexpr VkExtent2D const &RenderTarget::getExtent() const noexcept
 	{

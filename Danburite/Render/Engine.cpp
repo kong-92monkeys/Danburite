@@ -197,6 +197,7 @@ namespace Render
 			physicalDeviceFeatures.p12->descriptorBindingVariableDescriptorCount &&
 			physicalDeviceFeatures.p12->descriptorBindingPartiallyBound &&
 			physicalDeviceFeatures.p12->runtimeDescriptorArray &&
+			physicalDeviceFeatures.p12->separateDepthStencilLayouts &&
 
 			physicalDeviceFeatures.p13->pipelineCreationCacheControl &&
 			physicalDeviceFeatures.p13->synchronization2 &&
@@ -260,6 +261,7 @@ namespace Render
 		features12.descriptorBindingVariableDescriptorCount = VK_TRUE;
 		features12.descriptorBindingPartiallyBound = VK_TRUE;
 		features12.runtimeDescriptorArray = VK_TRUE;
+		features12.separateDepthStencilLayouts = VK_TRUE;
 		features12.pNext = &features13;
 		
 		features13.sType = VkStructureType::VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
