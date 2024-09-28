@@ -147,6 +147,17 @@ namespace VK
 			getHandle(), commandBufferCount, pCommandBuffers);
 	}
 
+	void CommandBuffer::vkCmdPushConstants(
+		VkPipelineLayout const layout,
+		VkShaderStageFlags const stageFlags,
+		uint32_t const offset,
+		uint32_t const size,
+		void const *const pValues)
+	{
+		__device.vkCmdPushConstants(
+			getHandle(), layout, stageFlags, offset, size, pValues);
+	}
+
 	void CommandBuffer::vkCmdSetVertexInputEXT(
 		uint32_t const vertexBindingDescriptionCount,
 		VkVertexInputBindingDescription2EXT const *const pVertexBindingDescriptions,

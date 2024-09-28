@@ -116,6 +116,15 @@ namespace Frx
 		cmdBuffer.vkCmdSetVertexInputEXT(
 			static_cast<uint32_t>(bindingDescs.size()), bindingDescs.data(),
 			static_cast<uint32_t>(attribDescs.size()), attribDescs.data());
+
+		__PushConstants pushConstants;
+		pushConstants.vertexAttribFlags = vertexAttribFlags;
+
+		cmdBuffer.vkCmdPushConstants(
+			getPipelineLayout().getHandle(),
+			VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT |
+			VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
+			0U, sizeof(__PushConstants), &pushConstants);
 	}
 
 	std::unique_ptr<VK::RenderPass> PhongRenderer::createRenderPass(
@@ -528,11 +537,23 @@ namespace Frx
 		// RENDERER_DESC_SET_LOCATION
 		setLayouts.emplace_back(__pDescSetLayout->getHandle());
 
+		VkPushConstantRange const pushConstantRange
+		{
+			.stageFlags		{
+				VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT |
+				VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT
+			},
+			.offset			{ 0U },
+			.size			{ sizeof(__PushConstants) }
+		};
+
 		VkPipelineLayoutCreateInfo const createInfo
 		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO },
-			.setLayoutCount		{ static_cast<uint32_t>(setLayouts.size()) },
-			.pSetLayouts		{ setLayouts.data() }
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO },
+			.setLayoutCount				{ static_cast<uint32_t>(setLayouts.size()) },
+			.pSetLayouts				{ setLayouts.data() },
+			.pushConstantRangeCount		{ 1U },
+			.pPushConstantRanges		{ &pushConstantRange }
 		};
 
 		return std::make_shared<VK::PipelineLayout>(_getDevice(), createInfo);

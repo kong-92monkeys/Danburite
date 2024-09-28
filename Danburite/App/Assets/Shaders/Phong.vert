@@ -16,6 +16,11 @@ layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = SUB_LAYER_DESC_INSTA
     InstanceInfo instanceInfos[];
 };
 
+layout(push_constant) uniform PushConstants
+{
+	uint vertexAttribFlags;
+};
+
 layout(location = VERTEX_ATTRIB_POS_LOCATION) in vec3 inPos;
 layout(location = VERTEX_ATTRIB_UV_LOCATION) in vec2 inUV;
 layout(location = VERTEX_ATTRIB_COLOR_LOCATION) in vec4 inColor;
@@ -31,7 +36,12 @@ void main()
 
 	gl_Position = (transform * vec4(inPos, 1.0f));
 
-	instanceIndex = gl_InstanceIndex;
-	outUV = inUV;
-	outColor = inColor;
+	if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))
+	{
+		instanceIndex = gl_InstanceIndex;
+		outUV = inUV;
+	}
+
+	if (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT))
+		outColor = inColor;
 }

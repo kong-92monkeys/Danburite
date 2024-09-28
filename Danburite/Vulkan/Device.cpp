@@ -654,6 +654,18 @@ namespace VK
 			commandBuffer, commandBufferCount, pCommandBuffers);
 	}
 
+	void Device::vkCmdPushConstants(
+		VkCommandBuffer const commandBuffer,
+		VkPipelineLayout const layout,
+		VkShaderStageFlags const stageFlags,
+		uint32_t const offset,
+		uint32_t const size,
+		void const *const pValues)
+	{
+		__deviceProc.vkCmdPushConstants(
+			commandBuffer, layout, stageFlags, offset, size, pValues);
+	}
+
 	void Device::vkCmdSetVertexInputEXT(
 		VkCommandBuffer const commandBuffer,
 		uint32_t const vertexBindingDescriptionCount,
@@ -771,6 +783,7 @@ namespace VK
 		LOAD_DEVICE_PROC(vkCmdBindIndexBuffer);
 		LOAD_DEVICE_PROC(vkCmdBindDescriptorSets);
 		LOAD_DEVICE_PROC(vkCmdExecuteCommands);
+		LOAD_DEVICE_PROC(vkCmdPushConstants);
 		LOAD_DEVICE_PROC(vkCmdSetVertexInputEXT);
 
 		// Memory

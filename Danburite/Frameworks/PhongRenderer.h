@@ -59,6 +59,12 @@ namespace Frx
 		virtual InitResult _onInit() override;
 
 	private:
+		struct __PushConstants
+		{
+		public:
+			uint32_t vertexAttribFlags{ };
+		};
+
 		std::unique_ptr<VK::ShaderModule> __pVertexShader;
 		std::unique_ptr<VK::ShaderModule> __pFragmentShader;
 

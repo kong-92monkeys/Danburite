@@ -354,6 +354,14 @@ namespace VK
 			uint32_t commandBufferCount,
 			VkCommandBuffer const *pCommandBuffers);
 
+		void vkCmdPushConstants(
+			VkCommandBuffer commandBuffer,
+			VkPipelineLayout layout,
+			VkShaderStageFlags stageFlags,
+			uint32_t offset,
+			uint32_t size,
+			void const *pValues);
+
 		void vkCmdSetVertexInputEXT(
 			VkCommandBuffer commandBuffer,
 			uint32_t vertexBindingDescriptionCount,

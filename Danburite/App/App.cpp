@@ -130,7 +130,7 @@ void CApp::__onInitBeforeMainFrame()
 	};
 
 #ifndef NDEBUG
-	contextCreateInfo.debugMode = true;
+	//contextCreateInfo.debugMode = true;
 #endif
 
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
