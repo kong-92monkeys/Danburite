@@ -1,10 +1,6 @@
 #pragma once
 
-#include <Windows.h>
-#include "../Infra/Stateful.h"
 #include "../Infra/GLM.h"
-#include "../Infra/Event.h"
-#include "../Infra/ThreadPool.h"
 #include "../Vulkan/Queue.h"
 #include "../Vulkan/Surface.h"
 #include "../Vulkan/Swapchain.h"
@@ -15,6 +11,7 @@
 #include "../Device/CommandBufferCirculator.h"
 #include "../Device/SemaphoreCirculator.h"
 #include "../Device/CommandExecutor.h"
+#include "../Device/MemoryImage.h"
 #include "Layer.h"
 
 namespace Render
@@ -37,10 +34,12 @@ namespace Render
 			VK::PhysicalDevice const &physicalDevice,
 			VK::Device &device,
 			VK::Queue &queue,
+			Dev::MemoryAllocator &memoryAllocator,
 			Infra::DeferredDeleter &deferredDeleter,
 			HINSTANCE hinstance,
 			HWND hwnd,
-			bool useDepthStencilBuffer);
+			bool useDepthBuffer,
+			bool useStencilBuffer);
 
 		virtual ~RenderTarget() noexcept override;
 
@@ -81,8 +80,11 @@ namespace Render
 		VK::PhysicalDevice const &__physicalDevice;
 		VK::Device &__device;
 		VK::Queue &__que;
+		Dev::MemoryAllocator &__memoryAllocator;
 		Infra::DeferredDeleter &__deferredDeleter;
-		bool const __useDepthStencilBuffer;
+
+		bool const __useDepthBuffer;
+		bool const __useStencilBuffer;
 
 		std::unique_ptr<VK::Surface> __pSurface;
 
@@ -100,8 +102,10 @@ namespace Render
 		std::vector<std::unique_ptr<VK::ImageView>> __swapchainImageViews;
 
 		VkFormat __depthStencilFormat{ };
-		std::vector<std::unique_ptr<VK::Image>> __depthStencilImages;
-		std::vector<std::unique_ptr<VK::ImageView>> __depthStencilImageViews;
+		VkImageLayout __depthStencilImageLayout{ };
+		VkImageAspectFlags __depthStencilAspectMask{ };
+		std::unique_ptr<Dev::MemoryImage> __pDepthStencilImage;
+		std::unique_ptr<VK::ImageView> __pDepthStencilImageView;
 
 		std::unique_ptr<VK::RenderPass> __pClearRenderPass;
 		std::vector<std::unique_ptr<VK::Framebuffer>> __clearFramebuffers;
@@ -130,10 +134,9 @@ namespace Render
 			HINSTANCE hinstance,
 			HWND hwnd);
 
-
 		void __syncSurface();
 		void __syncSwapchain();
-		void __syncDepthStencilBuffers();
+		void __syncDepthStencilBuffer();
 		void __syncClearFramebuffers();
 
 		void __verifySurfaceSupport();
@@ -148,9 +151,9 @@ namespace Render
 		void __enumerateSwapchainImages();
 		void __createSwapchainImageViews();
 
-		void __resolveDepthStencilFormat();
-		void __createDepthStencilImages();
-		void __createDepthStencilImageViews();
+		void __resolveDepthStencilProps();
+		void __createDepthStencilImage();
+		void __createDepthStencilImageView();
 
 		void __createClearRenderPass();
 		void __createClearFramebuffers();

@@ -75,13 +75,14 @@ namespace Render
 	RenderTarget *Engine::createRenderTarget(
 		HINSTANCE const hinstance,
 		HWND const hwnd,
-		bool const useDepthStencilBuffer)
+		bool const useDepthBuffer,
+		bool const useStencilBuffer)
 	{
 		return new RenderTarget
 		{
-			__context.getInstance(), __physicalDevice,
-			*__pDevice, *__pQueue, __deferredDeleter,
-			hinstance, hwnd, useDepthStencilBuffer
+			__context.getInstance(), __physicalDevice, *__pDevice, *__pQueue,
+			*__pMemoryAllocator, __deferredDeleter,
+			hinstance, hwnd, useDepthBuffer, useStencilBuffer
 		};
 	}
 

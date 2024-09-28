@@ -63,7 +63,7 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
-	__pDisplay = theApp.createDisplay(GetSafeHwnd(), true);
+	__pDisplay = theApp.createDisplay(GetSafeHwnd(), false, false);
 	theApp.setSceneDisplay(__pDisplay.get());
 
 	return 0;

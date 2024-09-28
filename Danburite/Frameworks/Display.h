@@ -13,7 +13,8 @@ namespace Frx
 			Render::Engine &renderEngine,
 			HINSTANCE hinstance,
 			HWND hwnd,
-			bool useDepthStencilBuffer);
+			bool useDepthBuffer,
+			bool useStencilBuffer);
 
 		virtual ~Display() noexcept override;
 

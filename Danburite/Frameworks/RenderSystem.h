@@ -21,7 +21,8 @@ namespace Frx
 		std::unique_ptr<Display> createDisplay(
 			HINSTANCE hinstance,
 			HWND hwnd,
-			bool useDepthStencilBuffer);
+			bool useDepthBuffer,
+			bool useStencilBuffer);
 
 		template <std::derived_from<Scene> $Scene, typename ...$Args>
 		[[nodiscard]]

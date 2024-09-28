@@ -11,16 +11,20 @@ namespace Render
 		VK::PhysicalDevice const &physicalDevice,
 		VK::Device &device,
 		VK::Queue &queue,
+		Dev::MemoryAllocator &memoryAllocator,
 		Infra::DeferredDeleter &deferredDeleter,
 		HINSTANCE const hinstance,
 		HWND const hwnd,
-		bool const useDepthStencilBuffer) :
-		__instance				{ instance },
-		__physicalDevice		{ physicalDevice },
-		__device				{ device },
-		__que					{ queue },
-		__deferredDeleter		{ deferredDeleter },
-		__useDepthStencilBuffer	{ useDepthStencilBuffer }
+		bool const useDepthBuffer,
+		bool const useStencilBuffer) :
+		__instance			{ instance },
+		__physicalDevice	{ physicalDevice },
+		__device			{ device },
+		__que				{ queue },
+		__memoryAllocator	{ memoryAllocator },
+		__deferredDeleter	{ deferredDeleter },
+		__useDepthBuffer	{ useDepthBuffer },
+		__useStencilBuffer	{ useStencilBuffer }
 	{
 		__pLayerInvalidateListener = Infra::EventListener<Layer *>::bind(
 			&RenderTarget::__onLayerInvalidated, this, std::placeholders::_1);
@@ -36,10 +40,10 @@ namespace Render
 		__syncSurface();
 		__syncSwapchain();
 
-		if (__useDepthStencilBuffer)
+		if (__useDepthBuffer || __useStencilBuffer)
 		{
-			__resolveDepthStencilFormat();
-			__syncDepthStencilBuffers();
+			__resolveDepthStencilProps();
+			__syncDepthStencilBuffer();
 		}
 
 		__createClearRenderPass();
@@ -73,8 +77,8 @@ namespace Render
 
 		__clearFramebuffers.clear();
 
-		__depthStencilImageViews.clear();
-		__depthStencilImages.clear();
+		__pDepthStencilImageView = nullptr;
+		__pDepthStencilImage = nullptr;
 
 		__swapchainImageViews.clear();
 		__swapchainImages.clear();
@@ -130,8 +134,8 @@ namespace Render
 		__syncSurface();
 		__syncSwapchain();
 		
-		if (__useDepthStencilBuffer)
-			__syncDepthStencilBuffers();
+		if (__useDepthBuffer || __useStencilBuffer)
+			__syncDepthStencilBuffer();
 
 		__syncClearFramebuffers();
 
@@ -226,13 +230,13 @@ namespace Render
 		__createSwapchainImageViews();
 	}
 
-	void RenderTarget::__syncDepthStencilBuffers()
+	void RenderTarget::__syncDepthStencilBuffer()
 	{
-		__depthStencilImageViews.clear();
-		__depthStencilImages.clear();
+		__pDepthStencilImageView = nullptr;
+		__pDepthStencilImage = nullptr;
 
-		__createDepthStencilImages();
-		__createDepthStencilImageViews();
+		__createDepthStencilImage();
+		__createDepthStencilImageView();
 	}
 
 	void RenderTarget::__syncClearFramebuffers()
@@ -418,40 +422,129 @@ namespace Render
 		}
 	}
 
-	void RenderTarget::__resolveDepthStencilFormat()
+	void RenderTarget::__resolveDepthStencilProps()
 	{
-		auto const formatProp{ __physicalDevice.getFormatPropsOf(VkFormat::VK_FORMAT_D32_SFLOAT_S8_UINT) };
+		if (__useDepthBuffer && __useStencilBuffer)
+		{
+			__depthStencilFormat		= VkFormat::VK_FORMAT_D32_SFLOAT_S8_UINT;
+			__depthStencilImageLayout	= VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			__depthStencilAspectMask	= (
+				VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT |
+				VkImageAspectFlagBits::VK_IMAGE_ASPECT_STENCIL_BIT
+			);
+		}
+		else if (__useDepthBuffer)
+		{
+			__depthStencilFormat		= VkFormat::VK_FORMAT_D32_SFLOAT;
+			__depthStencilImageLayout	= VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL;
+			__depthStencilAspectMask	= VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT;
+		}
+		else
+		{
+			__depthStencilFormat		= VkFormat::VK_FORMAT_S8_UINT;
+			__depthStencilImageLayout	= VkImageLayout::VK_IMAGE_LAYOUT_STENCIL_ATTACHMENT_OPTIMAL;
+			__depthStencilAspectMask	= VkImageAspectFlagBits::VK_IMAGE_ASPECT_STENCIL_BIT;
+		}
+
+		auto const formatProp{ __physicalDevice.getFormatPropsOf(__depthStencilFormat) };
 
 		if (!(formatProp.optimalTilingFeatures & VkFormatFeatureFlagBits::VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT))
 			throw std::runtime_error{ "Cannot resolve the depth stencil format." };
-
-		__depthStencilFormat = VkFormat::VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
 
-	void RenderTarget::__createDepthStencilImages()
+	void RenderTarget::__createDepthStencilImage()
 	{
+		auto const &extent{ getExtent() };
 
+		VkImageCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO },
+			.imageType		{ VkImageType::VK_IMAGE_TYPE_2D },
+			.format			{ __depthStencilFormat },
+			.extent			{ 
+				.width		{ extent.width },
+				.height		{ extent.height },
+				.depth		{ 1U }
+			},
+			.mipLevels		{ 1U },
+			.arrayLayers	{ 1U },
+			.samples		{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
+			.tiling			{ VkImageTiling::VK_IMAGE_TILING_OPTIMAL },
+			.usage			{ VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT },
+			.sharingMode	{ VkSharingMode::VK_SHARING_MODE_EXCLUSIVE }
+		};
+
+		__pDepthStencilImage = std::make_unique<Dev::MemoryImage>(
+			__device, __memoryAllocator, createInfo,
+			VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	}
 
-	void RenderTarget::__createDepthStencilImageViews()
+	void RenderTarget::__createDepthStencilImageView()
 	{
+		VkImageViewUsageCreateInfo const usageInfo
+		{
+			.sType	{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO },
+			.usage	{ VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT }
+		};
 
+		VkImageViewCreateInfo createInfo
+		{
+			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO },
+			.pNext					{ &usageInfo },
+			.image					{ __pDepthStencilImage->getHandle() },
+			.viewType				{ VkImageViewType::VK_IMAGE_VIEW_TYPE_2D },
+			.format					{ __depthStencilFormat },
+			.subresourceRange		{
+				.aspectMask			{ __depthStencilAspectMask },
+				.baseMipLevel		{ 0U },
+				.levelCount			{ 1U },
+				.baseArrayLayer		{ 0U },
+				.layerCount			{ 1U }
+			}
+		};
+
+		__pDepthStencilImageView = std::make_unique<VK::ImageView>(__device, createInfo);
 	}
 
 	void RenderTarget::__createClearRenderPass()
 	{
-		VkAttachmentDescription2 const colorAttachment
+		std::vector<VkAttachmentDescription2> attachmentDescs;
+
+		auto &colorAttachment			{ attachmentDescs.emplace_back() };
+		colorAttachment.sType			= VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+		colorAttachment.format			= __surfaceFormat.format;
+		colorAttachment.samples			= VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+		colorAttachment.loadOp			= VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR;
+		colorAttachment.storeOp			= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE;
+		colorAttachment.stencilLoadOp	= VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		colorAttachment.stencilStoreOp	= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		colorAttachment.initialLayout	= VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+		colorAttachment.finalLayout		= VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		if (__useDepthBuffer || __useStencilBuffer)
 		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2 },
-			.format				{ __surfaceFormat.format },
-			.samples			{ VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT },
-			.loadOp				{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR },
-			.storeOp			{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_STORE },
-			.stencilLoadOp		{ VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE },
-			.stencilStoreOp		{ VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE },
-			.initialLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED },
-			.finalLayout		{ VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL }
-		};
+			auto &depthStencilAttachment			{ attachmentDescs.emplace_back() };
+			depthStencilAttachment.sType			= VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_DESCRIPTION_2;
+			depthStencilAttachment.format			= __depthStencilFormat;
+			depthStencilAttachment.samples			= VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+			
+			depthStencilAttachment.loadOp			= (
+				__useDepthBuffer ?
+				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR :
+				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE
+			);
+
+			depthStencilAttachment.stencilLoadOp	= (
+				__useStencilBuffer ?
+				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_CLEAR :
+				VkAttachmentLoadOp::VK_ATTACHMENT_LOAD_OP_DONT_CARE
+			);
+
+			depthStencilAttachment.storeOp			= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			depthStencilAttachment.stencilStoreOp	= VkAttachmentStoreOp::VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			depthStencilAttachment.initialLayout	= VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+			depthStencilAttachment.finalLayout		= __depthStencilImageLayout;
+		}
 
 		VkAttachmentReference2 const colorAttachmentRef
 		{
@@ -461,22 +554,48 @@ namespace Render
 			.aspectMask		{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT }
 		};
 
-		VkSubpassDescription2 const subpass
+		std::unique_ptr<VkAttachmentReference2> pDepthStencilAttachmentRef;
+		if (__useDepthBuffer || __useStencilBuffer)
 		{
-			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
-			.pipelineBindPoint		{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
-			.colorAttachmentCount	{ 1U },
-			.pColorAttachments		{ &colorAttachmentRef }
+			pDepthStencilAttachmentRef					= std::make_unique<VkAttachmentReference2>();
+			pDepthStencilAttachmentRef->sType			= VkStructureType::VK_STRUCTURE_TYPE_ATTACHMENT_REFERENCE_2;
+			pDepthStencilAttachmentRef->attachment		= 1U;
+			pDepthStencilAttachmentRef->layout			= __depthStencilImageLayout;
+			pDepthStencilAttachmentRef->aspectMask		= __depthStencilAspectMask;
 		};
 
-		VkMemoryBarrier2 const memoryBarrier
+		VkSubpassDescription2 const subpass
+		{
+			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SUBPASS_DESCRIPTION_2 },
+			.pipelineBindPoint			{ VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS },
+			.colorAttachmentCount		{ 1U },
+			.pColorAttachments			{ &colorAttachmentRef },
+			.pDepthStencilAttachment	{ pDepthStencilAttachmentRef.get() }
+		};
+
+		VkMemoryBarrier2 memoryBarrier
 		{
 			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_MEMORY_BARRIER_2 },
 			.srcStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
 			.srcAccessMask	{ VK_ACCESS_2_NONE },
 			.dstStageMask	{ VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT },
-			.dstAccessMask	{ VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT }
+			.dstAccessMask	{
+				VK_ACCESS_2_COLOR_ATTACHMENT_READ_BIT |
+				VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT
+			}
 		};
+
+		if (__useDepthBuffer || __useStencilBuffer)
+		{
+			memoryBarrier.srcStageMask		|= VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
+			memoryBarrier.srcStageMask		|= VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
+			memoryBarrier.srcAccessMask		|= VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+			memoryBarrier.dstStageMask		|= VK_PIPELINE_STAGE_2_EARLY_FRAGMENT_TESTS_BIT;
+			memoryBarrier.dstStageMask		|= VK_PIPELINE_STAGE_2_LATE_FRAGMENT_TESTS_BIT;
+			memoryBarrier.dstAccessMask		|= VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+			memoryBarrier.dstAccessMask		|= VK_ACCESS_2_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		}
 
 		VkSubpassDependency2 const dependency
 		{
@@ -489,8 +608,8 @@ namespace Render
 		VkRenderPassCreateInfo2 const createInfo
 		{
 			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO_2 },
-			.attachmentCount	{ 1U },
-			.pAttachments		{ &colorAttachment },
+			.attachmentCount	{ static_cast<uint32_t>(attachmentDescs.size()) },
+			.pAttachments		{ attachmentDescs.data() },
 			.subpassCount		{ 1U },
 			.pSubpasses			{ &subpass },
 			.dependencyCount	{ 1U },

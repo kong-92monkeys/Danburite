@@ -7,11 +7,12 @@ namespace Frx
 		Render::Engine &renderEngine,
 		HINSTANCE const hinstance,
 		HWND const hwnd,
-		bool const useDepthStencilBuffer) :
+		bool const useDepthBuffer,
+		bool const useStencilBuffer) :
 		__rcmdExecutor	{ rcmdExecutor },
 		__renderEngine	{ renderEngine }
 	{
-		__rcmdExecutor.run([this, hinstance, hwnd, useDepthStencilBuffer]
+		__rcmdExecutor.run([this, hinstance, hwnd, useDepthBuffer, useStencilBuffer]
 		{
 			__pRenderTargetNeedRedrawListener =
 				Infra::EventListener<Render::RenderTarget const *>::bind(
@@ -20,7 +21,7 @@ namespace Frx
 			__pRenderTarget = std::unique_ptr<Render::RenderTarget>
 			{
 				__renderEngine.createRenderTarget(
-					hinstance, hwnd, useDepthStencilBuffer)
+					hinstance, hwnd, useDepthBuffer, useStencilBuffer)
 			};
 
 			__pRenderTarget->getNeedRedrawEvent() += __pRenderTargetNeedRedrawListener;
