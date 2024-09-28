@@ -58,6 +58,8 @@ namespace Render
 
 		__validateCmdParams();
 		__enableVertexAttribFlag(bindingIndex);
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::updateVertexBuffer(
@@ -72,6 +74,8 @@ namespace Render
 			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_VERTEX_ATTRIBUTE_INPUT_BIT,
 			VK_ACCESS_2_VERTEX_ATTRIBUTE_READ_BIT);
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::clearVertexBuffer(
@@ -87,6 +91,8 @@ namespace Render
 
 		__validateCmdParams();
 		__disableVertexAttribFlag(bindingIndex);
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::clearVertexBuffers()
@@ -103,6 +109,8 @@ namespace Render
 
 		__validateCmdParams();
 		__resetVertexAttribFlags();
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::createIndexBuffer(
@@ -128,6 +136,8 @@ namespace Render
 			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT,
 			VK_ACCESS_2_INDEX_READ_BIT);
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::updateIndexBuffer(
@@ -141,6 +151,8 @@ namespace Render
 			VK_ACCESS_2_NONE,
 			VK_PIPELINE_STAGE_2_INDEX_INPUT_BIT,
 			VK_ACCESS_2_INDEX_READ_BIT);
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::clearIndexBuffer()
@@ -151,6 +163,8 @@ namespace Render
 		__resourcePool.recycleBuffer(
 			ResourcePool::BufferType::DEVICE_LOCAL_INDEX,
 			std::move(__pIndexBuffer));
+
+		_invokeUpdateEvent();
 	}
 
 	void Mesh::bind(
@@ -261,5 +275,34 @@ namespace Render
 			__cmdParam_vertexBufferHandles[bindingIndex] = pVertexBuffer->getHandle();
 			__cmdParam_vertexBufferOffsets[bindingIndex] = 0ULL;
 		}
+	}
+
+	void Mesh::__enableVertexAttribFlag(
+		uint32_t const bindingIndex) noexcept
+	{
+		__setVertexAttribFlags(__vertexAttribFlags | (1U << bindingIndex));
+	}
+
+	void Mesh::__disableVertexAttribFlag(
+		uint32_t const bindingIndex) noexcept
+	{
+		__setVertexAttribFlags(__vertexAttribFlags & ~(1U << bindingIndex));
+	}
+
+	void Mesh::__resetVertexAttribFlags() noexcept
+	{
+		__setVertexAttribFlags(0U);
+	}
+
+	void Mesh::__setVertexAttribFlags(
+		uint32_t const flags) noexcept
+	{
+		if (__vertexAttribFlags == flags)
+			return;
+
+		uint32_t const prevFlags{ __vertexAttribFlags };
+		__vertexAttribFlags = flags;
+
+		__vertexAttribFlagsChangeEvent.invoke(this, prevFlags, __vertexAttribFlags);
 	}
 }

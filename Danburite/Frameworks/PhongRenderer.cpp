@@ -15,6 +15,12 @@ namespace Frx
 		deferredDeleter.reserve(std::move(__pDescSetLayout));
 	}
 
+	bool PhongRenderer::isValidVertexAttribFlags(
+		uint32_t const flags) const noexcept
+	{
+		return (flags & VertexAttribFlags::POS);
+	}
+
 	bool PhongRenderer::isValidMaterialPack(
 		Render::MaterialPack const &materialPack) const noexcept
 	{
@@ -47,6 +53,69 @@ namespace Frx
 	VkDescriptorSet PhongRenderer::getDescSet() const noexcept
 	{
 		return __hDescSet;
+	}
+
+	void PhongRenderer::bindVertexInput(
+		VK::CommandBuffer &cmdBuffer,
+		uint32_t const vertexAttribFlags) const
+	{
+		std::vector<VkVertexInputBindingDescription2EXT> bindingDescs;
+		std::vector<VkVertexInputAttributeDescription2EXT> attribDescs;
+
+		if (vertexAttribFlags & VertexAttribFlagBits::POS)
+		{
+			auto &posBindingDesc		{ bindingDescs.emplace_back() };
+			posBindingDesc.sType		= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			posBindingDesc.binding		= VertexAttrib::POS_LOCATION;
+			posBindingDesc.stride		= sizeof(Vertex_P);
+			posBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			posBindingDesc.divisor		= 1U;
+
+			auto &posAttribDesc			{ attribDescs.emplace_back() };
+			posAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			posAttribDesc.location		= VertexAttrib::POS_LOCATION;
+			posAttribDesc.binding		= VertexAttrib::POS_LOCATION;
+			posAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
+			posAttribDesc.offset		= 0U;
+		}
+
+		if (vertexAttribFlags & VertexAttribFlagBits::UV)
+		{
+			auto &uvBindingDesc			{ bindingDescs.emplace_back() };
+			uvBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			uvBindingDesc.binding		= VertexAttrib::UV_LOCATION;
+			uvBindingDesc.stride		= sizeof(Vertex_U);
+			uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			uvBindingDesc.divisor		= 1U;
+
+			auto &uvAttribDesc			{ attribDescs.emplace_back() };
+			uvAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			uvAttribDesc.location		= VertexAttrib::UV_LOCATION;
+			uvAttribDesc.binding		= VertexAttrib::UV_LOCATION;
+			uvAttribDesc.format			= VkFormat::VK_FORMAT_R32G32_SFLOAT;
+			uvAttribDesc.offset			= 0U;
+		}
+
+		if (vertexAttribFlags & VertexAttribFlagBits::COLOR)
+		{
+			auto &colorBindingDesc		{ bindingDescs.emplace_back() };
+			colorBindingDesc.sType		= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			colorBindingDesc.binding	= VertexAttrib::COLOR_LOCATION;
+			colorBindingDesc.stride		= sizeof(Vertex_C);
+			colorBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			colorBindingDesc.divisor	= 1U;
+
+			auto &colorAttribDesc		{ attribDescs.emplace_back() };
+			colorAttribDesc.sType		= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			colorAttribDesc.location	= VertexAttrib::COLOR_LOCATION;
+			colorAttribDesc.binding		= VertexAttrib::COLOR_LOCATION;
+			colorAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT;
+			colorAttribDesc.offset		= 0U;
+		}
+
+		cmdBuffer.vkCmdSetVertexInputEXT(
+			static_cast<uint32_t>(bindingDescs.size()), bindingDescs.data(),
+			static_cast<uint32_t>(attribDescs.size()), attribDescs.data());
 	}
 
 	std::unique_ptr<VK::RenderPass> PhongRenderer::createRenderPass(
@@ -194,52 +263,6 @@ namespace Frx
 		fragShaderInfo.module	= __pFragmentShader->getHandle();
 		fragShaderInfo.pName	= "main";
 
-		std::vector<VkVertexInputBindingDescription> vertexBindingDescs;
-
-		auto &posBindingDesc		{ vertexBindingDescs.emplace_back() };
-		posBindingDesc.binding		= VertexAttrib::POS_LOCATION;
-		posBindingDesc.stride		= sizeof(Vertex_P);
-		posBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
-
-		auto &uvBindingDesc			{ vertexBindingDescs.emplace_back() };
-		uvBindingDesc.binding		= VertexAttrib::UV_LOCATION;
-		uvBindingDesc.stride		= sizeof(Vertex_U);
-		uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
-
-		auto &colorBindingDesc		{ vertexBindingDescs.emplace_back() };
-		colorBindingDesc.binding	= VertexAttrib::COLOR_LOCATION;
-		colorBindingDesc.stride		= sizeof(Vertex_C);
-		colorBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
-
-		std::vector<VkVertexInputAttributeDescription> vertexAttribDescs;
-
-		auto &posAttribDesc			{ vertexAttribDescs.emplace_back() };
-		posAttribDesc.location		= VertexAttrib::POS_LOCATION;
-		posAttribDesc.binding		= VertexAttrib::POS_LOCATION;
-		posAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
-		posAttribDesc.offset		= 0U;
-
-		auto &uvAttribDesc			{ vertexAttribDescs.emplace_back() };
-		uvAttribDesc.location		= VertexAttrib::UV_LOCATION;
-		uvAttribDesc.binding		= VertexAttrib::UV_LOCATION;
-		uvAttribDesc.format			= VkFormat::VK_FORMAT_R32G32_SFLOAT;
-		uvAttribDesc.offset			= 0U;
-
-		auto &colorAttribDesc		{ vertexAttribDescs.emplace_back() };
-		colorAttribDesc.location	= VertexAttrib::COLOR_LOCATION;
-		colorAttribDesc.binding		= VertexAttrib::COLOR_LOCATION;
-		colorAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT;
-		colorAttribDesc.offset		= 0U;
-
-		VkPipelineVertexInputStateCreateInfo const vertexInputState
-		{
-			.sType								{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO },
-			.vertexBindingDescriptionCount		{ static_cast<uint32_t>(vertexBindingDescs.size()) },
-			.pVertexBindingDescriptions			{ vertexBindingDescs.data() },
-			.vertexAttributeDescriptionCount	{ static_cast<uint32_t>(vertexAttribDescs.size()) },
-			.pVertexAttributeDescriptions		{ vertexAttribDescs.data() }
-		};
-		
 		VkPipelineInputAssemblyStateCreateInfo const inputAssemblyState
 		{
 			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO },
@@ -330,12 +353,24 @@ namespace Frx
 			.pAttachments		{ &blendAttachment }
 		};
 
+		static constexpr std::array dynamicStates
+		{
+			VkDynamicState::VK_DYNAMIC_STATE_VERTEX_INPUT_EXT
+		};
+
+		VkPipelineDynamicStateCreateInfo const dynamicStateInfo
+		{
+			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO },
+			.dynamicStateCount	{ static_cast<uint32_t>(dynamicStates.size()) },
+			.pDynamicStates		{ dynamicStates.data() }
+		};
+
 		VkGraphicsPipelineCreateInfo const createInfo
 		{
 			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO },
 			.stageCount					{ static_cast<uint32_t>(stages.size()) },
 			.pStages					{ stages.data() },
-			.pVertexInputState			{ &vertexInputState },
+			.pVertexInputState			{ nullptr },
 			.pInputAssemblyState		{ &inputAssemblyState },
 			.pTessellationState			{ nullptr },
 			.pViewportState				{ &viewportState },
@@ -343,7 +378,7 @@ namespace Frx
 			.pMultisampleState			{ &multisampleState },
 			.pDepthStencilState			{ &depthStencilState },
 			.pColorBlendState			{ &colorBlendState },
-			.pDynamicState				{ nullptr },
+			.pDynamicState				{ &dynamicStateInfo },
 			.layout						{ getPipelineLayout().getHandle() },
 			.renderPass					{ renderPass.getHandle() },
 			.subpass					{ 0U },

@@ -41,45 +41,85 @@ namespace Frx
 }
 	
 constexpr Frx::VertexAttribFlags operator|(
-	const Frx::VertexAttribFlagBits lhs, const Frx::VertexAttribFlagBits rhs) noexcept
+	Frx::VertexAttribFlagBits const lhs,
+	Frx::VertexAttribFlagBits const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlags>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+	return static_cast<Frx::VertexAttribFlags>(
+		static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
 }
 
 constexpr Frx::VertexAttribFlags operator|(
-	const Frx::VertexAttribFlags lhs, const Frx::VertexAttribFlagBits rhs) noexcept
+	Frx::VertexAttribFlags const lhs,
+	Frx::VertexAttribFlagBits const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlags>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+	return static_cast<Frx::VertexAttribFlags>(
+		static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
 }
 
 constexpr Frx::VertexAttribFlags operator|(
-	const Frx::VertexAttribFlagBits lhs, const Frx::VertexAttribFlags rhs) noexcept
+	Frx::VertexAttribFlagBits const lhs,
+	Frx::VertexAttribFlags const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlags>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+	return (rhs | lhs);
 }
 
 constexpr Frx::VertexAttribFlags operator|(
-	const Frx::VertexAttribFlags lhs, const Frx::VertexAttribFlags rhs) noexcept
+	Frx::VertexAttribFlags const lhs,
+	Frx::VertexAttribFlags const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlags>(static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
+	return static_cast<Frx::VertexAttribFlags>(
+		static_cast<uint32_t>(lhs) | static_cast<uint32_t>(rhs));
 }
 
 constexpr Frx::VertexAttribFlags operator&(
-	const Frx::VertexAttribFlags lhs, const Frx::VertexAttribFlags rhs) noexcept
+	Frx::VertexAttribFlags const lhs,
+	Frx::VertexAttribFlags const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlags>(static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
+	return static_cast<Frx::VertexAttribFlags>(
+		static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
 }
 
 constexpr Frx::VertexAttribFlagBits operator&(
-	const Frx::VertexAttribFlags lhs, const Frx::VertexAttribFlagBits rhs) noexcept
+	Frx::VertexAttribFlags const lhs,
+	Frx::VertexAttribFlagBits const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlagBits>(static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
+	return static_cast<Frx::VertexAttribFlagBits>(
+		static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
 }
 
 constexpr Frx::VertexAttribFlagBits operator&(
-	const Frx::VertexAttribFlagBits lhs, const Frx::VertexAttribFlags rhs) noexcept
+	Frx::VertexAttribFlagBits const lhs,
+	Frx::VertexAttribFlags const rhs) noexcept
 {
-	return static_cast<Frx::VertexAttribFlagBits>(static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs));
+	return (rhs & lhs);
+}
+
+constexpr uint32_t operator&(
+	Frx::VertexAttribFlagBits const lhs,
+	uint32_t const rhs) noexcept
+{
+	return (static_cast<uint32_t>(lhs) & rhs);
+}
+
+constexpr uint32_t operator&(
+	uint32_t const lhs,
+	Frx::VertexAttribFlagBits const rhs) noexcept
+{
+	return (rhs & lhs);
+}
+
+constexpr uint32_t operator&(
+	Frx::VertexAttribFlags const lhs,
+	uint32_t const rhs) noexcept
+{
+	return (static_cast<uint32_t>(lhs) & rhs);
+}
+
+constexpr uint32_t operator&(
+	uint32_t const lhs,
+	Frx::VertexAttribFlags const rhs) noexcept
+{
+	return (rhs & lhs);
 }
 
 constexpr Frx::VertexAttribFlags &operator|=(

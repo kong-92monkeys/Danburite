@@ -101,6 +101,9 @@ namespace Render
 		Infra::EventListenerPtr<RenderObject const *>
 			__pObjectNeedRedrawListener;
 
+		Infra::EventListenerPtr<Mesh const *, uint32_t, uint32_t>
+			__pMeshVertexAttribFlagsChangeListener;
+
 		mutable Infra::Event<SubLayer const *> __needRedrawEvent;
 
 		void __createDescPool();
@@ -161,6 +164,7 @@ namespace Render
 			RenderObject const *pObject,
 			bool cur);
 
+		void __onMeshVertexAttribFlagsChanged();
 		void __onObjectNeedRedraw();
 
 		void __beginRenderPass(

@@ -12,6 +12,10 @@ namespace Frx
 		virtual ~PhongRenderer() noexcept override;
 
 		[[nodiscard]]
+		virtual bool isValidVertexAttribFlags(
+			uint32_t flags) const noexcept override;
+
+		[[nodiscard]]
 		virtual bool isValidMaterialPack(
 			Render::MaterialPack const &materialPack) const noexcept override;
 
@@ -24,6 +28,11 @@ namespace Frx
 
 		[[nodiscard]]
 		virtual VkDescriptorSet getDescSet() const noexcept;
+
+		[[nodiscard]]
+		virtual void bindVertexInput(
+			VK::CommandBuffer &cmdBuffer,
+			uint32_t vertexAttribFlags) const override;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(

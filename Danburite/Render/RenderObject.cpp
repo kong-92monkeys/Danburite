@@ -4,6 +4,14 @@ namespace Render
 {
 	RenderObject::RenderObject()
 	{
+		__pMeshUpdateListener =
+			Infra::EventListener<Mesh const *>::bind(
+				&RenderObject::__onMeshUpdated, this);
+
+		__pMeshVertexAttribFlagsChangeListener =
+			Infra::EventListener<Mesh const *, uint32_t, uint32_t>::bind(
+				&RenderObject::__onMeshVertexAttribFlagsChanged, this);
+
 		__pMaterialPackMaterialChangeListener =
 			Infra::EventListener<MaterialPack const *, std::type_index, Material const *, Material const *>::bind(
 				&RenderObject::__onMaterialPackMaterialChanged, this,
@@ -35,7 +43,7 @@ namespace Render
 		auto const pPrevRenderer{ __pRenderer };
 		__pRenderer = pRenderer;
 
-		__rendererChangeEvent.invoke(this, pPrevRenderer, pRenderer);
+		__rendererChangeEvent.invoke(this, pPrevRenderer, __pRenderer);
 		__validateDrawable();
 
 		__needRedrawEvent.invoke(this);
@@ -48,9 +56,20 @@ namespace Render
 			return;
 
 		auto const pPrevMesh{ __pMesh };
-		__pMesh = pMesh;
+		if (pPrevMesh)
+		{
+			pPrevMesh->getUpdateEvent() -= __pMeshUpdateListener;
+			pPrevMesh->getVertexAttribFlagsChangeEvent() -= __pMeshVertexAttribFlagsChangeListener;
+		}
 
-		__meshChangeEvent.invoke(this, pPrevMesh, pMesh);
+		__pMesh = pMesh;
+		if (__pMesh)
+		{
+			__pMesh->getUpdateEvent() += __pMeshUpdateListener;
+			__pMesh->getVertexAttribFlagsChangeEvent() += __pMeshVertexAttribFlagsChangeListener;
+		}
+
+		__meshChangeEvent.invoke(this, pPrevMesh, __pMesh);
 		__validateDrawable();
 
 		__needRedrawEvent.invoke(this);
@@ -65,7 +84,7 @@ namespace Render
 		auto const pPrevDrawParam{ __pDrawParam };
 		__pDrawParam = pDrawParam;
 
-		__drawParamChangeEvent.invoke(this, pPrevDrawParam, pDrawParam);
+		__drawParamChangeEvent.invoke(this, pPrevDrawParam, __pDrawParam);
 		__validateDrawable();
 
 		__needRedrawEvent.invoke(this);
@@ -136,6 +155,9 @@ namespace Render
 		if (!__pRenderer || !__pMesh || !__pDrawParam || !__visible)
 			return false;
 
+		if (!(__pRenderer->isValidVertexAttribFlags(__pMesh->getVertexAttribFlags())))
+			return false;
+
 		for (auto const &pMaterialPack : __materialPacks)
 		{
 			if (!(__pRenderer->isValidMaterialPack(*pMaterialPack)))
@@ -153,6 +175,17 @@ namespace Render
 
 		__drawable = curDrawable;
 		__drawableChangeEvent.invoke(this, curDrawable);
+	}
+
+	void RenderObject::__onMeshUpdated()
+	{
+		__needRedrawEvent.invoke(this);
+	}
+
+	void RenderObject::__onMeshVertexAttribFlagsChanged()
+	{
+		__validateDrawable();
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderObject::__onMaterialPackMaterialChanged(

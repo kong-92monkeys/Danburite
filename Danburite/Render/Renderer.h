@@ -43,6 +43,10 @@ namespace Render
 		VK::PipelineLayout const &getPipelineLayout() const noexcept;
 
 		[[nodiscard]]
+		virtual bool isValidVertexAttribFlags(
+			uint32_t flags) const noexcept = 0;
+
+		[[nodiscard]]
 		virtual bool isValidMaterialPack(
 			MaterialPack const &materialPack) const noexcept;
 
@@ -55,6 +59,11 @@ namespace Render
 
 		[[nodiscard]]
 		virtual VkDescriptorSet getDescSet() const noexcept;
+
+		[[nodiscard]]
+		virtual void bindVertexInput(
+			VK::CommandBuffer &cmdBuffer,
+			uint32_t vertexAttribFlags) const = 0;
 
 		[[nodiscard]]
 		virtual std::unique_ptr<VK::RenderPass> createRenderPass(

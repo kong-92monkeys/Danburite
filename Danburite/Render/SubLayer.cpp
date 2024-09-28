@@ -31,12 +31,16 @@ namespace Render
 				std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
 		__pObjectDrawableChangeListener =
-			Infra::EventListener<const RenderObject *, bool>::bind(
+			Infra::EventListener<RenderObject const *, bool>::bind(
 				&SubLayer::__onObjectDrawableChanged, this, std::placeholders::_1, std::placeholders::_2);
 
 		__pObjectNeedRedrawListener =
-			Infra::EventListener<const RenderObject *>::bind(
+			Infra::EventListener<RenderObject const *>::bind(
 				&SubLayer::__onObjectNeedRedraw, this);
+
+		__pMeshVertexAttribFlagsChangeListener =
+			Infra::EventListener<Mesh const *, uint32_t, uint32_t>::bind(
+				&SubLayer::__onMeshVertexAttribFlagsChanged, this);
 
 		if (__pRenderer->useMaterial())
 		{
@@ -258,6 +262,7 @@ namespace Render
 		RenderObject const *const pObject,
 		Mesh const *const pMesh)
 	{
+		pMesh->getVertexAttribFlagsChangeEvent() += __pMeshVertexAttribFlagsChangeListener;
 		__mesh2Objects[pMesh].emplace(pObject);
 	}
 
@@ -265,6 +270,8 @@ namespace Render
 		RenderObject const *const pObject,
 		Mesh const *const pMesh)
 	{
+		pMesh->getVertexAttribFlagsChangeEvent() -= __pMeshVertexAttribFlagsChangeListener;
+
 		auto &objects{ __mesh2Objects.at(pMesh) };
 		objects.erase(pObject);
 
@@ -376,9 +383,19 @@ namespace Render
 	{
 		__drawSequence.clear();
 
-		for (auto const &[pMesh, objects] : __mesh2Objects)
+		std::vector<Mesh const *> sortedMeshes;
+
+		for (auto const &[pMesh, _] : __mesh2Objects)
+			sortedMeshes.emplace_back(pMesh);
+
+		std::sort(sortedMeshes.begin(), sortedMeshes.end(), [] (auto const lhs, auto const rhs)
 		{
-			for (auto const pObject : objects)
+			return (lhs->getVertexAttribFlags() < rhs->getVertexAttribFlags());
+		});
+
+		for (auto const pMesh : sortedMeshes)
+		{
+			for (auto const pObject : __mesh2Objects.at(pMesh))
 			{
 				uint32_t const baseId
 				{
@@ -447,6 +464,12 @@ namespace Render
 			__registerObject(pObject);
 		else
 			__unregisterObject(pObject);
+	}
+
+	void SubLayer::__onMeshVertexAttribFlagsChanged()
+	{
+		__drawSequenceInvalidated = true;
+		_invalidate();
 	}
 
 	void SubLayer::__onObjectNeedRedraw()
@@ -539,6 +562,8 @@ namespace Render
 				__bindDescSets(secondaryBuffer);
 
 			Mesh const *pBoundMesh{ };
+			uint32_t boundVertexAttribFlags{ };
+
 			for (size_t seqIter{ sequenceBegin }; seqIter < sequenceEnd; ++seqIter)
 			{
 				auto const &[pMesh, baseId, pObject] { __drawSequence[seqIter] };
@@ -546,6 +571,12 @@ namespace Render
 				{
 					pBoundMesh = pMesh;
 					pMesh->bind(secondaryBuffer);
+
+					if (boundVertexAttribFlags != pMesh->getVertexAttribFlags())
+					{
+						boundVertexAttribFlags = pMesh->getVertexAttribFlags();
+						__pRenderer->bindVertexInput(secondaryBuffer, boundVertexAttribFlags);
+					}
 				}
 
 				pObject->draw(secondaryBuffer, baseId);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Infra/Updatable.h"
+#include "../Infra/Event.h"
 #include "../Device/CommandExecutor.h"
 #include "../Render/ResourcePool.h"
 #include <unordered_map>
@@ -7,7 +9,7 @@
 
 namespace Render
 {
-	class Mesh : public Infra::Unique
+	class Mesh : public Infra::Updatable<Mesh>
 	{
 	public:
 		Mesh(
@@ -52,6 +54,10 @@ namespace Render
 		[[nodiscard]]
 		constexpr uint32_t getVertexAttribFlags() const noexcept;
 
+		[[nodiscard]]
+		constexpr Infra::EventView<Mesh const *, uint32_t, uint32_t> &
+			getVertexAttribFlagsChangeEvent() const noexcept;
+
 	private:
 		VK::Device &__device;
 		Dev::MemoryAllocator &__memoryAllocator;
@@ -67,6 +73,9 @@ namespace Render
 		VkIndexType __indexType{};
 		std::shared_ptr<Dev::MemoryBuffer> __pIndexBuffer;
 
+		mutable Infra::Event<Mesh const *, uint32_t, uint32_t>
+			__vertexAttribFlagsChangeEvent;
+
 		void __updateData(
 			Dev::MemoryBuffer &dst,
 			void const *pData,
@@ -79,13 +88,16 @@ namespace Render
 
 		void __validateCmdParams() noexcept;
 
-		constexpr void __enableVertexAttribFlag(
+		void __enableVertexAttribFlag(
 			uint32_t bindingIndex) noexcept;
 
-		constexpr void __disableVertexAttribFlag(
+		void __disableVertexAttribFlag(
 			uint32_t bindingIndex) noexcept;
 
-		constexpr void __resetVertexAttribFlags() noexcept;
+		void __resetVertexAttribFlags() noexcept;
+
+		void __setVertexAttribFlags(
+			uint32_t flags) noexcept;
 	};
 
 	constexpr uint32_t Mesh::getVertexAttribFlags() const noexcept
@@ -93,20 +105,9 @@ namespace Render
 		return __vertexAttribFlags;
 	}
 
-	constexpr void Mesh::__enableVertexAttribFlag(
-		uint32_t const bindingIndex) noexcept
+	constexpr Infra::EventView<Mesh const *, uint32_t, uint32_t> &
+		Mesh::getVertexAttribFlagsChangeEvent() const noexcept
 	{
-		__vertexAttribFlags |= (1U << bindingIndex);
-	}
-
-	constexpr void Mesh::__disableVertexAttribFlag(
-		uint32_t const bindingIndex) noexcept
-	{
-		__vertexAttribFlags &= ~(1U << bindingIndex);
-	}
-
-	constexpr void Mesh::__resetVertexAttribFlags() noexcept
-	{
-		__vertexAttribFlags = 0U;
+		return __vertexAttribFlagsChangeEvent;
 	}
 }

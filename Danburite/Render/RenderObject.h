@@ -109,6 +109,12 @@ namespace Render
 		mutable Infra::Event<RenderObject const *>
 			__needRedrawEvent;
 
+		Infra::EventListenerPtr<Mesh const *>
+			__pMeshUpdateListener;
+
+		Infra::EventListenerPtr<Mesh const *, uint32_t, uint32_t>
+			__pMeshVertexAttribFlagsChangeListener;
+
 		Infra::EventListenerPtr<MaterialPack const *, std::type_index, Material const *, Material const *>
 			__pMaterialPackMaterialChangeListener;
 
@@ -121,6 +127,9 @@ namespace Render
 		[[nodiscard]]
 		bool __resolveDrawable() const noexcept;
 		void __validateDrawable();
+
+		void __onMeshUpdated();
+		void __onMeshVertexAttribFlagsChanged();
 
 		void __onMaterialPackMaterialChanged(
 			MaterialPack const *pPack,
