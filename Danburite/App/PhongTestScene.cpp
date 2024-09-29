@@ -62,6 +62,7 @@ void PhongTestScene::setDisplay(
 void PhongTestScene::_scmd_onInit()
 {
 	__scmd_camera.setPosition(0.0f, 0.0f, 2.0f);
+	__scmd_camera.setNear(0.1f);
 }
 
 std::any PhongTestScene::_scmd_onUpdate(
@@ -84,12 +85,13 @@ void PhongTestScene::_rcmd_onInit()
 	auto const meshData
 	{
 		Frx::PrimitiveBuilder::buildCube(
-			Frx::VertexAttribFlags::POS_UV, 1.0f)
+			Frx::VertexAttribFlags::POS_UV_NORMAL, 1.0f)
 	};
 
 	__rcmd_pMesh = _rcmd_createMesh();
 	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
 	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
+	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
 	__rcmd_pMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
 
 	__rcmd_pDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
@@ -166,7 +168,7 @@ void PhongTestScene::__syncCameraExtent()
 		float const displayHeight	{ static_cast<float>(__pDisplay->getHeight()) };
 		float const displayWidth	{ static_cast<float>(__pDisplay->getWidth()) };
 
-		float const cameraHeight	{ 2.0f };
+		float const cameraHeight	{ __scmd_camera.getNear() };
 		float const cameraWidth		{ cameraHeight * (displayWidth / displayHeight) };
 
 		__scmd_camera.setHeight(cameraHeight);

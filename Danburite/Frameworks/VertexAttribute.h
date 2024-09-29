@@ -38,7 +38,9 @@ namespace Frx
 
 		POS_UV			= (POS | UV),
 		POS_NORMAL		= (POS | NORMAL),
-		POS_COLOR		= (POS | COLOR)
+		POS_COLOR		= (POS | COLOR),
+
+		POS_UV_NORMAL	= (POS | UV | NORMAL)
 	};
 
 	constexpr bool hasFlagBit(

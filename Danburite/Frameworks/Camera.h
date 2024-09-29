@@ -7,7 +7,16 @@ namespace Frx
 	class Camera : public Infra::Stateful<Camera>
 	{
 	public:
+		enum class ProjectionType
+		{
+			ORTHO,
+			PERSPECTIVE
+		};
+
 		Camera() noexcept;
+
+		void setProjectionType(
+			ProjectionType type);
 
 		void setWidth(
 			float width);
@@ -57,6 +66,11 @@ namespace Frx
 		void __validateProjMatrix() noexcept;
 
 		void __onTransformInvalidated() noexcept;
+
+		void __calcProjMatrix_ortho() noexcept;
+		void __calcProjMatrix_perspective() noexcept;
+
+		void(Camera:: *__calcProjMatrix)() noexcept { &Camera::__calcProjMatrix_perspective };
 	};
 
 	constexpr Transform &Camera::getTransform() noexcept

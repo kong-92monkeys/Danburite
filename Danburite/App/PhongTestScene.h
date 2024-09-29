@@ -78,6 +78,7 @@ private:
 
 	float __cameraMoveSpeed		{ 1.0f };
 	float __cameraRotationSpeed	{ 0.5f };
+	float __cameraFovy			{ glm::pi<float>() / 6.0f };
 
 	bool __cameraMoveLeft{ };
 	bool __cameraMoveRight{ };
