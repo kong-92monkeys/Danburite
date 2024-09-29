@@ -15,6 +15,11 @@ namespace Frx
 	void Camera::setProjectionType(
 		ProjectionType const type)
 	{
+		if (__projType == type)
+			return;
+
+		__projType = type;
+
 		switch (type)
 		{
 			case ProjectionType::ORTHO:

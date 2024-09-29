@@ -69,6 +69,13 @@ void FPSCamera::yaw(
 	_invalidate();
 }
 
+void FPSCamera::setProjectionType(
+	Frx::Camera::ProjectionType const type)
+{
+	__camera.setProjectionType(type);
+	_invalidate();
+}
+
 void FPSCamera::setWidth(
 	float const width)
 {

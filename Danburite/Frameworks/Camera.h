@@ -15,18 +15,28 @@ namespace Frx
 
 		Camera() noexcept;
 
+		[[nodiscard]]
+		constexpr ProjectionType getProjectionType() const noexcept;
 		void setProjectionType(
 			ProjectionType type);
 
+		[[nodiscard]]
+		constexpr float getWidth() const noexcept;
 		void setWidth(
 			float width);
 
+		[[nodiscard]]
+		constexpr float getHeight() const noexcept;
 		void setHeight(
 			float height);
 
+		[[nodiscard]]
+		constexpr float getNear() const noexcept;
 		void setNear(
 			float zNear);
 
+		[[nodiscard]]
+		constexpr float getFar() const noexcept;
 		void setFar(
 			float zFar);
 
@@ -70,8 +80,34 @@ namespace Frx
 		void __calcProjMatrix_ortho() noexcept;
 		void __calcProjMatrix_perspective() noexcept;
 
+		ProjectionType __projType{ ProjectionType::PERSPECTIVE };
 		void(Camera:: *__calcProjMatrix)() noexcept { &Camera::__calcProjMatrix_perspective };
 	};
+
+	constexpr Camera::ProjectionType Camera::getProjectionType() const noexcept
+	{
+		return __projType;
+	}
+
+	constexpr float Camera::getWidth() const noexcept
+	{
+		return __width;
+	}
+
+	constexpr float Camera::getHeight() const noexcept
+	{
+		return __height;
+	}
+
+	constexpr float Camera::getNear() const noexcept
+	{
+		return __zNear;
+	}
+
+	constexpr float Camera::getFar() const noexcept
+	{
+		return __zFar;
+	}
 
 	constexpr Transform &Camera::getTransform() noexcept
 	{

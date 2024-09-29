@@ -61,7 +61,7 @@ void PhongTestScene::setDisplay(
 
 void PhongTestScene::_scmd_onInit()
 {
-	__scmd_camera.setPosition(0.0f, 0.0f, 2.0f);
+	__scmd_camera.setPosition(0.0f, 0.0f, 3.0f);
 	__scmd_camera.setNear(0.1f);
 }
 
@@ -168,7 +168,7 @@ void PhongTestScene::__syncCameraExtent()
 		float const displayHeight	{ static_cast<float>(__pDisplay->getHeight()) };
 		float const displayWidth	{ static_cast<float>(__pDisplay->getWidth()) };
 
-		float const cameraHeight	{ __scmd_camera.getNear() };
+		float const cameraHeight	{ __scmd_camera.getNear() * glm::tan(__cameraFovy) };
 		float const cameraWidth		{ cameraHeight * (displayWidth / displayHeight) };
 
 		__scmd_camera.setHeight(cameraHeight);
