@@ -318,7 +318,7 @@ namespace Frx
 			.rasterizerDiscardEnable	{ VK_FALSE },
 			.polygonMode				{ VkPolygonMode::VK_POLYGON_MODE_FILL },
 			.cullMode					{ VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT },
-			.frontFace					{ VkFrontFace::VK_FRONT_FACE_CLOCKWISE },
+			.frontFace					{ VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE },
 			.depthBiasEnable			{ VK_FALSE },
 			.lineWidth					{ 1.0f }
 		};
@@ -339,7 +339,7 @@ namespace Frx
 			.sType					{ VkStructureType::VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO },
 			.depthTestEnable		{ VK_TRUE },
 			.depthWriteEnable		{ VK_TRUE },
-			.depthCompareOp			{ VkCompareOp::VK_COMPARE_OP_LESS },
+			.depthCompareOp			{ VkCompareOp::VK_COMPARE_OP_GREATER },
 			.depthBoundsTestEnable	{ VK_FALSE },
 			.stencilTestEnable		{ VK_FALSE }
 		};

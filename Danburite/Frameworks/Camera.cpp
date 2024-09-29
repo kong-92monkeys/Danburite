@@ -12,6 +12,38 @@ namespace Frx
 		__validateProjMatrix();
 	}
 
+	void Camera::setWidth(
+		float const width)
+	{
+		__width = width;
+		__projMatrixInvalidated = true;
+		_invalidate();
+	}
+
+	void Camera::setHeight(
+		float const height)
+	{
+		__height = height;
+		__projMatrixInvalidated = true;
+		_invalidate();
+	}
+
+	void Camera::setNear(
+		float const zNear)
+	{
+		__zNear = zNear;
+		__projMatrixInvalidated = true;
+		_invalidate();
+	}
+
+	void Camera::setFar(
+		float const zFar)
+	{
+		__zFar = zFar;
+		__projMatrixInvalidated = true;
+		_invalidate();
+	}
+
 	void Camera::_onValidate()
 	{
 		if (__viewMatrixInvalidated)
@@ -51,8 +83,10 @@ namespace Frx
 
 	void Camera::__validateProjMatrix() noexcept
 	{
-		__projMatrix[1][1] = -1.0f;
-		__projMatrix[2][2] = -1.0f;
+		__projMatrix[0][0] = (2.0f / __width);
+		__projMatrix[1][1] = -(2.0f / __height);
+		__projMatrix[2][2] = (1.0f / (__zFar - __zNear));
+		__projMatrix[3][2] = (__zFar / (__zFar - __zNear));
 	}
 
 	void Camera::__onTransformInvalidated() noexcept

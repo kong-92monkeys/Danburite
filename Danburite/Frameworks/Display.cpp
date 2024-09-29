@@ -24,6 +24,7 @@ namespace Frx
 					hinstance, hwnd, useDepthBuffer, useStencilBuffer)
 			};
 
+			__pRenderTarget->setClearDepth(0.0f);
 			__pRenderTarget->getNeedRedrawEvent() += __pRenderTargetNeedRedrawListener;
 
 			auto const &extent{ __pRenderTarget->getExtent() };
@@ -51,6 +52,8 @@ namespace Frx
 			__width		= extent.width;
 			__height	= extent.height;
 		}).wait();
+
+		__syncEvent.invoke(this);
 	}
 
 	void Display::draw()

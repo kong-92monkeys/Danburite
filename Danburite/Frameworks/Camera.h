@@ -9,6 +9,18 @@ namespace Frx
 	public:
 		Camera() noexcept;
 
+		void setWidth(
+			float width);
+
+		void setHeight(
+			float height);
+
+		void setNear(
+			float zNear);
+
+		void setFar(
+			float zFar);
+
 		[[nodiscard]]
 		constexpr Transform &getTransform() noexcept;
 
@@ -26,6 +38,12 @@ namespace Frx
 
 	private:
 		Transform __transform;
+
+		float __width	{ 400.0f };
+		float __height	{ 300.0f };
+
+		float __zNear	{ 1.0f };
+		float __zFar	{ 1000.0f };
 
 		bool __viewMatrixInvalidated{ };
 		glm::mat4 __viewMatrix{ 1.0f };

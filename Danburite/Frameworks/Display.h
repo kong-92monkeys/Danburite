@@ -24,11 +24,17 @@ namespace Frx
 		[[nodiscard]]
 		constexpr uint32_t getHeight() const noexcept;
 
+		[[nodiscard]]
+		constexpr bool isPresentable() const noexcept;
+
 		void sync();
 		void draw();
 
 		[[nodiscard]]
 		constexpr Render::RenderTarget &rcmd_getRenderTarget() noexcept;
+
+		[[nodiscard]]
+		constexpr Infra::EventView<Display const *> &getSyncEvent() const noexcept;
 
 	private:
 		Infra::ThreadPool &__rcmdExecutor;
@@ -40,6 +46,8 @@ namespace Frx
 		uint32_t __height{ };
 
 		Infra::EventListenerPtr<Render::RenderTarget const *> __pRenderTargetNeedRedrawListener;
+
+		mutable Infra::Event<Display const *> __syncEvent;
 
 		void __rcmd_onRenderTargetNeedRedraw();
 	};
@@ -54,8 +62,18 @@ namespace Frx
 		return __height;
 	}
 
+	constexpr bool Display::isPresentable() const noexcept
+	{
+		return (__width && __height);
+	}
+
 	constexpr Render::RenderTarget &Display::rcmd_getRenderTarget() noexcept
 	{
 		return *__pRenderTarget;
+	}
+
+	constexpr Infra::EventView<Display const *> &Display::getSyncEvent() const noexcept
+	{
+		return __syncEvent;
 	}
 }

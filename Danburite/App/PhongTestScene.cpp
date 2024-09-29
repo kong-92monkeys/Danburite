@@ -3,13 +3,20 @@
 #include "../Frameworks/Vertex.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+PhongTestScene::PhongTestScene() noexcept
+{
+	__pDisplaySyncListener =
+		Infra::EventListener<Frx::Display const *>::bind(
+			&PhongTestScene::__onDisplaySync, this);
+}
+
 PhongTestScene::~PhongTestScene() noexcept
 {
 	_stopLoop();
 	_rcmd_run([this]
 	{
-		if (__rcmd_pDisplay)
-			__rcmd_pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
+		if (__pDisplay)
+			__pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
 		__rcmd_pLayer = nullptr;
 		__rcmd_pObject = nullptr;
@@ -25,21 +32,36 @@ PhongTestScene::~PhongTestScene() noexcept
 void PhongTestScene::setDisplay(
 	Frx::Display *const pDisplay)
 {
-	_rcmd_run([this, pDisplay]
+	if (__pDisplay == pDisplay)
+		return;
+
+	auto const pPrevDisplay{ __pDisplay };
+	__pDisplay = pDisplay;
+
+	if (pPrevDisplay)
+		pPrevDisplay->getSyncEvent() -= __pDisplaySyncListener;
+
+	if (pDisplay)
 	{
-		if (__rcmd_pDisplay == pDisplay)
-			return;
+		pDisplay->getSyncEvent() += __pDisplaySyncListener;
 
-		auto const pPrevDisplay{ __rcmd_pDisplay };
-		__rcmd_pDisplay = pDisplay;
+		if (__pDisplay->isPresentable())
+			__syncCameraExtent();
+	}
 
+	_rcmd_run([this, pPrevDisplay, pDisplay]
+	{
 		if (pPrevDisplay)
 			pPrevDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
 		if (pDisplay)
 			pDisplay->rcmd_getRenderTarget().addLayer(__rcmd_pLayer.get());
-
 	}).wait();
+}
+
+void PhongTestScene::_scmd_onInit()
+{
+	__scmd_camera.getTransform().getPosition().setZ(10.0f);
 }
 
 std::any PhongTestScene::_scmd_onUpdate(
@@ -61,10 +83,10 @@ std::any PhongTestScene::_scmd_onUpdate(
 void PhongTestScene::_rcmd_onInit()
 {
 	Infra::GenericBuffer posBuffer;
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, -0.5f });
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, -0.5f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, -0.5f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, -0.5f });
+	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, 0.0f });
+	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.0f });
+	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, 0.0f });
+	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, 0.0f });
 
 	Infra::GenericBuffer uvBuffer;
 	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
@@ -118,4 +140,25 @@ void PhongTestScene::_rcmd_onUpdate(
 {
 	auto const layerData{ std::any_cast<__LayerData>(updateParam) };
 	__rcmd_pLayer->setData(layerData);
+}
+
+void PhongTestScene::__syncCameraExtent()
+{
+	_scmd_run([this]
+	{
+		float const displayHeight	{ static_cast<float>(__pDisplay->getHeight()) };
+		float const displayWidth	{ static_cast<float>(__pDisplay->getWidth()) };
+
+		float const cameraHeight	{ 2.0f };
+		float const cameraWidth		{ cameraHeight * (displayWidth / displayHeight) };
+
+		__scmd_camera.setHeight(cameraHeight);
+		__scmd_camera.setWidth(cameraWidth);
+	}).wait();
+}
+
+void PhongTestScene::__onDisplaySync()
+{
+	if (__pDisplay->isPresentable())
+		__syncCameraExtent();
 }
