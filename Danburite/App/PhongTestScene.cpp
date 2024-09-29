@@ -61,7 +61,7 @@ void PhongTestScene::setDisplay(
 
 void PhongTestScene::_scmd_onInit()
 {
-	__scmd_camera.getTransform().getPosition().setZ(10.0f);
+	__scmd_camera.setPosition(0.0f, 0.0f, 2.0f);
 }
 
 std::any PhongTestScene::_scmd_onUpdate(
@@ -69,27 +69,7 @@ std::any PhongTestScene::_scmd_onUpdate(
 {
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
 
-	auto &cameraTransform	{ __scmd_camera.getTransform() };
-	auto &cameraPosition	{ cameraTransform.getPosition() };
-
-	if (__cameraMoveRight)
-		cameraPosition.addX(delta * __cameraMoveSpeed);
-
-	if (__cameraMoveLeft)
-		cameraPosition.addX(-delta * __cameraMoveSpeed);
-
-	if (__cameraMoveUp)
-		cameraPosition.addY(delta * __cameraMoveSpeed);
-
-	if (__cameraMoveDown)
-		cameraPosition.addY(-delta * __cameraMoveSpeed);
-
-	if (__cameraMoveForward)
-		cameraPosition.addZ(-delta * __cameraMoveSpeed);
-
-	if (__cameraMoveBackward)
-		cameraPosition.addZ(delta * __cameraMoveSpeed);
-
+	__scmd_handleCamera(delta);
 	__scmd_camera.validate();
 
 	return __LayerData
@@ -159,6 +139,40 @@ void PhongTestScene::_rcmd_onUpdate(
 {
 	auto const layerData{ std::any_cast<__LayerData>(updateParam) };
 	__rcmd_pLayer->setData(layerData);
+}
+
+void PhongTestScene::__scmd_handleCamera(
+	float const delta)
+{
+	if (__cameraMoveRight)
+		__scmd_camera.moveLocalX(delta * __cameraMoveSpeed);
+
+	if (__cameraMoveLeft)
+		__scmd_camera.moveLocalX(-delta * __cameraMoveSpeed);
+
+	if (__cameraMoveUp)
+		__scmd_camera.moveLocalY(delta * __cameraMoveSpeed);
+
+	if (__cameraMoveDown)
+		__scmd_camera.moveLocalY(-delta * __cameraMoveSpeed);
+
+	if (__cameraMoveForward)
+		__scmd_camera.moveLocalZ(-delta * __cameraMoveSpeed);
+
+	if (__cameraMoveBackward)
+		__scmd_camera.moveLocalZ(delta * __cameraMoveSpeed);
+
+	if (__cameraRotateRight)
+		__scmd_camera.yaw(-delta * __cameraRotationSpeed);
+
+	if (__cameraRotateLeft)
+		__scmd_camera.yaw(delta * __cameraRotationSpeed);
+
+	if (__cameraRotateUp)
+		__scmd_camera.pitch(delta * __cameraRotationSpeed);
+
+	if (__cameraRotateDown)
+		__scmd_camera.pitch(-delta * __cameraRotationSpeed);
 }
 
 void PhongTestScene::__syncCameraExtent()

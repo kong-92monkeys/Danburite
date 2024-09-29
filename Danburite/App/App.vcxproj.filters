@@ -53,6 +53,12 @@
     <Filter Include="Scenes\PhongTestScene">
       <UniqueIdentifier>{84d270a3-8eec-4214-bfa9-1acb0b1dc3eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{b7f587ca-03fe-4eeb-bcd8-570982c03a24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\Cameras">
+      <UniqueIdentifier>{c557352b-283d-470e-ad75-0c7af0961e56}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -85,6 +91,9 @@
     <ClInclude Include="PhongTestScene.h">
       <Filter>Scenes\PhongTestScene</Filter>
     </ClInclude>
+    <ClInclude Include="FPSCamera.h">
+      <Filter>Util\Cameras</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -108,6 +117,7 @@
     <ClCompile Include="PhongTestScene.cpp">
       <Filter>Scenes\PhongTestScene</Filter>
     </ClCompile>
+    <ClCompile Include="FPSCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc">

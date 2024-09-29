@@ -25,7 +25,7 @@ namespace Frx
 		glm::quat const &value)
 	{
 		__orientation = (value * __orientation);
-		glm::normalize(__orientation);
+		__orientation = glm::normalize(__orientation);
 		_invalidate();
 	}
 

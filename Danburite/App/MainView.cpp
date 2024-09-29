@@ -32,7 +32,6 @@ BEGIN_MESSAGE_MAP(CMainView, CWnd)
 	ON_WM_DESTROY()
 	ON_WM_SIZE()
 	ON_WM_ERASEBKGND()
-	ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -93,12 +92,4 @@ BOOL CMainView::OnEraseBkgnd(CDC *pDC)
 	// TODO: Add your message handler code here and/or call default
 	// To prevent from erasing window
 	return TRUE;
-}
-
-void CMainView::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	// TODO: Add your message handler code here and/or call default
-	Infra::Logger::log(Infra::Logger::Severity::INFO, "OnLButtonDown");
-
-	CWnd::OnLButtonDown(nFlags, point);
 }

@@ -140,6 +140,22 @@ void CApp::onViewKeyDown(
 		case 'S':
 			__pScene->startCameraMoveBackward();
 			break;
+
+		case VK_RIGHT:
+			__pScene->startCameraRotateRight();
+			break;
+
+		case VK_LEFT:
+			__pScene->startCameraRotateLeft();
+			break;
+
+		case VK_UP:
+			__pScene->startCameraRotateUp();
+			break;
+
+		case VK_DOWN:
+			__pScene->startCameraRotateDown();
+			break;
 	}
 }
 
@@ -176,6 +192,22 @@ void CApp::onViewKeyUp(
 		case 's':
 		case 'S':
 			__pScene->endCameraMoveBackward();
+			break;
+
+		case VK_RIGHT:
+			__pScene->endCameraRotateRight();
+			break;
+
+		case VK_LEFT:
+			__pScene->endCameraRotateLeft();
+			break;
+
+		case VK_UP:
+			__pScene->endCameraRotateUp();
+			break;
+
+		case VK_DOWN:
+			__pScene->endCameraRotateDown();
 			break;
 	}
 }

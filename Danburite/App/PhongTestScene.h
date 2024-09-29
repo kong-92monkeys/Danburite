@@ -5,7 +5,7 @@
 #include "../Frameworks/PhongRenderer.h"
 #include "../Frameworks/TransformMaterial.h"
 #include "../Frameworks/PhongMaterial.h"
-#include "../Frameworks/Camera.h"
+#include "FPSCamera.h"
 
 class PhongTestScene : public Frx::Scene
 {
@@ -33,6 +33,18 @@ public:
 
 	constexpr void startCameraMoveBackward() noexcept;
 	constexpr void endCameraMoveBackward() noexcept;
+
+	constexpr void startCameraRotateRight() noexcept;
+	constexpr void endCameraRotateRight() noexcept;
+
+	constexpr void startCameraRotateLeft() noexcept;
+	constexpr void endCameraRotateLeft() noexcept;
+
+	constexpr void startCameraRotateUp() noexcept;
+	constexpr void endCameraRotateUp() noexcept;
+
+	constexpr void startCameraRotateDown() noexcept;
+	constexpr void endCameraRotateDown() noexcept;
 
 protected:
 	virtual void _scmd_onInit() override;
@@ -64,7 +76,8 @@ private:
 
 	Frx::Display *__pDisplay{ };
 
-	float __cameraMoveSpeed{ 1.0f };
+	float __cameraMoveSpeed		{ 1.0f };
+	float __cameraRotationSpeed	{ 0.5f };
 
 	bool __cameraMoveLeft{ };
 	bool __cameraMoveRight{ };
@@ -72,9 +85,18 @@ private:
 	bool __cameraMoveDown{ };
 	bool __cameraMoveForward{ };
 	bool __cameraMoveBackward{ };
-	Frx::Camera __scmd_camera;
+
+	bool __cameraRotateRight{ };
+	bool __cameraRotateLeft{ };
+	bool __cameraRotateUp{ };
+	bool __cameraRotateDown{ };
+
+	FPSCamera __scmd_camera;
 
 	Infra::EventListenerPtr<Frx::Display const *> __pDisplaySyncListener;
+
+	void __scmd_handleCamera(
+		float delta);
 
 	void __syncCameraExtent();
 	void __onDisplaySync();
@@ -138,4 +160,44 @@ constexpr void PhongTestScene::startCameraMoveBackward() noexcept
 constexpr void PhongTestScene::endCameraMoveBackward() noexcept
 {
 	__cameraMoveBackward = false;
+}
+
+constexpr void PhongTestScene::startCameraRotateRight() noexcept
+{
+	__cameraRotateRight = true;
+}
+
+constexpr void PhongTestScene::endCameraRotateRight() noexcept
+{
+	__cameraRotateRight = false;
+}
+
+constexpr void PhongTestScene::startCameraRotateLeft() noexcept
+{
+	__cameraRotateLeft = true;
+}
+
+constexpr void PhongTestScene::endCameraRotateLeft() noexcept
+{
+	__cameraRotateLeft = false;
+}
+
+constexpr void PhongTestScene::startCameraRotateUp() noexcept
+{
+	__cameraRotateUp = true;
+}
+
+constexpr void PhongTestScene::endCameraRotateUp() noexcept
+{
+	__cameraRotateUp = false;
+}
+
+constexpr void PhongTestScene::startCameraRotateDown() noexcept
+{
+	__cameraRotateDown = true;
+}
+
+constexpr void PhongTestScene::endCameraRotateDown() noexcept
+{
+	__cameraRotateDown = false;
 }
