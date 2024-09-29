@@ -78,6 +78,18 @@ std::any PhongTestScene::_scmd_onUpdate(
 	if (__cameraMoveLeft)
 		cameraPosition.addX(-delta * __cameraMoveSpeed);
 
+	if (__cameraMoveUp)
+		cameraPosition.addY(delta * __cameraMoveSpeed);
+
+	if (__cameraMoveDown)
+		cameraPosition.addY(-delta * __cameraMoveSpeed);
+
+	if (__cameraMoveForward)
+		cameraPosition.addZ(-delta * __cameraMoveSpeed);
+
+	if (__cameraMoveBackward)
+		cameraPosition.addZ(delta * __cameraMoveSpeed);
+
 	__scmd_camera.validate();
 
 	return __LayerData

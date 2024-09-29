@@ -16,11 +16,23 @@ public:
 	void setDisplay(
 		Frx::Display *pDisplay);
 
-	constexpr void startCameraMoveRight();
-	constexpr void endCameraMoveRight();
+	constexpr void startCameraMoveRight() noexcept;
+	constexpr void endCameraMoveRight() noexcept;
 
-	constexpr void startCameraMoveLeft();
-	constexpr void endCameraMoveLeft();
+	constexpr void startCameraMoveLeft() noexcept;
+	constexpr void endCameraMoveLeft() noexcept;
+
+	constexpr void startCameraMoveUp() noexcept;
+	constexpr void endCameraMoveUp() noexcept;
+
+	constexpr void startCameraMoveDown() noexcept;
+	constexpr void endCameraMoveDown() noexcept;
+
+	constexpr void startCameraMoveForward() noexcept;
+	constexpr void endCameraMoveForward() noexcept;
+
+	constexpr void startCameraMoveBackward() noexcept;
+	constexpr void endCameraMoveBackward() noexcept;
 
 protected:
 	virtual void _scmd_onInit() override;
@@ -56,6 +68,10 @@ private:
 
 	bool __cameraMoveLeft{ };
 	bool __cameraMoveRight{ };
+	bool __cameraMoveUp{ };
+	bool __cameraMoveDown{ };
+	bool __cameraMoveForward{ };
+	bool __cameraMoveBackward{ };
 	Frx::Camera __scmd_camera;
 
 	Infra::EventListenerPtr<Frx::Display const *> __pDisplaySyncListener;
@@ -64,22 +80,62 @@ private:
 	void __onDisplaySync();
 };
 
-constexpr void PhongTestScene::startCameraMoveRight()
+constexpr void PhongTestScene::startCameraMoveRight() noexcept
 {
 	__cameraMoveRight = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveRight()
+constexpr void PhongTestScene::endCameraMoveRight() noexcept
 {
 	__cameraMoveRight = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveLeft()
+constexpr void PhongTestScene::startCameraMoveLeft() noexcept
 {
 	__cameraMoveLeft = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveLeft()
+constexpr void PhongTestScene::endCameraMoveLeft() noexcept
 {
 	__cameraMoveLeft = false;
+}
+
+constexpr void PhongTestScene::startCameraMoveUp() noexcept
+{
+	__cameraMoveUp = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveUp() noexcept
+{
+	__cameraMoveUp = false;
+}
+
+constexpr void PhongTestScene::startCameraMoveDown() noexcept
+{
+	__cameraMoveDown = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveDown() noexcept
+{
+	__cameraMoveDown = false;
+}
+
+constexpr void PhongTestScene::startCameraMoveForward() noexcept
+{
+	__cameraMoveForward = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveForward() noexcept
+{
+	__cameraMoveForward = false;
+}
+
+constexpr void PhongTestScene::startCameraMoveBackward() noexcept
+{
+	__cameraMoveBackward = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveBackward() noexcept
+{
+	__cameraMoveBackward = false;
 }

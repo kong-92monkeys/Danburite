@@ -48,6 +48,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 {
+
 	// TODO: Add your specialized code here and/or call the base class
 	if (!(__windowSplitter.CreateStatic(this, 1, 2)))
 	{
@@ -89,3 +90,21 @@ void CMainFrame::Dump(CDumpContext& dc) const
 
 
 // CMainFrame message handlers
+
+BOOL CMainFrame::PreTranslateMessage(MSG *pMsg)
+{
+	// TODO: Add your specialized code here and/or call the base class
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		theApp.onViewKeyDown(static_cast<UINT>(pMsg->wParam));
+		return TRUE;
+	}
+
+	if (pMsg->message == WM_KEYUP)
+	{
+		theApp.onViewKeyUp(static_cast<UINT>(pMsg->wParam));
+		return TRUE;
+	}
+
+	return CFrameWnd::PreTranslateMessage(pMsg);
+}

@@ -38,6 +38,6 @@ protected:
 
 private:
 	CSplitterWnd __windowSplitter;
+public:
+	virtual BOOL PreTranslateMessage(MSG *pMsg);
 };
-
-

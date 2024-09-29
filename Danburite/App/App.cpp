@@ -120,6 +120,26 @@ void CApp::onViewKeyDown(
 		case 'A':
 			__pScene->startCameraMoveLeft();
 			break;
+
+		case 'e':
+		case 'E':
+			__pScene->startCameraMoveUp();
+			break;
+
+		case 'q':
+		case 'Q':
+			__pScene->startCameraMoveDown();
+			break;
+
+		case 'w':
+		case 'W':
+			__pScene->startCameraMoveForward();
+			break;
+
+		case 's':
+		case 'S':
+			__pScene->startCameraMoveBackward();
+			break;
 	}
 }
 
@@ -136,6 +156,26 @@ void CApp::onViewKeyUp(
 		case 'a':
 		case 'A':
 			__pScene->endCameraMoveLeft();
+			break;
+
+		case 'e':
+		case 'E':
+			__pScene->endCameraMoveUp();
+			break;
+
+		case 'q':
+		case 'Q':
+			__pScene->endCameraMoveDown();
+			break;
+
+		case 'w':
+		case 'W':
+			__pScene->endCameraMoveForward();
+			break;
+
+		case 's':
+		case 'S':
+			__pScene->endCameraMoveBackward();
 			break;
 	}
 }
