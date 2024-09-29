@@ -40,6 +40,13 @@ namespace Frx
 		POS_NORMAL		= (POS | NORMAL),
 		POS_COLOR		= (POS | COLOR)
 	};
+
+	constexpr bool hasFlagBit(
+		VertexAttribFlags const flags,
+		VertexAttribFlagBits const bit) noexcept
+	{
+		return (static_cast<uint32_t>(flags) & (static_cast<uint32_t>(bit)));
+	}
 }
 	
 constexpr Frx::VertexAttribFlags operator|(

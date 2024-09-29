@@ -117,7 +117,9 @@
     <ClCompile Include="PhongTestScene.cpp">
       <Filter>Scenes\PhongTestScene</Filter>
     </ClCompile>
-    <ClCompile Include="FPSCamera.cpp" />
+    <ClCompile Include="FPSCamera.cpp">
+      <Filter>Util\Cameras</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc">

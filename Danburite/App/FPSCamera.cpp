@@ -106,8 +106,11 @@ void FPSCamera::__setOrientation() noexcept
 {
 	auto &orientation{ __camera.getTransform().getOrientation() };
 	
-	auto const yaw		{ glm::angleAxis(__cameraYaw, glm::vec3{ 0.0f, 1.0f, 0.0f }) };
-	auto const pitch	{ glm::angleAxis(__cameraPitch, glm::vec3{ 1.0f, 0.0f, 0.0f }) };
+	auto const yaw				{ glm::angleAxis(__cameraYaw, glm::vec3{ 0.0f, 1.0f, 0.0f }) };
+	auto const yawMatrix		{ glm::mat4_cast(yaw) };
+
+	glm::vec3 const cameraRight	{ yawMatrix[0] };
+	auto const pitch			{ glm::angleAxis(__cameraPitch, cameraRight) };
 
 	orientation.set(pitch * yaw);
 }

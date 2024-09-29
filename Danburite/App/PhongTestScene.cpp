@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "PhongTestScene.h"
-#include "../Frameworks/Vertex.h"
+#include "../Frameworks/PrimitiveBuilder.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 PhongTestScene::PhongTestScene() noexcept
@@ -81,34 +81,18 @@ std::any PhongTestScene::_scmd_onUpdate(
 
 void PhongTestScene::_rcmd_onInit()
 {
-	Infra::GenericBuffer posBuffer;
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, 0.0f });
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.0f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, 0.0f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, 0.0f });
-
-	Infra::GenericBuffer uvBuffer;
-	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
-	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 1.0f });
-	uvBuffer.typedAdd<glm::vec2>({ 1.0f, 1.0f });
-	uvBuffer.typedAdd<glm::vec2>({ 1.0f, 0.0f });
-
-	Infra::GenericBuffer colorBuffer;
-	colorBuffer.typedAdd<glm::vec4>({ 1.0f, 0.0f, 0.0f, 1.0f });
-	colorBuffer.typedAdd<glm::vec4>({ 0.0f, 1.0f, 0.0f, 1.0f });
-	colorBuffer.typedAdd<glm::vec4>({ 0.0f, 0.0f, 1.0f, 1.0f });
-	colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 0.0f, 1.0f });
-
-	Infra::GenericBuffer indexBuffer;
-	indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
+	auto const meshData
+	{
+		Frx::PrimitiveBuilder::buildCube(
+			Frx::VertexAttribFlags::POS_UV, 1.0f)
+	};
 
 	__rcmd_pMesh = _rcmd_createMesh();
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, posBuffer.getData(), posBuffer.getSize());
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, uvBuffer.getData(), uvBuffer.getSize());
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, colorBuffer.getData(), colorBuffer.getSize());
-	__rcmd_pMesh->createIndexBuffer(VkIndexType::VK_INDEX_TYPE_UINT16, indexBuffer.getData(), indexBuffer.getSize());
+	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
+	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
+	__rcmd_pMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
 
-	__rcmd_pDrawParam = std::make_unique<Render::DrawParamIndexed>(6U, 0U, 0);
+	__rcmd_pDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
 	__rcmd_pRenderer = _rcmd_createRenderer<Frx::PhongRenderer>();
 
 	__rcmd_pAlbedoTexture = _rcmd_createTexture(
