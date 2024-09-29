@@ -106,6 +106,40 @@ void CApp::setSceneDisplay(
 	__pScene->setDisplay(pDisplay);
 }
 
+void CApp::onViewKeyDown(
+	UINT const nChar)
+{
+	switch (nChar)
+	{
+		case 'd':
+		case 'D':
+			__pScene->startCameraMoveRight();
+			break;
+
+		case 'a':
+		case 'A':
+			__pScene->startCameraMoveLeft();
+			break;
+	}
+}
+
+void CApp::onViewKeyUp(
+	UINT const nChar)
+{
+	switch (nChar)
+	{
+		case 'd':
+		case 'D':
+			__pScene->endCameraMoveRight();
+			break;
+
+		case 'a':
+		case 'A':
+			__pScene->endCameraMoveLeft();
+			break;
+	}
+}
+
 BOOL CApp::OnIdle(LONG lCount)
 {
 	// TODO: Add your specialized code here and/or call the base class

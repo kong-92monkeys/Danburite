@@ -67,10 +67,17 @@ void PhongTestScene::_scmd_onInit()
 std::any PhongTestScene::_scmd_onUpdate(
 	Time const &time)
 {
-	float const delta	{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
-	float const elapsed	{ static_cast<float>(time.elapsedTime.count() * 2.0e-9) };
+	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
 
-	__scmd_camera.getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 0.0f, 1.0f });
+	auto &cameraTransform	{ __scmd_camera.getTransform() };
+	auto &cameraPosition	{ cameraTransform.getPosition() };
+
+	if (__cameraMoveRight)
+		cameraPosition.addX(delta * __cameraMoveSpeed);
+
+	if (__cameraMoveLeft)
+		cameraPosition.addX(-delta * __cameraMoveSpeed);
+
 	__scmd_camera.validate();
 
 	return __LayerData

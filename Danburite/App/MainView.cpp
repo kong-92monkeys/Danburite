@@ -31,6 +31,8 @@ BEGIN_MESSAGE_MAP(CMainView, CWnd)
 	ON_WM_DESTROY()
 	ON_WM_SIZE()
 	ON_WM_ERASEBKGND()
+	ON_WM_KEYDOWN()
+	ON_WM_KEYUP()
 END_MESSAGE_MAP()
 
 
@@ -91,4 +93,19 @@ BOOL CMainView::OnEraseBkgnd(CDC *pDC)
 	// TODO: Add your message handler code here and/or call default
 	// To prevent from erasing window
 	return TRUE;
+}
+
+void CMainView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: Add your message handler code here and/or call default
+	theApp.onViewKeyDown(nChar);
+	CWnd::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+void CMainView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// TODO: Add your message handler code here and/or call default
+	theApp.onViewKeyUp(nChar);
+	CWnd::OnKeyUp(nChar, nRepCnt, nFlags);
 }

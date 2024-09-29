@@ -43,4 +43,7 @@ protected:
 
 private:
 	std::unique_ptr<Frx::Display> __pDisplay;
+public:
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 };

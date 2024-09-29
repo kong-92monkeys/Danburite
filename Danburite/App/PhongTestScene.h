@@ -16,6 +16,12 @@ public:
 	void setDisplay(
 		Frx::Display *pDisplay);
 
+	constexpr void startCameraMoveRight();
+	constexpr void endCameraMoveRight();
+
+	constexpr void startCameraMoveLeft();
+	constexpr void endCameraMoveLeft();
+
 protected:
 	virtual void _scmd_onInit() override;
 
@@ -44,11 +50,36 @@ private:
 	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
 
-	Frx::Camera __scmd_camera;
 	Frx::Display *__pDisplay{ };
+
+	float __cameraMoveSpeed{ 1.0f };
+
+	bool __cameraMoveLeft{ };
+	bool __cameraMoveRight{ };
+	Frx::Camera __scmd_camera;
 
 	Infra::EventListenerPtr<Frx::Display const *> __pDisplaySyncListener;
 
 	void __syncCameraExtent();
 	void __onDisplaySync();
 };
+
+constexpr void PhongTestScene::startCameraMoveRight()
+{
+	__cameraMoveRight = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveRight()
+{
+	__cameraMoveRight = false;
+}
+
+constexpr void PhongTestScene::startCameraMoveLeft()
+{
+	__cameraMoveLeft = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveLeft()
+{
+	__cameraMoveLeft = false;
+}

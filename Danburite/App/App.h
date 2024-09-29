@@ -43,6 +43,9 @@ public:
 	void setSceneDisplay(
 		Frx::Display *pDisplay);
 
+	void onViewKeyDown(UINT nChar);
+	void onViewKeyUp(UINT nChar);
+
 	[[nodiscard]]
 	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
 
