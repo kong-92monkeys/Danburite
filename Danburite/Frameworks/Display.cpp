@@ -25,6 +25,10 @@ namespace Frx
 			};
 
 			__pRenderTarget->getNeedRedrawEvent() += __pRenderTargetNeedRedrawListener;
+
+			auto const &extent{ __pRenderTarget->getExtent() };
+			__width		= extent.width;
+			__height	= extent.height;
 		}).wait();
 	}
 
@@ -42,6 +46,10 @@ namespace Frx
 		__rcmdExecutor.run([this]
 		{
 			__pRenderTarget->sync();
+
+			auto const &extent{ __pRenderTarget->getExtent() };
+			__width		= extent.width;
+			__height	= extent.height;
 		}).wait();
 	}
 

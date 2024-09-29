@@ -13,7 +13,8 @@ layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = TRANSFORM_MATERIAL_L
 
 layout(std430, set = LAYER_DESC_SET_LOCATION, binding = LAYER_DATA_BUFFER_LOCATION) readonly buffer LayerDataBuffer
 {
-    mat4 layerTransform;
+    mat4 viewMatrix;
+    mat4 projMatrix;
 };
 
 layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = INSTANCE_INFO_BUFFER_LOCATION) readonly buffer InstanceInfoBuffer
@@ -37,9 +38,10 @@ layout(location = 2) out vec4 outColor;
 void main()
 {
 	const int transformMaterialId = instanceInfos[gl_InstanceIndex].materialIds[0U];
-	const mat4 transform = transformMaterials[transformMaterialId].transform;
+	const mat4 modelMatrix = transformMaterials[transformMaterialId].transform;
 
-	gl_Position = (layerTransform * transform * vec4(inPos, 1.0f));
+	const mat4 mvp = (projMatrix * viewMatrix * modelMatrix);
+	gl_Position = (mvp * vec4(inPos, 1.0f));
 
 	if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))
 	{

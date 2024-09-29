@@ -48,20 +48,23 @@ std::any PhongTestScene::_scmd_onUpdate(
 	float const delta	{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
 	float const elapsed	{ static_cast<float>(time.elapsedTime.count() * 2.0e-9) };
 
-	__transform.getOrientation().rotate(delta, glm::vec3{ 0.0f, 0.0f, 1.0f });
-	__transform.getScale().set(glm::sin(elapsed) * 0.6f + 1.0f);
-	__transform.validate();
+	__scmd_camera.getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 0.0f, 1.0f });
+	__scmd_camera.validate();
 
-	return __transform.getMatrix();
+	return __LayerData
+	{
+		.viewMatrix{ __scmd_camera.getViewMatrix() },
+		.projMatrix{ __scmd_camera.getProjectionMatrix() }
+	};
 }
 
 void PhongTestScene::_rcmd_onInit()
 {
 	Infra::GenericBuffer posBuffer;
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, 0.5f });
-	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, 0.5f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, 0.5f });
-	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, 0.5f });
+	posBuffer.typedAdd<glm::vec3>({ -0.5f, -0.5f, -0.5f });
+	posBuffer.typedAdd<glm::vec3>({ -0.5f, 0.5f, -0.5f });
+	posBuffer.typedAdd<glm::vec3>({ 0.5f, 0.5f, -0.5f });
+	posBuffer.typedAdd<glm::vec3>({ 0.5f, -0.5f, -0.5f });
 
 	Infra::GenericBuffer uvBuffer;
 	uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
@@ -106,15 +109,13 @@ void PhongTestScene::_rcmd_onInit()
 	__rcmd_pObject->getMaterialPackOf(0U).setMaterial(__rcmd_pPhongMaterial.get());
 
 	__rcmd_pLayer = _rcmd_createLayer();
-
-	glm::mat4 layerTransform{ glm::scale(glm::mat4{ 1.0f }, glm::vec3{ 0.3f, 0.3f, 0.3f }) };
-	__rcmd_pLayer->setData(&layerTransform, sizeof(layerTransform));
+	__rcmd_pLayer->setData(__LayerData{ });
 	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
 }
 
 void PhongTestScene::_rcmd_onUpdate(
 	std::any const &updateParam)
 {
-	auto const transform{ std::any_cast<glm::mat4>(updateParam) };
-	__rcmd_pTransformMaterial->setTransform(transform);
+	auto const layerData{ std::any_cast<__LayerData>(updateParam) };
+	__rcmd_pLayer->setData(layerData);
 }

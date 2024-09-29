@@ -46,6 +46,9 @@
     <Filter Include="Constants">
       <UniqueIdentifier>{01c69329-62fb-49fc-8052-6af83b27253f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{70d377ed-737e-4c4e-b42b-3d7b3cca0d2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -90,6 +93,9 @@
     <ClInclude Include="Constants.h">
       <Filter>Constants</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -124,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="PrimitiveBuilder.cpp">
       <Filter>PrimitiveBuilder</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -318,7 +318,7 @@ namespace Frx
 			.rasterizerDiscardEnable	{ VK_FALSE },
 			.polygonMode				{ VkPolygonMode::VK_POLYGON_MODE_FILL },
 			.cullMode					{ VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT },
-			.frontFace					{ VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE },
+			.frontFace					{ VkFrontFace::VK_FRONT_FACE_CLOCKWISE },
 			.depthBiasEnable			{ VK_FALSE },
 			.lineWidth					{ 1.0f }
 		};

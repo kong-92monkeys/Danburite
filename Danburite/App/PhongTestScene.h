@@ -4,6 +4,7 @@
 #include "../Frameworks/TransformMaterial.h"
 #include "../Frameworks/PhongMaterial.h"
 #include "../Frameworks/Transform.h"
+#include "../Frameworks/Camera.h"
 
 class PhongTestScene : public Frx::Scene
 {
@@ -23,6 +24,13 @@ protected:
 		std::any const &updateParam) override;
 
 private:
+	struct __LayerData
+	{
+	public:
+		glm::mat4 viewMatrix{ 1.0f };
+		glm::mat4 projMatrix{ 1.0f };
+	};
+
 	std::unique_ptr<Render::Mesh> __rcmd_pMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pDrawParam;
 	std::unique_ptr<Frx::PhongRenderer> __rcmd_pRenderer;
@@ -32,7 +40,6 @@ private:
 	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
 
-	Frx::Transform __transform;
-
+	Frx::Camera __scmd_camera;
 	Frx::Display *__rcmd_pDisplay{ };
 };

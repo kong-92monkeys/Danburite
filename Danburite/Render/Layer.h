@@ -28,6 +28,10 @@ namespace Render
 			void const *pData,
 			size_t size);
 
+		template <typename $Data>
+		void setData(
+			$Data const &data);
+
 		void addRenderObject(
 			RenderObject const *pObject);
 
@@ -138,6 +142,13 @@ namespace Render
 	constexpr int Layer::getPriority() const noexcept
 	{
 		return __priority;
+	}
+
+	template <typename $Data>
+	void Layer::setData(
+		$Data const &data)
+	{
+		setData(&data, sizeof($Data));
 	}
 
 	constexpr Infra::EventView<Layer const *, int, int> &Layer::getPriorityChangeEvent() const noexcept
