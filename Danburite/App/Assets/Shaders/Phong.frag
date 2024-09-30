@@ -39,7 +39,7 @@ layout(location = 0) out vec4 outColor;
 
 void main()
 {
-    outColor = (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT) ? inColor : vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    vec4 materialColor = (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT) ? inColor : vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))
     {
@@ -47,8 +47,11 @@ void main()
         const int imageId = phongMaterials[phongMaterialId].imageId;
 
         if (imageId >= 0)
-            outColor *= texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
+            materialColor *= texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
     }
 
-    outColor *= lightMaterials[0].color;
+    const LightMaterial light = lightMaterials[0];
+    const vec4 ambientColor = (light.color * light.ambientFactor);
+
+    outColor = (materialColor * ambientColor);
 }

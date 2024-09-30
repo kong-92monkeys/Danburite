@@ -3,6 +3,9 @@
 
 struct LightMaterial
 {
+	uint type;
+	float ambientFactor;
+
 	vec4 color;
 };
 
