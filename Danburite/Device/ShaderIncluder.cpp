@@ -44,7 +44,7 @@ namespace Dev
     void ShaderIncluder::ReleaseInclude(
         shaderc_include_result *const data)
     {
-        delete data->user_data;
+        delete static_cast<__IncludeResultPlaceholder *>(data->user_data);
         delete data;
     }
 
