@@ -93,8 +93,7 @@ namespace Render
 		VK::ImageView &colorAttachment,
 		VK::ImageView *const pDepthStencilAttachment,
 		RendererResourceManager &rendererResourceManager,
-		VkRect2D const &renderArea,
-		VkDescriptorSet const hLayerDescSet) const
+		VkRect2D const &renderArea) const
 	{
 		if (__drawSequence.empty())
 			return;
@@ -124,7 +123,7 @@ namespace Render
 				break;
 
 			subDrawExecutions.emplace_back(
-				__subDraw(renderPass, framebuffer, pipeline, sequenceBegin, sequenceEnd, hLayerDescSet));
+				__subDraw(renderPass, framebuffer, pipeline, sequenceBegin, sequenceEnd));
 
 			sequenceBegin = sequenceEnd;
 		}
@@ -506,35 +505,31 @@ namespace Render
 	}
 
 	void SubLayer::__bindDescSets(
-		VK::CommandBuffer &cmdBuffer,
-		VkDescriptorSet const hLayerDescSet) const
+		VK::CommandBuffer &cmdBuffer) const
 	{
-		std::array const descSets
-		{
-			// MATERIALS_DESC_SET_LOCATION
-			__globalDescManager.getMaterialsDescSet(),
+		std::vector<VkDescriptorSet> descSets;
 
-			// SAMPLED_IMAGES_DESC_SET_LOCATION
-			__globalDescManager.getSampledImagesDescSet(),
+		// GLOBAL_DESC_SET_LOCATION
+		descSets.emplace_back(__globalDescManager.getGlobalDescSet());
 
-			// LAYER_DESC_SET_LOCATION
-			hLayerDescSet,
+		// MATERIALS_DESC_SET_LOCATION
+		descSets.emplace_back(__globalDescManager.getMaterialsDescSet());
 
-			// SUB_LAYER_DESC_SET_LOCATION
-			__getDescSet(),
+		// SAMPLED_IMAGES_DESC_SET_LOCATION
+		descSets.emplace_back(__globalDescManager.getSampledImagesDescSet());
 
-			// RENDERER_DESC_SET_LOCATION
-			__pRenderer->getDescSet()
-		};
+		// SUB_LAYER_DESC_SET_LOCATION
+		descSets.emplace_back(__getDescSet());
 
-		uint32_t descCount{ static_cast<uint32_t>(descSets.size()) };
-		if (!(descSets.back()))
-			--descCount;
+		// RENDERER_DESC_SET_LOCATION
+		auto const hRendererDescSet{ __pRenderer->getDescSet() };
+		if (hRendererDescSet)
+			descSets.emplace_back(hRendererDescSet);
 
 		cmdBuffer.vkCmdBindDescriptorSets(
 			VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS,
-			__pRenderer->getPipelineLayout().getHandle(),
-			0U, descCount, descSets.data(), 0U, nullptr);
+			__pRenderer->getPipelineLayout().getHandle(), 0U,
+			static_cast<uint32_t>(descSets.size()), descSets.data(), 0U, nullptr);
 	}
 
 	void SubLayer::__endRenderPass(
@@ -553,11 +548,10 @@ namespace Render
 		VK::Framebuffer const &framebuffer,
 		VK::Pipeline const &pipeline,
 		size_t const sequenceBegin,
-		size_t const sequenceEnd,
-		VkDescriptorSet const hLayerDescSet) const
+		size_t const sequenceEnd) const
 	{
 		return __scbBuilder.build(
-			[this, &renderPass, &framebuffer, &pipeline, sequenceBegin, sequenceEnd, hLayerDescSet] (auto &secondaryBuffer)
+			[this, &renderPass, &framebuffer, &pipeline, sequenceBegin, sequenceEnd] (auto &secondaryBuffer)
 		{
 			__beginSecondaryBuffer(secondaryBuffer, renderPass, framebuffer);
 
@@ -566,7 +560,7 @@ namespace Render
 				pipeline.getHandle());
 
 			if (__pRenderer->useMaterial())
-				__bindDescSets(secondaryBuffer, hLayerDescSet);
+				__bindDescSets(secondaryBuffer);
 
 			Mesh const *pBoundMesh{ };
 			uint32_t boundVertexAttribFlags{ };

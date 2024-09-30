@@ -6,15 +6,15 @@
 #include <Shaders/ShaderData.glsl>
 #include <Shaders/Materials/TransformMaterial.glsl>
 
-layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = TRANSFORM_MATERIAL_LOCATION) readonly buffer TransformMaterialBuffer
-{
-	TransformMaterial transformMaterials[];
-};
-
-layout(std430, set = LAYER_DESC_SET_LOCATION, binding = LAYER_DATA_BUFFER_LOCATION) readonly buffer LayerDataBuffer
+layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCATION) readonly buffer GlobalDataBuffer
 {
     mat4 viewMatrix;
     mat4 projMatrix;
+} globalData;
+
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = TRANSFORM_MATERIAL_LOCATION) readonly buffer TransformMaterialBuffer
+{
+	TransformMaterial transformMaterials[];
 };
 
 layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = INSTANCE_INFO_BUFFER_LOCATION) readonly buffer InstanceInfoBuffer
@@ -40,7 +40,7 @@ void main()
 	const int transformMaterialId = instanceInfos[gl_InstanceIndex].materialIds[0U];
 	const mat4 modelMatrix = transformMaterials[transformMaterialId].transform;
 
-	const mat4 mvp = (projMatrix * viewMatrix * modelMatrix);
+	const mat4 mvp = (globalData.projMatrix * globalData.viewMatrix * modelMatrix);
 	gl_Position = (mvp * vec4(inPos, 1.0f));
 
 	if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))

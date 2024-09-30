@@ -47,18 +47,21 @@ public:
 	constexpr void endCameraRotateDown() noexcept;
 
 protected:
-	virtual void _scmd_onInit() override;
+	[[nodiscard]]
+	virtual std::any _scmd_onInit() override;
 
 	[[nodiscard]]
 	virtual std::any _scmd_onUpdate(
 		Time const &time) override;
 
-	virtual void _rcmd_onInit() override;
+	virtual void _rcmd_onInit(
+		std::any const &initParam) override;
+
 	virtual void _rcmd_onUpdate(
 		std::any const &updateParam) override;
 
 private:
-	struct __LayerData
+	struct __GlobalData
 	{
 	public:
 		glm::mat4 viewMatrix{ 1.0f };

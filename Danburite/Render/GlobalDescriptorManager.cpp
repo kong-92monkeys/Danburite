@@ -15,7 +15,7 @@ namespace Render
 		__device				{ device },
 		__deferredDeleter		{ deferredDeleter },
 		__imageReferenceManager	{ imageReferenceManager },
-		__descriptorUpdater		{ descriptorUpdater },
+		__descUpdater		{ descriptorUpdater },
 		__resourcePool			{ resourcePool },
 		__bindingInfo			{ bindingInfo }
 	{
@@ -29,12 +29,15 @@ namespace Render
 
 		__imageReferenceManager.getUpdateEvent() += __pSampledImagesDescInfosUpdateListener;
 
+		__createGlobalDescSetLayout();
 		__createMaterialsDescSetLayout();
 		__createSampledImagesDescSetLayout();
 
+		__createGlobalDescPool();
 		__createMaterialsDescPool();
 		__createSampledImagesDescPool();
 
+		__allocateGlobalDescSets();
 		__allocateMaterialsDescSets();
 		__allocateSampledImagesDescSets();
 
@@ -45,11 +48,43 @@ namespace Render
 	{
 		__materialBufferBuilders.clear();
 
+		if (__pGlobalDataBuffer)
+		{
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
+				std::move(__pGlobalDataBuffer));
+		}
+
 		__pSampledImagesDescPool = nullptr;
 		__pMaterialsDescPool = nullptr;
+		__pGlobalDescPool = nullptr;
 
 		__pSampledImagesDescSetLayout = nullptr;
 		__pMaterialsDescSetLayout = nullptr;
+		__pGlobalDescSetLayout = nullptr;
+	}
+
+	void GlobalDescriptorManager::setGlobalData(
+		void const *const pData,
+		size_t const size)
+	{
+		if (__pGlobalDataBuffer)
+		{
+			__resourcePool.recycleBuffer(
+				ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
+				std::move(__pGlobalDataBuffer));
+		}
+
+		__pGlobalDataBuffer = __resourcePool.getBuffer(
+			ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
+			size);
+
+		std::memcpy(__pGlobalDataBuffer->getData(), pData, size);
+
+		__globalDataBufferUpdated = true;
+		_invalidate();
+
+		__globalDataUpdateEvent.invoke(this);
 	}
 
 	void GlobalDescriptorManager::addMaterial(
@@ -72,6 +107,9 @@ namespace Render
 
 	void GlobalDescriptorManager::_onValidate()
 	{
+		if (__globalDataBufferUpdated)
+			__validateGlobalDescSet();
+
 		if (__materialsDescInvalidated)
 		{
 			for (auto const pBuilder : __invalidatedMaterialBufferBuilders)
@@ -83,8 +121,40 @@ namespace Render
 		if (__sampledImagesDescInvalidated)
 			__validateSampledImagesDescSet();
 
+		__globalDataBufferUpdated = false;
 		__invalidatedMaterialBufferBuilders.clear();
 		__materialsDescInvalidated = false;
+	}
+
+	void GlobalDescriptorManager::__createGlobalDescSetLayout()
+	{
+		std::vector<VkDescriptorBindingFlags> bindingFlags;
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+		auto &instanceInfoBufferBinding				{ bindings.emplace_back() };
+		instanceInfoBufferBinding.binding			= Constants::GLOBAL_DATA_BUFFER_LOCATION;
+		instanceInfoBufferBinding.descriptorType	= VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		instanceInfoBufferBinding.descriptorCount	= 1U;
+		instanceInfoBufferBinding.stageFlags		= VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+			
+		bindingFlags.emplace_back(0U);
+
+		VkDescriptorSetLayoutBindingFlagsCreateInfo const flagInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO },
+			.bindingCount	{ static_cast<uint32_t>(bindingFlags.size()) },
+			.pBindingFlags	{ bindingFlags.data() }
+		};
+
+		VkDescriptorSetLayoutCreateInfo const createInfo
+		{
+			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO },
+			.pNext			{ &flagInfo },
+			.bindingCount	{ static_cast<uint32_t>(bindings.size()) },
+			.pBindings		{ bindings.data() }
+		};
+
+		__pGlobalDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(__device, createInfo);
 	}
 
 	void GlobalDescriptorManager::__createMaterialsDescSetLayout()
@@ -156,6 +226,26 @@ namespace Render
 		__pSampledImagesDescSetLayout = std::make_unique<VK::DescriptorSetLayout>(__device, createInfo);
 	}
 
+	void GlobalDescriptorManager::__createGlobalDescPool()
+	{
+		uint32_t const descSetCount{ static_cast<uint32_t>(__globalDescSets.size()) };
+
+        std::vector<VkDescriptorPoolSize> poolSizes;
+        poolSizes.emplace_back(
+            VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            descSetCount);
+
+        VkDescriptorPoolCreateInfo const createInfo
+        {
+            .sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO },
+            .maxSets			{ descSetCount },
+            .poolSizeCount		{ static_cast<uint32_t>(poolSizes.size()) },
+            .pPoolSizes			{ poolSizes.data() }
+        };
+
+        __pGlobalDescPool = std::make_shared<VK::DescriptorPool>(__device, createInfo);
+	}
+
 	void GlobalDescriptorManager::__createMaterialsDescPool()
 	{
 		uint32_t const descSetCount				{ static_cast<uint32_t>(__materialsDescSets.size()) };
@@ -209,6 +299,26 @@ namespace Render
 		};
 
 		__pSampledImagesDescPool = std::make_shared<VK::DescriptorPool>(__device, createInfo);
+	}
+
+	void GlobalDescriptorManager::__allocateGlobalDescSets()
+	{
+		uint32_t const descSetCount{ static_cast<uint32_t>(__globalDescSets.size()) };
+
+        std::vector<VkDescriptorSetLayout> layoutHandles;
+
+        for (uint32_t iter{ }; iter < descSetCount; ++iter)
+            layoutHandles.emplace_back(__pGlobalDescSetLayout->getHandle());
+
+        VkDescriptorSetAllocateInfo const allocInfo
+        {
+            .sType					{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO },
+            .descriptorPool			{ __pGlobalDescPool->getHandle() },
+            .descriptorSetCount		{ descSetCount },
+            .pSetLayouts			{ layoutHandles.data() }
+        };
+
+        __device.vkAllocateDescriptorSets(&allocInfo, __globalDescSets.data());
 	}
 
 	void GlobalDescriptorManager::__allocateMaterialsDescSets()
@@ -274,6 +384,21 @@ namespace Render
 		}
 	}
 
+	void GlobalDescriptorManager::__validateGlobalDescSet()
+	{
+		__advanceGlobalDescSet();
+
+		VkDescriptorBufferInfo const bufferInfo
+		{
+			.buffer	{ __pGlobalDataBuffer->getHandle() },
+			.range	{ __pGlobalDataBuffer->getSize() }
+		};
+
+		__descUpdater.addInfos(
+			getGlobalDescSet(), Constants::GLOBAL_DATA_BUFFER_LOCATION,
+			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
+	}
+
 	void GlobalDescriptorManager::__validateMaterialsDescSet()
 	{
 		__advanceMaterialsDescSet();
@@ -291,7 +416,7 @@ namespace Render
 				.range	{ pMaterialBuffer->getSize() }
 			};
 
-			__descriptorUpdater.addInfos(
+			__descUpdater.addInfos(
 				getMaterialsDescSet(), __bindingInfo.materialBufferLocations.at(type), 0U, 1U,
 				VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 		}
@@ -308,7 +433,7 @@ namespace Render
 
 		__advanceSampledImagesDescSet();
 
-		__descriptorUpdater.addInfos(
+		__descUpdater.addInfos(
 			getSampledImagesDescSet(), Constants::SAMPLED_IMAGES_LOCATION,
 			0U, static_cast<uint32_t>(descInfos.size()),
 			VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,

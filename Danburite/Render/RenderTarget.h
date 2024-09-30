@@ -12,6 +12,7 @@
 #include "../Device/SemaphoreCirculator.h"
 #include "../Device/CommandExecutor.h"
 #include "../Device/MemoryImage.h"
+#include "GlobalDescriptorManager.h"
 #include "Layer.h"
 
 namespace Render
@@ -36,6 +37,7 @@ namespace Render
 			VK::Queue &queue,
 			Dev::MemoryAllocator &memoryAllocator,
 			Infra::DeferredDeleter &deferredDeleter,
+			GlobalDescriptorManager &globalDescManager,
 			HINSTANCE hinstance,
 			HWND hwnd,
 			bool useDepthBuffer,
@@ -85,6 +87,7 @@ namespace Render
 		VK::Queue &__que;
 		Dev::MemoryAllocator &__memoryAllocator;
 		Infra::DeferredDeleter &__deferredDeleter;
+		GlobalDescriptorManager &__globalDescManager;
 
 		bool const __useDepthBuffer;
 		bool const __useStencilBuffer;
@@ -136,6 +139,7 @@ namespace Render
 			.stencil	{ 0U }
 		};
 
+		Infra::EventListenerPtr<GlobalDescriptorManager const *> __pGlobalDataUpdateListener;
 		Infra::EventListenerPtr<Layer *> __pLayerInvalidateListener;
 		Infra::EventListenerPtr<Layer const *, int, int> __pLayerPriorityChangeListener;
 		Infra::EventListenerPtr<Layer const *> __pLayerNeedRedrawListener;
@@ -186,6 +190,8 @@ namespace Render
 			uint32_t imageIndex);
 
 		void __sortLayers();
+
+		void __onGlobalDataUpdated() noexcept;
 
 		void __onLayerInvalidated(
 			Layer *pLayer) noexcept;

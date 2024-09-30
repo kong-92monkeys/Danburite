@@ -527,15 +527,15 @@ namespace Frx
 
 		std::array const setLayouts
 		{
+			// GLOBAL_DESC_SET_LOCATION
+			globalDescManager.getGlobalDescSetLayout().getHandle(),
+
 			// MATERIALS_DESC_SET_LOCATION
 			globalDescManager.getMaterialsDescSetLayout().getHandle(),
 			
 			// SAMPLED_IMAGES_DESC_SET_LOCATION
 			globalDescManager.getSampledImagesDescSetLayout().getHandle(),
 
-			// LAYER_DESC_SET_LOCATION
-			_getLayerDescSetLayout().getHandle(),
-			
 			// SUB_LAYER_DESC_SET_LOCATION
 			_getSubLayerDescSetLayout().getHandle(),
 			

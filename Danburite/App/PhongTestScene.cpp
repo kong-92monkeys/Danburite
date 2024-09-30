@@ -59,10 +59,17 @@ void PhongTestScene::setDisplay(
 	}).wait();
 }
 
-void PhongTestScene::_scmd_onInit()
+std::any PhongTestScene::_scmd_onInit()
 {
 	__scmd_camera.setPosition(0.0f, 0.0f, 3.0f);
 	__scmd_camera.setNear(0.1f);
+	__scmd_camera.validate();
+
+	return __GlobalData
+	{
+		.viewMatrix{ __scmd_camera.getViewMatrix() },
+		.projMatrix{ __scmd_camera.getProjectionMatrix() }
+	};
 }
 
 std::any PhongTestScene::_scmd_onUpdate(
@@ -73,14 +80,15 @@ std::any PhongTestScene::_scmd_onUpdate(
 	__scmd_handleCamera(delta);
 	__scmd_camera.validate();
 
-	return __LayerData
+	return __GlobalData
 	{
 		.viewMatrix{ __scmd_camera.getViewMatrix() },
 		.projMatrix{ __scmd_camera.getProjectionMatrix() }
 	};
 }
 
-void PhongTestScene::_rcmd_onInit()
+void PhongTestScene::_rcmd_onInit(
+	std::any const &initParam)
 {
 	auto const meshData
 	{
@@ -116,15 +124,17 @@ void PhongTestScene::_rcmd_onInit()
 	__rcmd_pObject->getMaterialPackOf(0U).setMaterial(__rcmd_pPhongMaterial.get());
 
 	__rcmd_pLayer = _rcmd_createLayer();
-	__rcmd_pLayer->setData(__LayerData{ });
 	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
+
+	auto const globalData{ std::any_cast<__GlobalData>(initParam) };
+	_rcmd_setGlobalData(globalData);
 }
 
 void PhongTestScene::_rcmd_onUpdate(
 	std::any const &updateParam)
 {
-	auto const layerData{ std::any_cast<__LayerData>(updateParam) };
-	__rcmd_pLayer->setData(layerData);
+	auto const globalData{ std::any_cast<__GlobalData>(updateParam) };
+	_rcmd_setGlobalData(globalData);
 }
 
 void PhongTestScene::__scmd_handleCamera(

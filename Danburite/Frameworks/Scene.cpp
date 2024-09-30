@@ -24,8 +24,11 @@ namespace Frx
 			__pScmdExecutor->in_getIdleEvent() += __pScmdIdleListener;
 			__beginningTime = std::chrono::steady_clock::now();
 
-			_scmd_onInit();
-			_rcmd_silentRun(std::bind(&Scene::_rcmd_onInit, this));
+			auto initParam{ _scmd_onInit() };
+			_rcmd_silentRun([this, initParam{ std::move(initParam) }]
+			{
+				_rcmd_onInit(initParam);
+			});
 		});
 	}
 
@@ -38,6 +41,29 @@ namespace Frx
 	{
 		auto const rcmdFrameCount{ __rcmdFrameCount.load(std::memory_order::acquire) };
 		return (static_cast<double>(rcmdFrameCount) / (__time.elapsedTime.count() * 1e-9));
+	}
+
+	std::future<void> Scene::_scmd_run(
+		Infra::ThreadPool::Job &&job)
+	{
+		return __pScmdExecutor->run(std::move(job));
+	}
+
+	void Scene::_scmd_silentRun(
+		Infra::ThreadPool::Job &&job)
+	{
+		__pScmdExecutor->silentRun(std::move(job));
+	}
+
+	std::any Scene::_scmd_onInit()
+	{
+		return { };
+	}
+
+	std::any Scene::_scmd_onUpdate(
+		Time const &time)
+	{
+		return { };
 	}
 
 	std::unique_ptr<Render::Layer> Scene::_rcmd_createLayer()
@@ -66,16 +92,11 @@ namespace Frx
 		};
 	}
 
-	std::future<void> Scene::_scmd_run(
-		Infra::ThreadPool::Job &&job)
+	void Scene::_rcmd_setGlobalData(
+		void const *const pData,
+		size_t const size)
 	{
-		return __pScmdExecutor->run(std::move(job));
-	}
-
-	void Scene::_scmd_silentRun(
-		Infra::ThreadPool::Job &&job)
-	{
-		__pScmdExecutor->silentRun(std::move(job));
+		__pRenderEngine->setGlobalData(pData, size);
 	}
 
 	std::future<void> Scene::_rcmd_run(
@@ -90,16 +111,8 @@ namespace Frx
 		__pRcmdExecutor->silentRun(std::move(job));
 	}
 
-	void Scene::_scmd_onInit()
-	{}
-
-	std::any Scene::_scmd_onUpdate(
-		Time const &time)
-	{
-		return { };
-	}
-
-	void Scene::_rcmd_onInit()
+	void Scene::_rcmd_onInit(
+		std::any const &initParam)
 	{}
 
 	void Scene::_rcmd_onUpdate(
@@ -123,14 +136,6 @@ namespace Frx
 		++__scmdFrameCount;
 
 		return retVal;
-	}
-
-	void Scene::__rcmd_update(
-		std::any const &updateParam)
-	{
-		_rcmd_onUpdate(updateParam);
-		__pRenderEngine->render();
-		__rcmdFrameCount.fetch_add(1ULL, std::memory_order::release);
 	}
 
 	void Scene::__scmd_onIdle()
@@ -162,5 +167,13 @@ namespace Frx
 
 		__lastUpdateTime = curTime;
 		return true;
+	}
+
+	void Scene::__rcmd_update(
+		std::any const &updateParam)
+	{
+		_rcmd_onUpdate(updateParam);
+		__pRenderEngine->render();
+		__rcmdFrameCount.fetch_add(1ULL, std::memory_order::release);
 	}
 }

@@ -40,8 +40,7 @@ namespace Render
 			VK::ImageView &colorAttachment,
 			VK::ImageView *pDepthStencilAttachment,
 			RendererResourceManager &rendererResourceManager,
-			VkRect2D const &renderArea,
-			VkDescriptorSet hLayerDescSet) const;
+			VkRect2D const &renderArea) const;
 
 		[[nodiscard]]
 		constexpr Renderer const *getRenderer() const noexcept;
@@ -175,8 +174,7 @@ namespace Render
 			VkRect2D const &renderArea) const;
 
 		void __bindDescSets(
-			VK::CommandBuffer &cmdBuffer,
-			VkDescriptorSet hLayerDescSet) const;
+			VK::CommandBuffer &cmdBuffer) const;
 
 		void __endRenderPass(
 			VK::CommandBuffer &cmdBuffer) const;
@@ -187,8 +185,7 @@ namespace Render
 			VK::Framebuffer const &framebuffer,
 			VK::Pipeline const &pipeline,
 			size_t sequenceBegin,
-			size_t sequenceEnd,
-			VkDescriptorSet hLayerDescSet) const;
+			size_t sequenceEnd) const;
 
 		[[nodiscard]]
 		constexpr VkDescriptorSet __getDescSet() const noexcept;

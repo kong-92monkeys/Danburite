@@ -17,7 +17,6 @@ namespace Render
 		Infra::DeferredDeleter &deferredDeleter,
 		Dev::DescriptorUpdater &descriptorUpdater,
 		GlobalDescriptorManager const &globalDescriptorManager,
-		VK::DescriptorSetLayout const &layerDescSetLayout,
 		VK::DescriptorSetLayout const &subLayerDescSetLayout)
 	{
 		__pPhysicalDevice			= &physicalDevice;
@@ -26,7 +25,6 @@ namespace Render
 		__pDeferredDeleter			= &deferredDeleter;
 		__pDescriptorUpdater		= &descriptorUpdater;
 		__pGlobalDescriptorManager	= &globalDescriptorManager;
-		__pLayerDescSetLayout		= &layerDescSetLayout;
 		__pSubLayerDescSetLayout	= &subLayerDescSetLayout;
 
 		auto initResult{ _onInit() };

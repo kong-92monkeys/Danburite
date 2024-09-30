@@ -4,7 +4,6 @@ namespace Render
 {
 	Layer::Layer(
 		VK::Device &device,
-		VK::DescriptorSetLayout &layerDescSetLayout,
 		VK::DescriptorSetLayout &subLayerDescSetLayout,
 		Infra::DeferredDeleter &deferredDeleter,
 		Dev::SCBBuilder &scbBuilder,
@@ -12,7 +11,6 @@ namespace Render
 		ResourcePool &resourcePool,
 		GlobalDescriptorManager &globalDescManager) noexcept :
 		__device				{ device },
-		__layerDescSetLayout	{ layerDescSetLayout },
 		__subLayerDescSetLayout	{ subLayerDescSetLayout },
 		__deferredDeleter		{ deferredDeleter },
 		__scbBuilder			{ scbBuilder },
@@ -35,21 +33,6 @@ namespace Render
 		__pSubLayerNeedRedrawListener =
 			Infra::EventListener<SubLayer const *>::bind(
 				&Layer::__onSubLayerRedrawNeeded, this);
-
-		__createDescPool();
-		__allocDescSets();
-	}
-
-	Layer::~Layer() noexcept
-	{
-		if (__pDataBuffer)
-		{
-			__resourcePool.recycleBuffer(
-				ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
-				std::move(__pDataBuffer));
-		}
-
-		__deferredDeleter.reserve(std::move(__pDescPool));
 	}
 
 	void Layer::setPriority(
@@ -62,29 +45,6 @@ namespace Render
 		__priority = priority;
 
 		__priorityChangeEvent.invoke(this, prevPriority, priority);
-	}
-
-	void Layer::setData(
-		void const *const pData,
-		size_t const size)
-	{
-		if (__pDataBuffer)
-		{
-			__resourcePool.recycleBuffer(
-				ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
-				std::move(__pDataBuffer));
-		}
-
-		__pDataBuffer = __resourcePool.getBuffer(
-			ResourcePool::BufferType::HOST_VISIBLE_COHERENT_STORAGE,
-			size);
-
-		std::memcpy(__pDataBuffer->getData(), pData, size);
-
-		__dataBufferUpdated = true;
-		_invalidate();
-
-		__needRedrawEvent.invoke(this);
 	}
 
 	void Layer::addRenderObject(
@@ -130,7 +90,7 @@ namespace Render
 
 			pSubLayer->draw(
 				cmdBuffer, colorAttachment, pDepthStencilAttachment,
-				rendererResourceManager, renderArea, __getDescSet());
+				rendererResourceManager, renderArea);
 		}
 	}
 
@@ -142,52 +102,8 @@ namespace Render
 		if (__subLayerSortionInvalidated)
 			__sortSubLayers();
 
-		if (__dataBufferUpdated)
-			__validateDescSet();
-
 		__invalidatedSubLayers.clear();
 		__subLayerSortionInvalidated = false;
-		__dataBufferUpdated = false;
-	}
-
-	void Layer::__createDescPool()
-	{
-		uint32_t const descSetCount{ static_cast<uint32_t>(__descSets.size()) };
-
-		std::vector<VkDescriptorPoolSize> poolSizes;
-		poolSizes.emplace_back(
-			VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			descSetCount);
-
-		VkDescriptorPoolCreateInfo const createInfo
-		{
-			.sType			{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO },
-			.maxSets		{ descSetCount },
-			.poolSizeCount	{ static_cast<uint32_t>(poolSizes.size()) },
-			.pPoolSizes		{ poolSizes.data() }
-		};
-
-		__pDescPool = std::make_shared<VK::DescriptorPool>(__device, createInfo);
-	}
-
-	void Layer::__allocDescSets()
-	{
-		uint32_t const descSetCount{ static_cast<uint32_t>(__descSets.size()) };
-
-		std::vector<VkDescriptorSetLayout> layoutHandles;
-
-		for (uint32_t iter{ }; iter < descSetCount; ++iter)
-			layoutHandles.emplace_back(__layerDescSetLayout.getHandle());
-
-		VkDescriptorSetAllocateInfo const allocInfo
-		{
-			.sType				{ VkStructureType::VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO },
-			.descriptorPool		{ __pDescPool->getHandle() },
-			.descriptorSetCount	{ descSetCount },
-			.pSetLayouts		{ layoutHandles.data() }
-		};
-
-		__device.vkAllocateDescriptorSets(&allocInfo, __descSets.data());
 	}
 
 	void Layer::__registerObject(
@@ -247,21 +163,6 @@ namespace Render
 		{
 			return (lhs->getRenderer()->getPriority() < rhs->getRenderer()->getPriority());
 		});
-	}
-
-	void Layer::__validateDescSet()
-	{
-		__advanceDescSet();
-
-		VkDescriptorBufferInfo const bufferInfo
-		{
-			.buffer	{ __pDataBuffer->getHandle() },
-			.range	{ __pDataBuffer->getSize() }
-		};
-
-		__descUpdater.addInfos(
-			__getDescSet(), Constants::LAYER_DATA_BUFFER_LOCATION,
-			0U, 1U, VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, &bufferInfo);
 	}
 
 	void Layer::__onObjectRendererChanged(

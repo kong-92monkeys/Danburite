@@ -13,6 +13,7 @@ namespace Render
 		VK::Queue &queue,
 		Dev::MemoryAllocator &memoryAllocator,
 		Infra::DeferredDeleter &deferredDeleter,
+		GlobalDescriptorManager &globalDescManager,
 		HINSTANCE const hinstance,
 		HWND const hwnd,
 		bool const useDepthBuffer,
@@ -23,9 +24,13 @@ namespace Render
 		__que				{ queue },
 		__memoryAllocator	{ memoryAllocator },
 		__deferredDeleter	{ deferredDeleter },
+		__globalDescManager	{ globalDescManager },
 		__useDepthBuffer	{ useDepthBuffer },
 		__useStencilBuffer	{ useStencilBuffer }
 	{
+		__pGlobalDataUpdateListener = Infra::EventListener<GlobalDescriptorManager const *>::bind(
+			&RenderTarget::__onGlobalDataUpdated, this);
+
 		__pLayerInvalidateListener = Infra::EventListener<Layer *>::bind(
 			&RenderTarget::__onLayerInvalidated, this, std::placeholders::_1);
 
@@ -65,6 +70,8 @@ namespace Render
 		__pRendererResourceManager->invalidate(
 			__surfaceFormat.format, __depthStencilFormat, __depthStencilImageLayout,
 			extent.width, extent.height);
+
+		__globalDescManager.getGlobalDataUpdateEvent() += __pGlobalDataUpdateListener;
 	}
 
 	RenderTarget::~RenderTarget() noexcept
@@ -794,6 +801,11 @@ namespace Render
 		{
 			return (lhs->getPriority() < rhs->getPriority());
 		});
+	}
+
+	void RenderTarget::__onGlobalDataUpdated() noexcept
+	{
+		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::__onLayerInvalidated(

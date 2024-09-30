@@ -40,6 +40,20 @@ namespace Frx
 		double _scmd_getFps() const noexcept;
 
 		[[nodiscard]]
+		std::future<void> _scmd_run(
+			Infra::ThreadPool::Job &&job);
+
+		void _scmd_silentRun(
+			Infra::ThreadPool::Job &&job);
+
+		[[nodiscard]]
+		virtual std::any _scmd_onInit();
+
+		[[nodiscard]]
+		virtual std::any _scmd_onUpdate(
+			Time const &time);
+
+		[[nodiscard]]
 		std::unique_ptr<Render::Layer> _rcmd_createLayer();
 
 		[[nodiscard]]
@@ -61,12 +75,13 @@ namespace Frx
 		[[nodiscard]]
 		std::unique_ptr<$Renderer> _rcmd_createRenderer($Args &&...args);
 
-		[[nodiscard]]
-		std::future<void> _scmd_run(
-			Infra::ThreadPool::Job &&job);
+		void _rcmd_setGlobalData(
+			void const *pData,
+			size_t size);
 
-		void _scmd_silentRun(
-			Infra::ThreadPool::Job &&job);
+		template <typename $Data>
+		void _rcmd_setGlobalData(
+			$Data const &data);
 
 		[[nodiscard]]
 		std::future<void> _rcmd_run(
@@ -75,13 +90,9 @@ namespace Frx
 		void _rcmd_silentRun(
 			Infra::ThreadPool::Job &&job);
 
-		virtual void _scmd_onInit();
+		virtual void _rcmd_onInit(
+			std::any const &initParam);
 
-		[[nodiscard]]
-		virtual std::any _scmd_onUpdate(
-			Time const &time);
-
-		virtual void _rcmd_onInit();
 		virtual void _rcmd_onUpdate(
 			std::any const &updateParam);
 
@@ -108,9 +119,6 @@ namespace Frx
 
 		[[nodiscard]]
 		std::any __scmd_update();
-		void __rcmd_update(
-			std::any const &updateParam);
-
 		void __scmd_onIdle();
 
 		[[nodiscard]]
@@ -118,6 +126,9 @@ namespace Frx
 
 		[[nodiscard]]
 		bool __scmd_checkUpdateInterval() noexcept;
+
+		void __rcmd_update(
+			std::any const &updateParam);
 	};
 
 	constexpr void Scene::setMaxFrameDelay(
@@ -156,5 +167,12 @@ namespace Frx
 			__pRenderEngine->createRenderer<$Renderer>(
 				std::forward<$Args>(args)...)
 		};
+	}
+
+	template <typename $Data>
+	void Scene::_rcmd_setGlobalData(
+		$Data const &data)
+	{
+		_rcmd_setGlobalData(&data, sizeof($Data));
 	}
 }
