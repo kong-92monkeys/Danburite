@@ -64,15 +64,15 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 		return FALSE;
 	}
 
-	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS(CMainView), CSize{ 1200, 0 }, pContext)))
+	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS(CSceneMenuView00), CSize{ 400, 0 }, pContext)))
 	{
-		TRACE("Cannot create the main view.");
+		TRACE("Cannot create the menu view.");
 		return FALSE;
 	}
 
-	if (!(__windowSplitter.CreateView(0, 2, RUNTIME_CLASS(CSceneMenuView00), CSize{ 0, 0 }, pContext)))
+	if (!(__windowSplitter.CreateView(0, 2, RUNTIME_CLASS(CMainView), CSize{ 0, 0 }, pContext)))
 	{
-		TRACE("Cannot create the menu view.");
+		TRACE("Cannot create the main view.");
 		return FALSE;
 	}
 

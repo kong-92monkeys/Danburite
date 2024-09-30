@@ -46,17 +46,20 @@ public:
 template <typename $T>
 $T *CMainFrame::replaceSceneMenuView()
 {
-	if (!(__windowSplitter.GetPane(0, 2)->DestroyWindow()))
+	int cxCur, cxMin;
+	__windowSplitter.GetColumnInfo(1, cxCur, cxMin);
+
+	if (!(__windowSplitter.GetPane(0, 1)->DestroyWindow()))
 	{
 		TRACE("Cannot destroy the previous view.");
 	}
 
 	CCreateContext context{ };
-	if (!(__windowSplitter.CreateView(0, 2, RUNTIME_CLASS($T), CSize{ 0, 0 }, &context)))
+	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS($T), CSize{ cxCur, 0 }, &context)))
 	{
 		TRACE("Cannot create the menu view.");
 	}
 
 	__windowSplitter.RecalcLayout();
-	return STATIC_DOWNCAST($T, __windowSplitter.GetPane(0, 2));
+	return STATIC_DOWNCAST($T, __windowSplitter.GetPane(0, 1));
 }
