@@ -28,9 +28,6 @@ namespace Render
 		__useDepthBuffer	{ useDepthBuffer },
 		__useStencilBuffer	{ useStencilBuffer }
 	{
-		__pGlobalDataUpdateListener = Infra::EventListener<GlobalDescriptorManager const *>::bind(
-			&RenderTarget::__onGlobalDataUpdated, this);
-
 		__pLayerInvalidateListener = Infra::EventListener<Layer *>::bind(
 			&RenderTarget::__onLayerInvalidated, this, std::placeholders::_1);
 
@@ -70,8 +67,6 @@ namespace Render
 		__pRendererResourceManager->invalidate(
 			__surfaceFormat.format, __depthStencilFormat, __depthStencilImageLayout,
 			extent.width, extent.height);
-
-		__globalDescManager.getGlobalDataUpdateEvent() += __pGlobalDataUpdateListener;
 	}
 
 	RenderTarget::~RenderTarget() noexcept
@@ -131,21 +126,21 @@ namespace Render
 	}
 
 	void RenderTarget::setClearColor(
-		glm::vec4 const &color) noexcept
+		glm::vec4 const &color)
 	{
 		std::memcpy(__clearColor.float32, &color, sizeof(color));
 		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::setClearDepth(
-		float const depth) noexcept
+		float const depth)
 	{
 		__clearDepthStencil.depth = depth;
 		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::setClearStencil(
-		uint32_t const stencil) noexcept
+		uint32_t const stencil)
 	{
 		__clearDepthStencil.stencil = stencil;
 		__needRedrawEvent.invoke(this);
@@ -168,6 +163,11 @@ namespace Render
 		__pRendererResourceManager->invalidate(
 			__surfaceFormat.format, __depthStencilFormat, __depthStencilImageLayout,
 			extent.width, extent.height);
+	}
+
+	void RenderTarget::requestRedraw() const
+	{
+		__needRedrawEvent.invoke(this);
 	}
 
 	RenderTarget::DrawResult RenderTarget::draw()
@@ -801,11 +801,6 @@ namespace Render
 		{
 			return (lhs->getPriority() < rhs->getPriority());
 		});
-	}
-
-	void RenderTarget::__onGlobalDataUpdated() noexcept
-	{
-		__needRedrawEvent.invoke(this);
 	}
 
 	void RenderTarget::__onLayerInvalidated(

@@ -56,19 +56,16 @@ namespace Frx
 		__syncEvent.invoke(this);
 	}
 
-	void Display::draw()
+	void Display::requestRedraw() const
 	{
 		__rcmdExecutor.silentRun([this]
 		{
-			__renderEngine.reserveRender(__pRenderTarget.get());
+			__pRenderTarget->requestRedraw();
 		});
 	}
 
 	void Display::__rcmd_onRenderTargetNeedRedraw()
 	{
-		__rcmdExecutor.silentRun([this]
-		{
-			__renderEngine.reserveRender(__pRenderTarget.get());
-		});
+		__renderEngine.reserveRender(__pRenderTarget.get());
 	}
 }

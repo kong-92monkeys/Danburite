@@ -28,7 +28,7 @@ namespace Frx
 		constexpr bool isPresentable() const noexcept;
 
 		void sync();
-		void draw();
+		void requestRedraw() const;
 
 		[[nodiscard]]
 		constexpr Render::RenderTarget &rcmd_getRenderTarget() noexcept;

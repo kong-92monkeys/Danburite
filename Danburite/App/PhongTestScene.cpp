@@ -15,9 +15,12 @@ PhongTestScene::~PhongTestScene() noexcept
 	_stopLoop();
 	_rcmd_run([this]
 	{
+		_rcmd_removeGlobalMaterial(__rcmd_pLightMaterial.get());
+
 		if (__pDisplay)
 			__pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
+		__rcmd_pLightMaterial = nullptr;
 		__rcmd_pLayer = nullptr;
 		__rcmd_pObject = nullptr;
 		__rcmd_pPhongMaterial = nullptr;
@@ -76,15 +79,20 @@ std::any PhongTestScene::_scmd_onUpdate(
 	Time const &time)
 {
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
-
 	__scmd_handleCamera(delta);
-	__scmd_camera.validate();
 
-	return __GlobalData
+	__UpdateParam retVal;
+
+	if (__scmd_camera.isInvalidated())
 	{
-		.viewMatrix{ __scmd_camera.getViewMatrix() },
-		.projMatrix{ __scmd_camera.getProjectionMatrix() }
-	};
+		__scmd_camera.validate();
+
+		retVal.cameraUpdated = true;
+		retVal.globalData.viewMatrix = __scmd_camera.getViewMatrix();
+		retVal.globalData.projMatrix = __scmd_camera.getProjectionMatrix();
+	}
+
+	return retVal;
 }
 
 void PhongTestScene::_rcmd_onInit(
@@ -126,6 +134,11 @@ void PhongTestScene::_rcmd_onInit(
 	__rcmd_pLayer = _rcmd_createLayer();
 	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
 
+	__rcmd_pLightMaterial = _rcmd_createMaterial<Frx::LightMaterial>();
+	__rcmd_pLightMaterial->setColor(glm::vec4{ 1.0f, 0.5f, 0.0f, 1.0f });
+
+	_rcmd_addGlobalMaterial(__rcmd_pLightMaterial.get());
+
 	auto const globalData{ std::any_cast<__GlobalData>(initParam) };
 	_rcmd_setGlobalData(globalData);
 }
@@ -133,8 +146,17 @@ void PhongTestScene::_rcmd_onInit(
 void PhongTestScene::_rcmd_onUpdate(
 	std::any const &updateParam)
 {
-	auto const globalData{ std::any_cast<__GlobalData>(updateParam) };
-	_rcmd_setGlobalData(globalData);
+	if (!__pDisplay)
+		return;
+
+	auto const param{ std::any_cast<__UpdateParam>(updateParam) };
+	if (!(param.cameraUpdated))
+		return;
+
+	_rcmd_setGlobalData(param.globalData);
+
+	auto &renderTarget{ __pDisplay->rcmd_getRenderTarget() };
+	renderTarget.requestRedraw();
 }
 
 void PhongTestScene::__scmd_handleCamera(

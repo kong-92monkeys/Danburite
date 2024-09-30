@@ -5,6 +5,7 @@
 #include "../Frameworks/PhongRenderer.h"
 #include "../Frameworks/TransformMaterial.h"
 #include "../Frameworks/PhongMaterial.h"
+#include "../Frameworks/LightMaterial.h"
 #include "FPSCamera.h"
 
 class PhongTestScene : public Frx::Scene
@@ -68,6 +69,13 @@ private:
 		glm::mat4 projMatrix{ 1.0f };
 	};
 
+	struct __UpdateParam
+	{
+	public:
+		bool cameraUpdated{ };
+		__GlobalData globalData{ };
+	};
+
 	std::unique_ptr<Render::Mesh> __rcmd_pMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pDrawParam;
 	std::unique_ptr<Frx::PhongRenderer> __rcmd_pRenderer;
@@ -76,6 +84,8 @@ private:
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
+
+	std::unique_ptr<Frx::LightMaterial> __rcmd_pLightMaterial;
 
 	Frx::Display *__pDisplay{ };
 

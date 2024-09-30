@@ -52,15 +52,16 @@ namespace Render
 			Layer *pLayer);
 
 		void setClearColor(
-			glm::vec4 const &color) noexcept;
+			glm::vec4 const &color);
 
 		void setClearDepth(
-			float depth) noexcept;
+			float depth);
 
 		void setClearStencil(
-			uint32_t stencil) noexcept;
+			uint32_t stencil);
 
 		void sync();
+		void requestRedraw() const;
 
 		[[nodiscard]]
 		DrawResult draw();
@@ -139,7 +140,6 @@ namespace Render
 			.stencil	{ 0U }
 		};
 
-		Infra::EventListenerPtr<GlobalDescriptorManager const *> __pGlobalDataUpdateListener;
 		Infra::EventListenerPtr<Layer *> __pLayerInvalidateListener;
 		Infra::EventListenerPtr<Layer const *, int, int> __pLayerPriorityChangeListener;
 		Infra::EventListenerPtr<Layer const *> __pLayerNeedRedrawListener;
@@ -190,8 +190,6 @@ namespace Render
 			uint32_t imageIndex);
 
 		void __sortLayers();
-
-		void __onGlobalDataUpdated() noexcept;
 
 		void __onLayerInvalidated(
 			Layer *pLayer) noexcept;

@@ -11,6 +11,9 @@ namespace Infra
 		void validate();
 
 		[[nodiscard]]
+		constexpr bool isInvalidated() const noexcept;
+
+		[[nodiscard]]
 		constexpr EventView<$T *> &getInvalidateEvent() noexcept;
 
 	protected:
@@ -31,6 +34,12 @@ namespace Infra
 
 		_onValidate();
 		__invalidated = false;
+	}
+
+	template <typename $T>
+	constexpr bool Stateful<$T>::isInvalidated() const noexcept
+	{
+		return __invalidated;
 	}
 
 	template <typename $T>

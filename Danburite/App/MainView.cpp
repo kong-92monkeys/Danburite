@@ -54,7 +54,7 @@ BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs)
 void CMainView::OnPaint() 
 {
 	// TODO: Add your message handler code here
-	__pDisplay->draw();
+	__pDisplay->requestRedraw();
 	ValidateRect(nullptr);
 }
 
