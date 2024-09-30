@@ -3,6 +3,9 @@
 
 class SceneHandler_PhongTest : public SceneHandler
 {
+public:
+	virtual ~SceneHandler_PhongTest() noexcept override = default;
+
 protected:
 	virtual void _onActivated() override;
 	virtual void _onDeactivated() override;

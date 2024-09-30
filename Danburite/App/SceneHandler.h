@@ -3,9 +3,11 @@
 #include "../Frameworks/RenderSystem.h"
 #include "MainFrm.h"
 
-class SceneHandler
+class SceneHandler : public Infra::Unique
 {
 public:
+	virtual ~SceneHandler() noexcept override = default;
+
 	void init(
 		Frx::RenderSystem &renderSystem);
 
