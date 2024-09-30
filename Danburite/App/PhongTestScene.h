@@ -72,7 +72,7 @@ private:
 	struct __UpdateParam
 	{
 	public:
-		bool cameraUpdated{ };
+		glm::mat4 objectTransform{ };
 		__GlobalData globalData{ };
 	};
 
@@ -93,6 +93,8 @@ private:
 	float __cameraRotationSpeed	{ 0.5f };
 	float __cameraFovy			{ glm::pi<float>() / 6.0f };
 
+	float __objectRotationSpeed	{ 1.0f };
+
 	bool __cameraMoveLeft{ };
 	bool __cameraMoveRight{ };
 	bool __cameraMoveUp{ };
@@ -106,6 +108,7 @@ private:
 	bool __cameraRotateDown{ };
 
 	FPSCamera __scmd_camera;
+	Frx::Transform __scmd_objectTransform;
 
 	Infra::EventListenerPtr<Frx::Display const *> __pDisplaySyncListener;
 

@@ -7,7 +7,7 @@
 #include <Shaders/ShaderData.glsl>
 #include <Shaders/Images.glsl>
 #include <Shaders/Materials/PhongMaterial.glsl>
-#include <Shaders/Materials/LightMaterial.glsl>
+#include <Shaders/Utils/LightUtil.glsl>
 
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
 {
@@ -33,7 +33,8 @@ layout(push_constant) uniform PushConstants
 
 layout(location = 0) in flat int instanceIndex;
 layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec4 inColor;
+layout(location = 2) in vec3 worldNormal;
+layout(location = 3) in vec4 inColor;
 
 layout(location = 0) out vec4 outColor;
 
@@ -50,8 +51,6 @@ void main()
             materialColor *= texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
     }
 
-    const LightMaterial light = lightMaterials[0];
-    const vec4 ambientColor = (light.color * light.ambientFactor);
-
-    outColor = (materialColor * ambientColor);
+    const vec3 lightColor = LightUtil_calcColor(lightMaterials[0], worldNormal);
+    outColor = vec4(materialColor.rgb * lightColor, materialColor.a);
 }

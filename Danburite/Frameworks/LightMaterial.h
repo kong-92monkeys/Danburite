@@ -5,22 +5,41 @@
 
 namespace Frx
 {
+	enum class LightType : uint32_t
+	{
+		DIRECTIONAL,
+		POINT,
+		SPOT
+	};
+
 	struct LightMaterialData
 	{
 	public:
-		uint32_t type{ };
-		float ambientFactor{ 0.01f };
+		LightType type						{ LightType::DIRECTIONAL };
+		float ambientFactor					{ 0.009f };
 
-		alignas(16) glm::vec4 color{ };
+		alignas(16) glm::vec3 color			{ 1.0f, 1.0f, 1.0f };
+
+		alignas(16) glm::vec3 position		{ 0.0f, 0.0f, 0.0f };
+		alignas(16) glm::vec3 direction		{ 0.0f, -1.0f, 0.0f };
 	};
 
 	class LightMaterial : public Render::TypedMaterial<LightMaterialData>
 	{
 	public:
+		void setType(
+			LightType type);
+
 		void setAmbientFactor(
 			float factor);
 
 		void setColor(
-			glm::vec4 const &color);
+			glm::vec3 const &color);
+
+		void setPosition(
+			glm::vec3 const &position);
+
+		void setDirection(
+			glm::vec3 const &direction);
 	};
 }

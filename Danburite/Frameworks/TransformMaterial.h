@@ -8,7 +8,8 @@ namespace Frx
 	struct TransformMaterialData
 	{
 	public:
-		glm::mat4 transform{ 1.0f };
+		glm::mat4 transform			{ 1.0f };
+		glm::mat3x4 normalTransform	{ 1.0f };
 	};
 
 	class TransformMaterial : public Render::TypedMaterial<TransformMaterialData>

@@ -6,7 +6,9 @@ struct LightMaterial
 	uint type;
 	float ambientFactor;
 
-	vec4 color;
+	vec3 color;
+	vec3 position;
+	vec3 direction;
 };
 
 #endif

@@ -79,18 +79,19 @@ std::any PhongTestScene::_scmd_onUpdate(
 	Time const &time)
 {
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
+
+	__scmd_objectTransform.getOrientation().rotate(
+		delta * __objectRotationSpeed, glm::vec3{ 0.0f, 1.0f, 0.0f });
+
 	__scmd_handleCamera(delta);
 
+	__scmd_objectTransform.validate();
+	__scmd_camera.validate();
+
 	__UpdateParam retVal;
-
-	if (__scmd_camera.isInvalidated())
-	{
-		__scmd_camera.validate();
-
-		retVal.cameraUpdated = true;
-		retVal.globalData.viewMatrix = __scmd_camera.getViewMatrix();
-		retVal.globalData.projMatrix = __scmd_camera.getProjectionMatrix();
-	}
+	retVal.objectTransform			= __scmd_objectTransform.getMatrix();
+	retVal.globalData.viewMatrix	= __scmd_camera.getViewMatrix();
+	retVal.globalData.projMatrix	= __scmd_camera.getProjectionMatrix();
 
 	return retVal;
 }
@@ -137,6 +138,7 @@ void PhongTestScene::_rcmd_onInit(
 
 	__rcmd_pLightMaterial = _rcmd_createMaterial<Frx::LightMaterial>();
 	__rcmd_pLightMaterial->setColor(glm::vec4{ 1.0f, 0.5f, 0.0f, 1.0f });
+	__rcmd_pLightMaterial->setDirection(glm::normalize(glm::vec3{ 2.0f, -3.0f, -1.0f }));
 
 	_rcmd_addGlobalMaterial(__rcmd_pLightMaterial.get());
 
@@ -151,8 +153,7 @@ void PhongTestScene::_rcmd_onUpdate(
 		return;
 
 	auto const param{ std::any_cast<__UpdateParam>(updateParam) };
-	if (!(param.cameraUpdated))
-		return;
+	__rcmd_pTransformMaterial->setTransform(param.objectTransform);
 
 	_rcmd_setGlobalData(param.globalData);
 

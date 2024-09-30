@@ -59,6 +59,9 @@
     <Filter Include="Util\Cameras">
       <UniqueIdentifier>{c557352b-283d-470e-ad75-0c7af0961e56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Shaders\Utils">
+      <UniqueIdentifier>{2a78ab50-4aa4-40b8-b3ac-237015a86ca0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -165,6 +168,9 @@
     </None>
     <None Include="Assets\Shaders\Materials\LightMaterial.glsl">
       <Filter>Assets\Shaders\Materials</Filter>
+    </None>
+    <None Include="Assets\Shaders\Utils\LightUtil.glsl">
+      <Filter>Assets\Shaders\Utils</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

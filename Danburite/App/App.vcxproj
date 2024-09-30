@@ -202,6 +202,7 @@
     <None Include="Assets\Shaders\Simple.vert" />
     <None Include="Assets\Shaders\Test.frag" />
     <None Include="Assets\Shaders\Test.vert" />
+    <None Include="Assets\Shaders\Utils\LightUtil.glsl" />
     <None Include="res\App.rc2" />
   </ItemGroup>
   <ItemGroup>

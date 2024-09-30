@@ -4,6 +4,7 @@
 struct TransformMaterial
 {
 	mat4 transform;
+	mat3 normalTransform;
 };
 
 #endif

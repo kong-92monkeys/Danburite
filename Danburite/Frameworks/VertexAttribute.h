@@ -51,6 +51,16 @@ namespace Frx
 	{
 		return (static_cast<uint32_t>(flags) & (static_cast<uint32_t>(bit)));
 	}
+
+	constexpr bool hasFlagBits(
+		VertexAttribFlags const flags,
+		VertexAttribFlags const bits) noexcept
+	{
+		return (
+			(static_cast<uint32_t>(flags) & (static_cast<uint32_t>(bits))) ==
+			(static_cast<uint32_t>(bits))
+		);
+	}
 }
 	
 constexpr Frx::VertexAttribFlags operator|(

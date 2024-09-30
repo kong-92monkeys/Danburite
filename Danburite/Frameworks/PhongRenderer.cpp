@@ -19,7 +19,9 @@ namespace Frx
 	bool PhongRenderer::isValidVertexAttribFlags(
 		uint32_t const flags) const noexcept
 	{
-		return (flags & VertexAttribFlags::POS);
+		return hasFlagBits(
+			static_cast<VertexAttribFlags>(flags),
+			VertexAttribFlags::POS_NORMAL);
 	}
 
 	bool PhongRenderer::isValidMaterialPack(
@@ -95,6 +97,23 @@ namespace Frx
 			uvAttribDesc.binding		= VertexAttrib::UV_LOCATION;
 			uvAttribDesc.format			= VkFormat::VK_FORMAT_R32G32_SFLOAT;
 			uvAttribDesc.offset			= 0U;
+		}
+
+		if (vertexAttribFlags & VertexAttribFlagBits::NORMAL)
+		{
+			auto &normalBindingDesc			{ bindingDescs.emplace_back() };
+			normalBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			normalBindingDesc.binding		= VertexAttrib::NORMAL_LOCATION;
+			normalBindingDesc.stride		= sizeof(Vertex_N);
+			normalBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			normalBindingDesc.divisor		= 1U;
+
+			auto &normalAttribDesc			{ attribDescs.emplace_back() };
+			normalAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			normalAttribDesc.location		= VertexAttrib::NORMAL_LOCATION;
+			normalAttribDesc.binding		= VertexAttrib::NORMAL_LOCATION;
+			normalAttribDesc.format			= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
+			normalAttribDesc.offset			= 0U;
 		}
 
 		if (vertexAttribFlags & VertexAttribFlagBits::COLOR)
