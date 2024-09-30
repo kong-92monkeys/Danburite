@@ -41,8 +41,8 @@ namespace Render
 
 		if (!ref)
 		{
-			__unregisterMaterial(pMaterial);
 			__idAllocator.free(id);
+			__unregisterMaterial(pMaterial);
 		}
 	}
 

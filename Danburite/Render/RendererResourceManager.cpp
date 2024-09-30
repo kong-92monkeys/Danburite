@@ -102,7 +102,8 @@ namespace Render
 	void RendererResourceManager::__onRendererDestroyed(
 		Renderer const *pRenderer)
 	{
-		__resources.erase(pRenderer);
+		__deferredDeleter.reserve(
+			std::move(__resources.extract(pRenderer).mapped()));
 	}
 
 	RendererResourceManager::__RendererResource::~__RendererResource() noexcept

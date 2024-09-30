@@ -38,6 +38,16 @@ END_MESSAGE_MAP()
 
 // CMainView message handlers
 
+void CMainView::enableDisplay(
+	bool const enabled)
+{
+	if (__displayEnabled == enabled)
+		return;
+
+	__displayEnabled = enabled;
+	Invalidate(TRUE);
+}
+
 BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs) 
 {
 	if (!CWnd::PreCreateWindow(cs))
@@ -54,8 +64,13 @@ BOOL CMainView::PreCreateWindow(CREATESTRUCT& cs)
 void CMainView::OnPaint() 
 {
 	// TODO: Add your message handler code here
-	__pDisplay->requestRedraw();
-	ValidateRect(nullptr);
+	if (__displayEnabled)
+	{
+		__pDisplay->requestRedraw();
+		ValidateRect(nullptr);
+	}
+	else
+		CPaintDC dc{ this };
 }
 
 int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -65,7 +80,7 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// TODO:  Add your specialized creation code here
 	__pDisplay = theApp.createDisplay(GetSafeHwnd(), true, false);
-	theApp.setSceneDisplay(__pDisplay.get());
+	theApp.setMainView(this);
 
 	return 0;
 }
@@ -75,7 +90,7 @@ void CMainView::OnDestroy()
 	CWnd::OnDestroy();
 
 	// TODO: Add your message handler code here
-	theApp.setSceneDisplay(nullptr);
+	theApp.setMainView(nullptr);
 	__pDisplay = nullptr;
 }
 
@@ -90,6 +105,8 @@ void CMainView::OnSize(UINT nType, int cx, int cy)
 BOOL CMainView::OnEraseBkgnd(CDC *pDC)
 {
 	// TODO: Add your message handler code here and/or call default
-	// To prevent from erasing window
-	return TRUE;
+	if (__displayEnabled)
+		return FALSE;
+
+	return CWnd::OnEraseBkgnd(pDC);
 }

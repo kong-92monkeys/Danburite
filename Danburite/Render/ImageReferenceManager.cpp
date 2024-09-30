@@ -23,8 +23,8 @@ namespace Render
 
 		if (!ref)
 		{
-			__unregisterImage(pImage);
 			__idAllocator.free(id);
+			__unregisterImage(pImage);
 		}
 	}
 

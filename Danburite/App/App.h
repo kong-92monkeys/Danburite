@@ -9,6 +9,7 @@
 
 #include "resource.h"       // main symbols
 #include "../Frameworks/RenderSystem.h"
+#include "MainView.h"
 #include "SceneLoader.h"
 
 // CApp:
@@ -43,8 +44,8 @@ public:
 		bool useDepthBuffer,
 		bool useStencilBuffer);
 
-	void setSceneDisplay(
-		Frx::Display *pDisplay);
+	void setMainView(
+		CMainView *pMainView);
 
 	void onKeyDown(UINT nChar);
 	void onKeyUp(UINT nChar);
@@ -57,6 +58,7 @@ private:
 	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
 	std::unique_ptr<SceneLoader> __pSceneLoader;
 
+	CMainView *__pMainView{ };
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();

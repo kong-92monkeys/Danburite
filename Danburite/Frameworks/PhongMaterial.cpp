@@ -2,6 +2,15 @@
 
 namespace Frx
 {
+	PhongMaterial::~PhongMaterial()
+	{
+		if (!__pAlbedoTexture)
+			return;
+
+		auto &imageRefManager{ _getImageReferenceManager() };
+		imageRefManager.removeImage(&(__pAlbedoTexture->getImageView()));
+	}
+
 	void PhongMaterial::setShininess(
 		float const shininess)
 	{

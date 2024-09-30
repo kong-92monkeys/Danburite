@@ -15,6 +15,8 @@ namespace Frx
 	class PhongMaterial : public Render::TypedMaterial<PhongMaterialData>
 	{
 	public:
+		virtual ~PhongMaterial() noexcept override;
+
 		void setShininess(
 			float shininess);
 

@@ -21,6 +21,11 @@ public:
 
 // Operations
 public:
+	void enableDisplay(
+		bool enabled);
+
+	[[nodiscard]]
+	constexpr Frx::Display *getDisplay() noexcept;
 
 // Overrides
 	protected:
@@ -43,4 +48,11 @@ protected:
 
 private:
 	std::unique_ptr<Frx::Display> __pDisplay;
+
+	bool __displayEnabled{ false };
 };
+
+constexpr Frx::Display *CMainView::getDisplay() noexcept
+{
+	return __pDisplay.get();
+}

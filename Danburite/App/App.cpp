@@ -105,10 +105,21 @@ std::unique_ptr<Frx::Display> CApp::createDisplay(
 		m_hInstance, hwnd, useDepthBuffer, useStencilBuffer);
 }
 
-void CApp::setSceneDisplay(
-	Frx::Display *const pDisplay)
+void CApp::setMainView(
+	CMainView *const pMainView)
 {
-	__pSceneLoader->setDisplay(pDisplay);
+	if (__pMainView == pMainView)
+		return;
+
+	if (__pMainView)
+		__pMainView->enableDisplay(false);
+
+	__pMainView = pMainView;
+
+	if (__pMainView)
+		__pMainView->enableDisplay(__pSceneLoader->getSceneType() != SceneType::NOTHING);
+
+	__pSceneLoader->setDisplay(__pMainView ? __pMainView->getDisplay() : nullptr);
 }
 
 void CApp::onKeyDown(
@@ -163,12 +174,18 @@ void CApp::__onInitBeforeMainFrame()
 void CApp::OnScenes00()
 {
 	// TODO: Add your command handler code here
+	if (__pMainView)
+		__pMainView->enableDisplay(false);
+
 	__loadScene(SceneType::NOTHING);
 }
 
 void CApp::OnScenes01()
 {
 	// TODO: Add your command handler code here
+	if (__pMainView)
+		__pMainView->enableDisplay(true);
+
 	__loadScene(SceneType::PHONG_TEST);
 }
 
