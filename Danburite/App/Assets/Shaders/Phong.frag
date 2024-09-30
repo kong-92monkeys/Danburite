@@ -49,15 +49,16 @@ layout(location = 0) out vec4 outColor;
 
 void main()
 {
-    vec4 materialColor = (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT) ? inColor : vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    const int phongMaterialId = instanceInfos[instanceIndex].materialIds[1U];
+    const PhongMaterial material = phongMaterials[phongMaterialId];
 
+    vec4 materialColor = (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT) ? inColor : vec4(1.0f, 1.0f, 1.0f, 1.0f));
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))
     {
-        const int phongMaterialId = instanceInfos[instanceIndex].materialIds[1U];
-        const int imageId = phongMaterials[phongMaterialId].imageId;
+        const int albedoTexId = material.albedoTexId;
 
-        if (imageId >= 0)
-            materialColor *= texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
+        if (albedoTexId >= 0)
+            materialColor *= texture(sampler2D(sampledImages[albedoTexId], imageSampler), inUV);
     }
 
     outColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -65,7 +66,7 @@ void main()
     {
         const vec3 lightColor = LightUtil_calcColor(
             lightMaterials[globalData.lightIdx], globalData.cameraPosition,
-            worldPos, worldNormal, 32.0f);
+            worldPos, worldNormal, material.shininess);
 
         outColor.rgb = (materialColor.rgb * lightColor);
     }

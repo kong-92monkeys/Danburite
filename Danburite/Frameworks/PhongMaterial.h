@@ -8,14 +8,18 @@ namespace Frx
 	struct PhongMaterialData
 	{
 	public:
-		int imageId{ -1 };
+		float shininess{ 32.0f };
+		int albedoTexId{ -1 };
 	};
 
 	class PhongMaterial : public Render::TypedMaterial<PhongMaterialData>
 	{
 	public:
+		void setShininess(
+			float shininess);
+
 		void setAlbedoTexture(
-			Render::Texture const *pTexture) noexcept;
+			Render::Texture const *pTexture);
 
 	private:
 		Render::Texture const *__pAlbedoTexture{ };

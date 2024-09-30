@@ -2,8 +2,15 @@
 
 namespace Frx
 {
+	void PhongMaterial::setShininess(
+		float const shininess)
+	{
+		_getTypedData().shininess = shininess;
+		_invokeUpdateEvent();
+	}
+
 	void PhongMaterial::setAlbedoTexture(
-		Render::Texture const *const pTexture) noexcept
+		Render::Texture const *const pTexture)
 	{
 		if (__pAlbedoTexture == pTexture)
 			return;
@@ -20,10 +27,10 @@ namespace Frx
 		{
 			auto &imageView{ __pAlbedoTexture->getImageView() };
 			imageRefManager.addImage(&imageView);
-			_getTypedData().imageId = static_cast<int>(imageRefManager.getIdOf(&imageView));
+			_getTypedData().albedoTexId = static_cast<int>(imageRefManager.getIdOf(&imageView));
 		}
 		else
-			_getTypedData().imageId = -1;
+			_getTypedData().albedoTexId = -1;
 
 		_invokeUpdateEvent();
 	}

@@ -5,7 +5,8 @@
 
 struct PhongMaterial
 {
-	int imageId;
+	float shininess;
+	int albedoTexId;
 };
 
 #endif
