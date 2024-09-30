@@ -58,7 +58,10 @@ void PhongTestScene::setDisplay(
 			pPrevDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
 		if (pDisplay)
+		{
+			pDisplay->rcmd_getRenderTarget().setClearColor(glm::vec4{ 0.007f, 0.007f, 0.007f, 1.0f });
 			pDisplay->rcmd_getRenderTarget().addLayer(__rcmd_pLayer.get());
+		}
 	}).wait();
 }
 
@@ -86,12 +89,17 @@ std::any PhongTestScene::_scmd_onUpdate(
 	__scmd_handleCamera(delta);
 
 	__scmd_objectTransform.validate();
-	__scmd_camera.validate();
 
 	__UpdateParam retVal;
-	retVal.objectTransform			= __scmd_objectTransform.getMatrix();
-	retVal.globalData.viewMatrix	= __scmd_camera.getViewMatrix();
-	retVal.globalData.projMatrix	= __scmd_camera.getProjectionMatrix();
+	retVal.objectTransform = __scmd_objectTransform.getMatrix();
+
+	if (__scmd_camera.isInvalidated())
+	{
+		__scmd_camera.validate();
+		retVal.globalDataUpdated = true;
+		retVal.globalData.viewMatrix = __scmd_camera.getViewMatrix();
+		retVal.globalData.projMatrix = __scmd_camera.getProjectionMatrix();
+	}
 
 	return retVal;
 }
@@ -141,6 +149,7 @@ void PhongTestScene::_rcmd_onInit(
 	__rcmd_pLightMaterial->setDirection(glm::normalize(glm::vec3{ 2.0f, -3.0f, -1.0f }));
 
 	_rcmd_addGlobalMaterial(__rcmd_pLightMaterial.get());
+	__rcmd_lightIdx = static_cast<int>(_rcmd_getGlobalMaterialIdOf(__rcmd_pLightMaterial.get()));
 
 	auto const globalData{ std::any_cast<__GlobalData>(initParam) };
 	_rcmd_setGlobalData(globalData);
@@ -152,10 +161,14 @@ void PhongTestScene::_rcmd_onUpdate(
 	if (!__pDisplay)
 		return;
 
-	auto const param{ std::any_cast<__UpdateParam>(updateParam) };
+	auto param{ std::any_cast<__UpdateParam>(updateParam) };
 	__rcmd_pTransformMaterial->setTransform(param.objectTransform);
 
-	_rcmd_setGlobalData(param.globalData);
+	if (param.globalDataUpdated)
+	{
+		param.globalData.lightIdx = __rcmd_lightIdx;
+		_rcmd_setGlobalData(param.globalData);
+	}
 
 	auto &renderTarget{ __pDisplay->rcmd_getRenderTarget() };
 	renderTarget.requestRedraw();

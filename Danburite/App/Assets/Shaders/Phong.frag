@@ -9,6 +9,13 @@
 #include <Shaders/Materials/PhongMaterial.glsl>
 #include <Shaders/Utils/LightUtil.glsl>
 
+layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCATION) readonly buffer GlobalDataBuffer
+{
+    mat4 viewMatrix;
+    mat4 projMatrix;
+	int lightIdx;
+} globalData;
+
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
 {
 	PhongMaterial phongMaterials[];
@@ -51,6 +58,10 @@ void main()
             materialColor *= texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
     }
 
-    const vec3 lightColor = LightUtil_calcColor(lightMaterials[0], worldNormal);
-    outColor = vec4(materialColor.rgb * lightColor, materialColor.a);
+    outColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    if (globalData.lightIdx >= 0)
+    {
+        const vec3 lightColor = LightUtil_calcColor(lightMaterials[globalData.lightIdx], worldNormal);
+        outColor.rgb = (materialColor.rgb * lightColor);
+    }
 }

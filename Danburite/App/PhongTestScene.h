@@ -67,12 +67,15 @@ private:
 	public:
 		glm::mat4 viewMatrix{ 1.0f };
 		glm::mat4 projMatrix{ 1.0f };
+		int lightIdx{ -1 };
 	};
 
 	struct __UpdateParam
 	{
 	public:
 		glm::mat4 objectTransform{ };
+
+		bool globalDataUpdated{ };
 		__GlobalData globalData{ };
 	};
 
@@ -86,6 +89,7 @@ private:
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
 
 	std::unique_ptr<Frx::LightMaterial> __rcmd_pLightMaterial;
+	int __rcmd_lightIdx{ -1 };
 
 	Frx::Display *__pDisplay{ };
 

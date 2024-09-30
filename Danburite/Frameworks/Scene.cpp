@@ -5,7 +5,7 @@ namespace Frx
 {
 	Scene::Scene() noexcept
 	{
-		setUpdateFrequency(60.0);
+		setUpdateFrequency(65.0);
 	}
 
 	void Scene::init(
