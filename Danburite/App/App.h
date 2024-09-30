@@ -31,6 +31,7 @@ public:
 
 public:
 	afx_msg void OnAppAbout();
+	afx_msg void OnScenes01();
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -43,8 +44,8 @@ public:
 	void setSceneDisplay(
 		Frx::Display *pDisplay);
 
-	void onViewKeyDown(UINT nChar);
-	void onViewKeyUp(UINT nChar);
+	void onKeyDown(UINT nChar);
+	void onKeyUp(UINT nChar);
 
 	[[nodiscard]]
 	constexpr Infra::EventView<> &getIdleEvent() const noexcept;

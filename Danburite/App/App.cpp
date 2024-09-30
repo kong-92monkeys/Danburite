@@ -18,6 +18,7 @@
 
 BEGIN_MESSAGE_MAP(CApp, CWinApp)
 	ON_COMMAND(ID_APP_ABOUT, &CApp::OnAppAbout)
+	ON_COMMAND(ID_SCENES_01, &CApp::OnScenes01)
 END_MESSAGE_MAP()
 
 
@@ -63,7 +64,7 @@ BOOL CApp::InitInstance()
 
 	// To create the main window, this code creates a new frame window
 	// object and then sets it as the application's main window object
-	CFrameWnd* pFrame = new CMainFrame;
+	CMainFrame* pFrame = new CMainFrame;
 	if (!pFrame)
 		return FALSE;
 	m_pMainWnd = pFrame;
@@ -106,7 +107,7 @@ void CApp::setSceneDisplay(
 	__pScene->setDisplay(pDisplay);
 }
 
-void CApp::onViewKeyDown(
+void CApp::onKeyDown(
 	UINT const nChar)
 {
 	switch (nChar)
@@ -159,7 +160,7 @@ void CApp::onViewKeyDown(
 	}
 }
 
-void CApp::onViewKeyUp(
+void CApp::onKeyUp(
 	UINT const nChar)
 {
 	switch (nChar)
@@ -287,5 +288,8 @@ void CApp::OnAppAbout()
 
 // CApp message handlers
 
+void CApp::OnScenes01()
+{
+	// TODO: Add your command handler code here
 
-
+}

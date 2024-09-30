@@ -62,6 +62,21 @@
     <Filter Include="Assets\Shaders\Utils">
       <UniqueIdentifier>{2a78ab50-4aa4-40b8-b3ac-237015a86ca0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="View\SceneMenuViews">
+      <UniqueIdentifier>{10a370b0-4b48-4685-a0d7-25c44cbd31d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneLoader">
+      <UniqueIdentifier>{eb7e17cb-adef-4025-8d1d-3baf908892ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneHandler">
+      <UniqueIdentifier>{7a5e35d7-e4a8-471d-8af6-6be3f592ff3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneHandler\Impl">
+      <UniqueIdentifier>{fc32e5fc-1aa9-4af0-949f-6fbe3dd34d0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneHandler\Impl\Nothing">
+      <UniqueIdentifier>{cc4587da-f2ec-4d13-9428-fe9ca66cc109}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -97,6 +112,18 @@
     <ClInclude Include="FPSCamera.h">
       <Filter>Util\Cameras</Filter>
     </ClInclude>
+    <ClInclude Include="CSceneMenuView00.h">
+      <Filter>View\SceneMenuViews</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneLoader.h">
+      <Filter>SceneLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneHandler.h">
+      <Filter>SceneHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneHandler_Nothing.h">
+      <Filter>SceneHandler\Impl\Nothing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -122,6 +149,18 @@
     </ClCompile>
     <ClCompile Include="FPSCamera.cpp">
       <Filter>Util\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="CSceneMenuView00.cpp">
+      <Filter>View\SceneMenuViews</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneLoader.cpp">
+      <Filter>SceneLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneHandler.cpp">
+      <Filter>SceneHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneHandler_Nothing.cpp">
+      <Filter>SceneHandler\Impl\Nothing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
