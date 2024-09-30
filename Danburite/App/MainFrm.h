@@ -18,7 +18,10 @@ public:
 // Operations
 public:
 	template <typename $T>
-	$T *replaceSceneMenuView();
+	void replaceSceneMenuView();
+
+	template <typename $T>
+	$T *getSceneMenuView();
 
 // Overrides
 public:
@@ -44,7 +47,7 @@ public:
 };
 
 template <typename $T>
-$T *CMainFrame::replaceSceneMenuView()
+void CMainFrame::replaceSceneMenuView()
 {
 	int cxCur, cxMin;
 	__windowSplitter.GetColumnInfo(1, cxCur, cxMin);
@@ -61,5 +64,10 @@ $T *CMainFrame::replaceSceneMenuView()
 	}
 
 	__windowSplitter.RecalcLayout();
+}
+
+template <typename $T>
+$T *CMainFrame::getSceneMenuView()
+{
 	return STATIC_DOWNCAST($T, __windowSplitter.GetPane(0, 1));
 }

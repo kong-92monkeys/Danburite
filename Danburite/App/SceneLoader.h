@@ -28,6 +28,8 @@ public:
 	void onKeyUp(
 		UINT nChar);
 
+	void onTick();
+
 private:
 	Frx::RenderSystem &__renderSystem;
 	SceneType __sceneType{ SceneType::NOTHING };

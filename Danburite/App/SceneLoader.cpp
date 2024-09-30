@@ -47,3 +47,9 @@ void SceneLoader::onKeyUp(
 	auto &sceneHandler{ *(__sceneHandlers.at(__sceneType)) };
 	sceneHandler.onKeyUp(nChar);
 }
+
+void SceneLoader::onTick()
+{
+	auto &sceneHandler{ *(__sceneHandlers.at(__sceneType)) };
+	sceneHandler.onTick();
+}

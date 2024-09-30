@@ -23,6 +23,8 @@ public:
 	virtual void onKeyUp(
 		UINT nChar);
 
+	virtual void onTick();
+
 protected:
 	virtual void _onInit();
 	virtual void _onActivated();

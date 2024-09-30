@@ -22,7 +22,7 @@ namespace Frx
 					&Scene::__scmd_onIdle, this);
 
 			__pScmdExecutor->in_getIdleEvent() += __pScmdIdleListener;
-			__beginningTime = std::chrono::steady_clock::now();
+			__scmd_beginningTime = std::chrono::steady_clock::now();
 
 			auto initParam{ _scmd_onInit() };
 			_rcmd_silentRun([this, initParam{ std::move(initParam) }]
@@ -32,15 +32,20 @@ namespace Frx
 		});
 	}
 
+	double Scene::getFps() const noexcept
+	{
+		return __fps.load(std::memory_order::acquire);
+	}
+
 	void Scene::_stopLoop() noexcept
 	{
 		__pScmdExecutor = nullptr;
 	}
 
-	double Scene::_scmd_getFps() const noexcept
+	double Scene::_scmd_calcFps() const noexcept
 	{
 		auto const rcmdFrameCount{ __rcmdFrameCount.load(std::memory_order::acquire) };
-		return (static_cast<double>(rcmdFrameCount) / (__time.elapsedTime.count() * 1e-9));
+		return (static_cast<double>(rcmdFrameCount) / (__scmd_time.elapsedTime.count() * 1e-9));
 	}
 
 	std::future<void> Scene::_scmd_run(
@@ -137,20 +142,22 @@ namespace Frx
 		std::any const &updateParam)
 	{}
 
-	void Scene::__updateTime() noexcept
+	void Scene::__scmd_updateTime() noexcept
 	{
-		auto const curElapsedTime{ std::chrono::steady_clock::now() - __beginningTime };
+		auto const curElapsedTime{ std::chrono::steady_clock::now() - __scmd_beginningTime };
 
-		if (__time.elapsedTime.count() > 0)
-			__time.deltaTime = (curElapsedTime - __time.elapsedTime);
+		if (__scmd_time.elapsedTime.count() > 0)
+			__scmd_time.deltaTime = (curElapsedTime - __scmd_time.elapsedTime);
 
-		__time.elapsedTime = curElapsedTime;
+		__scmd_time.elapsedTime = curElapsedTime;
 	}
 
 	std::any Scene::__scmd_update()
 	{
-		__updateTime();
-		auto retVal{ _scmd_onUpdate(__time) };
+		__scmd_updateTime();
+		__fps.store(_scmd_calcFps(), std::memory_order::release);
+
+		auto retVal{ _scmd_onUpdate(__scmd_time) };
 		++__scmdFrameCount;
 
 		return retVal;

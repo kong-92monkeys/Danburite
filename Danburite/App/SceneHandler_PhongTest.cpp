@@ -2,19 +2,6 @@
 #include "SceneHandler_PhongTest.h"
 #include "CSceneMenuView01.h"
 
-void SceneHandler_PhongTest::_onActivated()
-{
-	__pScene = _getRenderSystem().createScene<PhongTestScene>();
-	__pScene->setDisplay(_getDisplay());
-
-	_getMainFrame()->replaceSceneMenuView<CSceneMenuView01>();
-}
-
-void SceneHandler_PhongTest::_onDeactivated()
-{
-	__pScene = nullptr;
-}
-
 void SceneHandler_PhongTest::onKeyDown(
 	UINT const nChar)
 {
@@ -119,6 +106,30 @@ void SceneHandler_PhongTest::onKeyUp(
 			__pScene->endCameraRotateDown();
 			break;
 	}
+}
+
+void SceneHandler_PhongTest::onTick()
+{
+	if (!__fpsUpdateTick)
+	{
+		auto const pView{ _getMainFrame()->getSceneMenuView<CSceneMenuView01>() };
+		pView->setFPSText(__pScene->getFps());
+	}
+
+	__fpsUpdateTick = ((__fpsUpdateTick + 1ULL) % __fpsUpdateTickCount);
+}
+
+void SceneHandler_PhongTest::_onActivated()
+{
+	__pScene = _getRenderSystem().createScene<PhongTestScene>();
+	__pScene->setDisplay(_getDisplay());
+
+	_getMainFrame()->replaceSceneMenuView<CSceneMenuView01>();
+}
+
+void SceneHandler_PhongTest::_onDeactivated()
+{
+	__pScene = nullptr;
 }
 
 void SceneHandler_PhongTest::_onDisplayChanged(

@@ -47,3 +47,12 @@ void CSceneMenuView01::Dump(CDumpContext& dc) const
 
 
 // CSceneMenuView01 message handlers
+
+void CSceneMenuView01::setFPSText(
+	double const fps)
+{
+	CString str;
+	str.Format(_T("%.2f"), fps);
+
+	SetDlgItemText(IDC_TEXT_FPS, str);
+}

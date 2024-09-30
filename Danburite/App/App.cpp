@@ -137,6 +137,7 @@ void CApp::onKeyUp(
 BOOL CApp::OnIdle(LONG lCount)
 {
 	// TODO: Add your specialized code here and/or call the base class
+	__pSceneLoader->onTick();
 	__idleEvent.invoke();
 	return CWinApp::OnIdle(lCount);
 }

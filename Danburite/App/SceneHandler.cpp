@@ -49,6 +49,9 @@ void SceneHandler::onKeyUp(
 void SceneHandler::_onInit()
 {}
 
+void SceneHandler::onTick()
+{}
+
 void SceneHandler::_onActivated()
 {}
 
