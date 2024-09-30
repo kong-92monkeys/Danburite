@@ -28,6 +28,7 @@ const uint GLOBAL_DATA_BUFFER_LOCATION				= 0U;
 // Material desc set
 const uint TRANSFORM_MATERIAL_LOCATION				= 0U;
 const uint PHONG_MATERIAL_LOCATION					= 1U;
+const uint LIGHT_MATERIAL_LOCATION					= 2U;
 
 // Sampled images desc set
 const uint SAMPLED_IMAGES_LOCATION					= 0U;

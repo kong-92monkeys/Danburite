@@ -101,13 +101,14 @@ void PhongTestScene::_rcmd_onInit(
 	auto const meshData
 	{
 		Frx::PrimitiveBuilder::buildCube(
-			Frx::VertexAttribFlags::POS_UV_NORMAL, 1.0f)
+			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 1.0f)
 	};
 
 	__rcmd_pMesh = _rcmd_createMesh();
 	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
 	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
 	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
+	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
 	__rcmd_pMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
 
 	__rcmd_pDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);

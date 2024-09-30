@@ -40,9 +40,6 @@
     <Filter Include="Transform\Orientation">
       <UniqueIdentifier>{7416da2f-ecfd-4552-ba0a-63399bd14113}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PrimitiveBuilder">
-      <UniqueIdentifier>{a0127a16-4b87-428a-baf9-6f222270fd09}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Constants">
       <UniqueIdentifier>{01c69329-62fb-49fc-8052-6af83b27253f}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,12 @@
     </Filter>
     <Filter Include="Materials\LightMaterial">
       <UniqueIdentifier>{26737013-0f9f-4efb-b218-d01e29d423cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{a5ae7a85-c357-4526-9cb9-9b9f0d8c616d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\PrimitiveBuilder">
+      <UniqueIdentifier>{a0127a16-4b87-428a-baf9-6f222270fd09}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -91,7 +94,7 @@
       <Filter>Transform</Filter>
     </ClInclude>
     <ClInclude Include="PrimitiveBuilder.h">
-      <Filter>PrimitiveBuilder</Filter>
+      <Filter>Utils\PrimitiveBuilder</Filter>
     </ClInclude>
     <ClInclude Include="Constants.h">
       <Filter>Constants</Filter>
@@ -135,7 +138,7 @@
       <Filter>Transform</Filter>
     </ClCompile>
     <ClCompile Include="PrimitiveBuilder.cpp">
-      <Filter>PrimitiveBuilder</Filter>
+      <Filter>Utils\PrimitiveBuilder</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Camera</Filter>

@@ -7,10 +7,16 @@
 #include <Shaders/ShaderData.glsl>
 #include <Shaders/Images.glsl>
 #include <Shaders/Materials/PhongMaterial.glsl>
+#include <Shaders/Materials/LightMaterial.glsl>
 
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
 {
 	PhongMaterial phongMaterials[];
+};
+
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = LIGHT_MATERIAL_LOCATION) readonly buffer LightMaterialBuffer
+{
+	LightMaterial lightMaterials[];
 };
 
 layout(std430, set = SUB_LAYER_DESC_SET_LOCATION, binding = INSTANCE_INFO_BUFFER_LOCATION) readonly buffer InstanceInfoBuffer
@@ -43,4 +49,6 @@ void main()
         if (imageId >= 0)
             outColor *= texture(sampler2D(sampledImages[imageId], imageSampler), inUV);
     }
+
+    outColor *= lightMaterials[0].color;
 }

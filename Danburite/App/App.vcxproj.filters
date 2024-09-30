@@ -163,6 +163,9 @@
     <None Include="Assets\Shaders\Materials\PhongMaterial.glsl">
       <Filter>Assets\Shaders\Materials</Filter>
     </None>
+    <None Include="Assets\Shaders\Materials\LightMaterial.glsl">
+      <Filter>Assets\Shaders\Materials</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\App.ico">

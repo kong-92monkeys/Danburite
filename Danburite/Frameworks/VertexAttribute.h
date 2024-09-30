@@ -28,19 +28,21 @@ namespace Frx
 
 	enum class VertexAttribFlags : uint32_t
 	{
-		NONE			= 0U,
+		NONE					= 0U,
 
-		POS				= VertexAttribFlagBits::POS,
-		UV				= VertexAttribFlagBits::UV,
-		NORMAL			= VertexAttribFlagBits::NORMAL,
-		COLOR			= VertexAttribFlagBits::COLOR,
-		TANGENT			= VertexAttribFlagBits::TANGENT,
+		POS						= VertexAttribFlagBits::POS,
+		UV						= VertexAttribFlagBits::UV,
+		NORMAL					= VertexAttribFlagBits::NORMAL,
+		COLOR					= VertexAttribFlagBits::COLOR,
+		TANGENT					= VertexAttribFlagBits::TANGENT,
 
-		POS_UV			= (POS | UV),
-		POS_NORMAL		= (POS | NORMAL),
-		POS_COLOR		= (POS | COLOR),
+		POS_UV					= (POS | UV),
+		POS_NORMAL				= (POS | NORMAL),
+		POS_COLOR				= (POS | COLOR),
 
-		POS_UV_NORMAL	= (POS | UV | NORMAL)
+		POS_UV_NORMAL			= (POS | UV | NORMAL),
+
+		POS_UV_NORMAL_COLOR		= (POS | UV | NORMAL | COLOR),
 	};
 
 	constexpr bool hasFlagBit(

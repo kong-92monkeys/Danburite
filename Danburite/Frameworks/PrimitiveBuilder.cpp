@@ -37,6 +37,15 @@ namespace Frx::PrimitiveBuilder
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, 1.0f });
 		}
 
+		if (hasFlagBit(attribFlags, VertexAttribFlagBits::COLOR))
+		{
+			auto &colorBuffer{ retVal.colorBuffer };
+			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
+			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
+			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
+			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
+		}
+
 		auto &indexBuffer{ retVal.indexBuffer };
 		indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
 
@@ -148,6 +157,14 @@ namespace Frx::PrimitiveBuilder
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, -1.0f });
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, -1.0f });
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, -1.0f });
+		}
+
+		if (hasFlagBit(attribFlags, VertexAttribFlagBits::COLOR))
+		{
+			auto &colorBuffer{ retVal.colorBuffer };
+
+			for (uint32_t vtxIter{ }; vtxIter < 24U; ++vtxIter)
+				colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 
 		auto &indexBuffer{ retVal.indexBuffer };

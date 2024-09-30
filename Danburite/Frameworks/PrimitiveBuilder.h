@@ -17,6 +17,7 @@ namespace Frx::PrimitiveBuilder
 		Infra::GenericBuffer posBuffer;
 		Infra::GenericBuffer uvBuffer;
 		Infra::GenericBuffer normalBuffer;
+		Infra::GenericBuffer colorBuffer;
 
 		Infra::GenericBuffer indexBuffer;
 	};
