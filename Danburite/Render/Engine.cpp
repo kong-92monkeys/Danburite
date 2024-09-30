@@ -124,6 +124,24 @@ namespace Render
 		__pGlobalDescriptorManager->setGlobalData(pData, size);
 	}
 
+	void Engine::addGlobalMaterial(
+		Material const *const pMaterial)
+	{
+		__pGlobalDescriptorManager->addMaterial(pMaterial);
+	}
+
+	void Engine::removeGlobalMaterial(
+		Material const *const pMaterial)
+	{
+		__pGlobalDescriptorManager->removeMaterial(pMaterial);
+	}
+
+	uint32_t Engine::getGlobalMaterialIdOf(
+		Material const *const pMaterial) const
+	{
+		return __pGlobalDescriptorManager->getMaterialIdOf(pMaterial);
+	}
+
 	void Engine::reserveRender(
 		RenderTarget *const pRenderTarget) noexcept
 	{

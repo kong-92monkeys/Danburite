@@ -49,6 +49,9 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{70d377ed-737e-4c4e-b42b-3d7b3cca0d2c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials\LightMaterial">
+      <UniqueIdentifier>{26737013-0f9f-4efb-b218-d01e29d423cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -96,6 +99,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="LightMaterial.h">
+      <Filter>Materials\LightMaterial</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -133,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="LightMaterial.cpp">
+      <Filter>Materials\LightMaterial</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 #include "Constants.h"
 #include "TransformMaterial.h"
 #include "PhongMaterial.h"
+#include "LightMaterial.h"
 #include <new>
 
 namespace Frx
@@ -44,6 +45,7 @@ namespace Frx
 		Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
 		globalDescBindingInfo.materialBufferLocations[typeid(TransformMaterial)]	= Constants::TRANSFORM_MATERIAL_LOCATION;
 		globalDescBindingInfo.materialBufferLocations[typeid(PhongMaterial)]		= Constants::PHONG_MATERIAL_LOCATION;
+		globalDescBindingInfo.materialBufferLocations[typeid(LightMaterial)]		= Constants::LIGHT_MATERIAL_LOCATION;
 
 		new (__enginePlaceholder.data()) Render::Engine{ context, physicalDevice, globalDescBindingInfo };
 	}

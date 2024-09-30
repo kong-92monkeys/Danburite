@@ -15,6 +15,6 @@ namespace Frx
 	{
 	public:
 		void setTransform(
-			glm::mat4 const &transform) noexcept;
+			glm::mat4 const &transform);
 	};
 }

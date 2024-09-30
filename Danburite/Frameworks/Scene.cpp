@@ -94,9 +94,27 @@ namespace Frx
 
 	void Scene::_rcmd_setGlobalData(
 		void const *const pData,
-		size_t const size)
+		size_t const size) const
 	{
 		__pRenderEngine->setGlobalData(pData, size);
+	}
+
+	void Scene::_rcmd_addGlobalMaterial(
+		Render::Material const *const pMaterial) const
+	{
+		return __pRenderEngine->addGlobalMaterial(pMaterial);
+	}
+
+	void Scene::_rcmd_removeGlobalMaterial(
+		Render::Material const *const pMaterial) const
+	{
+		return __pRenderEngine->removeGlobalMaterial(pMaterial);
+	}
+
+	uint32_t Scene::_rcmd_getGlobalMaterialIdOf(
+		Render::Material const *const pMaterial) const
+	{
+		return __pRenderEngine->getGlobalMaterialIdOf(pMaterial);
 	}
 
 	std::future<void> Scene::_rcmd_run(

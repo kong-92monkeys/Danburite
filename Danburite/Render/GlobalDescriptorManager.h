@@ -44,7 +44,7 @@ namespace Render
 
 		[[nodiscard]]
 		uint32_t getMaterialIdOf(
-			Material const *pMaterial) const noexcept;
+			Material const *pMaterial) const;
 
 		[[nodiscard]]
 		constexpr VK::DescriptorSetLayout const &getGlobalDescSetLayout() const noexcept;
@@ -139,6 +139,14 @@ namespace Render
 			MaterialBufferBuilder *pBuilder) noexcept;
 
 		void __onSampledImagesDescInfosUpdated() noexcept;
+
+		[[nodiscard]]
+		MaterialBufferBuilder &__getMaterialBufferBuilderOf(
+			std::type_index const &materialType);
+
+		[[nodiscard]]
+		MaterialBufferBuilder const &__getMaterialBufferBuilderOf(
+			std::type_index const &materialType) const;
 	};
 
 	constexpr VK::DescriptorSetLayout const &GlobalDescriptorManager::getGlobalDescSetLayout() const noexcept

@@ -18,6 +18,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Display.h" />
+    <ClInclude Include="LightMaterial.h" />
     <ClInclude Include="Orientation.h" />
     <ClInclude Include="PhongMaterial.h" />
     <ClInclude Include="PhongRenderer.h" />
@@ -34,6 +35,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="LightMaterial.cpp" />
     <ClCompile Include="Orientation.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
     <ClCompile Include="PhongRenderer.cpp" />

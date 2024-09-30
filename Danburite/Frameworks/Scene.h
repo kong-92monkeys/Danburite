@@ -77,11 +77,21 @@ namespace Frx
 
 		void _rcmd_setGlobalData(
 			void const *pData,
-			size_t size);
+			size_t size) const;
 
 		template <typename $Data>
 		void _rcmd_setGlobalData(
-			$Data const &data);
+			$Data const &data) const;
+
+		void _rcmd_addGlobalMaterial(
+			Render::Material const *pMaterial) const;
+
+		void _rcmd_removeGlobalMaterial(
+			Render::Material const *pMaterial) const;
+
+		[[nodiscard]]
+		uint32_t _rcmd_getGlobalMaterialIdOf(
+			Render::Material const *pMaterial) const;
 
 		[[nodiscard]]
 		std::future<void> _rcmd_run(
@@ -171,7 +181,7 @@ namespace Frx
 
 	template <typename $Data>
 	void Scene::_rcmd_setGlobalData(
-		$Data const &data)
+		$Data const &data) const
 	{
 		_rcmd_setGlobalData(&data, sizeof($Data));
 	}

@@ -90,19 +90,22 @@ namespace Render
 	void GlobalDescriptorManager::addMaterial(
 		Material const *const pMaterial)
 	{
-		__materialBufferBuilders.at(typeid(*pMaterial))->addMaterial(pMaterial);
+		auto &materialBufferBuilder{ __getMaterialBufferBuilderOf(typeid(*pMaterial)) };
+		materialBufferBuilder.addMaterial(pMaterial);
 	}
 
 	void GlobalDescriptorManager::removeMaterial(
 		Material const *pMaterial)
 	{
-		__materialBufferBuilders.at(typeid(*pMaterial))->removeMaterial(pMaterial);
+		auto &materialBufferBuilder{ __getMaterialBufferBuilderOf(typeid(*pMaterial)) };
+		materialBufferBuilder.removeMaterial(pMaterial);
 	}
 
 	uint32_t GlobalDescriptorManager::getMaterialIdOf(
-		Material const *pMaterial) const noexcept
+		Material const *pMaterial) const
 	{
-		return __materialBufferBuilders.at(typeid(*pMaterial))->getIdOf(pMaterial);
+		auto const &materialBufferBuilder{ __getMaterialBufferBuilderOf(typeid(*pMaterial)) };
+		return materialBufferBuilder.getIdOf(pMaterial);
 	}
 
 	void GlobalDescriptorManager::_onValidate()
@@ -462,5 +465,22 @@ namespace Render
 	{
 		__sampledImagesDescInvalidated = true;
 		_invalidate();
+	}
+
+	MaterialBufferBuilder &GlobalDescriptorManager::__getMaterialBufferBuilderOf(
+		std::type_index const &materialType)
+	{
+		auto const foundIt{ __materialBufferBuilders.find(materialType) };
+		if (foundIt == __materialBufferBuilders.end())
+			throw std::runtime_error{ "Unknown material type is detected. Did you inject the type information via bindingInfo?" };
+
+		return *(foundIt->second);
+	}
+
+	MaterialBufferBuilder const &GlobalDescriptorManager::__getMaterialBufferBuilderOf(
+		std::type_index const &materialType) const
+	{
+		return const_cast<GlobalDescriptorManager *>(this)->
+			__getMaterialBufferBuilderOf(materialType);
 	}
 }

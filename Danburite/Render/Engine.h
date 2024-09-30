@@ -54,6 +54,16 @@ namespace Render
 			void const *pData,
 			size_t size);
 
+		void addGlobalMaterial(
+			Material const *pMaterial);
+
+		void removeGlobalMaterial(
+			Material const *pMaterial);
+
+		[[nodiscard]]
+		uint32_t getGlobalMaterialIdOf(
+			Material const *pMaterial) const;
+
 		void reserveRender(
 			RenderTarget *pRenderTarget) noexcept;
 
