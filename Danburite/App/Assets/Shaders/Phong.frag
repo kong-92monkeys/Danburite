@@ -13,6 +13,7 @@ layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCA
 {
     mat4 viewMatrix;
     mat4 projMatrix;
+	vec3 cameraPosition;
 	int lightIdx;
 } globalData;
 
@@ -40,8 +41,9 @@ layout(push_constant) uniform PushConstants
 
 layout(location = 0) in flat int instanceIndex;
 layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec3 worldNormal;
-layout(location = 3) in vec4 inColor;
+layout(location = 2) in vec3 worldPos;
+layout(location = 3) in vec3 worldNormal;
+layout(location = 4) in vec4 inColor;
 
 layout(location = 0) out vec4 outColor;
 
@@ -61,7 +63,10 @@ void main()
     outColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if (globalData.lightIdx >= 0)
     {
-        const vec3 lightColor = LightUtil_calcColor(lightMaterials[globalData.lightIdx], worldNormal);
+        const vec3 lightColor = LightUtil_calcColor(
+            lightMaterials[globalData.lightIdx], globalData.cameraPosition,
+            worldPos, worldNormal, 32.0f);
+
         outColor.rgb = (materialColor.rgb * lightColor);
     }
 }

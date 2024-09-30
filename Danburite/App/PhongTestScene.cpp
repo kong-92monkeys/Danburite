@@ -99,6 +99,7 @@ std::any PhongTestScene::_scmd_onUpdate(
 		retVal.globalDataUpdated = true;
 		retVal.globalData.viewMatrix = __scmd_camera.getViewMatrix();
 		retVal.globalData.projMatrix = __scmd_camera.getProjectionMatrix();
+		retVal.globalData.cameraPosition = __scmd_camera.getPosition();;
 	}
 
 	return retVal;
@@ -145,7 +146,9 @@ void PhongTestScene::_rcmd_onInit(
 	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
 
 	__rcmd_pLightMaterial = _rcmd_createMaterial<Frx::LightMaterial>();
+	__rcmd_pLightMaterial->setType(Frx::LightType::POINT);
 	__rcmd_pLightMaterial->setColor(glm::vec4{ 1.0f, 0.5f, 0.0f, 1.0f });
+	__rcmd_pLightMaterial->setPosition(glm::vec3{ -1.0f, 1.0f, 1.0f });
 	__rcmd_pLightMaterial->setDirection(glm::normalize(glm::vec3{ 2.0f, -3.0f, -1.0f }));
 
 	_rcmd_addGlobalMaterial(__rcmd_pLightMaterial.get());

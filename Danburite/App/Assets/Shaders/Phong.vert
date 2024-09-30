@@ -10,6 +10,7 @@ layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCA
 {
     mat4 viewMatrix;
     mat4 projMatrix;
+	vec3 cameraPosition;
 	int lightIdx;
 } globalData;
 
@@ -35,8 +36,9 @@ layout(location = VERTEX_ATTRIB_COLOR_LOCATION) in vec4 inColor;
 
 layout(location = 0) out flat int instanceIndex;
 layout(location = 1) out vec2 outUV;
-layout(location = 2) out vec3 worldNormal;
-layout(location = 3) out vec4 outColor;
+layout(location = 2) out vec3 worldPos;
+layout(location = 3) out vec3 worldNormal;
+layout(location = 4) out vec4 outColor;
 
 void main()
 {
@@ -49,6 +51,7 @@ void main()
 	const mat4 mvp = (globalData.projMatrix * globalData.viewMatrix * modelMatrix);
 	gl_Position = (mvp * vec4(inPos, 1.0f));
 
+	worldPos = (modelMatrix * vec4(inPos, 1.0f)).xyz;
 	worldNormal = (normalMatrix * inNormal);
 
 	if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))

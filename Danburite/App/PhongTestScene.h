@@ -67,6 +67,7 @@ private:
 	public:
 		glm::mat4 viewMatrix{ 1.0f };
 		glm::mat4 projMatrix{ 1.0f };
+		alignas(16) glm::vec3 cameraPosition{ 0.0f, 0.0f, 0.0f };
 		int lightIdx{ -1 };
 	};
 

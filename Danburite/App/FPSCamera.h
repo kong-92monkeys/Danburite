@@ -5,6 +5,8 @@
 class FPSCamera : public Infra::Stateful<FPSCamera>
 {
 public:
+	[[nodiscard]]
+	constexpr glm::vec3 const &getPosition() const noexcept;
 	void setPosition(
 		float x,
 		float y,
@@ -67,6 +69,11 @@ private:
 
 	void __setOrientation() noexcept;
 };
+
+constexpr glm::vec3 const &FPSCamera::getPosition() const noexcept
+{
+	return __camera.getTransform().getPosition().get();
+}
 
 constexpr Frx::Camera::ProjectionType FPSCamera::getProjectionType() const noexcept
 {

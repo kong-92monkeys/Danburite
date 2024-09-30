@@ -7,58 +7,80 @@ const uint LIGHT_TYPE_DIRECTIONAL	= 0U;
 const uint LIGHT_TYPE_POINT			= 1U;
 const uint LIGHT_TYPE_SPOT			= 2U;
 
-vec3 LightUtil_calcAmbientColor(
-	in const LightMaterial light)
+float LightUtil_calcDiffuseFactor(
+	in const vec3 lightDir,
+	in const vec3 normal)
 {
-	return (light.color * light.ambientFactor);
+	return max(dot(-lightDir, normal), 0.0f);
 }
 
-vec3 LightUtil_calcDiffuseColor_directional(
-	in const LightMaterial light, in const vec3 normal)
+float LightUtil_calcSpecularFactor(
+	in const vec3 lightDir,
+	in const vec3 cameraPos,
+	in const vec3 position,
+	in const vec3 normal,
+	in const float shininess)
 {
-	const float diffuseFactor = max(dot(-(light.direction), normal), 0.0f);
-	return (light.color * diffuseFactor);
+	const vec3 lightReflectionDir = reflect(lightDir, normal);
+	const vec3 viewDir = normalize(position - cameraPos);
+
+	return pow(max(dot(lightReflectionDir, -viewDir), 0.0f), shininess);
 }
 
-vec3 LightUtil_calcDiffuseColor_point(
-	in const LightMaterial light, in const vec3 normal)
+float LightUtil_calcFactor_directional(
+	in const LightMaterial light,
+	in const vec3 cameraPos,
+	in const vec3 position,
+	in const vec3 normal,
+	in const float shininess)
 {
-	return vec3(0.0f, 0.0f, 0.0f);
+	const float ambientFactor	= light.ambientFactor;
+	const float diffuseFactor	= LightUtil_calcDiffuseFactor(light.direction, normal);
+	const float specularFactor	= LightUtil_calcSpecularFactor(light.direction, cameraPos, position, normal, shininess);
+
+	return (ambientFactor + diffuseFactor + specularFactor);
 }
 
-vec3 LightUtil_calcDiffuseColor_spot(
-	in const LightMaterial light, in const vec3 normal)
+float LightUtil_calcFactor_point(
+	in const LightMaterial light,
+	in const vec3 cameraPos,
+	in const vec3 position,
+	in const vec3 normal,
+	in const float shininess)
 {
-	return vec3(0.0f, 0.0f, 0.0f);
-}
+	const vec3 lightDir = normalize(position - light.position);
 
-vec3 LightUtil_calcDiffuseColor(
-	in const LightMaterial light, in const vec3 normal)
-{
-	switch (light.type)
-	{
-		case LIGHT_TYPE_DIRECTIONAL:
-			return LightUtil_calcDiffuseColor_directional(light, normal);
+	const float ambientFactor	= light.ambientFactor;
+	const float diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, normal);
+	const float specularFactor	= LightUtil_calcSpecularFactor(lightDir, cameraPos, position, normal, shininess);
 
-		case LIGHT_TYPE_POINT:
-			return LightUtil_calcDiffuseColor_point(light, normal);
-
-		case LIGHT_TYPE_SPOT:
-			return LightUtil_calcDiffuseColor_spot(light, normal);
-	}
-
-	return vec3(0.0f, 0.0f, 0.0f);
+	return (ambientFactor + diffuseFactor + specularFactor);
 }
 
 vec3 LightUtil_calcColor(
-	in const LightMaterial light, in const vec3 normal)
+	in const LightMaterial light,
+	in const vec3 cameraPos,
+	in const vec3 position,
+	in const vec3 normal,
+	in const float shininess)
 {
-	vec3 retVal = vec3(0.0f, 0.0f, 0.0f);
+	float factor = 0.0f;
 
-	retVal += LightUtil_calcAmbientColor(light);
-	retVal += LightUtil_calcDiffuseColor(light, normal);
+	switch (light.type)
+	{
+		case LIGHT_TYPE_DIRECTIONAL:
+			factor = LightUtil_calcFactor_directional(light, cameraPos, position, normal, shininess);
+			break;
 
-	return retVal;
+		case LIGHT_TYPE_POINT:
+			factor = LightUtil_calcFactor_point(light, cameraPos, position, normal, shininess);
+			break;
+
+		case LIGHT_TYPE_SPOT:
+			break;
+	}
+
+	return (light.color * factor);
 }
 
 #endif
