@@ -65,6 +65,16 @@ namespace Render
 
 		if (__pDescPool)
 			__deferredDeleter.reserve(std::move(__pDescPool));
+
+		for (auto const &[pObject, _] : __object2Region)
+		{
+			uint32_t const instanceCount{ pObject->getInstanceCount() };
+			for (uint32_t instanceIt{ }; instanceIt < instanceCount; ++instanceIt)
+			{
+				for (auto const pMaterial : pObject->getMaterialPackOf(instanceIt))
+					__unregisterMaterial(pMaterial);
+			}
+		}
 	}
 
 	void SubLayer::addRenderObject(

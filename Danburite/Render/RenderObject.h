@@ -10,6 +10,7 @@ namespace Render
 	{
 	public:
 		RenderObject();
+		virtual ~RenderObject() noexcept override = default;
 
 		[[nodiscard]]
 		constexpr Renderer const *getRenderer() const noexcept;
