@@ -8,17 +8,20 @@
 #include "afxdialogex.h"
 #include "App.h"
 #include "MainFrm.h"
+#include "AboutDlg.h"
 #include "../System/Env.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "../Infra/Logger.h"
 
 // CApp
 
 BEGIN_MESSAGE_MAP(CApp, CWinApp)
-	ON_COMMAND(ID_APP_ABOUT, &CApp::OnAppAbout)
+	ON_COMMAND(ID_SCENES_00, &CApp::OnScenes00)
 	ON_COMMAND(ID_SCENES_01, &CApp::OnScenes01)
+	ON_COMMAND(ID_APP_ABOUT, &CApp::OnAppAbout)
 END_MESSAGE_MAP()
 
 
@@ -79,12 +82,13 @@ BOOL CApp::InitInstance()
 	// The one and only window has been initialized, so show and update it
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
+
 	return TRUE;
 }
 
 int CApp::ExitInstance()
 {
-	__pScene = nullptr;
+	__pSceneLoader = nullptr;
 	__pRenderSystem = nullptr;
 	__pVulkanContext = nullptr;
 
@@ -104,113 +108,19 @@ std::unique_ptr<Frx::Display> CApp::createDisplay(
 void CApp::setSceneDisplay(
 	Frx::Display *const pDisplay)
 {
-	__pScene->setDisplay(pDisplay);
+	__pSceneLoader->setDisplay(pDisplay);
 }
 
 void CApp::onKeyDown(
 	UINT const nChar)
 {
-	switch (nChar)
-	{
-		case 'd':
-		case 'D':
-			__pScene->startCameraMoveRight();
-			break;
-
-		case 'a':
-		case 'A':
-			__pScene->startCameraMoveLeft();
-			break;
-
-		case 'e':
-		case 'E':
-			__pScene->startCameraMoveUp();
-			break;
-
-		case 'q':
-		case 'Q':
-			__pScene->startCameraMoveDown();
-			break;
-
-		case 'w':
-		case 'W':
-			__pScene->startCameraMoveForward();
-			break;
-
-		case 's':
-		case 'S':
-			__pScene->startCameraMoveBackward();
-			break;
-
-		case VK_RIGHT:
-			__pScene->startCameraRotateRight();
-			break;
-
-		case VK_LEFT:
-			__pScene->startCameraRotateLeft();
-			break;
-
-		case VK_UP:
-			__pScene->startCameraRotateUp();
-			break;
-
-		case VK_DOWN:
-			__pScene->startCameraRotateDown();
-			break;
-	}
+	__pSceneLoader->onKeyDown(nChar);
 }
 
 void CApp::onKeyUp(
 	UINT const nChar)
 {
-	switch (nChar)
-	{
-		case 'd':
-		case 'D':
-			__pScene->endCameraMoveRight();
-			break;
-
-		case 'a':
-		case 'A':
-			__pScene->endCameraMoveLeft();
-			break;
-
-		case 'e':
-		case 'E':
-			__pScene->endCameraMoveUp();
-			break;
-
-		case 'q':
-		case 'Q':
-			__pScene->endCameraMoveDown();
-			break;
-
-		case 'w':
-		case 'W':
-			__pScene->endCameraMoveForward();
-			break;
-
-		case 's':
-		case 'S':
-			__pScene->endCameraMoveBackward();
-			break;
-
-		case VK_RIGHT:
-			__pScene->endCameraRotateRight();
-			break;
-
-		case VK_LEFT:
-			__pScene->endCameraRotateLeft();
-			break;
-
-		case VK_UP:
-			__pScene->endCameraRotateUp();
-			break;
-
-		case VK_DOWN:
-			__pScene->endCameraRotateDown();
-			break;
-	}
+	__pSceneLoader->onKeyUp(nChar);
 }
 
 BOOL CApp::OnIdle(LONG lCount)
@@ -238,46 +148,29 @@ void CApp::__onInitBeforeMainFrame()
 
 #ifndef NDEBUG
 	contextCreateInfo.debugMode = true;
+	Infra::Logger::log(Infra::Logger::Severity::INFO, "Debug mode is activated.");
 #endif
 
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
 	__pRenderSystem = std::make_unique<Frx::RenderSystem>(
 		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 
-	__pScene = __pRenderSystem->createScene<PhongTestScene>();
+	__pSceneLoader = std::make_unique<SceneLoader>(*__pRenderSystem);
+	Infra::Logger::log(Infra::Logger::Severity::INFO, "Init completed successfully.");
 }
 
-// CAboutDlg dialog used for App About
-
-class CAboutDlg : public CDialogEx
+// CApp message handlers
+void CApp::OnScenes00()
 {
-public:
-	CAboutDlg() noexcept;
-
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
-{
+	// TODO: Add your command handler code here
+	__loadScene(SceneType::NOTHING);
 }
 
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+void CApp::OnScenes01()
 {
-	CDialogEx::DoDataExchange(pDX);
+	// TODO: Add your command handler code here
+	__loadScene(SceneType::PHONG_TEST);
 }
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
 
 // App command to run the dialog
 void CApp::OnAppAbout()
@@ -286,10 +179,15 @@ void CApp::OnAppAbout()
 	aboutDlg.DoModal();
 }
 
-// CApp message handlers
-
-void CApp::OnScenes01()
+void CApp::__loadScene(
+	SceneType const sceneType)
 {
-	// TODO: Add your command handler code here
+	if (__pSceneLoader->getSceneType() == sceneType)
+		return;
 
+	__pSceneLoader->load(sceneType);
+
+	Infra::Logger::log(
+		Infra::Logger::Severity::INFO,
+		std::format("Scene {} is loading now.", static_cast<int>(sceneType)));
 }

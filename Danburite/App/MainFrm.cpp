@@ -9,10 +9,12 @@
 #include "MainFrm.h"
 #include "MainView.h"
 #include "LogView.h"
+#include "CSceneMenuView00.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "CSceneMenuView01.h"
 
 // CMainFrame
 
@@ -49,23 +51,28 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 {
-
 	// TODO: Add your specialized code here and/or call the base class
-	if (!(__windowSplitter.CreateStatic(this, 1, 2)))
+	if (!(__windowSplitter.CreateStatic(this, 1, 3)))
 	{
 		TRACE("Cannot split the window.");
 		return FALSE;
 	}
 
-	if (!(__windowSplitter.CreateView(0, 0, RUNTIME_CLASS(CLogView), CSize{ 600, 0 }, pContext)))
+	if (!(__windowSplitter.CreateView(0, 0, RUNTIME_CLASS(CLogView), CSize{ 400, 0 }, pContext)))
 	{
 		TRACE("Cannot create the log view.");
 		return FALSE;
 	}
 
-	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS(CMainView), CSize{ 0, 0 }, pContext)))
+	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS(CMainView), CSize{ 1200, 0 }, pContext)))
 	{
 		TRACE("Cannot create the main view.");
+		return FALSE;
+	}
+
+	if (!(__windowSplitter.CreateView(0, 2, RUNTIME_CLASS(CSceneMenuView00), CSize{ 0, 0 }, pContext)))
+	{
+		TRACE("Cannot create the menu view.");
 		return FALSE;
 	}
 

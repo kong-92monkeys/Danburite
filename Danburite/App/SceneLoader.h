@@ -13,16 +13,19 @@ public:
 	SceneLoader(
 		Frx::RenderSystem &renderSystem);
 
+	[[nodiscard]]
+	constexpr SceneType getSceneType() const noexcept;
+
 	void load(
 		SceneType sceneType);
 
 	void setDisplay(
 		Frx::Display *pDisplay) noexcept;
 
-	void onViewKeyDown(
+	void onKeyDown(
 		UINT nChar);
 
-	void onViewKeyUp(
+	void onKeyUp(
 		UINT nChar);
 
 private:
@@ -30,3 +33,8 @@ private:
 	SceneType __sceneType{ SceneType::NOTHING };
 	std::unordered_map<SceneType, std::unique_ptr<SceneHandler>> __sceneHandlers;
 };
+
+constexpr SceneType SceneLoader::getSceneType() const noexcept
+{
+	return __sceneType;
+}

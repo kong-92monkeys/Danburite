@@ -17,6 +17,8 @@ public:
 
 // Operations
 public:
+	template <typename $T>
+	$T *replaceSceneMenuView();
 
 // Overrides
 public:
@@ -35,9 +37,26 @@ public:
 protected:
 	DECLARE_MESSAGE_MAP()
 
-
 private:
 	CSplitterWnd __windowSplitter;
 public:
 	virtual BOOL PreTranslateMessage(MSG *pMsg);
 };
+
+template <typename $T>
+$T *CMainFrame::replaceSceneMenuView()
+{
+	if (!(__windowSplitter.GetPane(0, 2)->DestroyWindow()))
+	{
+		TRACE("Cannot destroy the previous view.");
+	}
+
+	CCreateContext context{ };
+	if (!(__windowSplitter.CreateView(0, 2, RUNTIME_CLASS($T), CSize{ 0, 0 }, &context)))
+	{
+		TRACE("Cannot create the menu view.");
+	}
+
+	__windowSplitter.RecalcLayout();
+	return STATIC_DOWNCAST($T, __windowSplitter.GetPane(0, 2));
+}

@@ -8,18 +8,21 @@
 #define IDD_LOGVIEW                     310
 #define IDI_APP_ICON                    312
 #define IDD_SCENE_MENU_00               314
+#define IDD_SCENE_MENU_01               315
 #define IDC_BTN_CLEAR_LOGS              1000
 #define IDC_LIST_LOG                    1001
 #define IDC_EDIT1                       1002
 #define IDC_EDIT_LOG_MSG                1002
 #define ID_SCENES_01                    32771
+#define ID_SCENES_UNLOADSCENE           32772
+#define ID_SCENES_00                    32773
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        316
-#define _APS_NEXT_COMMAND_VALUE         32772
+#define _APS_NEXT_COMMAND_VALUE         32774
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

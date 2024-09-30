@@ -12,8 +12,8 @@ public:
 	void setDisplay(
 		Frx::Display *pDisplay) noexcept;
 
-	virtual void activate();
-	virtual void deactivate();
+	void activate();
+	void deactivate();
 
 	virtual void onKeyDown(
 		UINT nChar);
@@ -23,7 +23,17 @@ public:
 
 protected:
 	virtual void _onInit();
-	virtual void _onDisplayChanged();
+	virtual void _onActivated();
+	virtual void _onDeactivated();
+
+	virtual void _onDisplayChanged(
+		Frx::Display *pDisplay);
+
+	[[nodiscard]]
+	CMainFrame *_getMainFrame() const;
+
+	[[nodiscard]]
+	constexpr Frx::RenderSystem &_getRenderSystem() const noexcept;
 
 	[[nodiscard]]
 	constexpr Frx::Display *_getDisplay() const noexcept;
@@ -31,7 +41,14 @@ protected:
 private:
 	Frx::RenderSystem *__pRenderSystem{ };
 	Frx::Display *__pDisplay{ };
+
+	bool __activated{ };
 };
+
+constexpr Frx::RenderSystem &SceneHandler::_getRenderSystem() const noexcept
+{
+	return *__pRenderSystem;
+}
 
 constexpr Frx::Display *SceneHandler::_getDisplay() const noexcept
 {

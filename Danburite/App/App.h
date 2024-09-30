@@ -9,7 +9,7 @@
 
 #include "resource.h"       // main symbols
 #include "../Frameworks/RenderSystem.h"
-#include "PhongTestScene.h"
+#include "SceneLoader.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -30,8 +30,10 @@ public:
 // Implementation
 
 public:
-	afx_msg void OnAppAbout();
+	afx_msg void OnScenes00();
 	afx_msg void OnScenes01();
+	afx_msg void OnAppAbout();
+
 	DECLARE_MESSAGE_MAP()
 
 public:
@@ -53,11 +55,14 @@ public:
 private:
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
-	std::unique_ptr<PhongTestScene> __pScene;
+	std::unique_ptr<SceneLoader> __pSceneLoader;
 
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
+
+	void __loadScene(
+		SceneType sceneType);
 };
 
 constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept

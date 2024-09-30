@@ -77,6 +77,18 @@
     <Filter Include="SceneHandler\Impl\Nothing">
       <UniqueIdentifier>{cc4587da-f2ec-4d13-9428-fe9ca66cc109}</UniqueIdentifier>
     </Filter>
+    <Filter Include="View\SceneMenuViews\00">
+      <UniqueIdentifier>{381ec8b9-3afd-4486-95cd-9a2df2324630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="View\SceneMenuViews\01">
+      <UniqueIdentifier>{dc2366da-0178-49d4-ac73-e699715c4c70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{d22f604e-6280-41f1-aa02-14f71364864b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneHandler\Impl\PhongTest">
+      <UniqueIdentifier>{7c7709ac-1855-45fc-8ac2-570df94ad7d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -112,9 +124,6 @@
     <ClInclude Include="FPSCamera.h">
       <Filter>Util\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="CSceneMenuView00.h">
-      <Filter>View\SceneMenuViews</Filter>
-    </ClInclude>
     <ClInclude Include="SceneLoader.h">
       <Filter>SceneLoader</Filter>
     </ClInclude>
@@ -123,6 +132,18 @@
     </ClInclude>
     <ClInclude Include="SceneHandler_Nothing.h">
       <Filter>SceneHandler\Impl\Nothing</Filter>
+    </ClInclude>
+    <ClInclude Include="CSceneMenuView00.h">
+      <Filter>View\SceneMenuViews\00</Filter>
+    </ClInclude>
+    <ClInclude Include="CSceneMenuView01.h">
+      <Filter>View\SceneMenuViews\01</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutDlg.h">
+      <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneHandler_PhongTest.h">
+      <Filter>SceneHandler\Impl\PhongTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -150,9 +171,6 @@
     <ClCompile Include="FPSCamera.cpp">
       <Filter>Util\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="CSceneMenuView00.cpp">
-      <Filter>View\SceneMenuViews</Filter>
-    </ClCompile>
     <ClCompile Include="SceneLoader.cpp">
       <Filter>SceneLoader</Filter>
     </ClCompile>
@@ -161,6 +179,18 @@
     </ClCompile>
     <ClCompile Include="SceneHandler_Nothing.cpp">
       <Filter>SceneHandler\Impl\Nothing</Filter>
+    </ClCompile>
+    <ClCompile Include="CSceneMenuView00.cpp">
+      <Filter>View\SceneMenuViews\00</Filter>
+    </ClCompile>
+    <ClCompile Include="CSceneMenuView01.cpp">
+      <Filter>View\SceneMenuViews\01</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
+      <Filter>Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneHandler_PhongTest.cpp">
+      <Filter>SceneHandler\Impl\PhongTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

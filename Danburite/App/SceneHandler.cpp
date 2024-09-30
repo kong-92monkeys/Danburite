@@ -15,14 +15,28 @@ void SceneHandler::setDisplay(
 		return;
 
 	__pDisplay = pDisplay;
-	_onDisplayChanged();
+
+	if (__activated)
+		_onDisplayChanged(pDisplay);
+}
+
+void SceneHandler::activate()
+{
+	if (__activated)
+		return;
+
+	__activated = true;
+	_onActivated();
 }
 
 void SceneHandler::deactivate()
-{}
+{
+	if (!__activated)
+		return;
 
-void SceneHandler::activate()
-{}
+	__activated = false;
+	_onDeactivated();
+}
 
 void SceneHandler::onKeyDown(
 	UINT const nChar)
@@ -35,5 +49,17 @@ void SceneHandler::onKeyUp(
 void SceneHandler::_onInit()
 {}
 
-void SceneHandler::_onDisplayChanged()
+void SceneHandler::_onActivated()
 {}
+
+void SceneHandler::_onDeactivated()
+{}
+
+void SceneHandler::_onDisplayChanged(
+	Frx::Display *const pDisplay)
+{}
+
+CMainFrame *SceneHandler::_getMainFrame() const
+{
+	return STATIC_DOWNCAST(CMainFrame, AfxGetApp()->GetMainWnd());
+}
