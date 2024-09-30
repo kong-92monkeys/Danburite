@@ -183,5 +183,8 @@
     <Image Include="Assets\Images\wall.jpg">
       <Filter>Assets\Images</Filter>
     </Image>
+    <Image Include="res\AppIcon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

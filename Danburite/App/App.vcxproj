@@ -209,6 +209,7 @@
     <Image Include="Assets\Images\smile.jpg" />
     <Image Include="Assets\Images\wall.jpg" />
     <Image Include="res\App.ico" />
+    <Image Include="res\AppIcon.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Device\Device.vcxproj">
