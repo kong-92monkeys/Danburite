@@ -50,6 +50,7 @@ private:
 
 public:
 	afx_msg void OnDeltaposSpinLightCount(NMHDR *pNMHDR, LRESULT *pResult);
+	virtual void OnInitialUpdate();
 };
 
 constexpr Infra::EventView<> &CSceneMenuView01::getAddLightEvent() const noexcept

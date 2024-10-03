@@ -183,7 +183,7 @@ void PhongTestScene::_rcmd_onUpdate(
 	if (!__pDisplay)
 		return;
 
-	auto param{ std::any_cast<__UpdateParam>(updateParam) };
+	auto const param{ std::any_cast<__UpdateParam>(updateParam) };
 	__rcmd_pTransformMaterial->setTransform(param.objectTransform);
 
 	if (param.cameraUpdated || __rcmd_lightUpdated)

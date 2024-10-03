@@ -92,3 +92,11 @@ void CSceneMenuView01::OnDeltaposSpinLightCount(NMHDR *pNMHDR, LRESULT *pResult)
 
 	*pResult = 0;
 }
+
+void CSceneMenuView01::OnInitialUpdate()
+{
+	CFormView::OnInitialUpdate();
+
+	// TODO: Add your specialized code here and/or call the base class
+	__editLightCount.SetWindowText(_T("0"));
+}
