@@ -57,8 +57,7 @@ void CMainFrame::replaceSceneMenuView()
 		TRACE("Cannot destroy the previous view.");
 	}
 
-	CCreateContext context{ };
-	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS($T), CSize{ cxCur, 0 }, &context)))
+	if (!(__windowSplitter.CreateView(0, 1, RUNTIME_CLASS($T), CSize{ cxCur, 0 }, nullptr)))
 	{
 		TRACE("Cannot create the menu view.");
 	}

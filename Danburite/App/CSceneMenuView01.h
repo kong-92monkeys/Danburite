@@ -31,6 +31,8 @@ protected:
 public:
 	void setFPSText(
 		double fps);
+private:
+	CStatic __textFPS;
 };
 
 

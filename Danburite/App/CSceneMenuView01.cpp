@@ -23,6 +23,7 @@ CSceneMenuView01::~CSceneMenuView01()
 void CSceneMenuView01::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_TEXT_FPS, __textFPS);
 }
 
 BEGIN_MESSAGE_MAP(CSceneMenuView01, CFormView)
@@ -53,6 +54,5 @@ void CSceneMenuView01::setFPSText(
 {
 	CString str;
 	str.Format(_T("%.2f"), fps);
-
-	SetDlgItemText(IDC_TEXT_FPS, str);
+	__textFPS.SetWindowText(str);
 }
