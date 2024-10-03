@@ -244,5 +244,11 @@
     <Image Include="res\AppIcon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Assets\Images\container.png">
+      <Filter>Assets\Images</Filter>
+    </Image>
+    <Image Include="Assets\Images\wood.jpg">
+      <Filter>Assets\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -12,6 +12,8 @@ namespace Dev
 			VK::Device &device,
 			uint32_t queueFamilyIndex);
 
+		virtual ~SCBBuilder() noexcept override;
+
 		[[nodiscard]]
 		std::future<VK::CommandBuffer *> build(
 			std::function<void(VK::CommandBuffer &)> &&logic);
@@ -22,7 +24,8 @@ namespace Dev
 	private:
 		Infra::MultiThreadPool __threadPool;
 
-		std::unique_ptr<CommandBufferCirculator> __pCirculator;
+		std::vector<CommandBufferCirculator *> __circulators;
+		size_t __circulatorCursor{ };
 	};
 
 	constexpr size_t SCBBuilder::getCapacity() const noexcept

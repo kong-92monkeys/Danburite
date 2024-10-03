@@ -88,20 +88,29 @@ private:
 	{
 	public:
 		bool cameraUpdated{ };
-		glm::mat4 objectTransform	{ 1.0f };
 
 		glm::mat4 viewMatrix		{ 1.0f };
 		glm::mat4 projMatrix		{ 1.0f };
 		glm::vec3 cameraPos			{ 0.0f };
 	};
 
-	std::unique_ptr<Render::Mesh> __rcmd_pMesh;
-	std::unique_ptr<Render::DrawParam> __rcmd_pDrawParam;
 	std::unique_ptr<Frx::PhongRenderer> __rcmd_pRenderer;
-	std::unique_ptr<Render::Texture> __rcmd_pAlbedoTexture;
-	std::unique_ptr<Frx::TransformMaterial> __rcmd_pTransformMaterial;
-	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPhongMaterial;
-	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
+
+	std::unique_ptr<Render::Mesh> __rcmd_pPlaneMesh;
+	std::unique_ptr<Render::DrawParam> __rcmd_pPlaneDrawParam;
+	std::unique_ptr<Render::Texture> __rcmd_pPlaneTexture;
+	std::unique_ptr<Frx::TransformMaterial> __rcmd_pPlaneTransformMaterial;
+	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPlanePhongMaterial;
+	std::unique_ptr<Render::RenderObject> __rcmd_pPlaneObject;
+
+	static constexpr uint32_t __CONTAINER_OBJECT_COUNT{ 100U };
+	std::unique_ptr<Render::Mesh> __rcmd_pContainerMesh;
+	std::unique_ptr<Render::DrawParam> __rcmd_pContainerDrawParam;
+	std::unique_ptr<Render::Texture> __rcmd_pContainerTexture;
+	std::array<std::unique_ptr<Frx::TransformMaterial>, __CONTAINER_OBJECT_COUNT> __rcmd_containerTransformMaterials;
+	std::unique_ptr<Frx::PhongMaterial> __rcmd_pContainerPhongMaterial;
+	std::unique_ptr<Render::RenderObject> __rcmd_pContainerObject;
+
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
 
 	Frx::Display *__pDisplay{ };
@@ -125,7 +134,6 @@ private:
 	bool __cameraRotateDown{ };
 
 	FPSCamera __camera;
-	Frx::Transform __objectTransform;
 
 	std::list<std::unique_ptr<Frx::LightMaterial>> __rcmd_lightMaterials;
 	bool __rcmd_lightUpdated{ };
@@ -139,6 +147,9 @@ private:
 
 	void __syncCameraExtent();
 	void __onDisplaySync();
+
+	void __rcmd_createPlaneObject();
+	void __rcmd_createContainerObject();
 };
 
 constexpr Frx::Display *PhongTestScene::getDisplay() const noexcept

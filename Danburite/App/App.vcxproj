@@ -218,8 +218,10 @@
     <None Include="res\App.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Assets\Images\container.png" />
     <Image Include="Assets\Images\smile.jpg" />
     <Image Include="Assets\Images\wall.jpg" />
+    <Image Include="Assets\Images\wood.jpg" />
     <Image Include="res\App.ico" />
     <Image Include="res\AppIcon.ico" />
   </ItemGroup>

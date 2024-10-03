@@ -14,14 +14,26 @@ PhongTestScene::~PhongTestScene() noexcept
 			__pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
 		__rcmd_lightMaterials.clear();
+
+		__rcmd_pContainerObject = nullptr;
+		__rcmd_pContainerPhongMaterial = nullptr;
+
+		for (auto &pMaterial : __rcmd_containerTransformMaterials)
+			pMaterial = nullptr;
+
+		__rcmd_pContainerTexture = nullptr;
+		__rcmd_pContainerDrawParam = nullptr;
+		__rcmd_pContainerMesh = nullptr;
+
+		__rcmd_pPlaneObject = nullptr;
+		__rcmd_pPlanePhongMaterial = nullptr;
+		__rcmd_pPlaneTransformMaterial = nullptr;
+		__rcmd_pPlaneTexture = nullptr;
+		__rcmd_pPlaneDrawParam = nullptr;
+		__rcmd_pPlaneMesh = nullptr;
+
 		__rcmd_pLayer = nullptr;
-		__rcmd_pObject = nullptr;
-		__rcmd_pPhongMaterial = nullptr;
-		__rcmd_pTransformMaterial = nullptr;
-		__rcmd_pAlbedoTexture = nullptr;
 		__rcmd_pRenderer = nullptr;
-		__rcmd_pDrawParam = nullptr;
-		__rcmd_pMesh = nullptr;
 	}).wait();
 }
 
@@ -105,16 +117,9 @@ std::any PhongTestScene::_onUpdate(
 	Time const &time)
 {
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
-
-	__objectTransform.getOrientation().rotate(
-		delta * __objectRotationSpeed, glm::vec3{ 0.0f, 1.0f, 0.0f });
-
 	__handleCamera(delta);
 
-	__objectTransform.validate();
-
 	__UpdateParam retVal;
-	retVal.objectTransform = __objectTransform.getMatrix();
 
 	if (__camera.isInvalidated())
 	{
@@ -131,42 +136,14 @@ std::any PhongTestScene::_onUpdate(
 void PhongTestScene::_rcmd_onInit(
 	std::any const &initParam)
 {
-	auto const meshData
-	{
-		Frx::PrimitiveBuilder::buildCube(
-			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 1.0f)
-	};
-
-	__rcmd_pMesh = _rcmd_createMesh();
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
-	__rcmd_pMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
-	__rcmd_pMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
-
-	__rcmd_pDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
 	__rcmd_pRenderer = _rcmd_createRenderer<Frx::PhongRenderer>();
 
-	__rcmd_pAlbedoTexture = _rcmd_createTexture(
-		"Images/smile.jpg",
-		VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
-		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
-		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
-
-	__rcmd_pTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
-
-	__rcmd_pPhongMaterial = _rcmd_createMaterial<Frx::PhongMaterial>();
-	__rcmd_pPhongMaterial->setAlbedoTexture(__rcmd_pAlbedoTexture.get());
-
-	__rcmd_pObject = std::make_unique<Render::RenderObject>();
-	__rcmd_pObject->setMesh(__rcmd_pMesh.get());
-	__rcmd_pObject->setDrawParam(__rcmd_pDrawParam.get());
-	__rcmd_pObject->setRenderer(__rcmd_pRenderer.get());
-	__rcmd_pObject->getMaterialPackOf(0U).setMaterial(__rcmd_pTransformMaterial.get());
-	__rcmd_pObject->getMaterialPackOf(0U).setMaterial(__rcmd_pPhongMaterial.get());
+	__rcmd_createPlaneObject();
+	__rcmd_createContainerObject();
 
 	__rcmd_pLayer = _rcmd_createLayer();
-	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
+	__rcmd_pLayer->addRenderObject(__rcmd_pPlaneObject.get());
+	__rcmd_pLayer->addRenderObject(__rcmd_pContainerObject.get());
 
 	auto const initData{ std::any_cast<__UpdateParam>(initParam) };
 
@@ -184,7 +161,6 @@ void PhongTestScene::_rcmd_onUpdate(
 		return;
 
 	auto const param{ std::any_cast<__UpdateParam>(updateParam) };
-	__rcmd_pTransformMaterial->setTransform(param.objectTransform);
 
 	if (param.cameraUpdated || __rcmd_lightUpdated)
 	{
@@ -267,4 +243,96 @@ void PhongTestScene::__syncCameraExtent()
 void PhongTestScene::__onDisplaySync()
 {
 	syncDisplay();
+}
+
+void PhongTestScene::__rcmd_createPlaneObject()
+{
+	auto const meshData
+	{
+		Frx::PrimitiveBuilder::buildSquare(
+			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 1.0f)
+	};
+
+	__rcmd_pPlaneMesh = _rcmd_createMesh();
+	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
+	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
+	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
+	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
+	__rcmd_pPlaneMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
+
+	__rcmd_pPlaneDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
+
+	__rcmd_pPlaneTexture = _rcmd_createTexture(
+		"Images/wood.jpg",
+		VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
+		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
+
+	__rcmd_pPlaneTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
+
+	glm::mat4 transform{ 1.0f };
+	transform[1] = glm::vec4{ 0.0f, 0.0f, -1.0f, 1.0f };
+	transform[2] = glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f };
+	__rcmd_pPlaneTransformMaterial->setTransform(transform);
+
+	__rcmd_pPlanePhongMaterial = _rcmd_createMaterial<Frx::PhongMaterial>();
+	__rcmd_pPlanePhongMaterial->setAlbedoTexture(__rcmd_pPlaneTexture.get());
+
+	__rcmd_pPlaneObject = std::make_unique<Render::RenderObject>();
+	__rcmd_pPlaneObject->setMesh(__rcmd_pPlaneMesh.get());
+	__rcmd_pPlaneObject->setDrawParam(__rcmd_pPlaneDrawParam.get());
+	__rcmd_pPlaneObject->setRenderer(__rcmd_pRenderer.get());
+
+	auto &materialPack{ __rcmd_pPlaneObject->getMaterialPackOf(0U) };
+	materialPack.setMaterial(__rcmd_pPlaneTransformMaterial.get());
+	materialPack.setMaterial(__rcmd_pPlanePhongMaterial.get());
+}
+
+void PhongTestScene::__rcmd_createContainerObject()
+{
+	auto const meshData
+	{
+		Frx::PrimitiveBuilder::buildCube(
+			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 1.0f)
+	};
+
+	__rcmd_pContainerMesh = _rcmd_createMesh();
+	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
+	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
+	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
+	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
+	__rcmd_pContainerMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
+
+	__rcmd_pContainerDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
+
+	__rcmd_pContainerTexture = _rcmd_createTexture(
+		"Images/container.png",
+		VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
+		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
+
+	for (auto &pTransformMaterial : __rcmd_containerTransformMaterials)
+	{
+		pTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
+
+		glm::mat4 transform{ 1.0f };
+		transform = glm::translate(transform, __rcmd_randomExt.nextVec3(-30.0f, 30.0f));
+		pTransformMaterial->setTransform(transform);
+	}
+
+	__rcmd_pContainerPhongMaterial = _rcmd_createMaterial<Frx::PhongMaterial>();
+	__rcmd_pContainerPhongMaterial->setAlbedoTexture(__rcmd_pContainerTexture.get());
+
+	__rcmd_pContainerObject = std::make_unique<Render::RenderObject>();
+	__rcmd_pContainerObject->setMesh(__rcmd_pContainerMesh.get());
+	__rcmd_pContainerObject->setDrawParam(__rcmd_pContainerDrawParam.get());
+	__rcmd_pContainerObject->setRenderer(__rcmd_pRenderer.get());
+	__rcmd_pContainerObject->setInstanceCount(__CONTAINER_OBJECT_COUNT);
+
+	for (uint32_t objIter{ }; objIter < __CONTAINER_OBJECT_COUNT; ++objIter)
+	{
+		auto &materialPack{ __rcmd_pContainerObject->getMaterialPackOf(objIter) };
+		materialPack.setMaterial(__rcmd_containerTransformMaterials[objIter].get());
+		materialPack.setMaterial(__rcmd_pContainerPhongMaterial.get());
+	}
 }
