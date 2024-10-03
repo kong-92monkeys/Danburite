@@ -29,7 +29,7 @@ namespace Infra
 	}
 
 	void JobPipe::receive(
-		std::vector<JobInfo> &&jobs)
+		std::vector<JobInfo> &jobs)
 	{
 		std::lock_guard lock{ __mutex };
 		jobs.swap(__jobInfos);

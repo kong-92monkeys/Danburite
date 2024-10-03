@@ -12,8 +12,6 @@ public:
 	virtual void onKeyUp(
 		UINT nChar) override;
 
-	virtual void onTick() override;
-
 protected:
 	virtual void _onActivated() override;
 	virtual void _onDeactivated() override;

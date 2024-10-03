@@ -2,8 +2,10 @@
 #include "SceneHandler.h"
 
 void SceneHandler::init(
+	Infra::Executor &mainExecutor,
 	Frx::RenderSystem &renderSystem)
 {
+	__pMainExecutor		= &mainExecutor;
 	__pRenderSystem		= &renderSystem;
 	_onInit();
 }
@@ -47,9 +49,6 @@ void SceneHandler::onKeyUp(
 {}
 
 void SceneHandler::_onInit()
-{}
-
-void SceneHandler::onTick()
 {}
 
 void SceneHandler::_onActivated()

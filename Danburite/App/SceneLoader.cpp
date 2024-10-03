@@ -4,14 +4,14 @@
 #include "SceneHandler_PhongTest.h"
 
 SceneLoader::SceneLoader(
-	Frx::RenderSystem &renderSystem) :
-	__renderSystem	{ renderSystem }
+	Infra::Executor &mainExecutor,
+	Frx::RenderSystem &renderSystem)
 {
 	__sceneHandlers[SceneType::NOTHING]		= std::make_unique<SceneHandler_Nothing>();
 	__sceneHandlers[SceneType::PHONG_TEST]	= std::make_unique<SceneHandler_PhongTest>();
 
 	for (auto const &[_, pHandler] : __sceneHandlers)
-		pHandler->init(__renderSystem);
+		pHandler->init(mainExecutor, renderSystem);
 }
 
 void SceneLoader::load(
@@ -46,10 +46,4 @@ void SceneLoader::onKeyUp(
 {
 	auto &sceneHandler{ *(__sceneHandlers.at(__sceneType)) };
 	sceneHandler.onKeyUp(nChar);
-}
-
-void SceneLoader::onTick()
-{
-	auto &sceneHandler{ *(__sceneHandlers.at(__sceneType)) };
-	sceneHandler.onTick();
 }

@@ -108,17 +108,6 @@ void SceneHandler_PhongTest::onKeyUp(
 	}
 }
 
-void SceneHandler_PhongTest::onTick()
-{
-	if (!__fpsUpdateTick)
-	{
-		auto const pView{ _getMainFrame()->getSceneMenuView<CSceneMenuView01>() };
-		pView->setFPSText(__pScene->getFps());
-	}
-
-	__fpsUpdateTick = ((__fpsUpdateTick + 1ULL) % __fpsUpdateTickCount);
-}
-
 void SceneHandler_PhongTest::_onActivated()
 {
 	__pScene = _getRenderSystem().createScene<PhongTestScene>();

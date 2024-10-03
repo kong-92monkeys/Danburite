@@ -9,6 +9,7 @@ public:
 	virtual ~SceneHandler() noexcept override = default;
 
 	void init(
+		Infra::Executor &mainExecutor,
 		Frx::RenderSystem &renderSystem);
 
 	void setDisplay(
@@ -23,8 +24,6 @@ public:
 	virtual void onKeyUp(
 		UINT nChar);
 
-	virtual void onTick();
-
 protected:
 	virtual void _onInit();
 	virtual void _onActivated();
@@ -37,17 +36,26 @@ protected:
 	CMainFrame *_getMainFrame() const;
 
 	[[nodiscard]]
+	constexpr Infra::Executor &_getMainExecutor() const noexcept;
+
+	[[nodiscard]]
 	constexpr Frx::RenderSystem &_getRenderSystem() const noexcept;
 
 	[[nodiscard]]
 	constexpr Frx::Display *_getDisplay() const noexcept;
 
 private:
+	Infra::Executor *__pMainExecutor{ };
 	Frx::RenderSystem *__pRenderSystem{ };
 	Frx::Display *__pDisplay{ };
 
 	bool __activated{ };
 };
+
+constexpr Infra::Executor &SceneHandler::_getMainExecutor() const noexcept
+{
+	return *__pMainExecutor;
+}
 
 constexpr Frx::RenderSystem &SceneHandler::_getRenderSystem() const noexcept
 {

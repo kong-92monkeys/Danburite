@@ -1,3 +1,4 @@
+#include "../Infra/Executor.h"
 #include "../Frameworks/RenderSystem.h"
 #include "SceneHandler.h"
 
@@ -11,6 +12,7 @@ class SceneLoader : public Infra::Unique
 {
 public:
 	SceneLoader(
+		Infra::Executor &mainExecutor,
 		Frx::RenderSystem &renderSystem);
 
 	[[nodiscard]]
@@ -28,10 +30,7 @@ public:
 	void onKeyUp(
 		UINT nChar);
 
-	void onTick();
-
 private:
-	Frx::RenderSystem &__renderSystem;
 	SceneType __sceneType{ SceneType::NOTHING };
 	std::unordered_map<SceneType, std::unique_ptr<SceneHandler>> __sceneHandlers;
 };

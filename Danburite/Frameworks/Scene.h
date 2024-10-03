@@ -24,9 +24,6 @@ namespace Frx
 			Infra::Executor &rcmdExecutor,
 			Render::Engine &renderEngine);
 
-		[[nodiscard]]
-		double getFps() const noexcept;
-
 		constexpr void setMaxFrameDelay(
 			uint64_t maxDelay);
 
@@ -38,6 +35,9 @@ namespace Frx
 
 	protected:
 		void _stopLoop() noexcept;
+
+		[[nodiscard]]
+		double _scmd_getFps() const noexcept;
 
 		[[nodiscard]]
 		std::future<void> _scmd_run(
@@ -52,9 +52,6 @@ namespace Frx
 		[[nodiscard]]
 		virtual std::any _scmd_onUpdate(
 			Time const &time);
-
-		[[nodiscard]]
-		double _scmd_calcFps() const noexcept;
 
 		[[nodiscard]]
 		std::unique_ptr<Render::Layer> _rcmd_createLayer();
@@ -111,7 +108,6 @@ namespace Frx
 
 	private:
 		std::unique_ptr<Infra::Looper> __pScmdExecutor{ std::make_unique<Infra::Looper>() };
-		std::atomic<double> __fps;
 
 		std::chrono::time_point<std::chrono::steady_clock> __scmd_beginningTime;
 

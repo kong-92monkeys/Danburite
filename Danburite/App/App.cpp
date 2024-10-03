@@ -137,7 +137,11 @@ void CApp::onKeyUp(
 BOOL CApp::OnIdle(LONG lCount)
 {
 	// TODO: Add your specialized code here and/or call the base class
-	__pSceneLoader->onTick();
+	__executor.receive(__executorJobs);
+	for (auto &job : __executorJobs)
+		job.run();
+
+	__executorJobs.clear();
 	__idleEvent.invoke();
 	return CWinApp::OnIdle(lCount);
 }
@@ -167,7 +171,7 @@ void CApp::__onInitBeforeMainFrame()
 	__pRenderSystem = std::make_unique<Frx::RenderSystem>(
 		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 
-	__pSceneLoader = std::make_unique<SceneLoader>(*__pRenderSystem);
+	__pSceneLoader = std::make_unique<SceneLoader>(__executor, *__pRenderSystem);
 	Infra::Logger::log(Infra::Logger::Severity::INFO, "Init completed successfully.");
 }
 

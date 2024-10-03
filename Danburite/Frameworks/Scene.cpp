@@ -32,17 +32,12 @@ namespace Frx
 		});
 	}
 
-	double Scene::getFps() const noexcept
-	{
-		return __fps.load(std::memory_order::acquire);
-	}
-
 	void Scene::_stopLoop() noexcept
 	{
 		__pScmdExecutor = nullptr;
 	}
 
-	double Scene::_scmd_calcFps() const noexcept
+	double Scene::_scmd_getFps() const noexcept
 	{
 		auto const rcmdFrameCount{ __rcmdFrameCount.load(std::memory_order::acquire) };
 		return (static_cast<double>(rcmdFrameCount) / (__scmd_time.elapsedTime.count() * 1e-9));
@@ -155,8 +150,6 @@ namespace Frx
 	std::any Scene::__scmd_update()
 	{
 		__scmd_updateTime();
-		__fps.store(_scmd_calcFps(), std::memory_order::release);
-
 		auto retVal{ _scmd_onUpdate(__scmd_time) };
 		++__scmdFrameCount;
 

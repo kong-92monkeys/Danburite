@@ -36,7 +36,7 @@ namespace Infra
 
 		[[nodiscard]]
 		void receive(
-			std::vector<JobInfo> &&jobs);
+			std::vector<JobInfo> &jobs);
 
 	private:
 		std::mutex __mutex;

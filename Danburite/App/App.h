@@ -11,6 +11,7 @@
 #include "../Frameworks/RenderSystem.h"
 #include "MainView.h"
 #include "SceneLoader.h"
+#include "../Infra/JobPipe.h"
 
 // CApp:
 // See App.cpp for the implementation of this class
@@ -51,14 +52,21 @@ public:
 	void onKeyUp(UINT nChar);
 
 	[[nodiscard]]
+	constexpr Infra::Executor &getExecutor() noexcept;
+
+	[[nodiscard]]
 	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
 
 private:
+	Infra::JobPipe __executor;
+	std::vector<Infra::JobPipe::JobInfo> __executorJobs;
+
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
 	std::unique_ptr<SceneLoader> __pSceneLoader;
 
 	CMainView *__pMainView{ };
+
 	mutable Infra::Event<> __idleEvent;
 
 	void __onInitBeforeMainFrame();
@@ -66,6 +74,11 @@ private:
 	void __loadScene(
 		SceneType sceneType);
 };
+
+constexpr Infra::Executor &CApp::getExecutor() noexcept
+{
+	return __executor;
+}
 
 constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept
 {
