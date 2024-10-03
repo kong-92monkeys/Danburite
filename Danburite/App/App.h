@@ -58,8 +58,8 @@ public:
 	constexpr Infra::EventView<> &getUIIdleEvent() const noexcept;
 
 private:
-	Infra::JobPipe __executor;
-	std::vector<Infra::JobPipe::JobInfo> __executorJobs;
+	Infra::JobPipe __uiExecutor;
+	std::vector<Infra::JobPipe::JobInfo> __uiJobs;
 
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
@@ -77,7 +77,7 @@ private:
 
 constexpr Infra::Executor &CApp::getUIExecutor() noexcept
 {
-	return __executor;
+	return __uiExecutor;
 }
 
 constexpr Infra::EventView<> &CApp::getUIIdleEvent() const noexcept

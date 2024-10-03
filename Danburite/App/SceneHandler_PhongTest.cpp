@@ -135,6 +135,18 @@ void SceneHandler_PhongTest::onKeyUp(
 void SceneHandler_PhongTest::onTick()
 {
 	__pScene->update();
+
+	++__fpsUpdateTick;
+	if (__fpsUpdateTick % __fpsUpdateTickCount)
+		return;
+
+	__fpsUpdateTick = 0ULL;
+
+	_getUIExecutor().silentRun([this, fps{ __pScene->getFps() }]
+	{
+		auto const pMenuView{ _ui_getMainFrame()->getSceneMenuView<CSceneMenuView01>() };
+		pMenuView->setFPSText(fps);
+	});
 }
 
 void SceneHandler_PhongTest::_onActivated()

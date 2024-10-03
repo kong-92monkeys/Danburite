@@ -31,5 +31,5 @@ private:
 	std::unique_ptr<PhongTestScene> __pScene;
 	size_t __fpsUpdateTick{ };
 
-	static constexpr size_t __fpsUpdateTickCount{ 20ULL };
+	static constexpr size_t __fpsUpdateTickCount{ 100'000ULL };
 };
