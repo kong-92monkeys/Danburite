@@ -75,7 +75,7 @@ void PhongTestScene::addLight()
 		auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
 		pLightMaterial->setType(Frx::LightType::POINT);
 		pLightMaterial->setColor(__rcmd_randomExt.nextVec3(0.0f, 1.0f));
-		pLightMaterial->setPosition(__rcmd_randomExt.nextVec3(-5.0f, 5.0f));
+		pLightMaterial->setPosition(__rcmd_randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
 
 		_rcmd_addGlobalMaterial(pLightMaterial.get());
 		__rcmd_lightMaterials.emplace_back(std::move(pLightMaterial));
@@ -99,7 +99,7 @@ void PhongTestScene::removeLight()
 
 std::any PhongTestScene::_onInit()
 {
-	__camera.setPosition(0.0f, 0.0f, 3.0f);
+	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
 	__camera.validate();
 
@@ -250,7 +250,7 @@ void PhongTestScene::__rcmd_createPlaneObject()
 	auto const meshData
 	{
 		Frx::PrimitiveBuilder::buildSquare(
-			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 1.0f)
+			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 100.0f, 10.0f)
 	};
 
 	__rcmd_pPlaneMesh = _rcmd_createMesh();
@@ -271,8 +271,7 @@ void PhongTestScene::__rcmd_createPlaneObject()
 	__rcmd_pPlaneTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
 
 	glm::mat4 transform{ 1.0f };
-	transform[1] = glm::vec4{ 0.0f, 0.0f, -1.0f, 1.0f };
-	transform[2] = glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f };
+	transform = glm::rotate(transform, -glm::half_pi<float>(), glm::vec3{ 1.0f, 0.0f, 0.0f });
 	__rcmd_pPlaneTransformMaterial->setTransform(transform);
 
 	__rcmd_pPlanePhongMaterial = _rcmd_createMaterial<Frx::PhongMaterial>();
@@ -316,7 +315,10 @@ void PhongTestScene::__rcmd_createContainerObject()
 		pTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
 
 		glm::mat4 transform{ 1.0f };
-		transform = glm::translate(transform, __rcmd_randomExt.nextVec3(-30.0f, 30.0f));
+		transform = glm::translate(
+			transform,
+			__rcmd_randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
+
 		pTransformMaterial->setTransform(transform);
 	}
 

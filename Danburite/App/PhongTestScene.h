@@ -103,7 +103,7 @@ private:
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPlanePhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pPlaneObject;
 
-	static constexpr uint32_t __CONTAINER_OBJECT_COUNT{ 100U };
+	static constexpr uint32_t __CONTAINER_OBJECT_COUNT{ 400U };
 	std::unique_ptr<Render::Mesh> __rcmd_pContainerMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pContainerDrawParam;
 	std::unique_ptr<Render::Texture> __rcmd_pContainerTexture;
@@ -115,7 +115,7 @@ private:
 
 	Frx::Display *__pDisplay{ };
 
-	float __cameraMoveSpeed		{ 1.0f };
+	float __cameraMoveSpeed		{ 5.0f };
 	float __cameraRotationSpeed	{ 0.5f };
 	float __cameraFovy			{ glm::pi<float>() / 6.0f };
 

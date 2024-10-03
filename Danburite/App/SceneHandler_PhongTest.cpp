@@ -175,12 +175,12 @@ void SceneHandler_PhongTest::_onActivated()
 
 void SceneHandler_PhongTest::_onDeactivated()
 {
-	_getUIExecutor().run([this]
+	_getUIExecutor().silentRun([this]
 	{
 		auto const pMenuView{ _ui_getMainFrame()->getSceneMenuView<CSceneMenuView01>() };
 		pMenuView->getAddLightEvent() -= __ui_pUIAddLightListener;
 		pMenuView->getRemoveLightEvent() -= __ui_pUIRemoveLightListener;
-	}).wait();
+	});
 
 	__pScene = nullptr;
 }

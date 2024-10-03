@@ -4,7 +4,8 @@ namespace Frx::PrimitiveBuilder
 {
 	PrimitiveData buildSquare(
 		VertexAttribFlags const attribFlags,
-		float const size) noexcept
+		float const size,
+		float const uvSize) noexcept
 	{
 		PrimitiveData retVal;
 
@@ -23,9 +24,9 @@ namespace Frx::PrimitiveBuilder
 		{
 			auto &uvBuffer{ retVal.uvBuffer };
 			uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
-			uvBuffer.typedAdd<glm::vec2>({ 0.0f, 1.0f });
-			uvBuffer.typedAdd<glm::vec2>({ 1.0f, 1.0f });
-			uvBuffer.typedAdd<glm::vec2>({ 1.0f, 0.0f });
+			uvBuffer.typedAdd<glm::vec2>({ 0.0f, uvSize });
+			uvBuffer.typedAdd<glm::vec2>({ uvSize, uvSize });
+			uvBuffer.typedAdd<glm::vec2>({ uvSize, 0.0f });
 		}
 
 		if (hasFlagBit(attribFlags, VertexAttribFlagBits::NORMAL))

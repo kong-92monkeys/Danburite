@@ -25,7 +25,7 @@ namespace Frx::PrimitiveBuilder
 	[[nodiscard]]
 	PrimitiveData buildSquare(
 		VertexAttribFlags attribFlags,
-		float size = 1.0f) noexcept;
+		float size, float uvSize) noexcept;
 
 	[[nodiscard]]
 	PrimitiveData buildCube(
