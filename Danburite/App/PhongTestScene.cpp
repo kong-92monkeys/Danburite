@@ -13,6 +13,9 @@ PhongTestScene::~PhongTestScene() noexcept
 		if (__pDisplay)
 			__pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
+		__rcmd_pLayer = nullptr;
+		__rcmd_pRenderer = nullptr;
+
 		__rcmd_lightMaterials.clear();
 
 		__rcmd_pContainerObject = nullptr;
@@ -31,9 +34,6 @@ PhongTestScene::~PhongTestScene() noexcept
 		__rcmd_pPlaneTexture = nullptr;
 		__rcmd_pPlaneDrawParam = nullptr;
 		__rcmd_pPlaneMesh = nullptr;
-
-		__rcmd_pLayer = nullptr;
-		__rcmd_pRenderer = nullptr;
 	}).wait();
 }
 
@@ -136,12 +136,12 @@ std::any PhongTestScene::_onUpdate(
 void PhongTestScene::_rcmd_onInit(
 	std::any const &initParam)
 {
+	__rcmd_pLayer = _rcmd_createLayer();
 	__rcmd_pRenderer = _rcmd_createRenderer<Frx::PhongRenderer>();
 
 	__rcmd_createPlaneObject();
 	__rcmd_createContainerObject();
 
-	__rcmd_pLayer = _rcmd_createLayer();
 	__rcmd_pLayer->addRenderObject(__rcmd_pPlaneObject.get());
 	__rcmd_pLayer->addRenderObject(__rcmd_pContainerObject.get());
 
