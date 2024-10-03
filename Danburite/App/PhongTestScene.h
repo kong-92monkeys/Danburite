@@ -7,6 +7,7 @@
 #include "../Frameworks/PhongMaterial.h"
 #include "../Frameworks/LightMaterial.h"
 #include "FPSCamera.h"
+#include "RandomExt.h"
 
 class PhongTestScene : public Frx::Scene
 {
@@ -21,6 +22,9 @@ public:
 		Frx::Display *pDisplay);
 
 	void syncDisplay();
+
+	void addLight();
+	void removeLight();
 
 	constexpr void startCameraMoveRight() noexcept;
 	constexpr void endCameraMoveRight() noexcept;
@@ -70,19 +74,25 @@ private:
 	struct __GlobalData
 	{
 	public:
-		glm::mat4 viewMatrix{ 1.0f };
-		glm::mat4 projMatrix{ 1.0f };
-		alignas(16) glm::vec3 cameraPosition{ 0.0f, 0.0f, 0.0f };
-		int lightIdx{ -1 };
+		glm::mat4 viewMatrix	{ 1.0f };
+		glm::mat4 projMatrix	{ 1.0f };
+
+		alignas(16)
+		glm::vec3 cameraPos		{ 0.0f, 0.0f, 0.0f };
+
+		uint32_t lightCount{ };
+		std::array<uint32_t, 15ULL> lightIndices{ };
 	};
 
 	struct __UpdateParam
 	{
 	public:
-		glm::mat4 objectTransform{ };
+		bool cameraUpdated{ };
+		glm::mat4 objectTransform	{ 1.0f };
 
-		bool globalDataUpdated{ };
-		__GlobalData globalData{ };
+		glm::mat4 viewMatrix		{ 1.0f };
+		glm::mat4 projMatrix		{ 1.0f };
+		glm::vec3 cameraPos			{ 0.0f };
 	};
 
 	std::unique_ptr<Render::Mesh> __rcmd_pMesh;
@@ -93,9 +103,6 @@ private:
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pObject;
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
-
-	std::unique_ptr<Frx::LightMaterial> __rcmd_pLightMaterial;
-	int __rcmd_lightIdx{ -1 };
 
 	Frx::Display *__pDisplay{ };
 
@@ -119,6 +126,13 @@ private:
 
 	FPSCamera __camera;
 	Frx::Transform __objectTransform;
+
+	std::list<std::unique_ptr<Frx::LightMaterial>> __rcmd_lightMaterials;
+	bool __rcmd_lightUpdated{ };
+
+	RandomExt __rcmd_randomExt;
+
+	__GlobalData __rcmd_globalData;
 
 	void __handleCamera(
 		float delta);

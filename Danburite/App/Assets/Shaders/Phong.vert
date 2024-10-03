@@ -10,8 +10,9 @@ layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCA
 {
     mat4 viewMatrix;
     mat4 projMatrix;
-	vec3 cameraPosition;
-	int lightIdx;
+	vec3 cameraPos;
+	uint lightCount;
+	uint lightIndices[];
 } globalData;
 
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = TRANSFORM_MATERIAL_LOCATION) readonly buffer TransformMaterialBuffer

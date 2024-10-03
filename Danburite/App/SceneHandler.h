@@ -9,6 +9,7 @@ public:
 	virtual ~SceneHandler() noexcept override = default;
 
 	void init(
+		Infra::Executor &scmdExecutor,
 		Infra::Executor &uiExecutor,
 		Frx::RenderSystem &renderSystem);
 
@@ -41,17 +42,26 @@ protected:
 	CMainFrame *_ui_getMainFrame() const;
 
 	[[nodiscard]]
+	constexpr Infra::Executor &_getScmdExecutor() const noexcept;
+
+	[[nodiscard]]
 	constexpr Infra::Executor &_getUIExecutor() const noexcept;
 
 	[[nodiscard]]
 	constexpr Frx::RenderSystem &_getRenderSystem() const noexcept;
 
 private:
+	Infra::Executor *__pScmdExecutor{ };
 	Infra::Executor *__pUIExecutor{ };
 	Frx::RenderSystem *__pRenderSystem{ };
 
 	bool __activated{ };
 };
+
+constexpr Infra::Executor &SceneHandler::_getScmdExecutor() const noexcept
+{
+	return *__pScmdExecutor;
+}
 
 constexpr Infra::Executor &SceneHandler::_getUIExecutor() const noexcept
 {

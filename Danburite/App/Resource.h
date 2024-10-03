@@ -13,7 +13,10 @@
 #define IDC_LIST_LOG                    1001
 #define IDC_EDIT1                       1002
 #define IDC_EDIT_LOG_MSG                1002
-#define IDC_TEXT_FPS                    1004
+#define IDC_EDIT_FPS                    1002
+#define IDC_EDIT_LIGHT_COUNT            1006
+#define IDC_SPIN2                       1007
+#define IDC_SPIN_LIGHT_COUNT            1007
 #define ID_SCENES_01                    32771
 #define ID_SCENES_UNLOADSCENE           32772
 #define ID_SCENES_00                    32773
@@ -24,7 +27,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         32774
-#define _APS_NEXT_CONTROL_VALUE         1005
+#define _APS_NEXT_CONTROL_VALUE         1008
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

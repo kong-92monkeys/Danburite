@@ -21,7 +21,7 @@ SceneManager::SceneManager(
 		__scmd_handlers[SceneType::PHONG_TEST]	= std::make_unique<SceneHandler_PhongTest>();
 
 		for (auto const &[_, pHandler] : __scmd_handlers)
-			pHandler->init(uiExecutor, renderSystem);
+			pHandler->init(__scmdExecutor, uiExecutor, renderSystem);
 
 		__scmdExecutor.in_getIdleEvent() += __scmd_pIdleListener;
 	});

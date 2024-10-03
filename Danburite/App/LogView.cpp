@@ -86,12 +86,16 @@ void CLogView::OnDestroy()
 void CLogView::OnBnClickedClearLogs()
 {
 	__listLog.ResetContent();
+
 	__editLogMsg.SetWindowText(TEXT(""));
+	__editLogMsg.UpdateData(FALSE);
 }
 
 void CLogView::OnLbnSelchangeListLog()
 {
 	CString text;
 	__listLog.GetText(__listLog.GetCurSel(), text);
+
 	__editLogMsg.SetWindowText(text);
+	__editLogMsg.UpdateData(FALSE);
 }

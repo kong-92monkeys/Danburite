@@ -2,9 +2,11 @@
 #include "SceneHandler.h"
 
 void SceneHandler::init(
+	Infra::Executor &scmdExecutor,
 	Infra::Executor &uiExecutor,
 	Frx::RenderSystem &renderSystem)
 {
+	__pScmdExecutor		= &scmdExecutor;
 	__pUIExecutor		= &uiExecutor;
 	__pRenderSystem		= &renderSystem;
 	_onInit();

@@ -2,6 +2,15 @@
 #include "SceneHandler_PhongTest.h"
 #include "CSceneMenuView01.h"
 
+SceneHandler_PhongTest::SceneHandler_PhongTest() noexcept
+{
+	__ui_pUIAddLightListener = Infra::EventListener<>::bind(
+		&SceneHandler_PhongTest::__ui_onUIAddLight, this);
+
+	__ui_pUIRemoveLightListener = Infra::EventListener<>::bind(
+		&SceneHandler_PhongTest::__ui_onUIRemoveLight, this);
+}
+
 void SceneHandler_PhongTest::onDisplayRegistered(
 	Frx::Display *const pDisplay)
 {
@@ -155,11 +164,39 @@ void SceneHandler_PhongTest::_onActivated()
 
 	_getUIExecutor().silentRun([this]
 	{
-		_ui_getMainFrame()->replaceSceneMenuView<CSceneMenuView01>();
+		auto const pMainFrame{ _ui_getMainFrame() };
+		pMainFrame->replaceSceneMenuView<CSceneMenuView01>();
+
+		auto const pMenuView{ pMainFrame->getSceneMenuView<CSceneMenuView01>() };
+		pMenuView->getAddLightEvent() += __ui_pUIAddLightListener;
+		pMenuView->getRemoveLightEvent() += __ui_pUIRemoveLightListener;
 	});
 }
 
 void SceneHandler_PhongTest::_onDeactivated()
 {
+	_getUIExecutor().run([this]
+	{
+		auto const pMenuView{ _ui_getMainFrame()->getSceneMenuView<CSceneMenuView01>() };
+		pMenuView->getAddLightEvent() -= __ui_pUIAddLightListener;
+		pMenuView->getRemoveLightEvent() -= __ui_pUIRemoveLightListener;
+	}).wait();
+
 	__pScene = nullptr;
+}
+
+void SceneHandler_PhongTest::__ui_onUIAddLight()
+{
+	_getScmdExecutor().silentRun([this]
+	{
+		__pScene->addLight();
+	});
+}
+
+void SceneHandler_PhongTest::__ui_onUIRemoveLight()
+{
+	_getScmdExecutor().silentRun([this]
+	{
+		__pScene->removeLight();
+	});
 }

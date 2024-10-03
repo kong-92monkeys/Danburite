@@ -32,12 +32,6 @@
     <Filter Include="Assets\Shaders">
       <UniqueIdentifier>{8b2b13ad-6a29-4cd8-ad57-16983be9a662}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Assets\Shaders\Test">
-      <UniqueIdentifier>{93437e74-d959-4d3f-9225-f7bb29a12202}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Assets\Shaders\Simple">
-      <UniqueIdentifier>{935722f8-c792-4327-a43d-3c2d369f77c3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Assets\Shaders\Materials">
       <UniqueIdentifier>{b885c91a-3aec-4260-becf-109e727041e8}</UniqueIdentifier>
     </Filter>
@@ -88,6 +82,9 @@
     </Filter>
     <Filter Include="SceneManager">
       <UniqueIdentifier>{67f9eb89-8b9e-45f3-8ba4-076248907389}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util\RandomExt">
+      <UniqueIdentifier>{250bb3d7-5b11-4b41-8ee5-5c28dd5347e0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +142,9 @@
     <ClInclude Include="SceneManager.h">
       <Filter>SceneManager</Filter>
     </ClInclude>
+    <ClInclude Include="RandomExt.h">
+      <Filter>Util\RandomExt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -192,6 +192,7 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>SceneManager</Filter>
     </ClCompile>
+    <ClCompile Include="RandomExt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc">
@@ -207,18 +208,6 @@
     </None>
     <None Include="Assets\Shaders\Constants.glsl">
       <Filter>Assets\Shaders</Filter>
-    </None>
-    <None Include="Assets\Shaders\Test.frag">
-      <Filter>Assets\Shaders\Test</Filter>
-    </None>
-    <None Include="Assets\Shaders\Test.vert">
-      <Filter>Assets\Shaders\Test</Filter>
-    </None>
-    <None Include="Assets\Shaders\Simple.frag">
-      <Filter>Assets\Shaders\Simple</Filter>
-    </None>
-    <None Include="Assets\Shaders\Simple.vert">
-      <Filter>Assets\Shaders\Simple</Filter>
     </None>
     <None Include="Assets\Shaders\Images.glsl">
       <Filter>Assets\Shaders</Filter>

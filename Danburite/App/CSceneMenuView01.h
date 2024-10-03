@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "../Infra/Event.h"
 
 // CSceneMenuView01 form view
 
@@ -31,8 +31,33 @@ protected:
 public:
 	void setFPSText(
 		double fps);
+
+	[[nodiscard]]
+	constexpr Infra::EventView<> &getAddLightEvent() const noexcept;
+
+	[[nodiscard]]
+	constexpr Infra::EventView<> &getRemoveLightEvent() const noexcept;
+
 private:
-	CStatic __textFPS;
+	CEdit __editFPS;
+	CEdit __editLightCount;
+
+	int __lightCount{ };
+	static constexpr int __MAX_LIGHT_COUNT{ 15 };
+
+	mutable Infra::Event<> __addLightEvent;
+	mutable Infra::Event<> __removeLightEvent;
+
+public:
+	afx_msg void OnDeltaposSpinLightCount(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
+constexpr Infra::EventView<> &CSceneMenuView01::getAddLightEvent() const noexcept
+{
+	return __addLightEvent;
+}
 
+constexpr Infra::EventView<> &CSceneMenuView01::getRemoveLightEvent() const noexcept
+{
+	return __removeLightEvent;
+}

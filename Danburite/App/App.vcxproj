@@ -171,6 +171,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RandomExt.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SceneHandler.h" />
     <ClInclude Include="SceneHandler_PhongTest.h" />
@@ -195,6 +196,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PhongTestScene.cpp" />
+    <ClCompile Include="RandomExt.cpp" />
     <ClCompile Include="SceneHandler.cpp" />
     <ClCompile Include="SceneHandler_PhongTest.cpp" />
     <ClCompile Include="SceneHandler_Nothing.cpp" />
@@ -212,10 +214,6 @@
     <None Include="Assets\Shaders\Images.glsl" />
     <None Include="Assets\Shaders\Materials\TransformMaterial.glsl" />
     <None Include="Assets\Shaders\ShaderData.glsl" />
-    <None Include="Assets\Shaders\Simple.frag" />
-    <None Include="Assets\Shaders\Simple.vert" />
-    <None Include="Assets\Shaders\Test.frag" />
-    <None Include="Assets\Shaders\Test.vert" />
     <None Include="Assets\Shaders\Utils\LightUtil.glsl" />
     <None Include="res\App.rc2" />
   </ItemGroup>

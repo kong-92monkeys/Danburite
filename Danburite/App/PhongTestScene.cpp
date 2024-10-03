@@ -7,12 +7,13 @@ PhongTestScene::~PhongTestScene() noexcept
 {
 	_rcmd_run([this]
 	{
-		_rcmd_removeGlobalMaterial(__rcmd_pLightMaterial.get());
+		for (auto const &pLightMaterial : __rcmd_lightMaterials)
+			_rcmd_removeGlobalMaterial(pLightMaterial.get());
 
 		if (__pDisplay)
 			__pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
-		__rcmd_pLightMaterial = nullptr;
+		__rcmd_lightMaterials.clear();
 		__rcmd_pLayer = nullptr;
 		__rcmd_pObject = nullptr;
 		__rcmd_pPhongMaterial = nullptr;
@@ -55,17 +56,49 @@ void PhongTestScene::syncDisplay()
 		__syncCameraExtent();
 }
 
+void PhongTestScene::addLight()
+{
+	_rcmd_silentRun([this]
+	{
+		auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
+		pLightMaterial->setType(Frx::LightType::POINT);
+		pLightMaterial->setColor(__rcmd_randomExt.nextVec3(0.0f, 1.0f));
+		pLightMaterial->setPosition(__rcmd_randomExt.nextVec3(-5.0f, 5.0f));
+
+		_rcmd_addGlobalMaterial(pLightMaterial.get());
+		__rcmd_lightMaterials.emplace_back(std::move(pLightMaterial));
+
+		__rcmd_lightUpdated = true;
+	});
+}
+
+void PhongTestScene::removeLight()
+{
+	_rcmd_silentRun([this]
+	{
+		auto pLightMaterial{ std::move(__rcmd_lightMaterials.front()) };
+
+		_rcmd_removeGlobalMaterial(pLightMaterial.get());
+		__rcmd_lightMaterials.pop_front();
+
+		__rcmd_lightUpdated = true;
+	});
+}
+
 std::any PhongTestScene::_onInit()
 {
 	__camera.setPosition(0.0f, 0.0f, 3.0f);
 	__camera.setNear(0.1f);
 	__camera.validate();
 
-	return __GlobalData
-	{
-		.viewMatrix{ __camera.getViewMatrix() },
-		.projMatrix{ __camera.getProjectionMatrix() }
-	};
+	__UpdateParam retVal;
+
+	retVal.cameraUpdated	= true;
+	retVal.viewMatrix		= __camera.getViewMatrix();
+	retVal.projMatrix		= __camera.getProjectionMatrix();
+	retVal.cameraPos		= __camera.getPosition();
+
+	return retVal;
 }
 
 std::any PhongTestScene::_onUpdate(
@@ -86,10 +119,10 @@ std::any PhongTestScene::_onUpdate(
 	if (__camera.isInvalidated())
 	{
 		__camera.validate();
-		retVal.globalDataUpdated = true;
-		retVal.globalData.viewMatrix = __camera.getViewMatrix();
-		retVal.globalData.projMatrix = __camera.getProjectionMatrix();
-		retVal.globalData.cameraPosition = __camera.getPosition();;
+		retVal.cameraUpdated = true;
+		retVal.viewMatrix	= __camera.getViewMatrix();
+		retVal.projMatrix	= __camera.getProjectionMatrix();
+		retVal.cameraPos	= __camera.getPosition();;
 	}
 
 	return retVal;
@@ -135,17 +168,13 @@ void PhongTestScene::_rcmd_onInit(
 	__rcmd_pLayer = _rcmd_createLayer();
 	__rcmd_pLayer->addRenderObject(__rcmd_pObject.get());
 
-	__rcmd_pLightMaterial = _rcmd_createMaterial<Frx::LightMaterial>();
-	__rcmd_pLightMaterial->setType(Frx::LightType::POINT);
-	__rcmd_pLightMaterial->setColor(glm::vec4{ 1.0f, 0.5f, 0.0f, 1.0f });
-	__rcmd_pLightMaterial->setPosition(glm::vec3{ -1.0f, 1.0f, 1.0f });
-	__rcmd_pLightMaterial->setDirection(glm::normalize(glm::vec3{ 2.0f, -3.0f, -1.0f }));
+	auto const initData{ std::any_cast<__UpdateParam>(initParam) };
 
-	_rcmd_addGlobalMaterial(__rcmd_pLightMaterial.get());
-	__rcmd_lightIdx = static_cast<int>(_rcmd_getGlobalMaterialIdOf(__rcmd_pLightMaterial.get()));
+	__rcmd_globalData.viewMatrix	= initData.viewMatrix;
+	__rcmd_globalData.projMatrix	= initData.projMatrix;
+	__rcmd_globalData.cameraPos		= initData.cameraPos;
 
-	auto const globalData{ std::any_cast<__GlobalData>(initParam) };
-	_rcmd_setGlobalData(globalData);
+	_rcmd_setGlobalData(__rcmd_globalData);
 }
 
 void PhongTestScene::_rcmd_onUpdate(
@@ -157,10 +186,32 @@ void PhongTestScene::_rcmd_onUpdate(
 	auto param{ std::any_cast<__UpdateParam>(updateParam) };
 	__rcmd_pTransformMaterial->setTransform(param.objectTransform);
 
-	if (param.globalDataUpdated)
+	if (param.cameraUpdated || __rcmd_lightUpdated)
 	{
-		param.globalData.lightIdx = __rcmd_lightIdx;
-		_rcmd_setGlobalData(param.globalData);
+		if (param.cameraUpdated)
+		{
+			__rcmd_globalData.viewMatrix	= param.viewMatrix;
+			__rcmd_globalData.projMatrix	= param.projMatrix;
+			__rcmd_globalData.cameraPos		= param.cameraPos;
+		}
+
+		if (__rcmd_lightUpdated)
+		{
+			__rcmd_globalData.lightCount = static_cast<uint32_t>(__rcmd_lightMaterials.size());
+
+			uint32_t slotIdx{ };
+			for (auto const &pLightMaterial : __rcmd_lightMaterials)
+			{
+				__rcmd_globalData.lightIndices[slotIdx] =
+					_rcmd_getGlobalMaterialIdOf(pLightMaterial.get());
+
+				++slotIdx;
+			}
+
+			__rcmd_lightUpdated = false;
+		}
+
+		_rcmd_setGlobalData(__rcmd_globalData);
 	}
 
 	auto &renderTarget{ __pDisplay->rcmd_getRenderTarget() };

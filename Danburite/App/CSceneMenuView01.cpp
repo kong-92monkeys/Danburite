@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "App.h"
 #include "CSceneMenuView01.h"
+#include "../Infra/Logger.h"
 
 
 // CSceneMenuView01
@@ -23,10 +24,12 @@ CSceneMenuView01::~CSceneMenuView01()
 void CSceneMenuView01::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_TEXT_FPS, __textFPS);
+	DDX_Control(pDX, IDC_EDIT_FPS, __editFPS);
+	DDX_Control(pDX, IDC_EDIT_LIGHT_COUNT, __editLightCount);
 }
 
 BEGIN_MESSAGE_MAP(CSceneMenuView01, CFormView)
+	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_LIGHT_COUNT, &CSceneMenuView01::OnDeltaposSpinLightCount)
 END_MESSAGE_MAP()
 
 
@@ -54,5 +57,38 @@ void CSceneMenuView01::setFPSText(
 {
 	CString str;
 	str.Format(_T("%.2f"), fps);
-	__textFPS.SetWindowText(str);
+
+	__editFPS.SetWindowText(str);
+	__editFPS.UpdateData(FALSE);
+}
+
+void CSceneMenuView01::OnDeltaposSpinLightCount(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
+
+	// TODO: Add your control notification handler code here
+
+	int curLightCount{ __lightCount };
+
+	if (pNMUpDown->iDelta < 0)
+		++curLightCount;
+	else
+		--curLightCount;
+
+	curLightCount = std::clamp(curLightCount, 0, __MAX_LIGHT_COUNT);
+	if (__lightCount == curLightCount)
+		return;
+
+	if (__lightCount < curLightCount)
+		__addLightEvent.invoke();
+	else
+		__removeLightEvent.invoke();
+		
+	CString str;
+	str.Format(_T("%d"), curLightCount);
+	__editLightCount.SetWindowText(str);
+
+	__lightCount = curLightCount;
+
+	*pResult = 0;
 }

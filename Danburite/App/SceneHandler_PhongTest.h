@@ -4,6 +4,7 @@
 class SceneHandler_PhongTest : public SceneHandler
 {
 public:
+	SceneHandler_PhongTest() noexcept;
 	virtual ~SceneHandler_PhongTest() noexcept override = default;
 
 	virtual void onDisplayRegistered(
@@ -31,5 +32,11 @@ private:
 	std::unique_ptr<PhongTestScene> __pScene;
 	size_t __fpsUpdateTick{ };
 
+	Infra::EventListenerPtr<> __ui_pUIAddLightListener;
+	Infra::EventListenerPtr<> __ui_pUIRemoveLightListener;
+
 	static constexpr size_t __fpsUpdateTickCount{ 100'000ULL };
+
+	void __ui_onUIAddLight();
+	void __ui_onUIRemoveLight();
 };

@@ -13,8 +13,9 @@ layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCA
 {
     mat4 viewMatrix;
     mat4 projMatrix;
-	vec3 cameraPosition;
-	int lightIdx;
+	vec3 cameraPos;
+	uint lightCount;
+	uint lightIndices[];
 } globalData;
 
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
@@ -61,13 +62,15 @@ void main()
             materialColor *= texture(sampler2D(sampledImages[albedoTexId], imageSampler), inUV);
     }
 
-    outColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    if (globalData.lightIdx >= 0)
+    vec3 lightColor = vec3(0.0f, 0.0f, 0.0f);
+    for (uint lightIter = 0U; lightIter < globalData.lightCount; ++lightIter)
     {
-        const vec3 lightColor = LightUtil_calcColor(
-            lightMaterials[globalData.lightIdx], globalData.cameraPosition,
-            worldPos, worldNormal, material.shininess);
+        uint lightIndex = globalData.lightIndices[lightIter];
 
-        outColor.rgb = (materialColor.rgb * lightColor);
+        lightColor += LightUtil_calcColor(
+            lightMaterials[lightIndex], globalData.cameraPos,
+            worldPos, worldNormal, material.shininess);
     }
+
+    outColor = vec4(materialColor.rgb * lightColor, 1.0f);
 }
