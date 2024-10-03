@@ -16,9 +16,6 @@
     <Filter Include="AssetManager">
       <UniqueIdentifier>{b80d708d-672b-4bc2-b035-105d7ae4134e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ThreadPool">
-      <UniqueIdentifier>{4f9ce5d3-b50a-4ed1-877b-b61ff89cf45f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Bitmap">
       <UniqueIdentifier>{9f749813-5d96-4a6b-aacc-0399af5c6c71}</UniqueIdentifier>
     </Filter>
@@ -55,17 +52,20 @@
     <Filter Include="Updatable">
       <UniqueIdentifier>{14c9106b-49cf-4166-9fcc-8ba7c36128b7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Executor">
-      <UniqueIdentifier>{618fa274-ab4c-4622-85fd-c5c67800f410}</UniqueIdentifier>
+    <Filter Include="Executors">
+      <UniqueIdentifier>{4f9ce5d3-b50a-4ed1-877b-b61ff89cf45f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ThreadPool\SingleThreadPool">
+    <Filter Include="Executors\SingleThreadPool">
       <UniqueIdentifier>{213be4c2-3df8-4381-8e9f-49c0079e7bd6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ThreadPool\MultiThreadPool">
+    <Filter Include="Executors\MultiThreadPool">
       <UniqueIdentifier>{2ab2af56-4cce-48fa-95eb-47fb4b9ac1a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ThreadPool\Looper">
+    <Filter Include="Executors\Looper">
       <UniqueIdentifier>{af96ce23-b0c7-47fa-ad96-1dfe19b4283b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Executors\JobPipe">
+      <UniqueIdentifier>{c0dc6846-615c-41d6-8e96-684c4b52c35f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -111,8 +111,8 @@
     <ClInclude Include="Stateful.h">
       <Filter>Stateful</Filter>
     </ClInclude>
-    <ClInclude Include="ThreadPool.h">
-      <Filter>ThreadPool</Filter>
+    <ClInclude Include="Executor.h">
+      <Filter>Executors</Filter>
     </ClInclude>
     <ClInclude Include="Version.h">
       <Filter>Version</Filter>
@@ -124,13 +124,16 @@
       <Filter>Updatable</Filter>
     </ClInclude>
     <ClInclude Include="SingleThreadPool.h">
-      <Filter>ThreadPool\SingleThreadPool</Filter>
+      <Filter>Executors\SingleThreadPool</Filter>
     </ClInclude>
     <ClInclude Include="MultiThreadPool.h">
-      <Filter>ThreadPool\MultiThreadPool</Filter>
+      <Filter>Executors\MultiThreadPool</Filter>
     </ClInclude>
     <ClInclude Include="Looper.h">
-      <Filter>ThreadPool\Looper</Filter>
+      <Filter>Executors\Looper</Filter>
+    </ClInclude>
+    <ClInclude Include="JobPipe.h">
+      <Filter>Executors\JobPipe</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -153,13 +156,16 @@
       <Filter>RegionAllocator</Filter>
     </ClCompile>
     <ClCompile Include="MultiThreadPool.cpp">
-      <Filter>ThreadPool\MultiThreadPool</Filter>
+      <Filter>Executors\MultiThreadPool</Filter>
     </ClCompile>
     <ClCompile Include="SingleThreadPool.cpp">
-      <Filter>ThreadPool\SingleThreadPool</Filter>
+      <Filter>Executors\SingleThreadPool</Filter>
     </ClCompile>
     <ClCompile Include="Looper.cpp">
-      <Filter>ThreadPool\Looper</Filter>
+      <Filter>Executors\Looper</Filter>
+    </ClCompile>
+    <ClCompile Include="JobPipe.cpp">
+      <Filter>Executors\JobPipe</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

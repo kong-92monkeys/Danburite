@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ThreadPool.h"
+#include "Executor.h"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -9,7 +9,7 @@
 
 namespace Infra
 {
-	class MultiThreadPool : public ThreadPool
+	class MultiThreadPool : public Executor
 	{
 	public:
 		using Job = std::function<void()>;
@@ -44,13 +44,18 @@ namespace Infra
 		constexpr size_t getPoolSize() const noexcept;
 
 	private:
-		struct __JobInfo
+		class __JobInfo
 		{
 		public:
-			Job job;
-			std::optional<std::promise<void>> optPromise;
+			__JobInfo(
+				Job &&job,
+				std::optional<std::promise<void>> optPromise) noexcept;
 
-			void signal() noexcept;
+			void run();
+
+		private:
+			Job __job;
+			std::optional<std::promise<void>> __optPromise;
 		};
 
 		struct __SlotInfo

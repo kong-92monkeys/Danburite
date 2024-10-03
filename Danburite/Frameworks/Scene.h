@@ -21,7 +21,7 @@ namespace Frx
 		virtual ~Scene() noexcept override = default;
 
 		void init(
-			Infra::ThreadPool &rcmdExecutor,
+			Infra::Executor &rcmdExecutor,
 			Render::Engine &renderEngine);
 
 		[[nodiscard]]
@@ -41,10 +41,10 @@ namespace Frx
 
 		[[nodiscard]]
 		std::future<void> _scmd_run(
-			Infra::ThreadPool::Job &&job);
+			Infra::Executor::Job &&job);
 
 		void _scmd_silentRun(
-			Infra::ThreadPool::Job &&job);
+			Infra::Executor::Job &&job);
 
 		[[nodiscard]]
 		virtual std::any _scmd_onInit();
@@ -98,10 +98,10 @@ namespace Frx
 
 		[[nodiscard]]
 		std::future<void> _rcmd_run(
-			Infra::ThreadPool::Job &&job);
+			Infra::Executor::Job &&job);
 
 		void _rcmd_silentRun(
-			Infra::ThreadPool::Job &&job);
+			Infra::Executor::Job &&job);
 
 		virtual void _rcmd_onInit(
 			std::any const &initParam);
@@ -117,7 +117,7 @@ namespace Frx
 
 		Time __scmd_time;
 
-		Infra::ThreadPool *__pRcmdExecutor{ };
+		Infra::Executor *__pRcmdExecutor{ };
 		Render::Engine *__pRenderEngine{ };
 
 		uint64_t __maxFrameDelay{ 3ULL };

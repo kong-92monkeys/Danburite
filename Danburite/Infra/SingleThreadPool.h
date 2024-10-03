@@ -1,14 +1,13 @@
 #pragma once
 
-#include "ThreadPool.h"
+#include "Executor.h"
 #include <thread>
 #include <mutex>
 #include <optional>
-#include <memory>
 
 namespace Infra
 {
-	class SingleThreadPool : public ThreadPool
+	class SingleThreadPool : public Executor
 	{
 	public:
 		SingleThreadPool();
@@ -24,13 +23,18 @@ namespace Infra
 			Job &&job) override;
 
 	private:
-		struct __JobInfo
+		class __JobInfo
 		{
 		public:
-			Job job;
-			std::optional<std::promise<void>> optPromise;
+			__JobInfo(
+				Job &&job,
+				std::optional<std::promise<void>> optPromise) noexcept;
 
-			void signal() noexcept;
+			void run();
+
+		private:
+			Job __job;
+			std::optional<std::promise<void>> __optPromise;
 		};
 
 		std::thread __thread;

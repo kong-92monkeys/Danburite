@@ -9,7 +9,7 @@ namespace Frx
 	}
 
 	void Scene::init(
-		Infra::ThreadPool &rcmdExecutor,
+		Infra::Executor &rcmdExecutor,
 		Render::Engine &renderEngine)
 	{
 		__pRcmdExecutor = &rcmdExecutor;
@@ -49,13 +49,13 @@ namespace Frx
 	}
 
 	std::future<void> Scene::_scmd_run(
-		Infra::ThreadPool::Job &&job)
+		Infra::Executor::Job &&job)
 	{
 		return __pScmdExecutor->run(std::move(job));
 	}
 
 	void Scene::_scmd_silentRun(
-		Infra::ThreadPool::Job &&job)
+		Infra::Executor::Job &&job)
 	{
 		__pScmdExecutor->silentRun(std::move(job));
 	}
@@ -123,13 +123,13 @@ namespace Frx
 	}
 
 	std::future<void> Scene::_rcmd_run(
-		Infra::ThreadPool::Job &&job)
+		Infra::Executor::Job &&job)
 	{
 		return __pRcmdExecutor->run(std::move(job));
 	}
 
 	void Scene::_rcmd_silentRun(
-		Infra::ThreadPool::Job &&job)
+		Infra::Executor::Job &&job)
 	{
 		__pRcmdExecutor->silentRun(std::move(job));
 	}

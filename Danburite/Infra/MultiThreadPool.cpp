@@ -73,15 +73,9 @@ namespace Infra
 		std::promise<void> promise;
 		std::future<void> retVal{ promise.get_future() };
 
-		__JobInfo jobInfo
-		{
-			.job		{ std::move(job) },
-			.optPromise	{ std::move(promise) }
-		};
-
 		{
 			std::lock_guard loopLock{ pSlotInfo->loopMutex };
-			jobInfos.emplace_back(std::move(jobInfo));
+			jobInfos.emplace_back(std::move(job), std::move(promise));
 			loopCV.notify_all();
 		}
 
@@ -96,14 +90,9 @@ namespace Infra
 		auto &loopCV			{ pSlotInfo->loopCV };
 		auto &jobInfos			{ pSlotInfo->jobInfos };
 
-		__JobInfo jobInfo
-		{
-			.job{ std::move(job) }
-		};
-
 		{
 			std::lock_guard loopLock{ pSlotInfo->loopMutex };
-			jobInfos.emplace_back(std::move(jobInfo));
+			jobInfos.emplace_back(std::move(job), std::nullopt);
 			loopCV.notify_all();
 		}
 	}
@@ -135,21 +124,24 @@ namespace Infra
 			loopLock.unlock();
 
 			for (auto &jobInfo : inFlightJobInfos)
-			{
-				jobInfo.job();
-				jobInfo.signal();
-			}
+				jobInfo.run();
 
 			inFlightJobInfos.clear();
 		}
 	}
 
-	void MultiThreadPool::__JobInfo::signal() noexcept
-	{
-		if (!(optPromise.has_value()))
-			return;
+	MultiThreadPool::__JobInfo::__JobInfo(
+		Job &&job,
+		std::optional<std::promise<void>> optPromise) noexcept :
+		__job			{ std::move(job) },
+		__optPromise	{ std::move(optPromise) }
+	{}
 
-		auto &promise{ optPromise.value() };
-		promise.set_value();
+	void MultiThreadPool::__JobInfo::run()
+	{
+		__job();
+
+		if (__optPromise.has_value())
+			__optPromise.value().set_value();
 	}
 }

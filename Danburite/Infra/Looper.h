@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Event.h"
-#include "ThreadPool.h"
+#include "Executor.h"
 #include <thread>
 #include <mutex>
 #include <vector>
 
 namespace Infra
 {
-	class Looper : public ThreadPool
+	class Looper : public Executor
 	{
 	public:
 		using Job = std::function<void()>;
@@ -29,13 +29,18 @@ namespace Infra
 		constexpr EventView<Looper *> &in_getIdleEvent() noexcept;
 
 	private:
-		struct __JobInfo
+		class __JobInfo
 		{
 		public:
-			Job job;
-			std::optional<std::promise<void>> optPromise;
+			__JobInfo(
+				Job &&job,
+				std::optional<std::promise<void>> optPromise) noexcept;
 
-			void signal() noexcept;
+			void run();
+
+		private:
+			Job __job;
+			std::optional<std::promise<void>> __optPromise;
 		};
 
 		std::thread __thread;

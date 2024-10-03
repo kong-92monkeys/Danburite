@@ -6,12 +6,12 @@
 
 namespace Infra
 {
-	class ThreadPool : public Unique
+	class Executor : public Unique
 	{
 	public:
 		using Job = std::function<void()>;
 
-		virtual ~ThreadPool() noexcept override = default;
+		virtual ~Executor() noexcept override = default;
 
 		virtual void waitIdle() = 0;
 

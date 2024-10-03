@@ -3,7 +3,7 @@
 namespace Frx
 {
 	Display::Display(
-		Infra::ThreadPool &rcmdExecutor,
+		Infra::Executor &rcmdExecutor,
 		Render::Engine &renderEngine,
 		HINSTANCE const hinstance,
 		HWND const hwnd,

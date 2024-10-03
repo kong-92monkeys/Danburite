@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Infra/ThreadPool.h"
+#include "../Infra/Executor.h"
 #include "../Render/Engine.h"
 
 namespace Frx
@@ -9,7 +9,7 @@ namespace Frx
 	{
 	public:
 		Display(
-			Infra::ThreadPool &rcmdExecutor,
+			Infra::Executor &rcmdExecutor,
 			Render::Engine &renderEngine,
 			HINSTANCE hinstance,
 			HWND hwnd,
@@ -37,7 +37,7 @@ namespace Frx
 		constexpr Infra::EventView<Display const *> &getSyncEvent() const noexcept;
 
 	private:
-		Infra::ThreadPool &__rcmdExecutor;
+		Infra::Executor &__rcmdExecutor;
 		Render::Engine &__renderEngine;
 
 		std::unique_ptr<Render::RenderTarget> __pRenderTarget;
