@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Infra/Looper.h"
 #include "../Render/Engine.h"
 #include <chrono>
 #include <any>
@@ -23,6 +22,9 @@ namespace Frx
 		void init(
 			Infra::Executor &rcmdExecutor,
 			Render::Engine &renderEngine);
+		
+		[[nodiscard]]
+		double getFps() const noexcept;
 
 		constexpr void setMaxFrameDelay(
 			uint64_t maxDelay);
@@ -33,24 +35,14 @@ namespace Frx
 		constexpr void setUpdateFrequency(
 			double frequency) noexcept;
 
+		void update();
+
 	protected:
-		void _stopLoop() noexcept;
+		[[nodiscard]]
+		virtual std::any _onInit();
 
 		[[nodiscard]]
-		double _scmd_getFps() const noexcept;
-
-		[[nodiscard]]
-		std::future<void> _scmd_run(
-			Infra::Executor::Job &&job);
-
-		void _scmd_silentRun(
-			Infra::Executor::Job &&job);
-
-		[[nodiscard]]
-		virtual std::any _scmd_onInit();
-
-		[[nodiscard]]
-		virtual std::any _scmd_onUpdate(
+		virtual std::any _onUpdate(
 			Time const &time);
 
 		[[nodiscard]]
@@ -107,11 +99,9 @@ namespace Frx
 			std::any const &updateParam);
 
 	private:
-		std::unique_ptr<Infra::Looper> __pScmdExecutor{ std::make_unique<Infra::Looper>() };
+		std::chrono::time_point<std::chrono::steady_clock> __beginningTime;
 
-		std::chrono::time_point<std::chrono::steady_clock> __scmd_beginningTime;
-
-		Time __scmd_time;
+		Time __time;
 
 		Infra::Executor *__pRcmdExecutor{ };
 		Render::Engine *__pRenderEngine{ };
@@ -123,19 +113,13 @@ namespace Frx
 		std::chrono::steady_clock::duration __updateInterval{ std::chrono::steady_clock::duration::zero() };
 		std::chrono::time_point<std::chrono::steady_clock> __lastUpdateTime;
 
-		Infra::EventListenerPtr<Infra::Looper *> __pScmdIdleListener;
-
-		void __scmd_updateTime() noexcept;
+		void __updateTime() noexcept;
 
 		[[nodiscard]]
-		std::any __scmd_update();
-		void __scmd_onIdle();
+		bool __checkFrameDelay() const noexcept;
 
 		[[nodiscard]]
-		bool __scmd_checkFrameDelay() const noexcept;
-
-		[[nodiscard]]
-		bool __scmd_checkUpdateInterval() noexcept;
+		bool __checkUpdateInterval() noexcept;
 
 		void __rcmd_update(
 			std::any const &updateParam);

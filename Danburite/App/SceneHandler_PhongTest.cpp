@@ -2,6 +2,30 @@
 #include "SceneHandler_PhongTest.h"
 #include "CSceneMenuView01.h"
 
+void SceneHandler_PhongTest::onDisplayRegistered(
+	Frx::Display *const pDisplay)
+{
+	__pScene->setDisplay(pDisplay);
+}
+
+void SceneHandler_PhongTest::onDisplayUnregistered(
+	Frx::Display *const pDisplay)
+{
+	if (pDisplay != __pScene->getDisplay())
+		return;
+
+	__pScene->setDisplay(nullptr);
+}
+
+void SceneHandler_PhongTest::onDisplaySync(
+	Frx::Display const *const pDisplay)
+{
+	if (pDisplay != __pScene->getDisplay())
+		return;
+
+	__pScene->syncDisplay();
+}
+
 void SceneHandler_PhongTest::onKeyDown(
 	UINT const nChar)
 {
@@ -108,21 +132,22 @@ void SceneHandler_PhongTest::onKeyUp(
 	}
 }
 
+void SceneHandler_PhongTest::onTick()
+{
+	__pScene->update();
+}
+
 void SceneHandler_PhongTest::_onActivated()
 {
 	__pScene = _getRenderSystem().createScene<PhongTestScene>();
-	__pScene->setDisplay(_getDisplay());
 
-	_getMainFrame()->replaceSceneMenuView<CSceneMenuView01>();
+	_getUIExecutor().silentRun([this]
+	{
+		_ui_getMainFrame()->replaceSceneMenuView<CSceneMenuView01>();
+	});
 }
 
 void SceneHandler_PhongTest::_onDeactivated()
 {
 	__pScene = nullptr;
-}
-
-void SceneHandler_PhongTest::_onDisplayChanged(
-	Frx::Display *const pDisplay)
-{
-	__pScene->setDisplay(pDisplay);
 }

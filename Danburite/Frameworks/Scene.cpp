@@ -15,52 +15,45 @@ namespace Frx
 		__pRcmdExecutor = &rcmdExecutor;
 		__pRenderEngine = &renderEngine;
 
-		_scmd_silentRun([this]
+		__beginningTime = std::chrono::steady_clock::now();
+
+		auto initParam{ std::move(_onInit()) };
+		_rcmd_silentRun([this, initParam{ initParam }]
 		{
-			__pScmdIdleListener =
-				Infra::EventListener<Infra::Looper *>::bind(
-					&Scene::__scmd_onIdle, this);
-
-			__pScmdExecutor->in_getIdleEvent() += __pScmdIdleListener;
-			__scmd_beginningTime = std::chrono::steady_clock::now();
-
-			auto initParam{ _scmd_onInit() };
-			_rcmd_silentRun([this, initParam{ std::move(initParam) }]
-			{
-				_rcmd_onInit(initParam);
-			});
+			_rcmd_onInit(initParam);
 		});
 	}
 
-	void Scene::_stopLoop() noexcept
-	{
-		__pScmdExecutor = nullptr;
-	}
-
-	double Scene::_scmd_getFps() const noexcept
+	double Scene::getFps() const noexcept
 	{
 		auto const rcmdFrameCount{ __rcmdFrameCount.load(std::memory_order::acquire) };
-		return (static_cast<double>(rcmdFrameCount) / (__scmd_time.elapsedTime.count() * 1e-9));
+		return (static_cast<double>(rcmdFrameCount) / (__time.elapsedTime.count() * 1e-9));
 	}
 
-	std::future<void> Scene::_scmd_run(
-		Infra::Executor::Job &&job)
+	void Scene::update()
 	{
-		return __pScmdExecutor->run(std::move(job));
+		if (!(__checkFrameDelay()))
+			return;
+
+		if (!(__checkUpdateInterval()))
+			return;
+
+		__updateTime();
+		auto updateParam{ _onUpdate(__time) };
+		++__scmdFrameCount;
+
+		_rcmd_silentRun([this, updateParam{ std::move(updateParam) }]
+		{
+			__rcmd_update(updateParam);
+		});
 	}
 
-	void Scene::_scmd_silentRun(
-		Infra::Executor::Job &&job)
-	{
-		__pScmdExecutor->silentRun(std::move(job));
-	}
-
-	std::any Scene::_scmd_onInit()
+	std::any Scene::_onInit()
 	{
 		return { };
 	}
 
-	std::any Scene::_scmd_onUpdate(
+	std::any Scene::_onUpdate(
 		Time const &time)
 	{
 		return { };
@@ -137,47 +130,23 @@ namespace Frx
 		std::any const &updateParam)
 	{}
 
-	void Scene::__scmd_updateTime() noexcept
+	void Scene::__updateTime() noexcept
 	{
-		auto const curElapsedTime{ std::chrono::steady_clock::now() - __scmd_beginningTime };
+		auto const curElapsedTime{ std::chrono::steady_clock::now() - __beginningTime };
 
-		if (__scmd_time.elapsedTime.count() > 0)
-			__scmd_time.deltaTime = (curElapsedTime - __scmd_time.elapsedTime);
+		if (__time.elapsedTime.count() > 0)
+			__time.deltaTime = (curElapsedTime - __time.elapsedTime);
 
-		__scmd_time.elapsedTime = curElapsedTime;
+		__time.elapsedTime = curElapsedTime;
 	}
 
-	std::any Scene::__scmd_update()
-	{
-		__scmd_updateTime();
-		auto retVal{ _scmd_onUpdate(__scmd_time) };
-		++__scmdFrameCount;
-
-		return retVal;
-	}
-
-	void Scene::__scmd_onIdle()
-	{
-		if (!(__scmd_checkFrameDelay()))
-			return;
-
-		if (!(__scmd_checkUpdateInterval()))
-			return;
-		
-		auto updateParam{ __scmd_update() };
-		_rcmd_silentRun([this, updateParam{ std::move(updateParam) }]
-		{
-			__rcmd_update(updateParam);
-		});
-	}
-
-	bool Scene::__scmd_checkFrameDelay() const noexcept
+	bool Scene::__checkFrameDelay() const noexcept
 	{
 		auto const rcmdFrameCount{ __rcmdFrameCount.load(std::memory_order::acquire) };
 		return (__scmdFrameCount <= (rcmdFrameCount + __maxFrameDelay));
 	}
 
-	bool Scene::__scmd_checkUpdateInterval() noexcept
+	bool Scene::__checkUpdateInterval() noexcept
 	{
 		auto const curTime{ std::chrono::steady_clock::now() };
 		if (__updateInterval >= (curTime - __lastUpdateTime))

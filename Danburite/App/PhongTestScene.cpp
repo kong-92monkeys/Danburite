@@ -3,16 +3,8 @@
 #include "../Frameworks/PrimitiveBuilder.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-PhongTestScene::PhongTestScene() noexcept
-{
-	__pDisplaySyncListener =
-		Infra::EventListener<Frx::Display const *>::bind(
-			&PhongTestScene::__onDisplaySync, this);
-}
-
 PhongTestScene::~PhongTestScene() noexcept
 {
-	_stopLoop();
 	_rcmd_run([this]
 	{
 		_rcmd_removeGlobalMaterial(__rcmd_pLightMaterial.get());
@@ -41,16 +33,8 @@ void PhongTestScene::setDisplay(
 	auto const pPrevDisplay{ __pDisplay };
 	__pDisplay = pDisplay;
 
-	if (pPrevDisplay)
-		pPrevDisplay->getSyncEvent() -= __pDisplaySyncListener;
-
-	if (pDisplay)
-	{
-		pDisplay->getSyncEvent() += __pDisplaySyncListener;
-
-		if (__pDisplay->isPresentable())
-			__syncCameraExtent();
-	}
+	if (__pDisplay)
+		syncDisplay();
 
 	_rcmd_run([this, pPrevDisplay, pDisplay]
 	{
@@ -65,41 +49,47 @@ void PhongTestScene::setDisplay(
 	}).wait();
 }
 
-std::any PhongTestScene::_scmd_onInit()
+void PhongTestScene::syncDisplay()
 {
-	__scmd_camera.setPosition(0.0f, 0.0f, 3.0f);
-	__scmd_camera.setNear(0.1f);
-	__scmd_camera.validate();
+	if (__pDisplay->isPresentable())
+		__syncCameraExtent();
+}
+
+std::any PhongTestScene::_onInit()
+{
+	__camera.setPosition(0.0f, 0.0f, 3.0f);
+	__camera.setNear(0.1f);
+	__camera.validate();
 
 	return __GlobalData
 	{
-		.viewMatrix{ __scmd_camera.getViewMatrix() },
-		.projMatrix{ __scmd_camera.getProjectionMatrix() }
+		.viewMatrix{ __camera.getViewMatrix() },
+		.projMatrix{ __camera.getProjectionMatrix() }
 	};
 }
 
-std::any PhongTestScene::_scmd_onUpdate(
+std::any PhongTestScene::_onUpdate(
 	Time const &time)
 {
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
 
-	__scmd_objectTransform.getOrientation().rotate(
+	__objectTransform.getOrientation().rotate(
 		delta * __objectRotationSpeed, glm::vec3{ 0.0f, 1.0f, 0.0f });
 
-	__scmd_handleCamera(delta);
+	__handleCamera(delta);
 
-	__scmd_objectTransform.validate();
+	__objectTransform.validate();
 
 	__UpdateParam retVal;
-	retVal.objectTransform = __scmd_objectTransform.getMatrix();
+	retVal.objectTransform = __objectTransform.getMatrix();
 
-	if (__scmd_camera.isInvalidated())
+	if (__camera.isInvalidated())
 	{
-		__scmd_camera.validate();
+		__camera.validate();
 		retVal.globalDataUpdated = true;
-		retVal.globalData.viewMatrix = __scmd_camera.getViewMatrix();
-		retVal.globalData.projMatrix = __scmd_camera.getProjectionMatrix();
-		retVal.globalData.cameraPosition = __scmd_camera.getPosition();;
+		retVal.globalData.viewMatrix = __camera.getViewMatrix();
+		retVal.globalData.projMatrix = __camera.getProjectionMatrix();
+		retVal.globalData.cameraPosition = __camera.getPosition();;
 	}
 
 	return retVal;
@@ -177,57 +167,53 @@ void PhongTestScene::_rcmd_onUpdate(
 	renderTarget.requestRedraw();
 }
 
-void PhongTestScene::__scmd_handleCamera(
+void PhongTestScene::__handleCamera(
 	float const delta)
 {
 	if (__cameraMoveRight)
-		__scmd_camera.moveLocalX(delta * __cameraMoveSpeed);
+		__camera.moveLocalX(delta * __cameraMoveSpeed);
 
 	if (__cameraMoveLeft)
-		__scmd_camera.moveLocalX(-delta * __cameraMoveSpeed);
+		__camera.moveLocalX(-delta * __cameraMoveSpeed);
 
 	if (__cameraMoveUp)
-		__scmd_camera.moveLocalY(delta * __cameraMoveSpeed);
+		__camera.moveLocalY(delta * __cameraMoveSpeed);
 
 	if (__cameraMoveDown)
-		__scmd_camera.moveLocalY(-delta * __cameraMoveSpeed);
+		__camera.moveLocalY(-delta * __cameraMoveSpeed);
 
 	if (__cameraMoveForward)
-		__scmd_camera.moveLocalZ(-delta * __cameraMoveSpeed);
+		__camera.moveLocalZ(-delta * __cameraMoveSpeed);
 
 	if (__cameraMoveBackward)
-		__scmd_camera.moveLocalZ(delta * __cameraMoveSpeed);
+		__camera.moveLocalZ(delta * __cameraMoveSpeed);
 
 	if (__cameraRotateRight)
-		__scmd_camera.yaw(-delta * __cameraRotationSpeed);
+		__camera.yaw(-delta * __cameraRotationSpeed);
 
 	if (__cameraRotateLeft)
-		__scmd_camera.yaw(delta * __cameraRotationSpeed);
+		__camera.yaw(delta * __cameraRotationSpeed);
 
 	if (__cameraRotateUp)
-		__scmd_camera.pitch(delta * __cameraRotationSpeed);
+		__camera.pitch(delta * __cameraRotationSpeed);
 
 	if (__cameraRotateDown)
-		__scmd_camera.pitch(-delta * __cameraRotationSpeed);
+		__camera.pitch(-delta * __cameraRotationSpeed);
 }
 
 void PhongTestScene::__syncCameraExtent()
 {
-	_scmd_run([this]
-	{
-		float const displayHeight	{ static_cast<float>(__pDisplay->getHeight()) };
-		float const displayWidth	{ static_cast<float>(__pDisplay->getWidth()) };
+	float const displayHeight	{ static_cast<float>(__pDisplay->getHeight()) };
+	float const displayWidth	{ static_cast<float>(__pDisplay->getWidth()) };
 
-		float const cameraHeight	{ __scmd_camera.getNear() * glm::tan(__cameraFovy) };
-		float const cameraWidth		{ cameraHeight * (displayWidth / displayHeight) };
+	float const cameraHeight	{ __camera.getNear() * glm::tan(__cameraFovy) };
+	float const cameraWidth		{ cameraHeight * (displayWidth / displayHeight) };
 
-		__scmd_camera.setHeight(cameraHeight);
-		__scmd_camera.setWidth(cameraWidth);
-	}).wait();
+	__camera.setHeight(cameraHeight);
+	__camera.setWidth(cameraWidth);
 }
 
 void PhongTestScene::__onDisplaySync()
 {
-	if (__pDisplay->isPresentable())
-		__syncCameraExtent();
+	syncDisplay();
 }

@@ -69,7 +69,7 @@ int CLogView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
-	theApp.getIdleEvent() += __pAppIdleListener;
+	theApp.getUIIdleEvent() += __pAppIdleListener;
 
 	return 0;
 }
@@ -80,7 +80,7 @@ void CLogView::OnDestroy()
 	CFormView::OnDestroy();
 
 	// TODO: Add your message handler code here
-	theApp.getIdleEvent() -= __pAppIdleListener;
+	theApp.getUIIdleEvent() -= __pAppIdleListener;
 }
 
 void CLogView::OnBnClickedClearLogs()

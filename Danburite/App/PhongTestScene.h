@@ -11,11 +11,16 @@
 class PhongTestScene : public Frx::Scene
 {
 public:
-	PhongTestScene() noexcept;
+	PhongTestScene() = default;
 	virtual ~PhongTestScene() noexcept override;
+
+	[[nodiscard]]
+	constexpr Frx::Display *getDisplay() const noexcept;
 
 	void setDisplay(
 		Frx::Display *pDisplay);
+
+	void syncDisplay();
 
 	constexpr void startCameraMoveRight() noexcept;
 	constexpr void endCameraMoveRight() noexcept;
@@ -49,10 +54,10 @@ public:
 
 protected:
 	[[nodiscard]]
-	virtual std::any _scmd_onInit() override;
+	virtual std::any _onInit() override;
 
 	[[nodiscard]]
-	virtual std::any _scmd_onUpdate(
+	virtual std::any _onUpdate(
 		Time const &time) override;
 
 	virtual void _rcmd_onInit(
@@ -112,17 +117,20 @@ private:
 	bool __cameraRotateUp{ };
 	bool __cameraRotateDown{ };
 
-	FPSCamera __scmd_camera;
-	Frx::Transform __scmd_objectTransform;
+	FPSCamera __camera;
+	Frx::Transform __objectTransform;
 
-	Infra::EventListenerPtr<Frx::Display const *> __pDisplaySyncListener;
-
-	void __scmd_handleCamera(
+	void __handleCamera(
 		float delta);
 
 	void __syncCameraExtent();
 	void __onDisplaySync();
 };
+
+constexpr Frx::Display *PhongTestScene::getDisplay() const noexcept
+{
+	return __pDisplay;
+}
 
 constexpr void PhongTestScene::startCameraMoveRight() noexcept
 {

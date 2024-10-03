@@ -88,7 +88,7 @@ BOOL CApp::InitInstance()
 
 int CApp::ExitInstance()
 {
-	__pSceneLoader = nullptr;
+	__pSceneManager = nullptr;
 	__pRenderSystem = nullptr;
 	__pVulkanContext = nullptr;
 
@@ -112,26 +112,30 @@ void CApp::setMainView(
 		return;
 
 	if (__pMainView)
+	{
+		__pSceneManager->unregisterDisplay(__pMainView->getDisplay());
 		__pMainView->enableDisplay(false);
+	}
 
 	__pMainView = pMainView;
 
 	if (__pMainView)
-		__pMainView->enableDisplay(__pSceneLoader->getSceneType() != SceneType::NOTHING);
-
-	__pSceneLoader->setDisplay(__pMainView ? __pMainView->getDisplay() : nullptr);
+	{
+		__pMainView->enableDisplay(__pSceneManager->getSceneType() != SceneType::NOTHING);
+		__pSceneManager->registerDisplay(__pMainView->getDisplay());
+	}
 }
 
 void CApp::onKeyDown(
 	UINT const nChar)
 {
-	__pSceneLoader->onKeyDown(nChar);
+	__pSceneManager->onKeyDown(nChar);
 }
 
 void CApp::onKeyUp(
 	UINT const nChar)
 {
-	__pSceneLoader->onKeyUp(nChar);
+	__pSceneManager->onKeyUp(nChar);
 }
 
 BOOL CApp::OnIdle(LONG lCount)
@@ -171,7 +175,7 @@ void CApp::__onInitBeforeMainFrame()
 	__pRenderSystem = std::make_unique<Frx::RenderSystem>(
 		*__pVulkanContext, __pVulkanContext->getPhysicalDeviceOf(0ULL));
 
-	__pSceneLoader = std::make_unique<SceneLoader>(__executor, *__pRenderSystem);
+	__pSceneManager = std::make_unique<SceneManager>(__executor, *__pRenderSystem);
 	Infra::Logger::log(Infra::Logger::Severity::INFO, "Init completed successfully.");
 }
 
@@ -204,10 +208,10 @@ void CApp::OnAppAbout()
 void CApp::__loadScene(
 	SceneType const sceneType)
 {
-	if (__pSceneLoader->getSceneType() == sceneType)
+	if (__pSceneManager->getSceneType() == sceneType)
 		return;
 
-	__pSceneLoader->load(sceneType);
+	__pSceneManager->load(sceneType);
 
 	Infra::Logger::log(
 		Infra::Logger::Severity::INFO,

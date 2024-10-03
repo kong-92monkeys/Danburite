@@ -2,24 +2,12 @@
 #include "SceneHandler.h"
 
 void SceneHandler::init(
-	Infra::Executor &mainExecutor,
+	Infra::Executor &uiExecutor,
 	Frx::RenderSystem &renderSystem)
 {
-	__pMainExecutor		= &mainExecutor;
+	__pUIExecutor		= &uiExecutor;
 	__pRenderSystem		= &renderSystem;
 	_onInit();
-}
-
-void SceneHandler::setDisplay(
-	Frx::Display *const pDisplay) noexcept
-{
-	if (__pDisplay == pDisplay)
-		return;
-
-	__pDisplay = pDisplay;
-
-	if (__activated)
-		_onDisplayChanged(pDisplay);
 }
 
 void SceneHandler::activate()
@@ -40,12 +28,27 @@ void SceneHandler::deactivate()
 	_onDeactivated();
 }
 
+void SceneHandler::onDisplayRegistered(
+	Frx::Display *const pDisplay)
+{}
+
+void SceneHandler::onDisplayUnregistered(
+	Frx::Display *const pDisplay)
+{}
+
+void SceneHandler::onDisplaySync(
+	Frx::Display const *const pDisplay)
+{}
+
 void SceneHandler::onKeyDown(
 	UINT const nChar)
 {}
 
 void SceneHandler::onKeyUp(
 	UINT const nChar)
+{}
+
+void SceneHandler::onTick()
 {}
 
 void SceneHandler::_onInit()
@@ -57,11 +60,7 @@ void SceneHandler::_onActivated()
 void SceneHandler::_onDeactivated()
 {}
 
-void SceneHandler::_onDisplayChanged(
-	Frx::Display *const pDisplay)
-{}
-
-CMainFrame *SceneHandler::_getMainFrame() const
+CMainFrame *SceneHandler::_ui_getMainFrame() const
 {
 	return STATIC_DOWNCAST(CMainFrame, AfxGetApp()->GetMainWnd());
 }

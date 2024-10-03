@@ -65,9 +65,6 @@
     <Filter Include="View\SceneMenuViews">
       <UniqueIdentifier>{10a370b0-4b48-4685-a0d7-25c44cbd31d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SceneLoader">
-      <UniqueIdentifier>{eb7e17cb-adef-4025-8d1d-3baf908892ef}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SceneHandler">
       <UniqueIdentifier>{7a5e35d7-e4a8-471d-8af6-6be3f592ff3c}</UniqueIdentifier>
     </Filter>
@@ -88,6 +85,9 @@
     </Filter>
     <Filter Include="SceneHandler\Impl\PhongTest">
       <UniqueIdentifier>{7c7709ac-1855-45fc-8ac2-570df94ad7d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneManager">
+      <UniqueIdentifier>{67f9eb89-8b9e-45f3-8ba4-076248907389}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -124,9 +124,6 @@
     <ClInclude Include="FPSCamera.h">
       <Filter>Util\Cameras</Filter>
     </ClInclude>
-    <ClInclude Include="SceneLoader.h">
-      <Filter>SceneLoader</Filter>
-    </ClInclude>
     <ClInclude Include="SceneHandler.h">
       <Filter>SceneHandler</Filter>
     </ClInclude>
@@ -144,6 +141,9 @@
     </ClInclude>
     <ClInclude Include="SceneHandler_PhongTest.h">
       <Filter>SceneHandler\Impl\PhongTest</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>SceneManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -171,9 +171,6 @@
     <ClCompile Include="FPSCamera.cpp">
       <Filter>Util\Cameras</Filter>
     </ClCompile>
-    <ClCompile Include="SceneLoader.cpp">
-      <Filter>SceneLoader</Filter>
-    </ClCompile>
     <ClCompile Include="SceneHandler.cpp">
       <Filter>SceneHandler</Filter>
     </ClCompile>
@@ -191,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="SceneHandler_PhongTest.cpp">
       <Filter>SceneHandler\Impl\PhongTest</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>SceneManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

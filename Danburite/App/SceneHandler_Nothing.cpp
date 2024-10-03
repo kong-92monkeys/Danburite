@@ -4,5 +4,8 @@
 
 void SceneHandler_Nothing::_onActivated()
 {
-	_getMainFrame()->replaceSceneMenuView<CSceneMenuView00>();
+	_getUIExecutor().silentRun([this]
+	{
+		_ui_getMainFrame()->replaceSceneMenuView<CSceneMenuView00>();
+	});
 }

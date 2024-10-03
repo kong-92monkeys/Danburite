@@ -10,7 +10,7 @@
 #include "resource.h"       // main symbols
 #include "../Frameworks/RenderSystem.h"
 #include "MainView.h"
-#include "SceneLoader.h"
+#include "SceneManager.h"
 #include "../Infra/JobPipe.h"
 
 // CApp:
@@ -52,10 +52,10 @@ public:
 	void onKeyUp(UINT nChar);
 
 	[[nodiscard]]
-	constexpr Infra::Executor &getExecutor() noexcept;
+	constexpr Infra::Executor &getUIExecutor() noexcept;
 
 	[[nodiscard]]
-	constexpr Infra::EventView<> &getIdleEvent() const noexcept;
+	constexpr Infra::EventView<> &getUIIdleEvent() const noexcept;
 
 private:
 	Infra::JobPipe __executor;
@@ -63,7 +63,7 @@ private:
 
 	std::unique_ptr<Dev::Context> __pVulkanContext;
 	std::unique_ptr<Frx::RenderSystem> __pRenderSystem;
-	std::unique_ptr<SceneLoader> __pSceneLoader;
+	std::unique_ptr<SceneManager> __pSceneManager;
 
 	CMainView *__pMainView{ };
 
@@ -75,12 +75,12 @@ private:
 		SceneType sceneType);
 };
 
-constexpr Infra::Executor &CApp::getExecutor() noexcept
+constexpr Infra::Executor &CApp::getUIExecutor() noexcept
 {
 	return __executor;
 }
 
-constexpr Infra::EventView<> &CApp::getIdleEvent() const noexcept
+constexpr Infra::EventView<> &CApp::getUIIdleEvent() const noexcept
 {
 	return __idleEvent;
 }
