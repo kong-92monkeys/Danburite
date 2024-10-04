@@ -503,21 +503,22 @@ namespace Frx
 
 	void PhongRenderer::__createSampler()
 	{
+		auto const &limits{ _getPhysicalDevice().getProps().p10->limits };
+
 		VkSamplerCreateInfo const createInfo
 		{
 			.sType						{ VkStructureType::VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO },
 			.magFilter					{ VkFilter::VK_FILTER_LINEAR },
 			.minFilter					{ VkFilter::VK_FILTER_LINEAR },
-			.mipmapMode					{ VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST },
+			.mipmapMode					{ VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_LINEAR },
 			.addressModeU				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
 			.addressModeV				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
 			.addressModeW				{ VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT },
 			.mipLodBias					{ 0.0f },
-			.anisotropyEnable			{ VK_FALSE },
-			.maxAnisotropy				{ 1.0f },
-			.compareEnable				{ VK_FALSE },
+			.anisotropyEnable			{ VK_TRUE },
+			.maxAnisotropy				{ limits.maxSamplerAnisotropy },
 			.minLod						{ 0.0f },
-			.maxLod						{ 0.0f },
+			.maxLod						{ 16.0f },
 			.borderColor				{ VkBorderColor::VK_BORDER_COLOR_INT_OPAQUE_BLACK },
 			.unnormalizedCoordinates	{ VK_FALSE }
 		};
