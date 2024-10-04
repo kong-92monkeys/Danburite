@@ -1,6 +1,12 @@
 #include "pch.h"
 #include "RandomExt.h"
 
+bool RandomExt::nextBool() noexcept
+{
+	std::uniform_int_distribution dist{ 0, 1 };
+	return dist(__eng);
+}
+
 float RandomExt::nextFloat(
 	float const min,
 	float const max) noexcept

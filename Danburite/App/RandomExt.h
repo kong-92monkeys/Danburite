@@ -5,6 +5,9 @@ class RandomExt
 {
 public:
 	[[nodiscard]]
+	bool nextBool() noexcept;
+
+	[[nodiscard]]
 	float nextFloat(
 		float min, float max) noexcept;
 

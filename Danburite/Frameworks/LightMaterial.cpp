@@ -16,6 +16,13 @@ namespace Frx
 		_invokeUpdateEvent();
 	}
 
+	void LightMaterial::setMaxDistance(
+		float const distance)
+	{
+		_getTypedData().maxDistance = distance;
+		_invokeUpdateEvent();
+	}
+
 	void LightMaterial::setColor(
 		glm::vec3 const &color)
 	{
@@ -34,6 +41,13 @@ namespace Frx
 		glm::vec3 const &direction)
 	{
 		_getTypedData().direction = direction;
+		_invokeUpdateEvent();
+	}
+
+	void LightMaterial::setAttenuation(
+		glm::vec3 const &attenuation)
+	{
+		_getTypedData().attenuation = attenuation;
 		_invokeUpdateEvent();
 	}
 }

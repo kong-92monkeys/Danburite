@@ -27,7 +27,7 @@ float LightUtil_calcSpecularFactor(
 	return pow(max(dot(lightReflectionDir, -viewDir), 0.0f), shininess);
 }
 
-float LightUtil_calcFactor_directional(
+float LightUtil_calcIntensity_directional(
 	in const LightMaterial light,
 	in const vec3 cameraPos,
 	in const vec3 position,
@@ -41,7 +41,7 @@ float LightUtil_calcFactor_directional(
 	return (ambientFactor + diffuseFactor + specularFactor);
 }
 
-float LightUtil_calcFactor_point(
+float LightUtil_calcIntensity_point(
 	in const LightMaterial light,
 	in const vec3 cameraPos,
 	in const vec3 position,
@@ -57,6 +57,42 @@ float LightUtil_calcFactor_point(
 	return (ambientFactor + diffuseFactor + specularFactor);
 }
 
+float LightUtil_calcIntensity(
+	in const LightMaterial light,
+	in const vec3 cameraPos,
+	in const vec3 position,
+	in const vec3 normal,
+	in const float shininess)
+{
+	float intensity = 0.0f;
+
+	switch (light.type)
+	{
+		case LIGHT_TYPE_DIRECTIONAL:
+			intensity = LightUtil_calcIntensity_directional(light, cameraPos, position, normal, shininess);
+			break;
+
+		case LIGHT_TYPE_POINT:
+			intensity = LightUtil_calcIntensity_point(light, cameraPos, position, normal, shininess);
+			break;
+
+		case LIGHT_TYPE_SPOT:
+			break;
+	}
+
+	return intensity;
+}
+
+float LightUtil_calcAttenuation(
+	in const vec3 attenuation,
+	in const float lightDistance)
+{
+	const float attConst	= attenuation[0];
+	const float attLinear	= attenuation[1];
+	const float attQuad		= attenuation[2];
+	return (1.0 / (attConst + (attLinear * lightDistance) + (attQuad * lightDistance * lightDistance)));
+}
+
 vec3 LightUtil_calcColor(
 	in const LightMaterial light,
 	in const vec3 cameraPos,
@@ -64,23 +100,18 @@ vec3 LightUtil_calcColor(
 	in const vec3 normal,
 	in const float shininess)
 {
-	float factor = 0.0f;
+	vec3 retVal = vec3(0.0f, 0.0f, 0.0f);
 
-	switch (light.type)
+	const float lightDistance = length(position - light.position);
+	if (lightDistance < light.maxDistance)
 	{
-		case LIGHT_TYPE_DIRECTIONAL:
-			factor = LightUtil_calcFactor_directional(light, cameraPos, position, normal, shininess);
-			break;
+		const float intensity		= LightUtil_calcIntensity(light, cameraPos, position, normal, shininess);
+		const float attenuation		= LightUtil_calcAttenuation(light.attenuation, lightDistance);
 
-		case LIGHT_TYPE_POINT:
-			factor = LightUtil_calcFactor_point(light, cameraPos, position, normal, shininess);
-			break;
-
-		case LIGHT_TYPE_SPOT:
-			break;
+		retVal = ((intensity * attenuation) * light.color);
 	}
 
-	return (light.color * factor);
+	return retVal;
 }
 
 #endif

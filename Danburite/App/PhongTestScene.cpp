@@ -73,9 +73,19 @@ void PhongTestScene::addLight()
 	_rcmd_silentRun([this]
 	{
 		auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
-		pLightMaterial->setType(Frx::LightType::POINT);
+
+		//auto const lightType{ __randomExt.nextBool() ? Frx::LightType::POINT : Frx::LightType::SPOT };
+		auto const lightType{ Frx::LightType::POINT };
+
+		pLightMaterial->setType(lightType);
 		pLightMaterial->setColor(__randomExt.nextVec3(0.0f, 1.0f));
 		pLightMaterial->setPosition(__randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
+
+		if (lightType == Frx::LightType::SPOT)
+		{
+			auto const direction{ glm::normalize(__randomExt.nextVec3(-1.0f, 1.0f)) };
+			pLightMaterial->setDirection(direction);
+		}
 
 		_rcmd_addGlobalMaterial(pLightMaterial.get());
 		__rcmd_lightMaterials.emplace_back(std::move(pLightMaterial));
