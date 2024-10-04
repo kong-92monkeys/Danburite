@@ -31,61 +31,52 @@ namespace Render
 		return *__pImageView;
 	}
 
+	void Texture::transitLayout(
+		VkPipelineStageFlags2 const srcStageMask,
+		VkAccessFlags2 const srcAccessMask,
+		VkPipelineStageFlags2 const dstStageMask,
+		VkAccessFlags2 const dstAccessMask,
+		VkImageLayout const oldLayout,
+		VkImageLayout const newLayout,
+		VkImageSubresourceRange const &subresourceRange)
+	{
+		__commandExecutor.reserve([=, &image{ *__pImage }] (auto &cmdBuffer)
+		{
+			VkImageMemoryBarrier2 const imageBarrier
+			{
+				.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 },
+				.srcStageMask			{ srcStageMask },
+				.srcAccessMask			{ srcAccessMask },
+				.dstStageMask			{ dstStageMask },
+				.dstAccessMask			{ dstAccessMask },
+				.oldLayout				{ oldLayout },
+				.newLayout				{ newLayout },
+				.image					{ image.getHandle() },
+				.subresourceRange		{ subresourceRange }
+			};
+
+			VkDependencyInfo const barrier
+			{
+				.sType						{ VkStructureType::VK_STRUCTURE_TYPE_DEPENDENCY_INFO },
+				.imageMemoryBarrierCount	{ 1U },
+				.pImageMemoryBarriers		{ &imageBarrier }
+			};
+
+			cmdBuffer.vkCmdPipelineBarrier2(&barrier);
+		});
+	}
+
 	void Texture::updateData(
-		ImageRegionInfo const &regionInfo,
+		VkBufferImageCopy2 const &region,
+		VkImageLayout const imageLayout,
 		void const *pData,
-		size_t const size,
-		VkPipelineStageFlags2 const beforeStageMask,
-		VkAccessFlags2 const beforeAccessMask,
-		VkPipelineStageFlags2 const afterStageMask,
-		VkAccessFlags2 const afterAccessMask,
-		VkImageLayout const afterLayout)
+		size_t size)
 	{
 		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
-		__commandExecutor.reserve([=, &dst{ *__pImage }, pSrc{ std::move(pStagingBuffer) }] (auto &cmdBuffer) mutable
+		__commandExecutor.reserve([=, pSrc{ std::move(pStagingBuffer) }, &dst{ *__pImage }] (auto &cmdBuffer) mutable
 		{
-			VkImageSubresourceRange const subresourceRange
-			{
-				.aspectMask			{ regionInfo.imageSubresource.aspectMask },
-				.baseMipLevel		{ regionInfo.imageSubresource.mipLevel },
-				.levelCount			{ 1U },
-				.baseArrayLayer		{ regionInfo.imageSubresource.baseArrayLayer },
-				.layerCount			{ regionInfo.imageSubresource.layerCount }
-			};
-
-			VkImageMemoryBarrier2 const beforeMemoryBarrier
-			{
-				.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 },
-				.srcStageMask			{ beforeStageMask },
-				.srcAccessMask			{ beforeAccessMask },
-				.dstStageMask			{ VK_PIPELINE_STAGE_2_COPY_BIT },
-				.dstAccessMask			{ VK_ACCESS_2_TRANSFER_WRITE_BIT },
-				.oldLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED },
-				.newLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL },
-				.image					{ dst.getHandle() },
-				.subresourceRange		{ subresourceRange }
-			};
-
-			VkDependencyInfo const beforeBarrier
-			{
-				.sType						{ VkStructureType::VK_STRUCTURE_TYPE_DEPENDENCY_INFO },
-				.imageMemoryBarrierCount	{ 1U },
-				.pImageMemoryBarriers		{ &beforeMemoryBarrier }
-			};
-
-			VkBufferImageCopy2 const region
-			{
-				.sType				{ VkStructureType::VK_STRUCTURE_TYPE_BUFFER_IMAGE_COPY_2 },
-				.bufferOffset		{ 0U },
-				.bufferRowLength	{ regionInfo.bufferRowLength },
-				.bufferImageHeight	{ regionInfo.bufferImageHeight },
-				.imageSubresource	{ regionInfo.imageSubresource },
-				.imageOffset		{ regionInfo.imageOffset },
-				.imageExtent		{ regionInfo.imageExtent }
-			};
-
 			VkCopyBufferToImageInfo2 const copyInfo
 			{
 				.sType			{ VkStructureType::VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2 },
@@ -96,31 +87,23 @@ namespace Render
 				.pRegions		{ &region }
 			};
 
-			VkImageMemoryBarrier2 const afterMemoryBarrier
-			{
-				.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 },
-				.srcStageMask			{ VK_PIPELINE_STAGE_2_COPY_BIT },
-				.srcAccessMask			{ VK_ACCESS_2_TRANSFER_WRITE_BIT },
-				.dstStageMask			{ afterStageMask },
-				.dstAccessMask			{ afterAccessMask },
-				.oldLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL },
-				.newLayout				{ afterLayout },
-				.image					{ dst.getHandle() },
-				.subresourceRange		{ subresourceRange }
-			};
-
-			VkDependencyInfo const afterBarrier
-			{
-				.sType						{ VkStructureType::VK_STRUCTURE_TYPE_DEPENDENCY_INFO },
-				.imageMemoryBarrierCount	{ 1U },
-				.pImageMemoryBarriers		{ &afterMemoryBarrier }
-			};
-
-			cmdBuffer.vkCmdPipelineBarrier2(&beforeBarrier);
 			cmdBuffer.vkCmdCopyBufferToImage2(&copyInfo);
-			cmdBuffer.vkCmdPipelineBarrier2(&afterBarrier);
-
 			__resourcePool.recycleBuffer(ResourcePool::BufferType::STAGING, std::move(pSrc));
+		});
+	}
+
+	void Texture::blit(
+		VkImageLayout const srcImageLayout,
+		VkImageLayout const dstImageLayout,
+		VkImageBlit const &region,
+		VkFilter const filter)
+	{
+		__commandExecutor.reserve([=, &image{ *__pImage }] (auto &cmdBuffer)
+		{
+			cmdBuffer.vkCmdBlitImage(
+				image.getHandle(), srcImageLayout,
+				image.getHandle(), dstImageLayout,
+				1U, &region, filter);
 		});
 	}
 

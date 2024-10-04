@@ -600,6 +600,23 @@ namespace VK
 			commandBuffer, pCopyBufferToImageInfo);
 	}
 
+	void Device::vkCmdBlitImage(
+		VkCommandBuffer const commandBuffer,
+		VkImage const srcImage,
+		VkImageLayout const srcImageLayout,
+		VkImage const dstImage,
+		VkImageLayout const dstImageLayout,
+		uint32_t const regionCount,
+		VkImageBlit const *const pRegions,
+		VkFilter const filter)
+	{
+		__deviceProc.vkCmdBlitImage(
+			commandBuffer,
+			srcImage, srcImageLayout,
+			dstImage, dstImageLayout,
+			regionCount, pRegions, filter);
+	}
+
 	void Device::vkCmdPipelineBarrier2(
 		VkCommandBuffer const commandBuffer,
 		VkDependencyInfo const *const pDependencyInfo)
@@ -778,6 +795,7 @@ namespace VK
 		LOAD_DEVICE_PROC(vkCmdDrawIndexed);
 		LOAD_DEVICE_PROC(vkCmdCopyBuffer2);
 		LOAD_DEVICE_PROC(vkCmdCopyBufferToImage2);
+		LOAD_DEVICE_PROC(vkCmdBlitImage);
 		LOAD_DEVICE_PROC(vkCmdPipelineBarrier2);
 		LOAD_DEVICE_PROC(vkCmdBindVertexBuffers);
 		LOAD_DEVICE_PROC(vkCmdBindIndexBuffer);

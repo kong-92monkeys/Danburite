@@ -54,10 +54,9 @@ namespace Frx
 		[[nodiscard]]
 		std::unique_ptr<Render::Texture> _rcmd_createTexture(
 			std::string_view const &assetPath,
-			VkPipelineStageFlags2 beforeStageMask,
-			VkAccessFlags2 beforeAccessMask,
-			VkPipelineStageFlags2 afterStageMask,
-			VkAccessFlags2 afterAccessMask);
+			bool useMipmap,
+			VkPipelineStageFlags2 dstStageMask,
+			VkAccessFlags2 dstAccessMask);
 
 		template <std::derived_from<Render::Material> $Material, typename ...$Args>
 		[[nodiscard]]

@@ -317,8 +317,7 @@ void PhongTestScene::__rcmd_createPlaneObject()
 	__rcmd_pPlaneDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
 
 	__rcmd_pPlaneTexture = _rcmd_createTexture(
-		"Images/wood.jpg",
-		VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
+		"Images/wood.jpg", true,
 		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
 		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
 
@@ -359,8 +358,7 @@ void PhongTestScene::__rcmd_createContainerObject()
 	__rcmd_pContainerDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
 
 	__rcmd_pContainerTexture = _rcmd_createTexture(
-		"Images/container.png",
-		VK_PIPELINE_STAGE_2_NONE, VK_ACCESS_2_NONE,
+		"Images/container.png", true,
 		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
 		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
 

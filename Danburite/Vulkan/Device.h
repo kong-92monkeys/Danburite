@@ -322,6 +322,16 @@ namespace VK
 			VkCommandBuffer commandBuffer,
 			VkCopyBufferToImageInfo2 const *pCopyBufferToImageInfo);
 
+		void vkCmdBlitImage(
+			VkCommandBuffer commandBuffer,
+			VkImage srcImage,
+			VkImageLayout srcImageLayout,
+			VkImage dstImage,
+			VkImageLayout dstImageLayout,
+			uint32_t regionCount,
+			VkImageBlit const *pRegions,
+			VkFilter filter);
+
 		void vkCmdPipelineBarrier2(
 			VkCommandBuffer commandBuffer,
 			VkDependencyInfo const *pDependencyInfo);

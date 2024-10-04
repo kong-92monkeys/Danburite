@@ -71,17 +71,15 @@ namespace Frx
 
 	std::unique_ptr<Render::Texture> Scene::_rcmd_createTexture(
 		std::string_view const &assetPath,
-		VkPipelineStageFlags2 const beforeStageMask,
-		VkAccessFlags2 const beforeAccessMask,
-		VkPipelineStageFlags2 const afterStageMask,
-		VkAccessFlags2 const afterAccessMask)
+		bool const useMipmap,
+		VkPipelineStageFlags2 const dstStageMask,
+		VkAccessFlags2 const dstAccessMask)
 	{
 		return std::unique_ptr<Render::Texture>
 		{
 			TextureUtil::loadTexture(
 				*__pRenderEngine, assetPath,
-				beforeStageMask, beforeAccessMask,
-				afterStageMask, afterAccessMask)
+				useMipmap, dstStageMask, dstAccessMask)
 		};
 	}
 

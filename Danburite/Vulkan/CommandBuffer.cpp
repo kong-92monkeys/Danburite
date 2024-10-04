@@ -98,6 +98,22 @@ namespace VK
 			getHandle(), pCopyBufferToImageInfo);
 	}
 
+	void CommandBuffer::vkCmdBlitImage(
+		VkImage const srcImage,
+		VkImageLayout const srcImageLayout,
+		VkImage const dstImage,
+		VkImageLayout const dstImageLayout,
+		uint32_t const regionCount,
+		VkImageBlit const *const pRegions,
+		VkFilter const filter)
+	{
+		__device.vkCmdBlitImage(
+			getHandle(),
+			srcImage, srcImageLayout,
+			dstImage, dstImageLayout,
+			regionCount, pRegions, filter);
+	}
+
 	void CommandBuffer::vkCmdPipelineBarrier2(
 		VkDependencyInfo const *const pDependencyInfo)
 	{

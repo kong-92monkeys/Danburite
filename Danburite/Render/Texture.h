@@ -58,15 +58,26 @@ namespace Render
 		[[nodiscard]]
 		VK::ImageView const &getImageView() const noexcept;
 
+		void transitLayout(
+			VkPipelineStageFlags2 srcStageMask,
+			VkAccessFlags2 srcAccessMask,
+			VkPipelineStageFlags2 dstStageMask,
+			VkAccessFlags2 dstAccessMask,
+			VkImageLayout oldLayout,
+			VkImageLayout newLayout,
+			VkImageSubresourceRange const &subresourceRange);
+
 		void updateData(
-			ImageRegionInfo const &regionInfo,
+			VkBufferImageCopy2 const &region,
+			VkImageLayout imageLayout,
 			void const *pData,
-			size_t size,
-			VkPipelineStageFlags2 beforeStageMask,
-			VkAccessFlags2 beforeAccessMask,
-			VkPipelineStageFlags2 afterStageMask,
-			VkAccessFlags2 afterAccessMask,
-			VkImageLayout afterLayout);
+			size_t size);
+
+		void blit(
+			VkImageLayout srcImageLayout,
+			VkImageLayout dstImageLayout,
+			VkImageBlit const &region,
+			VkFilter filter);
 
 	private:
 		VK::Device &__device;

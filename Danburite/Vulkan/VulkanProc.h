@@ -151,6 +151,7 @@ namespace VK
 		DECLARE_PROC(vkCmdDrawIndexed);
 		DECLARE_PROC(vkCmdCopyBuffer2);
 		DECLARE_PROC(vkCmdCopyBufferToImage2);
+		DECLARE_PROC(vkCmdBlitImage);
 		DECLARE_PROC(vkCmdPipelineBarrier2);
 		DECLARE_PROC(vkCmdBindVertexBuffers);
 		DECLARE_PROC(vkCmdBindIndexBuffer);
