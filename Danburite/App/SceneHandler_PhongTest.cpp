@@ -40,6 +40,10 @@ void SceneHandler_PhongTest::onKeyDown(
 {
 	switch (nChar)
 	{
+		case VK_SHIFT:
+			__pScene->startCameraMoveAcceleration();
+			break;
+
 		case 'd':
 		case 'D':
 			__pScene->startCameraMoveRight();
@@ -93,6 +97,10 @@ void SceneHandler_PhongTest::onKeyUp(
 {
 	switch (nChar)
 	{
+		case VK_SHIFT:
+			__pScene->endCameraMoveAcceleration();
+			break;
+
 		case 'd':
 		case 'D':
 			__pScene->endCameraMoveRight();

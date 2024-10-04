@@ -12,28 +12,26 @@ namespace Render
 	class Texture : public Infra::Unique
 	{
 	public:
-		// TODO: Mipmap handling
-
 		struct ImageCreateInfo
 		{
 		public:
-			VkImageType imageType{};
-			VkFormat format{};
-			VkExtent3D extent{};
-			uint32_t mipLevels{};
-			uint32_t arrayLayers{};
-			VkSampleCountFlagBits samples{};
-			VkImageTiling tiling{};
-			VkImageUsageFlags usage{};
+			VkImageType imageType{ };
+			VkFormat format{ };
+			VkExtent3D extent{ };
+			uint32_t mipLevels{ };
+			uint32_t arrayLayers{ };
+			VkSampleCountFlagBits samples{ };
+			VkImageTiling tiling{ };
+			VkImageUsageFlags usage{ };
 		};
 
 		struct ImageViewCreateInfo
 		{
 		public:
-			VkImageViewType viewType{};
-			VkFormat format{};
-			VkComponentMapping components{};
-			VkImageSubresourceRange subresourceRange{};
+			VkImageViewType viewType{ };
+			VkFormat format{ };
+			VkComponentMapping components{ };
+			VkImageSubresourceRange subresourceRange{ };
 		};
 
 		struct ImageRegionInfo
@@ -67,7 +65,8 @@ namespace Render
 			VkPipelineStageFlags2 beforeStageMask,
 			VkAccessFlags2 beforeAccessMask,
 			VkPipelineStageFlags2 afterStageMask,
-			VkAccessFlags2 afterAccessMask);
+			VkAccessFlags2 afterAccessMask,
+			VkImageLayout afterLayout);
 
 	private:
 		VK::Device &__device;

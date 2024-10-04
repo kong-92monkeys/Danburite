@@ -1,6 +1,14 @@
 #include "pch.h"
 #include "RandomExt.h"
 
+float RandomExt::nextFloat(
+	float const min,
+	float const max) noexcept
+{
+	std::uniform_real_distribution<float> dist{ min, max };
+	return dist(__eng);
+}
+
 glm::vec3 RandomExt::nextVec3(
 	float const min,
 	float const max) noexcept

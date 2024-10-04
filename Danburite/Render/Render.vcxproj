@@ -34,7 +34,6 @@
     <ClInclude Include="SubLayer.h" />
     <ClInclude Include="SwapchainException.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="TextureUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Device\Device.vcxproj">
@@ -68,7 +67,6 @@
     <ClCompile Include="SubLayer.cpp" />
     <ClCompile Include="SwapchainException.cpp" />
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TextureUtil.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

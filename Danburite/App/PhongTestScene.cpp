@@ -44,11 +44,6 @@ void PhongTestScene::setDisplay(
 		return;
 
 	auto const pPrevDisplay{ __pDisplay };
-	__pDisplay = pDisplay;
-
-	if (__pDisplay)
-		syncDisplay();
-
 	_rcmd_run([this, pPrevDisplay, pDisplay]
 	{
 		if (pPrevDisplay)
@@ -60,6 +55,11 @@ void PhongTestScene::setDisplay(
 			pDisplay->rcmd_getRenderTarget().addLayer(__rcmd_pLayer.get());
 		}
 	}).wait();
+
+	__pDisplay = pDisplay;
+
+	if (__pDisplay)
+		syncDisplay();
 }
 
 void PhongTestScene::syncDisplay()
@@ -74,8 +74,8 @@ void PhongTestScene::addLight()
 	{
 		auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
 		pLightMaterial->setType(Frx::LightType::POINT);
-		pLightMaterial->setColor(__rcmd_randomExt.nextVec3(0.0f, 1.0f));
-		pLightMaterial->setPosition(__rcmd_randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
+		pLightMaterial->setColor(__randomExt.nextVec3(0.0f, 1.0f));
+		pLightMaterial->setPosition(__randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
 
 		_rcmd_addGlobalMaterial(pLightMaterial.get());
 		__rcmd_lightMaterials.emplace_back(std::move(pLightMaterial));
@@ -104,6 +104,24 @@ std::any PhongTestScene::_onInit()
 	__camera.validate();
 
 	__UpdateParam retVal;
+	retVal.containerTransforms.resize(__CONTAINER_COUNT);
+
+	for (size_t containerIt{ }; containerIt < __CONTAINER_COUNT; ++containerIt)
+	{
+		auto &transformInfo	{ __containerTransforms[containerIt] };
+		auto &transform		{ __containerTransforms[containerIt].transform };
+
+		transformInfo.up				= glm::normalize(__randomExt.nextVec3(-1.0f, 1.0f));
+		transformInfo.rotationSpeed		= __randomExt.nextFloat(0.1f, 2.0f);
+
+		transform.getPosition().set(
+			__randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
+
+		transform.validate();
+
+		auto &matrix{ retVal.containerTransforms[containerIt] };
+		matrix = transform.getMatrix();
+	}
 
 	retVal.cameraUpdated	= true;
 	retVal.viewMatrix		= __camera.getViewMatrix();
@@ -117,9 +135,23 @@ std::any PhongTestScene::_onUpdate(
 	Time const &time)
 {
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
-	__handleCamera(delta);
+	__updateCamera(delta);
 
 	__UpdateParam retVal;
+	retVal.containerTransforms.resize(__CONTAINER_COUNT);
+
+	for (size_t containerIt{ }; containerIt < __CONTAINER_COUNT; ++containerIt)
+	{
+		auto &transformInfo	{ __containerTransforms[containerIt] };
+		auto &transform		{ __containerTransforms[containerIt].transform };
+		auto &orientation	{ transform.getOrientation() };
+
+		orientation.rotate(transformInfo.rotationSpeed * delta, transformInfo.up);
+		transform.validate();
+
+		auto &matrix{ retVal.containerTransforms[containerIt] };
+		matrix = transform.getMatrix();
+	}
 
 	if (__camera.isInvalidated())
 	{
@@ -136,6 +168,23 @@ std::any PhongTestScene::_onUpdate(
 void PhongTestScene::_rcmd_onInit(
 	std::any const &initParam)
 {
+	auto const initData{ std::any_cast<__UpdateParam>(initParam) };
+
+	for (size_t containerIt{ }; containerIt < __CONTAINER_COUNT; ++containerIt)
+	{
+		auto &pTransformMaterial{ __rcmd_containerTransformMaterials[containerIt] };
+		pTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
+
+		auto const &transform{ initData.containerTransforms[containerIt] };
+		pTransformMaterial->setTransform(transform);
+	}
+
+	__rcmd_globalData.viewMatrix = initData.viewMatrix;
+	__rcmd_globalData.projMatrix = initData.projMatrix;
+	__rcmd_globalData.cameraPos = initData.cameraPos;
+
+	_rcmd_setGlobalData(__rcmd_globalData);
+
 	__rcmd_pLayer = _rcmd_createLayer();
 	__rcmd_pRenderer = _rcmd_createRenderer<Frx::PhongRenderer>();
 
@@ -144,14 +193,6 @@ void PhongTestScene::_rcmd_onInit(
 
 	__rcmd_pLayer->addRenderObject(__rcmd_pPlaneObject.get());
 	__rcmd_pLayer->addRenderObject(__rcmd_pContainerObject.get());
-
-	auto const initData{ std::any_cast<__UpdateParam>(initParam) };
-
-	__rcmd_globalData.viewMatrix	= initData.viewMatrix;
-	__rcmd_globalData.projMatrix	= initData.projMatrix;
-	__rcmd_globalData.cameraPos		= initData.cameraPos;
-
-	_rcmd_setGlobalData(__rcmd_globalData);
 }
 
 void PhongTestScene::_rcmd_onUpdate(
@@ -161,6 +202,14 @@ void PhongTestScene::_rcmd_onUpdate(
 		return;
 
 	auto const param{ std::any_cast<__UpdateParam>(updateParam) };
+
+	for (size_t containerIt{ }; containerIt < __CONTAINER_COUNT; ++containerIt)
+	{
+		auto &pTransformMaterial{ __rcmd_containerTransformMaterials[containerIt] };
+
+		auto const &transform{ param.containerTransforms[containerIt] };
+		pTransformMaterial->setTransform(transform);
+	}
 
 	if (param.cameraUpdated || __rcmd_lightUpdated)
 	{
@@ -194,26 +243,31 @@ void PhongTestScene::_rcmd_onUpdate(
 	renderTarget.requestRedraw();
 }
 
-void PhongTestScene::__handleCamera(
+void PhongTestScene::__updateCamera(
 	float const delta)
 {
+	float cameraMoveSpeed{ __cameraMoveSpeed };
+
+	if (__cameraMoveAccelerated)
+		cameraMoveSpeed *= 3.0f;
+
 	if (__cameraMoveRight)
-		__camera.moveLocalX(delta * __cameraMoveSpeed);
+		__camera.moveLocalX(delta * cameraMoveSpeed);
 
 	if (__cameraMoveLeft)
-		__camera.moveLocalX(-delta * __cameraMoveSpeed);
+		__camera.moveLocalX(-delta * cameraMoveSpeed);
 
 	if (__cameraMoveUp)
-		__camera.moveLocalY(delta * __cameraMoveSpeed);
+		__camera.moveLocalY(delta * cameraMoveSpeed);
 
 	if (__cameraMoveDown)
-		__camera.moveLocalY(-delta * __cameraMoveSpeed);
+		__camera.moveLocalY(-delta * cameraMoveSpeed);
 
 	if (__cameraMoveForward)
-		__camera.moveLocalZ(-delta * __cameraMoveSpeed);
+		__camera.moveLocalZ(-delta * cameraMoveSpeed);
 
 	if (__cameraMoveBackward)
-		__camera.moveLocalZ(delta * __cameraMoveSpeed);
+		__camera.moveLocalZ(delta * cameraMoveSpeed);
 
 	if (__cameraRotateRight)
 		__camera.yaw(-delta * __cameraRotationSpeed);
@@ -310,18 +364,6 @@ void PhongTestScene::__rcmd_createContainerObject()
 		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
 		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
 
-	for (auto &pTransformMaterial : __rcmd_containerTransformMaterials)
-	{
-		pTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
-
-		glm::mat4 transform{ 1.0f };
-		transform = glm::translate(
-			transform,
-			__rcmd_randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
-
-		pTransformMaterial->setTransform(transform);
-	}
-
 	__rcmd_pContainerPhongMaterial = _rcmd_createMaterial<Frx::PhongMaterial>();
 	__rcmd_pContainerPhongMaterial->setAlbedoTexture(__rcmd_pContainerTexture.get());
 
@@ -329,9 +371,9 @@ void PhongTestScene::__rcmd_createContainerObject()
 	__rcmd_pContainerObject->setMesh(__rcmd_pContainerMesh.get());
 	__rcmd_pContainerObject->setDrawParam(__rcmd_pContainerDrawParam.get());
 	__rcmd_pContainerObject->setRenderer(__rcmd_pRenderer.get());
-	__rcmd_pContainerObject->setInstanceCount(__CONTAINER_OBJECT_COUNT);
+	__rcmd_pContainerObject->setInstanceCount(__CONTAINER_COUNT);
 
-	for (uint32_t objIter{ }; objIter < __CONTAINER_OBJECT_COUNT; ++objIter)
+	for (uint32_t objIter{ }; objIter < __CONTAINER_COUNT; ++objIter)
 	{
 		auto &materialPack{ __rcmd_pContainerObject->getMaterialPackOf(objIter) };
 		materialPack.setMaterial(__rcmd_containerTransformMaterials[objIter].get());

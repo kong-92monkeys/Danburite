@@ -38,13 +38,23 @@ namespace Render
 		VkPipelineStageFlags2 const beforeStageMask,
 		VkAccessFlags2 const beforeAccessMask,
 		VkPipelineStageFlags2 const afterStageMask,
-		VkAccessFlags2 const afterAccessMask)
+		VkAccessFlags2 const afterAccessMask,
+		VkImageLayout const afterLayout)
 	{
 		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
 		__commandExecutor.reserve([=, &dst{ *__pImage }, pSrc{ std::move(pStagingBuffer) }] (auto &cmdBuffer) mutable
 		{
+			VkImageSubresourceRange const subresourceRange
+			{
+				.aspectMask			{ regionInfo.imageSubresource.aspectMask },
+				.baseMipLevel		{ regionInfo.imageSubresource.mipLevel },
+				.levelCount			{ 1U },
+				.baseArrayLayer		{ regionInfo.imageSubresource.baseArrayLayer },
+				.layerCount			{ regionInfo.imageSubresource.layerCount }
+			};
+
 			VkImageMemoryBarrier2 const beforeMemoryBarrier
 			{
 				.sType					{ VkStructureType::VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2 },
@@ -55,13 +65,7 @@ namespace Render
 				.oldLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED },
 				.newLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL },
 				.image					{ dst.getHandle() },
-				.subresourceRange		{
-					.aspectMask			{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT },
-					.baseMipLevel		{ 0U },
-					.levelCount			{ 1U },
-					.baseArrayLayer		{ 0U },
-					.layerCount			{ 1U }
-				}
+				.subresourceRange		{ subresourceRange }
 			};
 
 			VkDependencyInfo const beforeBarrier
@@ -100,15 +104,9 @@ namespace Render
 				.dstStageMask			{ afterStageMask },
 				.dstAccessMask			{ afterAccessMask },
 				.oldLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL },
-				.newLayout				{ VkImageLayout::VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+				.newLayout				{ afterLayout },
 				.image					{ dst.getHandle() },
-				.subresourceRange		{
-					.aspectMask			{ VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT },
-					.baseMipLevel		{ 0U },
-					.levelCount			{ 1U },
-					.baseArrayLayer		{ 0U },
-					.layerCount			{ 1U }
-				}
+				.subresourceRange		{ subresourceRange }
 			};
 
 			VkDependencyInfo const afterBarrier

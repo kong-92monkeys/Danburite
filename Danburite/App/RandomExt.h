@@ -5,6 +5,10 @@ class RandomExt
 {
 public:
 	[[nodiscard]]
+	float nextFloat(
+		float min, float max) noexcept;
+
+	[[nodiscard]]
 	glm::vec3 nextVec3(
 		float min, float max) noexcept;
 

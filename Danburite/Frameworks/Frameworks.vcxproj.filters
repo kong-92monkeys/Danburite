@@ -55,6 +55,9 @@
     <Filter Include="Utils\PrimitiveBuilder">
       <UniqueIdentifier>{a0127a16-4b87-428a-baf9-6f222270fd09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\TextureUtil">
+      <UniqueIdentifier>{7dadebd9-3725-4272-82eb-7f529793436a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -105,6 +108,9 @@
     <ClInclude Include="LightMaterial.h">
       <Filter>Materials\LightMaterial</Filter>
     </ClInclude>
+    <ClInclude Include="TextureUtil.h">
+      <Filter>Utils\TextureUtil</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -145,6 +151,9 @@
     </ClCompile>
     <ClCompile Include="LightMaterial.cpp">
       <Filter>Materials\LightMaterial</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureUtil.cpp">
+      <Filter>Utils\TextureUtil</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

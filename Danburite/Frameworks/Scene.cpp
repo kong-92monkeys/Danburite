@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include "../Render/TextureUtil.h"
+#include "TextureUtil.h"
 
 namespace Frx
 {
@@ -78,7 +78,7 @@ namespace Frx
 	{
 		return std::unique_ptr<Render::Texture>
 		{
-			Render::TextureUtil::loadTexture(
+			TextureUtil::loadTexture(
 				*__pRenderEngine, assetPath,
 				beforeStageMask, beforeAccessMask,
 				afterStageMask, afterAccessMask)

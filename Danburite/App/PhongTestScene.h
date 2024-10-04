@@ -26,6 +26,9 @@ public:
 	void addLight();
 	void removeLight();
 
+	constexpr void startCameraMoveAcceleration() noexcept;
+	constexpr void endCameraMoveAcceleration() noexcept;
+
 	constexpr void startCameraMoveRight() noexcept;
 	constexpr void endCameraMoveRight() noexcept;
 
@@ -71,6 +74,8 @@ protected:
 		std::any const &updateParam) override;
 
 private:
+	static constexpr uint32_t __CONTAINER_COUNT{ 400U };
+
 	struct __GlobalData
 	{
 	public:
@@ -92,6 +97,16 @@ private:
 		glm::mat4 viewMatrix		{ 1.0f };
 		glm::mat4 projMatrix		{ 1.0f };
 		glm::vec3 cameraPos			{ 0.0f };
+
+		std::vector<glm::mat4> containerTransforms;
+	};
+
+	struct __ObjectTransformInfo
+	{
+	public:
+		glm::vec3 up{ };
+		float rotationSpeed{ };
+		Frx::Transform transform;
 	};
 
 	std::unique_ptr<Frx::PhongRenderer> __rcmd_pRenderer;
@@ -103,11 +118,10 @@ private:
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPlanePhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pPlaneObject;
 
-	static constexpr uint32_t __CONTAINER_OBJECT_COUNT{ 400U };
 	std::unique_ptr<Render::Mesh> __rcmd_pContainerMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pContainerDrawParam;
 	std::unique_ptr<Render::Texture> __rcmd_pContainerTexture;
-	std::array<std::unique_ptr<Frx::TransformMaterial>, __CONTAINER_OBJECT_COUNT> __rcmd_containerTransformMaterials;
+	std::array<std::unique_ptr<Frx::TransformMaterial>, __CONTAINER_COUNT> __rcmd_containerTransformMaterials;
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pContainerPhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pContainerObject;
 
@@ -119,8 +133,7 @@ private:
 	float __cameraRotationSpeed	{ 0.5f };
 	float __cameraFovy			{ glm::pi<float>() / 6.0f };
 
-	float __objectRotationSpeed	{ 1.0f };
-
+	bool __cameraMoveAccelerated{ };
 	bool __cameraMoveLeft{ };
 	bool __cameraMoveRight{ };
 	bool __cameraMoveUp{ };
@@ -133,16 +146,17 @@ private:
 	bool __cameraRotateUp{ };
 	bool __cameraRotateDown{ };
 
+	std::array<__ObjectTransformInfo, __CONTAINER_COUNT> __containerTransforms;
 	FPSCamera __camera;
 
 	std::list<std::unique_ptr<Frx::LightMaterial>> __rcmd_lightMaterials;
 	bool __rcmd_lightUpdated{ };
 
-	RandomExt __rcmd_randomExt;
+	RandomExt __randomExt;
 
 	__GlobalData __rcmd_globalData;
 
-	void __handleCamera(
+	void __updateCamera(
 		float delta);
 
 	void __syncCameraExtent();
@@ -155,6 +169,16 @@ private:
 constexpr Frx::Display *PhongTestScene::getDisplay() const noexcept
 {
 	return __pDisplay;
+}
+
+constexpr void PhongTestScene::startCameraMoveAcceleration() noexcept
+{
+	__cameraMoveAccelerated = true;
+}
+
+constexpr void PhongTestScene::endCameraMoveAcceleration() noexcept
+{
+	__cameraMoveAccelerated = false;
 }
 
 constexpr void PhongTestScene::startCameraMoveRight() noexcept

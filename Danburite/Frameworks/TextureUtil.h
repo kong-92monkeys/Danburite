@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Engine.h"
+#include "../Render/Engine.h"
 
-namespace Render::TextureUtil
+namespace Frx::TextureUtil
 {
 	[[nodiscard]]
-	Texture *loadTexture(
-		Engine &engine,
+	Render::Texture *loadTexture(
+		Render::Engine &engine,
 		std::string_view const &assetPath,
 		VkPipelineStageFlags2 beforeStageMask,
 		VkAccessFlags2 beforeAccessMask,
