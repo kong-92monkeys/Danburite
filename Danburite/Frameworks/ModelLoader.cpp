@@ -1,30 +1,42 @@
 #include "ModelLoader.h"
 #include "../System/Env.h"
 #include <assimp/scene.h>
-#include <assimp/mesh.h>
 #include <assimp/postprocess.h>
 
 namespace Frx
 {
-	ModelLoader::ModelLoader() noexcept
+	void ModelLoader::filterPrimitiveType(
+		aiPrimitiveType const type,
+		bool const filtered) noexcept
 	{
-		__importer.SetPropertyInteger(
-			AI_CONFIG_PP_SBP_REMOVE,
-			aiPrimitiveType::aiPrimitiveType_POINT | aiPrimitiveType::aiPrimitiveType_LINE);
+		if (filtered)
+			__primitiveTypeFlags |= type;
+		else
+			__primitiveTypeFlags &= ~type;
+
+		__importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, __primitiveTypeFlags);
 	}
 
 	void ModelLoader::load(
 		std::string_view const &assetPath)
 	{
-		auto &assetManager		{ Sys::Env::getInstance().getAssetManager() };
-		auto const binary		{ assetManager.readBinary(assetPath) };
+		auto &assetManager	{ Sys::Env::getInstance().getAssetManager() };
+		auto const binary	{ assetManager.readBinary(assetPath) };
 
-		const aiScene *scene = __importer.ReadFileFromMemory(
-			binary.data(),
-			binary.size(),
-			aiPostProcessSteps::aiProcess_Triangulate |
-			aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
-			aiPostProcessSteps::aiProcess_SortByPType);
+		auto const pScene
+		{
+			__importer.ReadFileFromMemory(
+				binary.data(), binary.size(),
+				aiPostProcessSteps::aiProcess_Triangulate |
+				aiPostProcessSteps::aiProcess_FlipUVs |
+				aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
+				aiPostProcessSteps::aiProcess_SortByPType)
+		};
+
+		if (!pScene)
+			throw std::runtime_error{ __importer.GetErrorString() };
+
+		// NOTE: Need to transpose matrix
 
 		__importer.FreeScene();
 	}

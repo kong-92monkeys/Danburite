@@ -18,6 +18,8 @@ namespace Infra
 
 	protected:
 		void _invalidate() noexcept;
+		constexpr void _markAsValidated() noexcept;
+
 		virtual void _onValidate();
 
 	private:
@@ -53,6 +55,12 @@ namespace Infra
 	{
 		__invalidated = true;
 		__invalidateEvent.invoke(static_cast<$T *>(this));
+	}
+
+	template <typename $T>
+	constexpr void Stateful<$T>::_markAsValidated() noexcept
+	{
+		__invalidated = false;
 	}
 
 	template <typename $T>

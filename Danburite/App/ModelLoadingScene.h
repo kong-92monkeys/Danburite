@@ -6,6 +6,7 @@
 #include "../Frameworks/TransformMaterial.h"
 #include "../Frameworks/PhongMaterial.h"
 #include "../Frameworks/LightMaterial.h"
+#include "../Frameworks/ModelLoader.h"
 #include "FPSCamera.h"
 #include "RandomExt.h"
 
@@ -129,6 +130,8 @@ private:
 
 	FPSCamera __camera;
 	RandomExt __randomExt;
+
+	Frx::ModelLoader __modelLoader;
 
 	__GlobalData __rcmd_globalData;
 
