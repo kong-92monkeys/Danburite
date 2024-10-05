@@ -58,6 +58,9 @@
     <Filter Include="Utils\TextureUtil">
       <UniqueIdentifier>{7dadebd9-3725-4272-82eb-7f529793436a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\ModelLoader">
+      <UniqueIdentifier>{0e259051-12c4-484d-a1e3-fe928ba91c18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -111,6 +114,9 @@
     <ClInclude Include="TextureUtil.h">
       <Filter>Utils\TextureUtil</Filter>
     </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Utils\ModelLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -154,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="TextureUtil.cpp">
       <Filter>Utils\TextureUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
