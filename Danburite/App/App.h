@@ -34,6 +34,7 @@ public:
 public:
 	afx_msg void OnScenes00();
 	afx_msg void OnScenes01();
+	afx_msg void OnScenes02();
 	afx_msg void OnAppAbout();
 
 	DECLARE_MESSAGE_MAP()

@@ -5,7 +5,8 @@
 enum class SceneType
 {
 	NOTHING,
-	PHONG_TEST
+	PHONG_TEST,
+	MODEL_LOADING
 };
 
 class SceneManager : public Infra::Unique

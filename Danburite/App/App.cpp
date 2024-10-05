@@ -21,6 +21,7 @@
 BEGIN_MESSAGE_MAP(CApp, CWinApp)
 	ON_COMMAND(ID_SCENES_00, &CApp::OnScenes00)
 	ON_COMMAND(ID_SCENES_01, &CApp::OnScenes01)
+	ON_COMMAND(ID_SCENES_02, &CApp::OnScenes02)
 	ON_COMMAND(ID_APP_ABOUT, &CApp::OnAppAbout)
 END_MESSAGE_MAP()
 
@@ -196,6 +197,15 @@ void CApp::OnScenes01()
 		__pMainView->enableDisplay(true);
 
 	__loadScene(SceneType::PHONG_TEST);
+}
+
+void CApp::OnScenes02()
+{
+	// TODO: Add your command handler code here
+	if (__pMainView)
+		__pMainView->enableDisplay(true);
+
+	__loadScene(SceneType::MODEL_LOADING);
 }
 
 // App command to run the dialog

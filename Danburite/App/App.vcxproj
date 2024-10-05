@@ -164,6 +164,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="CSceneMenuView00.h" />
     <ClInclude Include="CSceneMenuView01.h" />
+    <ClInclude Include="CSceneMenuView02.h" />
     <ClInclude Include="FPSCamera.h" />
     <ClInclude Include="ListBoxLoggerImpl.h" />
     <ClInclude Include="LogView.h" />
@@ -171,9 +172,11 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ModelLoadingScene.h" />
     <ClInclude Include="RandomExt.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SceneHandler.h" />
+    <ClInclude Include="SceneHandler_ModelLoading.h" />
     <ClInclude Include="SceneHandler_PhongTest.h" />
     <ClInclude Include="SceneHandler_Nothing.h" />
     <ClInclude Include="SceneManager.h" />
@@ -185,6 +188,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="CSceneMenuView00.cpp" />
     <ClCompile Include="CSceneMenuView01.cpp" />
+    <ClCompile Include="CSceneMenuView02.cpp" />
     <ClCompile Include="FPSCamera.cpp" />
     <ClCompile Include="ListBoxLoggerImpl.cpp" />
     <ClCompile Include="LogView.cpp" />
@@ -195,9 +199,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ModelLoadingScene.cpp" />
     <ClCompile Include="PhongTestScene.cpp" />
     <ClCompile Include="RandomExt.cpp" />
     <ClCompile Include="SceneHandler.cpp" />
+    <ClCompile Include="SceneHandler_ModelLoading.cpp" />
     <ClCompile Include="SceneHandler_PhongTest.cpp" />
     <ClCompile Include="SceneHandler_Nothing.cpp" />
     <ClCompile Include="SceneManager.cpp" />

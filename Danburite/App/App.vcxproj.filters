@@ -44,9 +44,6 @@
     <Filter Include="Assets\Shaders\Phong">
       <UniqueIdentifier>{cdd31695-bd9c-4bbc-a20a-32932a731e80}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes\PhongTestScene">
-      <UniqueIdentifier>{84d270a3-8eec-4214-bfa9-1acb0b1dc3eb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{b7f587ca-03fe-4eeb-bcd8-570982c03a24}</UniqueIdentifier>
     </Filter>
@@ -86,6 +83,18 @@
     <Filter Include="Util\RandomExt">
       <UniqueIdentifier>{250bb3d7-5b11-4b41-8ee5-5c28dd5347e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="View\SceneMenuViews\02">
+      <UniqueIdentifier>{6d22d7e7-a0e0-47f5-8c95-e6f4110a1358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneHandler\Impl\ModelLoading">
+      <UniqueIdentifier>{247548e0-df48-4d30-92aa-e67aa638621b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\PhongTest">
+      <UniqueIdentifier>{84d270a3-8eec-4214-bfa9-1acb0b1dc3eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\ModelLoading">
+      <UniqueIdentifier>{8e98584a-9ccf-4518-845e-c35c21c069f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -116,7 +125,7 @@
       <Filter>Logger</Filter>
     </ClInclude>
     <ClInclude Include="PhongTestScene.h">
-      <Filter>Scenes\PhongTestScene</Filter>
+      <Filter>Scenes\PhongTest</Filter>
     </ClInclude>
     <ClInclude Include="FPSCamera.h">
       <Filter>Util\Cameras</Filter>
@@ -145,6 +154,15 @@
     <ClInclude Include="RandomExt.h">
       <Filter>Util\RandomExt</Filter>
     </ClInclude>
+    <ClInclude Include="CSceneMenuView02.h">
+      <Filter>View\SceneMenuViews\02</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneHandler_ModelLoading.h">
+      <Filter>SceneHandler\Impl\ModelLoading</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoadingScene.h">
+      <Filter>Scenes\ModelLoading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -166,7 +184,7 @@
       <Filter>Logger</Filter>
     </ClCompile>
     <ClCompile Include="PhongTestScene.cpp">
-      <Filter>Scenes\PhongTestScene</Filter>
+      <Filter>Scenes\PhongTest</Filter>
     </ClCompile>
     <ClCompile Include="FPSCamera.cpp">
       <Filter>Util\Cameras</Filter>
@@ -192,7 +210,18 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>SceneManager</Filter>
     </ClCompile>
-    <ClCompile Include="RandomExt.cpp" />
+    <ClCompile Include="RandomExt.cpp">
+      <Filter>Util\RandomExt</Filter>
+    </ClCompile>
+    <ClCompile Include="CSceneMenuView02.cpp">
+      <Filter>View\SceneMenuViews\02</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneHandler_ModelLoading.cpp">
+      <Filter>SceneHandler\Impl\ModelLoading</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoadingScene.cpp">
+      <Filter>Scenes\ModelLoading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App.rc">

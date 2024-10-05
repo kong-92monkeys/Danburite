@@ -9,13 +9,11 @@
 #include "FPSCamera.h"
 #include "RandomExt.h"
 
-class PhongTestScene : public Frx::Scene
+class ModelLoadingScene : public Frx::Scene
 {
 public:
-	static constexpr size_t MAX_LIGHT_COUNT{ 31U };
-
-	PhongTestScene() = default;
-	virtual ~PhongTestScene() noexcept override;
+	ModelLoadingScene() = default;
+	virtual ~ModelLoadingScene() noexcept override;
 
 	[[nodiscard]]
 	constexpr Frx::Display *getDisplay() const noexcept;
@@ -24,9 +22,6 @@ public:
 		Frx::Display *pDisplay);
 
 	void syncDisplay();
-
-	void addLight();
-	void removeLight();
 
 	constexpr void startCameraMoveAcceleration() noexcept;
 	constexpr void endCameraMoveAcceleration() noexcept;
@@ -76,7 +71,7 @@ protected:
 		std::any const &updateParam) override;
 
 private:
-	static constexpr uint32_t __CONTAINER_COUNT{ 400U };
+	static constexpr size_t __MAX_LIGHT_COUNT{ 7U };
 
 	struct __GlobalData
 	{
@@ -87,7 +82,7 @@ private:
 		alignas(16) glm::vec3 cameraPos{ 0.0f, 0.0f, 0.0f };
 
 		uint32_t lightCount{ };
-		std::array<uint32_t, MAX_LIGHT_COUNT> lightIndices{ };
+		std::array<uint32_t, __MAX_LIGHT_COUNT> lightIndices{ };
 	};
 
 	struct __UpdateParam
@@ -95,19 +90,9 @@ private:
 	public:
 		bool cameraUpdated{ };
 
-		glm::mat4 viewMatrix		{ 1.0f };
-		glm::mat4 projMatrix		{ 1.0f };
-		glm::vec3 cameraPos			{ 0.0f };
-
-		std::vector<glm::mat4> containerTransforms;
-	};
-
-	struct __ObjectTransformInfo
-	{
-	public:
-		glm::vec3 up{ };
-		float rotationSpeed{ };
-		Frx::Transform transform;
+		glm::mat4 viewMatrix	{ 1.0f };
+		glm::mat4 projMatrix	{ 1.0f };
+		glm::vec3 cameraPos		{ 0.0f };
 	};
 
 	std::unique_ptr<Frx::PhongRenderer> __rcmd_pRenderer;
@@ -118,13 +103,6 @@ private:
 	std::unique_ptr<Frx::TransformMaterial> __rcmd_pPlaneTransformMaterial;
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pPlanePhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pPlaneObject;
-
-	std::unique_ptr<Render::Mesh> __rcmd_pContainerMesh;
-	std::unique_ptr<Render::DrawParam> __rcmd_pContainerDrawParam;
-	std::unique_ptr<Render::Texture> __rcmd_pContainerTexture;
-	std::array<std::unique_ptr<Frx::TransformMaterial>, __CONTAINER_COUNT> __rcmd_containerTransformMaterials;
-	std::unique_ptr<Frx::PhongMaterial> __rcmd_pContainerPhongMaterial;
-	std::unique_ptr<Render::RenderObject> __rcmd_pContainerObject;
 
 	std::unique_ptr<Render::Layer> __rcmd_pLayer;
 
@@ -147,10 +125,7 @@ private:
 	bool __cameraRotateUp{ };
 	bool __cameraRotateDown{ };
 
-	std::array<__ObjectTransformInfo, __CONTAINER_COUNT> __containerTransforms;
-
 	std::list<std::unique_ptr<Frx::LightMaterial>> __rcmd_lightMaterials;
-	bool __rcmd_lightUpdated{ };
 
 	FPSCamera __camera;
 	RandomExt __randomExt;
@@ -164,120 +139,120 @@ private:
 	void __onDisplaySync();
 
 	void __rcmd_createPlaneObject();
-	void __rcmd_createContainerObject();
+	void __rcmd_addLight();
 };
 
-constexpr Frx::Display *PhongTestScene::getDisplay() const noexcept
+constexpr Frx::Display *ModelLoadingScene::getDisplay() const noexcept
 {
 	return __pDisplay;
 }
 
-constexpr void PhongTestScene::startCameraMoveAcceleration() noexcept
+constexpr void ModelLoadingScene::startCameraMoveAcceleration() noexcept
 {
 	__cameraMoveAccelerated = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveAcceleration() noexcept
+constexpr void ModelLoadingScene::endCameraMoveAcceleration() noexcept
 {
 	__cameraMoveAccelerated = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveRight() noexcept
+constexpr void ModelLoadingScene::startCameraMoveRight() noexcept
 {
 	__cameraMoveRight = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveRight() noexcept
+constexpr void ModelLoadingScene::endCameraMoveRight() noexcept
 {
 	__cameraMoveRight = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveLeft() noexcept
+constexpr void ModelLoadingScene::startCameraMoveLeft() noexcept
 {
 	__cameraMoveLeft = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveLeft() noexcept
+constexpr void ModelLoadingScene::endCameraMoveLeft() noexcept
 {
 	__cameraMoveLeft = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveUp() noexcept
+constexpr void ModelLoadingScene::startCameraMoveUp() noexcept
 {
 	__cameraMoveUp = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveUp() noexcept
+constexpr void ModelLoadingScene::endCameraMoveUp() noexcept
 {
 	__cameraMoveUp = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveDown() noexcept
+constexpr void ModelLoadingScene::startCameraMoveDown() noexcept
 {
 	__cameraMoveDown = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveDown() noexcept
+constexpr void ModelLoadingScene::endCameraMoveDown() noexcept
 {
 	__cameraMoveDown = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveForward() noexcept
+constexpr void ModelLoadingScene::startCameraMoveForward() noexcept
 {
 	__cameraMoveForward = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveForward() noexcept
+constexpr void ModelLoadingScene::endCameraMoveForward() noexcept
 {
 	__cameraMoveForward = false;
 }
 
-constexpr void PhongTestScene::startCameraMoveBackward() noexcept
+constexpr void ModelLoadingScene::startCameraMoveBackward() noexcept
 {
 	__cameraMoveBackward = true;
 }
 
-constexpr void PhongTestScene::endCameraMoveBackward() noexcept
+constexpr void ModelLoadingScene::endCameraMoveBackward() noexcept
 {
 	__cameraMoveBackward = false;
 }
 
-constexpr void PhongTestScene::startCameraRotateRight() noexcept
+constexpr void ModelLoadingScene::startCameraRotateRight() noexcept
 {
 	__cameraRotateRight = true;
 }
 
-constexpr void PhongTestScene::endCameraRotateRight() noexcept
+constexpr void ModelLoadingScene::endCameraRotateRight() noexcept
 {
 	__cameraRotateRight = false;
 }
 
-constexpr void PhongTestScene::startCameraRotateLeft() noexcept
+constexpr void ModelLoadingScene::startCameraRotateLeft() noexcept
 {
 	__cameraRotateLeft = true;
 }
 
-constexpr void PhongTestScene::endCameraRotateLeft() noexcept
+constexpr void ModelLoadingScene::endCameraRotateLeft() noexcept
 {
 	__cameraRotateLeft = false;
 }
 
-constexpr void PhongTestScene::startCameraRotateUp() noexcept
+constexpr void ModelLoadingScene::startCameraRotateUp() noexcept
 {
 	__cameraRotateUp = true;
 }
 
-constexpr void PhongTestScene::endCameraRotateUp() noexcept
+constexpr void ModelLoadingScene::endCameraRotateUp() noexcept
 {
 	__cameraRotateUp = false;
 }
 
-constexpr void PhongTestScene::startCameraRotateDown() noexcept
+constexpr void ModelLoadingScene::startCameraRotateDown() noexcept
 {
 	__cameraRotateDown = true;
 }
 
-constexpr void PhongTestScene::endCameraRotateDown() noexcept
+constexpr void ModelLoadingScene::endCameraRotateDown() noexcept
 {
 	__cameraRotateDown = false;
 }

@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "SceneHandler_Nothing.h"
 #include "SceneHandler_PhongTest.h"
+#include "SceneHandler_ModelLoading.h"
 
 SceneManager::SceneManager(
 	Infra::Executor &uiExecutor,
@@ -17,8 +18,9 @@ SceneManager::SceneManager(
 			Infra::EventListener<Infra::Looper *>::bind(
 				&SceneManager::__scmd_onIdle, this);
 
-		__scmd_handlers[SceneType::NOTHING]		= std::make_unique<SceneHandler_Nothing>();
-		__scmd_handlers[SceneType::PHONG_TEST]	= std::make_unique<SceneHandler_PhongTest>();
+		__scmd_handlers[SceneType::NOTHING]			= std::make_unique<SceneHandler_Nothing>();
+		__scmd_handlers[SceneType::PHONG_TEST]		= std::make_unique<SceneHandler_PhongTest>();
+		__scmd_handlers[SceneType::MODEL_LOADING]	= std::make_unique<SceneHandler_ModelLoading>();
 
 		for (auto const &[_, pHandler] : __scmd_handlers)
 			pHandler->init(__scmdExecutor, uiExecutor, renderSystem);
