@@ -4,8 +4,7 @@
 #include "pch.h"
 #include "App.h"
 #include "CSceneMenuView01.h"
-#include "../Infra/Logger.h"
-
+#include "PhongTestScene.h"
 
 // CSceneMenuView01
 
@@ -75,7 +74,7 @@ void CSceneMenuView01::OnDeltaposSpinLightCount(NMHDR *pNMHDR, LRESULT *pResult)
 	else
 		--curLightCount;
 
-	curLightCount = std::clamp(curLightCount, 0, __MAX_LIGHT_COUNT);
+	curLightCount = std::clamp(curLightCount, 0, static_cast<int>(PhongTestScene::MAX_LIGHT_COUNT));
 	if (__lightCount == curLightCount)
 		return;
 

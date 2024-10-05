@@ -45,9 +45,24 @@ namespace Frx
 	}
 
 	void LightMaterial::setAttenuation(
-		glm::vec3 const &attenuation)
+		float const constant,
+		float const linear,
+		float const quad)
 	{
-		_getTypedData().attenuation = attenuation;
+		auto &attenuation	{ _getTypedData().attenuation };
+		attenuation[0]		= constant;
+		attenuation[1]		= linear;
+		attenuation[2]		= quad;
+
+		_invokeUpdateEvent();
+	}
+
+	void LightMaterial::setCutOff(
+		float const inner,
+		float const outer)
+	{
+		_getTypedData().cosInnerCutOff = glm::cos(inner);
+		_getTypedData().cosOuterCutOff = glm::cos(outer);
 		_invokeUpdateEvent();
 	}
 }

@@ -57,6 +57,30 @@ float LightUtil_calcIntensity_point(
 	return (ambientFactor + diffuseFactor + specularFactor);
 }
 
+float LightUtil_calcIntensity_spot(
+	in const LightMaterial light,
+	in const vec3 cameraPos,
+	in const vec3 position,
+	in const vec3 normal,
+	in const float shininess)
+{
+	const float ambientFactor	= light.ambientFactor;
+
+	const vec3 lightDir		= normalize(position - light.position);
+	const float cosAngle	= dot(light.direction, lightDir);
+
+	float cutOffFactor = ((cosAngle - light.cosOuterCutOff) / (light.cosInnerCutOff - light.cosOuterCutOff));
+	cutOffFactor = min(cutOffFactor, 1.0f);
+
+	if (cutOffFactor <= 0.0f)
+		return ambientFactor;
+
+	const float diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, normal);
+	const float specularFactor	= LightUtil_calcSpecularFactor(lightDir, cameraPos, position, normal, shininess);
+
+	return (ambientFactor + (cutOffFactor * (diffuseFactor + specularFactor)));
+}
+
 float LightUtil_calcIntensity(
 	in const LightMaterial light,
 	in const vec3 cameraPos,
@@ -77,6 +101,7 @@ float LightUtil_calcIntensity(
 			break;
 
 		case LIGHT_TYPE_SPOT:
+			intensity = LightUtil_calcIntensity_spot(light, cameraPos, position, normal, shininess);
 			break;
 	}
 

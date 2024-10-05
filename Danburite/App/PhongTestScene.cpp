@@ -74,16 +74,24 @@ void PhongTestScene::addLight()
 	{
 		auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
 
-		//auto const lightType{ __randomExt.nextBool() ? Frx::LightType::POINT : Frx::LightType::SPOT };
-		auto const lightType{ Frx::LightType::POINT };
+		auto const lightType{ __randomExt.nextBool() ? Frx::LightType::POINT : Frx::LightType::SPOT };
 
 		pLightMaterial->setType(lightType);
 		pLightMaterial->setColor(__randomExt.nextVec3(0.0f, 1.0f));
-		pLightMaterial->setPosition(__randomExt.nextVec3(-40.0f, 40.0f, 1.0f, 20.0f, -40.0f, 40.0f));
 
-		if (lightType == Frx::LightType::SPOT)
+		if (lightType == Frx::LightType::POINT)
 		{
-			auto const direction{ glm::normalize(__randomExt.nextVec3(-1.0f, 1.0f)) };
+			pLightMaterial->setPosition(__randomExt.nextVec3(-35.0f, 35.0f, 2.0f, 15.0f, -35.0f, 35.0f));
+			pLightMaterial->setMaxDistance(64.0f);
+			pLightMaterial->setAttenuation(1.0f, 0.14f, 0.07f);
+		}
+		else
+		{
+			pLightMaterial->setPosition(__randomExt.nextVec3(-30.0f, 30.0f, 35.0f, 50.0f, -30.0f, 30.0f));
+			pLightMaterial->setMaxDistance(130.0f);
+			pLightMaterial->setAttenuation(1.0f, 0.07f, 0.017f);
+
+			auto const direction{ glm::normalize(__randomExt.nextVec3(-1.f, 1.f, -2.f, -1.f, -1.f, 1.f)) };
 			pLightMaterial->setDirection(direction);
 		}
 

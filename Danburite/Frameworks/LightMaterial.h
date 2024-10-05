@@ -17,13 +17,16 @@ namespace Frx
 	public:
 		LightType type						{ LightType::DIRECTIONAL };
 		float ambientFactor					{ 0.009f };
-		float maxDistance					{ 32.0f };
+		float maxDistance					{ 40.0f };
 
 		alignas(16) glm::vec3 color			{ 1.0f, 1.0f, 1.0f };
 
 		alignas(16) glm::vec3 position		{ 0.0f, 0.0f, 0.0f };
 		alignas(16) glm::vec3 direction		{ 0.0f, -1.0f, 0.0f };
 		alignas(16) glm::vec3 attenuation	{ 1.0f, 0.22f, 0.20f };
+
+		float cosInnerCutOff				{ 0.9848078f }; // cos(pi/18)
+		float cosOuterCutOff				{ 0.9659258f }; // cos(pi/12)
 	};
 
 	class LightMaterial : public Render::TypedMaterial<LightMaterialData>
@@ -48,6 +51,12 @@ namespace Frx
 			glm::vec3 const &direction);
 
 		void setAttenuation(
-			glm::vec3 const &attenuation);
+			float constant,
+			float linear,
+			float quad);
+
+		void setCutOff(
+			float inner,
+			float outer);
 	};
 }

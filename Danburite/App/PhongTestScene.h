@@ -12,6 +12,8 @@
 class PhongTestScene : public Frx::Scene
 {
 public:
+	static constexpr size_t MAX_LIGHT_COUNT{ 31U };
+
 	PhongTestScene() = default;
 	virtual ~PhongTestScene() noexcept override;
 
@@ -79,14 +81,13 @@ private:
 	struct __GlobalData
 	{
 	public:
-		glm::mat4 viewMatrix	{ 1.0f };
-		glm::mat4 projMatrix	{ 1.0f };
+		glm::mat4 viewMatrix{ 1.0f };
+		glm::mat4 projMatrix{ 1.0f };
 
-		alignas(16)
-		glm::vec3 cameraPos		{ 0.0f, 0.0f, 0.0f };
+		alignas(16) glm::vec3 cameraPos{ 0.0f, 0.0f, 0.0f };
 
 		uint32_t lightCount{ };
-		std::array<uint32_t, 15ULL> lightIndices{ };
+		std::array<uint32_t, MAX_LIGHT_COUNT> lightIndices{ };
 	};
 
 	struct __UpdateParam

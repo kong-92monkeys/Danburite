@@ -11,6 +11,9 @@ struct LightMaterial
 	vec3 position;
 	vec3 direction;
 	vec3 attenuation;
+
+	float cosInnerCutOff;
+	float cosOuterCutOff;
 };
 
 #endif

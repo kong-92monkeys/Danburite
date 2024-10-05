@@ -43,7 +43,6 @@ private:
 	CEdit __editLightCount;
 
 	int __lightCount{ };
-	static constexpr int __MAX_LIGHT_COUNT{ 15 };
 
 	mutable Infra::Event<> __addLightEvent;
 	mutable Infra::Event<> __removeLightEvent;
