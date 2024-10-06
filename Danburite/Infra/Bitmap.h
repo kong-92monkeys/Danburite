@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Unique.h"
 #include <cstdint>
 #include <cstddef>
 #include <vector>
 
 namespace Infra
 {
-	class Bitmap : public Unique
+	class Bitmap
 	{
 	public:
 		Bitmap(

@@ -16,25 +16,25 @@ namespace Frx
 	}
 
 	void SceneObject::addChild(
-		std::shared_ptr<SceneObject> const &pChild)
+		SceneObject *const pChild)
 	{
 		if (!(__children.emplace(pChild).second))
 			throw std::runtime_error{ "The display is already registered." };
 
 		pChild->getInvalidateEvent() += __pChildInvalidateListener;
-		__invalidatedChildren.emplace(pChild.get());
+		__invalidatedChildren.emplace(pChild);
 
 		_invalidate();
 	}
 
 	void SceneObject::removeChild(
-		std::shared_ptr<SceneObject> const &pChild)
+		SceneObject *const pChild)
 	{
 		if (!(__children.erase(pChild)))
 			throw std::runtime_error{ "The display is not registered yet." };
 
 		pChild->getInvalidateEvent() -= __pChildInvalidateListener;
-		__invalidatedChildren.erase(pChild.get());
+		__invalidatedChildren.erase(pChild);
 	}
 
 	void SceneObject::_onValidate()

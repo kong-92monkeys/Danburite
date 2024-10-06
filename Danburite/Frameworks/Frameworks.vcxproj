@@ -19,6 +19,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="LightMaterial.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Orientation.h" />
     <ClInclude Include="PhongMaterial.h" />
@@ -144,6 +145,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>assimp-vc143-mt.lib</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -169,6 +171,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>assimp-vc143-mt.lib</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'">
@@ -194,6 +197,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>assimp-vc143-mt.lib</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

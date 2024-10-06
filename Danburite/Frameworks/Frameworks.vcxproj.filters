@@ -64,6 +64,9 @@
     <Filter Include="SceneObject">
       <UniqueIdentifier>{b495f6a0-0e32-42ca-91b4-4f4f2b04c367}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{59d4071d-11b4-4b78-9d13-017d92d1a58e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -122,6 +125,9 @@
     </ClInclude>
     <ClInclude Include="SceneObject.h">
       <Filter>SceneObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,8 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/mesh.h>
-#include "../Infra/Unique.h"
+#include <assimp/scene.h>
+#include "Model.h"
 
 namespace Frx
 {
@@ -15,12 +16,23 @@ namespace Frx
 			aiPrimitiveType type,
 			bool filtered) noexcept;
 
-		void load(
+		[[nodiscard]]
+		Model::CreateInfo load(
 			std::string_view const &assetPath);
 
 	private:
 		Assimp::Importer __importer;
 
 		int __primitiveTypeFlags{ };
+
+		[[nodiscard]]
+		static std::vector<Model::Mesh> __loadMesh(
+			aiMesh const *const *mMeshes,
+			uint32_t mNumMeshes);
+
+		[[nodiscard]]
+		static std::vector<Model::Material> __loadMaterial(
+			aiMaterial const *const *mMaterials,
+			uint32_t mNumMaterials);
 	};
 }

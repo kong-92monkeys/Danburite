@@ -11,16 +11,19 @@ namespace Frx
 		SceneObject() noexcept;
 
 		void addChild(
-			std::shared_ptr<SceneObject> const &pChild);
+			SceneObject *pChild);
 
 		void removeChild(
-			std::shared_ptr<SceneObject> const &pChild);
+			SceneObject *pChild);
 
 		[[nodiscard]]
 		constexpr Transform &getTransform() noexcept;
 
 		[[nodiscard]]
 		constexpr Transform const &getTransform() const noexcept;
+
+		[[nodiscard]]
+		constexpr glm::mat4 const &getGlobalTransform() const noexcept;
 
 	protected:
 		virtual void _onValidate() override;
@@ -32,7 +35,7 @@ namespace Frx
 		Transform __transform;
 		glm::mat4 __globalTransform{ 1.0f };
 
-		std::unordered_set<std::shared_ptr<SceneObject>> __children;
+		std::unordered_set<SceneObject *> __children;
 		std::unordered_set<SceneObject *> __invalidatedChildren;
 
 		Infra::EventListenerPtr<Transform *> __pTransformInvalidateListener;
@@ -52,5 +55,10 @@ namespace Frx
 	constexpr Transform const &SceneObject::getTransform() const noexcept
 	{
 		return __transform;
+	}
+
+	constexpr glm::mat4 const &SceneObject::getGlobalTransform() const noexcept
+	{
+		return __globalTransform;
 	}
 }
