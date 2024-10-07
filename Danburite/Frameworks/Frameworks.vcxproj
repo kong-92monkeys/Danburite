@@ -15,6 +15,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AssimpAssetStringStream.h" />
+    <ClInclude Include="AssimpAssetIOSystem.h" />
+    <ClInclude Include="AssimpAssetBinaryStream.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Display.h" />
@@ -37,6 +40,9 @@
     <ClInclude Include="VertexAttribute.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AssimpAssetStringStream.cpp" />
+    <ClCompile Include="AssimpAssetIOSystem.cpp" />
+    <ClCompile Include="AssimpAssetBinaryStream.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="LightMaterial.cpp" />
@@ -144,7 +150,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp-vc143-mt.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mtd.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>

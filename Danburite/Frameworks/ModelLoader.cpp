@@ -1,9 +1,15 @@
+#include "AssimpAssetIOSystem.h"
 #include "ModelLoader.h"
-#include "../System/Env.h"
 #include <assimp/postprocess.h>
+#include <stdexcept>
 
 namespace Frx
 {
+	ModelLoader::ModelLoader()
+	{
+		__importer.SetIOHandler(new AssimpAssetIOSystem);
+	}
+
 	void ModelLoader::filterPrimitiveType(
 		aiPrimitiveType const type,
 		bool const filtered) noexcept
@@ -19,13 +25,12 @@ namespace Frx
 	Model::CreateInfo ModelLoader::load(
 		std::string_view const &assetPath)
 	{
-		auto &assetManager	{ Sys::Env::getInstance().getAssetManager() };
-		auto const binary	{ assetManager.readBinary(assetPath) };
+		std::string const *fileName{ new std::string{ assetPath } };
 
 		auto const pScene
 		{
-			__importer.ReadFileFromMemory(
-				binary.data(), binary.size(),
+			__importer.ReadFile(
+				*fileName,
 				aiPostProcessSteps::aiProcess_Triangulate |
 				aiPostProcessSteps::aiProcess_FlipUVs |
 				aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
@@ -36,7 +41,10 @@ namespace Frx
 		};
 
 		if (!pScene || (pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE))
-			throw std::runtime_error{ __importer.GetErrorString() };
+		{
+			auto const errStr{ __importer.GetErrorString() };
+			throw std::runtime_error{ errStr };
+		}
 
 		Model::CreateInfo retVal;
 
@@ -44,6 +52,7 @@ namespace Frx
 		retVal.meshes		= __loadMesh(pScene->mMeshes, pScene->mNumMeshes);
 
 		__importer.FreeScene();
+
 		return retVal;
 	}
 
@@ -263,7 +272,7 @@ namespace Frx
 				int texTypeIter{ aiTextureType::aiTextureType_NONE };
 				texTypeIter < AI_TEXTURE_TYPE_MAX; ++texTypeIter)
 			{
-				auto const texCount{ pAiMaterial->GetTextureCount(aiTextureType_DIFFUSE) };
+				auto const texCount{ pAiMaterial->GetTextureCount(static_cast<aiTextureType>(texTypeIter)) };
 
 				for (uint32_t texIter{ }; texIter < texCount; ++texIter)
 				{

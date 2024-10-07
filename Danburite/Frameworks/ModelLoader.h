@@ -10,7 +10,7 @@ namespace Frx
 	class ModelLoader : public Infra::Unique
 	{
 	public:
-		ModelLoader() = default;
+		ModelLoader();
 
 		void filterPrimitiveType(
 			aiPrimitiveType type,

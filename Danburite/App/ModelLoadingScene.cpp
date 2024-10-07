@@ -63,7 +63,7 @@ std::any ModelLoadingScene::_onInit()
 	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_POINT, true);
 	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_LINE, true);
 
-	auto result{ __modelLoader.load("Models/backpack/backpack.obj") };
+	auto result{ __modelLoader.load(R"(Models\backpack\backpack.obj)") };
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);

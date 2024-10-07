@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstddef>
 #include <filesystem>
+#include <mutex>
 #include "Unique.h"
 
 namespace Infra
@@ -21,14 +22,19 @@ namespace Infra
 			std::string_view const &rootPath) noexcept;
 
 		[[nodiscard]]
+		bool exists(
+			std::string_view const &path) noexcept;
+
+		[[nodiscard]]
 		std::string readString(
-			std::string_view const &path) const;
+			std::string_view const &path);
 
 		[[nodiscard]]
 		std::vector<std::byte> readBinary(
-			std::string_view const &path) const;
+			std::string_view const &path);
 
 	private:
+		std::mutex __mutex;
 		std::filesystem::path __rootPath;
 	};
 }

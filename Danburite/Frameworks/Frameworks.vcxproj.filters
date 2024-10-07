@@ -67,6 +67,21 @@
     <Filter Include="Model">
       <UniqueIdentifier>{59d4071d-11b4-4b78-9d13-017d92d1a58e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\Assimp">
+      <UniqueIdentifier>{52475ba6-551b-4da1-a33d-cec0902aa20d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Assimp\IOStream">
+      <UniqueIdentifier>{5b5de2f7-6826-4d05-bc30-ea510962ff0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Assimp\IOSystem">
+      <UniqueIdentifier>{ecf5db05-92bc-4e40-b1dd-703ad4d61f76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Assimp\IOStream\Binary">
+      <UniqueIdentifier>{3282082e-1b0b-4898-bbb4-274e08e8af4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils\Assimp\IOStream\String">
+      <UniqueIdentifier>{bc733c85-d55a-48a4-a938-1045e7c84062}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -129,6 +144,15 @@
     <ClInclude Include="Model.h">
       <Filter>Model</Filter>
     </ClInclude>
+    <ClInclude Include="AssimpAssetIOSystem.h">
+      <Filter>Utils\Assimp\IOSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="AssimpAssetBinaryStream.h">
+      <Filter>Utils\Assimp\IOStream\Binary</Filter>
+    </ClInclude>
+    <ClInclude Include="AssimpAssetStringStream.h">
+      <Filter>Utils\Assimp\IOStream\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -178,6 +202,15 @@
     </ClCompile>
     <ClCompile Include="SceneObject.cpp">
       <Filter>SceneObject</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpAssetIOSystem.cpp">
+      <Filter>Utils\Assimp\IOSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpAssetBinaryStream.cpp">
+      <Filter>Utils\Assimp\IOStream\Binary</Filter>
+    </ClCompile>
+    <ClCompile Include="AssimpAssetStringStream.cpp">
+      <Filter>Utils\Assimp\IOStream\String</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

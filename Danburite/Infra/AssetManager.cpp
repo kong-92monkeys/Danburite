@@ -13,13 +13,30 @@ namespace Infra
 	void AssetManager::setRootPath(
 		std::string_view const &rootPath) noexcept
 	{
+		std::lock_guard lock{ __mutex };
 		__rootPath = rootPath;
 	}
 
-	std::string AssetManager::readString(
-		std::string_view const &path) const
+	bool AssetManager::exists(
+		std::string_view const &path) noexcept
 	{
-		auto const filePath{ __rootPath / path };
+		std::filesystem::path filePath;
+		{
+			std::lock_guard lock{ __mutex };
+			filePath = (__rootPath / path);
+		}
+		
+		return std::filesystem::exists(filePath);
+	}
+
+	std::string AssetManager::readString(
+		std::string_view const &path)
+	{
+		std::filesystem::path filePath;
+		{
+			std::lock_guard lock{ __mutex };
+			filePath = (__rootPath / path);
+		}
 
 		std::ifstream fin{ filePath };
 		if (!fin)
@@ -32,9 +49,13 @@ namespace Infra
 	}
 
 	std::vector<std::byte> AssetManager::readBinary(
-		std::string_view const &path) const
+		std::string_view const &path)
 	{
-		auto const filePath{ __rootPath / path };
+		std::filesystem::path filePath;
+		{
+			std::lock_guard lock{ __mutex };
+			filePath = (__rootPath / path);
+		}
 
 		std::ifstream fin{ filePath, std::ios_base::binary };
 		if (!fin)

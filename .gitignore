@@ -399,6 +399,10 @@ FodyWeavers.xsd
 
 # Third-party resources
 !Danburite/ThirdParty/**
+!Danburite/ThirdParty/**
 
 # App's custom environment variable setting
 !Danburite/App/App.vcxproj.user
+
+# Assets
+!Danburite/App/Assets/**
