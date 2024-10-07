@@ -441,7 +441,7 @@ namespace Frx
 		struct CreateInfo
 		{
 		public:
-			std::vector<Infra::Bitmap> textures;
+			std::vector<std::unique_ptr<Infra::Bitmap>> textures;
 			std::vector<Material> materials;
 			std::vector<Mesh> meshes;
 			std::vector<Node> nodes;

@@ -1,5 +1,6 @@
 #include "AssimpAssetIOSystem.h"
 #include "ModelLoader.h"
+#include "../System/Env.h"
 #include <assimp/postprocess.h>
 #include <stdexcept>
 
@@ -25,12 +26,10 @@ namespace Frx
 	Model::CreateInfo ModelLoader::load(
 		std::string_view const &assetPath)
 	{
-		std::string const *fileName{ new std::string{ assetPath } };
-
 		auto const pScene
 		{
 			__importer.ReadFile(
-				*fileName,
+				assetPath.data(),
 				aiPostProcessSteps::aiProcess_Triangulate |
 				aiPostProcessSteps::aiProcess_FlipUVs |
 				aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
@@ -46,11 +45,13 @@ namespace Frx
 			throw std::runtime_error{ errStr };
 		}
 
+		auto const assetDir{ std::filesystem::path{ assetPath }.parent_path() };
+
 		Model::CreateInfo retVal;
 
 		__loadTexturesAndMaterials(
 			pScene->mMaterials, pScene->mNumMaterials,
-			retVal.textures, retVal.materials);
+			assetDir, retVal.textures, retVal.materials);
 		
 		__loadMeshes(
 			pScene->mMeshes, pScene->mNumMeshes,
@@ -142,13 +143,14 @@ namespace Frx
 	void ModelLoader::__loadTexturesAndMaterials(
 		aiMaterial const *const *mMaterials,
 		uint32_t const mNumMaterials,
-		std::vector<Infra::Bitmap> &outTextures,
+		std::filesystem::path const &assetDir,
+		std::vector<std::unique_ptr<Infra::Bitmap>> &outTextures,
 		std::vector<Model::Material> &outMaterials)
 	{
 		outMaterials.resize(mNumMaterials);
 
-		size_t texIdxCounter{ };
-		std::unordered_map<std::string, size_t> texPaths;
+		size_t texCount{ };
+		std::unordered_map<std::string, size_t> texNames;
 
 		for (uint32_t materialIt{ }; materialIt < mNumMaterials; ++materialIt)
 		{
@@ -262,7 +264,7 @@ namespace Frx
 				material.indexOfRefraction = indexOfRefraction;
 			}
 
-			// Handling textures
+			// Handling texture infos
 			for (
 				int texTypeIter{ aiTextureType::aiTextureType_NONE };
 				texTypeIter < AI_TEXTURE_TYPE_MAX; ++texTypeIter)
@@ -271,24 +273,24 @@ namespace Frx
 				auto const texType		{ __parseAIType(aiTexType) };
 				auto &texInfos			{ material.textureInfos[texType] };
 
-				auto const texCount{ pAiMaterial->GetTextureCount(aiTexType) };
-				texInfos.resize(texCount);
+				auto const texInfoCount{ pAiMaterial->GetTextureCount(aiTexType) };
+				texInfos.resize(texInfoCount);
 
-				for (uint32_t texIter{ }; texIter < texCount; ++texIter)
+				for (uint32_t texInfoIter{ }; texInfoIter < texInfoCount; ++texInfoIter)
 				{
-					auto &texInfo{ texInfos[texIter] };
+					auto &texInfo{ texInfos[texInfoIter] };
 
 					// Index
 					{
-						aiString aiTexPath{ };
-						pAiMaterial->Get(AI_MATKEY_TEXTURE(texTypeIter, texIter), aiTexPath);
+						aiString aiTexName{ };
+						pAiMaterial->Get(AI_MATKEY_TEXTURE(texTypeIter, texInfoIter), aiTexName);
 
-						std::string texPath{ aiTexPath.C_Str() };
-						auto const texEmplacement{ texPaths.try_emplace(texPath, texIdxCounter) };
+						std::string const texName{ aiTexName.C_Str() };
+						auto const texEmplacement{ texNames.try_emplace(texName, texCount) };
 
 						bool const emplaced{ texEmplacement.second };
 						if (emplaced)
-							++texIdxCounter;
+							++texCount;
 
 						size_t const texIndex{ texEmplacement.first->second };
 						texInfo.index = texIndex;
@@ -297,41 +299,52 @@ namespace Frx
 					// Blend
 					{
 						float blend{ 1.0f };
-						pAiMaterial->Get(AI_MATKEY_TEXBLEND(texTypeIter, texIter), blend);
+						pAiMaterial->Get(AI_MATKEY_TEXBLEND(texTypeIter, texInfoIter), blend);
 						texInfo.blend = blend;
 					}
 
 					// Operation
 					{
 						aiTextureOp aiOp{ aiTextureOp::aiTextureOp_Multiply };
-						pAiMaterial->Get(AI_MATKEY_TEXOP(texTypeIter, texIter), aiOp);
+						pAiMaterial->Get(AI_MATKEY_TEXOP(texTypeIter, texInfoIter), aiOp);
 						texInfo.op = __parseAIType(aiOp);
 					}
 
 					// Mapping mode U
 					{
 						aiTextureMapMode aiMapModeU{ aiTextureMapMode::aiTextureMapMode_Wrap };
-						pAiMaterial->Get(AI_MATKEY_MAPPINGMODE_U(texTypeIter, texIter), aiMapModeU);
+						pAiMaterial->Get(AI_MATKEY_MAPPINGMODE_U(texTypeIter, texInfoIter), aiMapModeU);
 						texInfo.mapModeU = __parseAIType(aiMapModeU);
 					}
 
 					// Mapping mode V
 					{
 						aiTextureMapMode aiMapModeV{ aiTextureMapMode::aiTextureMapMode_Wrap };
-						pAiMaterial->Get(AI_MATKEY_MAPPINGMODE_V(texTypeIter, texIter), aiMapModeV);
+						pAiMaterial->Get(AI_MATKEY_MAPPINGMODE_V(texTypeIter, texInfoIter), aiMapModeV);
 						texInfo.mapModeV = __parseAIType(aiMapModeV);
 					}
 
 					// Other flags
 					{
 						aiTextureFlags flags{ };
-						pAiMaterial->Get(AI_MATKEY_TEXFLAGS(texTypeIter, texIter), flags);
+						pAiMaterial->Get(AI_MATKEY_TEXFLAGS(texTypeIter, texInfoIter), flags);
 
 						texInfo.inverted = (flags & aiTextureFlags::aiTextureFlags_Invert);
 						texInfo.useAlpha = (flags &aiTextureFlags::aiTextureFlags_UseAlpha);
 					}
 				}
 			}
+		}
+
+		auto &assetManager{ Sys::Env::getInstance().getAssetManager() };
+
+		// Load textures
+		outTextures.resize(texCount);
+		for (auto const &[texName, texIndex] : texNames)
+		{
+			auto const texPath		{ (assetDir / texName).string() };
+			auto const texData		{ assetManager.readBinary(texPath) };
+			outTextures[texIndex]	= std::make_unique<Infra::Bitmap>(texData.data(), texData.size(), 4ULL);
 		}
 	}
 }

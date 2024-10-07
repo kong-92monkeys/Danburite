@@ -3,6 +3,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
+#include <filesystem>
 #include "Model.h"
 
 namespace Frx
@@ -28,7 +29,8 @@ namespace Frx
 		static void __loadTexturesAndMaterials(
 			aiMaterial const *const *mMaterials,
 			uint32_t mNumMaterials,
-			std::vector<Infra::Bitmap> &outTextures,
+			std::filesystem::path const &assetDir,
+			std::vector<std::unique_ptr<Infra::Bitmap>> &outTextures,
 			std::vector<Model::Material> &outMaterials);
 
 		[[nodiscard]]
