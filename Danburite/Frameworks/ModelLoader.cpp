@@ -48,25 +48,36 @@ namespace Frx
 
 		Model::CreateInfo retVal;
 
-		retVal.materials	= __loadMaterial(pScene->mMaterials, pScene->mNumMaterials);
-		retVal.meshes		= __loadMesh(pScene->mMeshes, pScene->mNumMeshes);
+		__loadTexturesAndMaterials(
+			pScene->mMaterials, pScene->mNumMaterials,
+			retVal.textures, retVal.materials);
+		
+		__loadMeshes(
+			pScene->mMeshes, pScene->mNumMeshes,
+			retVal.meshes);
 
 		__importer.FreeScene();
 
 		return retVal;
 	}
 
-	std::vector<Model::Mesh> ModelLoader::__loadMesh(
+	void ModelLoader::__loadMeshes(
 		aiMesh const *const *const mMeshes,
-		uint32_t const mNumMeshes)
+		uint32_t const mNumMeshes,
+		std::vector<Model::Mesh> &outMeshes)
 	{
-		std::vector<Model::Mesh> retVal;
-		retVal.resize(mNumMeshes);
+		outMeshes.resize(mNumMeshes);
 
 		for (uint32_t meshIt{ }; meshIt < mNumMeshes; ++meshIt)
 		{
 			auto const pAiMesh	{ mMeshes[meshIt] };
-			auto &mesh			{ retVal[meshIt] };
+			auto &mesh			{ outMeshes[meshIt] };
+
+			if (pAiMesh->GetNumUVChannels() > 1)
+				throw std::runtime_error{ "Cannot handle UV channels more than 1." };
+
+			if (pAiMesh->GetNumColorChannels() > 1)
+				throw std::runtime_error{ "Cannot handle color channels more than 1." };
 
 			mesh.vertexCount = pAiMesh->mNumVertices;
 
@@ -126,164 +137,201 @@ namespace Frx
 			else
 				mesh.indexBuffer.add(indices32.data(), indices32.size() * sizeof(uint32_t));
 		}
-
-		return retVal;
 	}
 
-	std::vector<Model::Material> ModelLoader::__loadMaterial(
+	void ModelLoader::__loadTexturesAndMaterials(
 		aiMaterial const *const *mMaterials,
-		uint32_t const mNumMaterials)
+		uint32_t const mNumMaterials,
+		std::vector<Infra::Bitmap> &outTextures,
+		std::vector<Model::Material> &outMaterials)
 	{
-		std::vector<Model::Material> retVal;
-		retVal.resize(mNumMaterials);
+		outMaterials.resize(mNumMaterials);
+
+		size_t texIdxCounter{ };
+		std::unordered_map<std::string, size_t> texPaths;
 
 		for (uint32_t materialIt{ }; materialIt < mNumMaterials; ++materialIt)
 		{
 			auto const pAiMaterial	{ mMaterials[materialIt] };
-			auto &material			{ retVal[materialIt] };
+			auto &material			{ outMaterials[materialIt] };
 
-			aiColor3D ambient{ 0.0f, 0.0f, 0.0f };
-			pAiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-			material.ambient.r = ambient.r;
-			material.ambient.g = ambient.g;
-			material.ambient.b = ambient.b;
-
-			aiColor3D diffuse{ 0.0f, 0.0f, 0.0f };
-			pAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-			material.diffuse.r = diffuse.r;
-			material.diffuse.g = diffuse.g;
-			material.diffuse.b = diffuse.b;
-
-			aiColor3D specular{ 0.0f, 0.0f, 0.0f };
-			pAiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-			material.specular.r = specular.r;
-			material.specular.g = specular.g;
-			material.specular.b = specular.b;
-
-			aiColor3D emissive{ 0.0f, 0.0f, 0.0f };
-			pAiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
-			material.emissive.r = emissive.r;
-			material.emissive.g = emissive.g;
-			material.emissive.b = emissive.b;
-
-			aiColor3D transparent{ 1.0f, 1.0f, 1.0f };
-			pAiMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, transparent);
-			material.transparent.r = transparent.r;
-			material.transparent.g = transparent.g;
-			material.transparent.b = transparent.b;
-
-			aiColor3D reflective{ 0.0f, 0.0f, 0.0f };
-			pAiMaterial->Get(AI_MATKEY_COLOR_REFLECTIVE, reflective);
-			material.reflective.r = reflective.r;
-			material.reflective.g = reflective.g;
-			material.reflective.b = reflective.b;
-
-			float reflectivity{ 0.0f };
-			pAiMaterial->Get(AI_MATKEY_REFLECTIVITY, reflectivity);
-			material.reflectivity = reflectivity;
-
-			bool wireframe{ };
-			pAiMaterial->Get(AI_MATKEY_ENABLE_WIREFRAME, wireframe);
-			material.wireframe = wireframe;
-
-			bool twoSided{ };
-			pAiMaterial->Get(AI_MATKEY_TWOSIDED, twoSided);
-			material.twoSided = twoSided;
-
-			aiShadingMode shadingModel{ aiShadingMode::aiShadingMode_Gouraud };
-			pAiMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
-			switch (shadingModel)
+			// Ambient
 			{
-				case aiShadingMode::aiShadingMode_Flat:
-					material.shadingModel = Model::ShadingModel::FLAT;
-					break;
+				aiColor3D ambient{ 0.0f, 0.0f, 0.0f };
+				pAiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
+				material.ambient = __parseAIType(ambient);
+			}
+			
+			// Diffuse
+			{
+				aiColor3D diffuse{ 0.0f, 0.0f, 0.0f };
+				pAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
+				material.diffuse = __parseAIType(diffuse);
+			}
 
-				case aiShadingMode::aiShadingMode_Gouraud:
-					material.shadingModel = Model::ShadingModel::GOURAUD;
-					break;
+			// Specular
+			{
+				aiColor3D specular{ 0.0f, 0.0f, 0.0f };
+				pAiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specular);
+				material.specular = __parseAIType(specular);
+			}
 
-				case aiShadingMode::aiShadingMode_Phong:
+			// Emissive
+			{
+				aiColor3D emissive{ 0.0f, 0.0f, 0.0f };
+				pAiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
+				material.emissive = __parseAIType(emissive);
+			}
+
+			// Transparent
+			{
+				aiColor3D transparent{ 1.0f, 1.0f, 1.0f };
+				pAiMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, transparent);
+				material.transparent = __parseAIType(transparent);
+			}
+
+			// Reflective
+			{
+				aiColor3D reflective{ 0.0f, 0.0f, 0.0f };
+				pAiMaterial->Get(AI_MATKEY_COLOR_REFLECTIVE, reflective);
+				material.reflective = __parseAIType(reflective);
+			}
+
+			// Reflectivity
+			{
+				float reflectivity{ 0.0f };
+				pAiMaterial->Get(AI_MATKEY_REFLECTIVITY, reflectivity);
+				material.reflectivity = reflectivity;
+			}
+
+			// Wireframe
+			{
+				bool wireframe{ };
+				pAiMaterial->Get(AI_MATKEY_ENABLE_WIREFRAME, wireframe);
+				material.wireframe = wireframe;
+			}
+
+			// Two-sided
+			{
+				bool twoSided{ };
+				pAiMaterial->Get(AI_MATKEY_TWOSIDED, twoSided);
+				material.twoSided = twoSided;
+			}
+
+			// Shading model
+			{
+				aiShadingMode shadingModel{ aiShadingMode::aiShadingMode_Gouraud };
+				pAiMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
+				material.shadingModel = __parseAIType(shadingModel);
+			}
+
+			// Blend mode
+			{
+				aiBlendMode blendMode{ aiBlendMode::aiBlendMode_Default };
+				pAiMaterial->Get(AI_MATKEY_BLEND_FUNC, blendMode);
+				material.blendMode = __parseAIType(blendMode);
+			}
+
+			// Opacity
+			{
+				float opacity{ 1.0f };
+				pAiMaterial->Get(AI_MATKEY_OPACITY, opacity);
+				material.opacity = opacity;
+			}
+
+			// Shininess
+			{
+				float shininess{ 0.0f };
+				pAiMaterial->Get(AI_MATKEY_SHININESS, shininess);
+				material.shininess = shininess;
+				if ((material.shadingModel == Model::ShadingModel::GOURAUD) && (shininess > 0.0f))
 					material.shadingModel = Model::ShadingModel::PHONG;
-					break;
-
-				case aiShadingMode::aiShadingMode_Blinn:
-					material.shadingModel = Model::ShadingModel::BLINN;
-					break;
-
-				case aiShadingMode::aiShadingMode_OrenNayar:
-					material.shadingModel = Model::ShadingModel::OREN_NAYAR;
-					break;
-
-				case aiShadingMode::aiShadingMode_Minnaert:
-					material.shadingModel = Model::ShadingModel::MINNAERT;
-					break;
-
-				case aiShadingMode::aiShadingMode_CookTorrance:
-					material.shadingModel = Model::ShadingModel::COOK_TORRANCE;
-					break;
-
-				case aiShadingMode::aiShadingMode_Unlit:
-					material.shadingModel = Model::ShadingModel::UNLIT;
-					break;
-
-				case aiShadingMode::aiShadingMode_Fresnel:
-					material.shadingModel = Model::ShadingModel::FRESNEL;
-					break;
-
-				case aiShadingMode::aiShadingMode_PBR_BRDF:
-					material.shadingModel = Model::ShadingModel::PBR_BRDF;
-					break;
 			}
 
-			aiBlendMode blendMode{ aiBlendMode::aiBlendMode_Default };
-			pAiMaterial->Get(AI_MATKEY_BLEND_FUNC, blendMode);
-			switch (blendMode)
+			// Shininess strength
 			{
-				case aiBlendMode::aiBlendMode_Default:
-					material.blendMode = Model::BlendMode::DEFAULT;
-					break;
-
-				case aiBlendMode::aiBlendMode_Additive:
-					material.blendMode = Model::BlendMode::ADDITIVE;
-					break;
+				float shininessStrength{ 1.0f };
+				pAiMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, shininessStrength);
+				material.shininessStrength = shininessStrength;
 			}
 
-			float opacity{ 1.0f };
-			pAiMaterial->Get(AI_MATKEY_OPACITY, opacity);
-			material.opacity = opacity;
+			// Index of refraction
+			{
+				float indexOfRefraction{ 1.0f };
+				pAiMaterial->Get(AI_MATKEY_REFRACTI, indexOfRefraction);
+				material.indexOfRefraction = indexOfRefraction;
+			}
 
-			float shininess{ 0.0f };
-			pAiMaterial->Get(AI_MATKEY_SHININESS, shininess);
-			material.shininess = shininess;
-			if ((material.shadingModel == Model::ShadingModel::GOURAUD) && (shininess > 0.0f))
-				material.shadingModel = Model::ShadingModel::PHONG;
-
-			float shininessStrength{ 1.0f };
-			pAiMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, shininessStrength);
-			material.shininessStrength = shininessStrength;
-
-			float indexOfRefraction{ 1.0f };
-			pAiMaterial->Get(AI_MATKEY_REFRACTI, indexOfRefraction);
-			material.indexOfRefraction = indexOfRefraction;
-
-			std::unordered_map<std::string, size_t> texNames;
-
+			// Handling textures
 			for (
 				int texTypeIter{ aiTextureType::aiTextureType_NONE };
 				texTypeIter < AI_TEXTURE_TYPE_MAX; ++texTypeIter)
 			{
-				auto const texCount{ pAiMaterial->GetTextureCount(static_cast<aiTextureType>(texTypeIter)) };
+				auto const aiTexType	{ static_cast<aiTextureType>(texTypeIter) };
+				auto const texType		{ __parseAIType(aiTexType) };
+				auto &texInfos			{ material.textureInfos[texType] };
+
+				auto const texCount{ pAiMaterial->GetTextureCount(aiTexType) };
+				texInfos.resize(texCount);
 
 				for (uint32_t texIter{ }; texIter < texCount; ++texIter)
 				{
-					aiString texName{ };
-					pAiMaterial->Get(AI_MATKEY_TEXTURE(texTypeIter, texIter), texName);
+					auto &texInfo{ texInfos[texIter] };
 
-					int a = 0;
+					// Index
+					{
+						aiString aiTexPath{ };
+						pAiMaterial->Get(AI_MATKEY_TEXTURE(texTypeIter, texIter), aiTexPath);
+
+						std::string texPath{ aiTexPath.C_Str() };
+						auto const texEmplacement{ texPaths.try_emplace(texPath, texIdxCounter) };
+
+						bool const emplaced{ texEmplacement.second };
+						if (emplaced)
+							++texIdxCounter;
+
+						size_t const texIndex{ texEmplacement.first->second };
+						texInfo.index = texIndex;
+					}
+
+					// Blend
+					{
+						float blend{ 1.0f };
+						pAiMaterial->Get(AI_MATKEY_TEXBLEND(texTypeIter, texIter), blend);
+						texInfo.blend = blend;
+					}
+
+					// Operation
+					{
+						aiTextureOp aiOp{ aiTextureOp::aiTextureOp_Multiply };
+						pAiMaterial->Get(AI_MATKEY_TEXOP(texTypeIter, texIter), aiOp);
+						texInfo.op = __parseAIType(aiOp);
+					}
+
+					// Mapping mode U
+					{
+						aiTextureMapMode aiMapModeU{ aiTextureMapMode::aiTextureMapMode_Wrap };
+						pAiMaterial->Get(AI_MATKEY_MAPPINGMODE_U(texTypeIter, texIter), aiMapModeU);
+						texInfo.mapModeU = __parseAIType(aiMapModeU);
+					}
+
+					// Mapping mode V
+					{
+						aiTextureMapMode aiMapModeV{ aiTextureMapMode::aiTextureMapMode_Wrap };
+						pAiMaterial->Get(AI_MATKEY_MAPPINGMODE_V(texTypeIter, texIter), aiMapModeV);
+						texInfo.mapModeV = __parseAIType(aiMapModeV);
+					}
+
+					// Other flags
+					{
+						aiTextureFlags flags{ };
+						pAiMaterial->Get(AI_MATKEY_TEXFLAGS(texTypeIter, texIter), flags);
+
+						texInfo.inverted = (flags & aiTextureFlags::aiTextureFlags_Invert);
+						texInfo.useAlpha = (flags &aiTextureFlags::aiTextureFlags_UseAlpha);
+					}
 				}
 			}
 		}
-
-		return retVal;
 	}
 }

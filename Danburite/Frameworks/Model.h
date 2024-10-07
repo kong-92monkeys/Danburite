@@ -15,6 +15,11 @@ namespace Frx
 		enum class TextureType
 		{
 			/*
+				No texture, but the value to be used as 'texture semantic'
+			*/
+			NONE,
+
+			/*
 				The texture is combined with the result of the ambient
 				lighting equation.
 			*/
@@ -108,6 +113,13 @@ namespace Frx
 			METALNESS,
 			DIFFUSE_ROUGHNESS,
 			AMBIENT_OCCLUSION,
+
+			/*
+				Unknown texture
+				A texture reference that does not match any of the definitions
+				above is considered to be 'unknown'.
+			*/
+			UNKNOWN,
 
 			/*
 				Sheen
@@ -282,16 +294,16 @@ namespace Frx
 				All color components (rgb) are multiplied
 				with this factor before any further processing is done.
 			*/
-			float blend{ };
+			float blend{ 1.0f };
 
 			/*
 				Defines the arithmetic operation
 				to be used to combine the n¡¯th texture
 			*/
-			TextureOp op{ };
+			TextureOp op{ TextureOp::MULTIPLY };
 
-			TextureMapMode mapModeU{ };
-			TextureMapMode mapModeV{ };
+			TextureMapMode mapModeU{ TextureMapMode::WRAP };
+			TextureMapMode mapModeV{ TextureMapMode::WRAP };
 
 			bool inverted{ };
 			bool useAlpha{ };
