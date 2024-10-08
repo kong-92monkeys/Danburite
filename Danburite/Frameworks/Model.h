@@ -288,7 +288,7 @@ namespace Frx
 		struct TextureInfo
 		{
 		public:
-			size_t index{ };
+			uint32_t index{ };
 
 			/*
 				All color components (rgb) are multiplied
@@ -434,8 +434,9 @@ namespace Frx
 		public:
 			glm::mat4 transform{ 1.0f };
 
-			std::vector<size_t> meshes;
-			std::vector<size_t> children;
+			std::vector<uint32_t> materials;
+			std::vector<uint32_t> meshes;
+			std::vector<uint32_t> children;
 		};
 
 		struct CreateInfo

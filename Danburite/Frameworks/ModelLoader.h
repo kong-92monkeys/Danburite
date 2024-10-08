@@ -27,17 +27,23 @@ namespace Frx
 
 		[[nodiscard]]
 		static void __loadTexturesAndMaterials(
-			aiMaterial const *const *mMaterials,
-			uint32_t mNumMaterials,
+			aiMaterial const *const *pAiMaterials,
+			uint32_t materialCount,
 			std::filesystem::path const &assetDir,
 			std::vector<std::unique_ptr<Infra::Bitmap>> &outTextures,
 			std::vector<Model::Material> &outMaterials);
 
 		[[nodiscard]]
 		static void __loadMeshes(
-			aiMesh const *const *mMeshes,
-			uint32_t mNumMeshes,
+			aiMesh const *const *pAiMeshes,
+			uint32_t meshCount,
 			std::vector<Model::Mesh> &outMeshes);
+
+		[[nodiscard]]
+		static void __loadNodes(
+			aiNode const *pAiRootNode,
+			aiMesh const *const *pAiMeshes,
+			std::vector<Model::Node> &outNodes);
 
 		[[nodiscard]]
 		static constexpr glm::vec3 __parseAIType(
@@ -62,6 +68,10 @@ namespace Frx
 		[[nodiscard]]
 		static constexpr Model::TextureMapMode __parseAIType(
 			aiTextureMapMode value) noexcept;
+
+		[[nodiscard]]
+		static glm::mat4 __parseAIType(
+			aiMatrix4x4 const &value) noexcept;
 	};
 
 	constexpr glm::vec3 ModelLoader::__parseAIType(

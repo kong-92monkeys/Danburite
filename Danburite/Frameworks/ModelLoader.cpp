@@ -3,6 +3,8 @@
 #include "../System/Env.h"
 #include <assimp/postprocess.h>
 #include <stdexcept>
+#include <optional>
+#include <future>
 
 namespace Frx
 {
@@ -49,112 +51,51 @@ namespace Frx
 
 		Model::CreateInfo retVal;
 
-		__loadTexturesAndMaterials(
-			pScene->mMaterials, pScene->mNumMaterials,
-			assetDir, retVal.textures, retVal.materials);
-		
-		__loadMeshes(
-			pScene->mMeshes, pScene->mNumMeshes,
-			retVal.meshes);
+		std::vector<std::future<void>> jobs;
+
+		jobs.emplace_back(
+			std::async(std::launch::async, [pScene, assetDir, &retVal]
+		{
+			__loadTexturesAndMaterials(
+				pScene->mMaterials, pScene->mNumMaterials,
+				assetDir, retVal.textures, retVal.materials);
+		}));
+
+		jobs.emplace_back(
+			std::async(std::launch::async, [pScene, &retVal]
+		{
+			__loadMeshes(pScene->mMeshes, pScene->mNumMeshes, retVal.meshes);
+		}));
+
+		jobs.emplace_back(
+			std::async(std::launch::async, [pScene, &retVal]
+		{
+			__loadNodes(pScene->mRootNode, pScene->mMeshes, retVal.nodes);
+		}));
+
+		for (auto const &job : jobs)
+			job.wait();
 
 		__importer.FreeScene();
 
 		return retVal;
 	}
 
-	void ModelLoader::__loadMeshes(
-		aiMesh const *const *const mMeshes,
-		uint32_t const mNumMeshes,
-		std::vector<Model::Mesh> &outMeshes)
-	{
-		outMeshes.resize(mNumMeshes);
-
-		for (uint32_t meshIt{ }; meshIt < mNumMeshes; ++meshIt)
-		{
-			auto const pAiMesh	{ mMeshes[meshIt] };
-			auto &mesh			{ outMeshes[meshIt] };
-
-			if (pAiMesh->GetNumUVChannels() > 1)
-				throw std::runtime_error{ "Cannot handle UV channels more than 1." };
-
-			if (pAiMesh->GetNumColorChannels() > 1)
-				throw std::runtime_error{ "Cannot handle color channels more than 1." };
-
-			mesh.vertexCount = pAiMesh->mNumVertices;
-
-			if (pAiMesh->HasPositions())
-			{
-				auto &posBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::POS] };
-				posBuffer.add(pAiMesh->mVertices, pAiMesh->mNumVertices * sizeof(Vertex_P));
-			}
-
-			if (pAiMesh->HasTextureCoords(0U))
-			{
-				auto &uvBuffer				{ mesh.vertexBuffers[VertexAttribFlagBits::UV] };
-				auto const pAiTexCoords		{ pAiMesh->mTextureCoords[0] };
-
-				for (uint32_t texCoordIt{ }; texCoordIt < pAiMesh->mNumVertices; ++texCoordIt)
-					uvBuffer.add(pAiTexCoords + texCoordIt, sizeof(Vertex_U));
-			}
-
-			if (pAiMesh->HasNormals())
-			{
-				auto &normalBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::NORMAL] };
-				normalBuffer.add(pAiMesh->mNormals, pAiMesh->mNumVertices * sizeof(Vertex_N));
-			}
-
-			if (pAiMesh->HasVertexColors(0U))
-			{
-				auto &colorBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::COLOR] };
-				colorBuffer.add(pAiMesh->mColors[0], pAiMesh->mNumVertices * sizeof(Vertex_C));
-			}
-
-			auto &indexType{ mesh.indexType };
-			indexType = VkIndexType::VK_INDEX_TYPE_UINT16;
-
-			std::vector<uint16_t> indices16;
-			std::vector<uint32_t> indices32;
-
-			for (uint32_t primitiveIt{ }; primitiveIt < pAiMesh->mNumFaces; ++primitiveIt)
-			{
-				auto const &aiFace{ pAiMesh->mFaces[primitiveIt] };
-				for (uint32_t indexIt{ }; indexIt < aiFace.mNumIndices; ++indexIt)
-				{
-					uint32_t const index{ aiFace.mIndices[indexIt] };
-
-					if (index <= UINT16_MAX)
-						indices16.emplace_back(static_cast<uint16_t>(index));
-					else
-						indexType = VkIndexType::VK_INDEX_TYPE_UINT32;
-
-					indices32.emplace_back(index);
-				}
-			}
-
-			mesh.indexCount = static_cast<uint32_t>(indices32.size());
-
-			if (indexType == VkIndexType::VK_INDEX_TYPE_UINT16)
-				mesh.indexBuffer.add(indices16.data(), indices16.size() * sizeof(uint16_t));
-			else
-				mesh.indexBuffer.add(indices32.data(), indices32.size() * sizeof(uint32_t));
-		}
-	}
-
 	void ModelLoader::__loadTexturesAndMaterials(
-		aiMaterial const *const *mMaterials,
-		uint32_t const mNumMaterials,
+		aiMaterial const *const *pAiMaterials,
+		uint32_t const materialCount,
 		std::filesystem::path const &assetDir,
 		std::vector<std::unique_ptr<Infra::Bitmap>> &outTextures,
 		std::vector<Model::Material> &outMaterials)
 	{
-		outMaterials.resize(mNumMaterials);
+		outMaterials.resize(materialCount);
 
-		size_t texCount{ };
-		std::unordered_map<std::string, size_t> texNames;
+		uint32_t texCount{ };
+		std::unordered_map<std::string, uint32_t> texNames;
 
-		for (uint32_t materialIt{ }; materialIt < mNumMaterials; ++materialIt)
+		for (uint32_t materialIt{ }; materialIt < materialCount; ++materialIt)
 		{
-			auto const pAiMaterial	{ mMaterials[materialIt] };
+			auto const pAiMaterial	{ pAiMaterials[materialIt] };
 			auto &material			{ outMaterials[materialIt] };
 
 			// Ambient
@@ -270,10 +211,13 @@ namespace Frx
 				texTypeIter < AI_TEXTURE_TYPE_MAX; ++texTypeIter)
 			{
 				auto const aiTexType	{ static_cast<aiTextureType>(texTypeIter) };
-				auto const texType		{ __parseAIType(aiTexType) };
-				auto &texInfos			{ material.textureInfos[texType] };
+				auto const texInfoCount	{ pAiMaterial->GetTextureCount(aiTexType) };
+				if (!texInfoCount)
+					continue;
 
-				auto const texInfoCount{ pAiMaterial->GetTextureCount(aiTexType) };
+				auto const texType	{ __parseAIType(aiTexType) };
+				auto &texInfos		{ material.textureInfos[texType] };
+
 				texInfos.resize(texInfoCount);
 
 				for (uint32_t texInfoIter{ }; texInfoIter < texInfoCount; ++texInfoIter)
@@ -292,7 +236,7 @@ namespace Frx
 						if (emplaced)
 							++texCount;
 
-						size_t const texIndex{ texEmplacement.first->second };
+						uint32_t const texIndex{ texEmplacement.first->second };
 						texInfo.index = texIndex;
 					}
 
@@ -336,15 +280,184 @@ namespace Frx
 			}
 		}
 
-		auto &assetManager{ Sys::Env::getInstance().getAssetManager() };
-
 		// Load textures
 		outTextures.resize(texCount);
+		std::vector<std::future<void>> bitmapJobs;
+
 		for (auto const &[texName, texIndex] : texNames)
 		{
-			auto const texPath		{ (assetDir / texName).string() };
-			auto const texData		{ assetManager.readBinary(texPath) };
-			outTextures[texIndex]	= std::make_unique<Infra::Bitmap>(texData.data(), texData.size(), 4ULL);
+			bitmapJobs.emplace_back(
+				std::async(std::launch::async,
+					[&outTexture{ outTextures[texIndex] }, texPath{ (assetDir / texName).string() }]
+			{
+				auto &assetManager	{ Sys::Env::getInstance().getAssetManager() };
+				auto const texData	{ assetManager.readBinary(texPath) };
+				outTexture = std::make_unique<Infra::Bitmap>(texData.data(), texData.size(), 4ULL);
+			}));
 		}
+
+		for (auto const &job : bitmapJobs)
+			job.wait();
+	}
+
+	void ModelLoader::__loadMeshes(
+		aiMesh const *const *const pAiMeshes,
+		uint32_t const meshCount,
+		std::vector<Model::Mesh> &outMeshes)
+	{
+		outMeshes.resize(meshCount);
+
+		for (uint32_t meshIt{ }; meshIt < meshCount; ++meshIt)
+		{
+			auto const pAiMesh	{ pAiMeshes[meshIt] };
+			auto &mesh			{ outMeshes[meshIt] };
+
+			if (pAiMesh->GetNumUVChannels() > 1)
+				throw std::runtime_error{ "Cannot handle UV channels more than 1." };
+
+			if (pAiMesh->GetNumColorChannels() > 1)
+				throw std::runtime_error{ "Cannot handle color channels more than 1." };
+
+			mesh.vertexCount = pAiMesh->mNumVertices;
+
+			if (pAiMesh->HasPositions())
+			{
+				auto &posBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::POS] };
+				posBuffer.add(pAiMesh->mVertices, pAiMesh->mNumVertices * sizeof(Vertex_P));
+			}
+
+			if (pAiMesh->HasTextureCoords(0U))
+			{
+				auto &uvBuffer				{ mesh.vertexBuffers[VertexAttribFlagBits::UV] };
+				auto const pAiTexCoords		{ pAiMesh->mTextureCoords[0] };
+
+				for (uint32_t texCoordIt{ }; texCoordIt < pAiMesh->mNumVertices; ++texCoordIt)
+					uvBuffer.add(pAiTexCoords + texCoordIt, sizeof(Vertex_U));
+			}
+
+			if (pAiMesh->HasNormals())
+			{
+				auto &normalBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::NORMAL] };
+				normalBuffer.add(pAiMesh->mNormals, pAiMesh->mNumVertices * sizeof(Vertex_N));
+			}
+
+			if (pAiMesh->HasVertexColors(0U))
+			{
+				auto &colorBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::COLOR] };
+				colorBuffer.add(pAiMesh->mColors[0], pAiMesh->mNumVertices * sizeof(Vertex_C));
+			}
+
+			auto &indexType{ mesh.indexType };
+			indexType = VkIndexType::VK_INDEX_TYPE_UINT16;
+
+			std::vector<uint16_t> indices16;
+			std::vector<uint32_t> indices32;
+
+			for (uint32_t primitiveIt{ }; primitiveIt < pAiMesh->mNumFaces; ++primitiveIt)
+			{
+				auto const &aiFace{ pAiMesh->mFaces[primitiveIt] };
+				for (uint32_t indexIt{ }; indexIt < aiFace.mNumIndices; ++indexIt)
+				{
+					uint32_t const index{ aiFace.mIndices[indexIt] };
+
+					if (index <= UINT16_MAX)
+						indices16.emplace_back(static_cast<uint16_t>(index));
+					else
+						indexType = VkIndexType::VK_INDEX_TYPE_UINT32;
+
+					indices32.emplace_back(index);
+				}
+			}
+
+			mesh.indexCount = static_cast<uint32_t>(indices32.size());
+
+			if (indexType == VkIndexType::VK_INDEX_TYPE_UINT16)
+				mesh.indexBuffer.add(indices16.data(), indices16.size() * sizeof(uint16_t));
+			else
+				mesh.indexBuffer.add(indices32.data(), indices32.size() * sizeof(uint32_t));
+		}
+	}
+
+	void ModelLoader::__loadNodes(
+		aiNode const *const pAiRootNode,
+		aiMesh const *const *const pAiMeshes,
+		std::vector<Model::Node> &outNodes)
+	{
+		struct AiNodeSequenceInfo
+		{
+		public:
+			aiNode const *pAiNode{ };
+			std::optional<uint32_t> parent;
+			std::vector<uint32_t> children;
+		};
+
+		std::vector<AiNodeSequenceInfo> aiNodeSequence;
+
+		// Serialize
+		{
+			struct AiNodeStackInfo
+			{
+			public:
+				aiNode const *pAiNode{ };
+				std::optional<uint32_t> parent;
+			};
+
+			std::stack<AiNodeStackInfo> aiNodeStack;
+			aiNodeStack.emplace(pAiRootNode, std::nullopt);
+
+			while (!(aiNodeStack.empty()))
+			{
+				auto const [pAiNode, parent]{ std::move(aiNodeStack.top()) };
+				aiNodeStack.pop();
+
+				uint32_t const nodeIdx{ static_cast<uint32_t>(aiNodeSequence.size()) };
+				aiNodeSequence.emplace_back(pAiNode, parent);
+
+				if (parent.has_value())
+				{
+					auto &parentInfo{ aiNodeSequence[parent.value()] };
+					parentInfo.children.emplace_back(nodeIdx);
+				}
+
+				for (uint32_t childIter{ }; childIter < pAiNode->mNumChildren; ++childIter)
+					aiNodeStack.emplace(pAiNode->mChildren[childIter], nodeIdx);
+			}
+		}
+
+		size_t const nodeCount{ aiNodeSequence.size() };
+		outNodes.resize(nodeCount);
+
+		for (size_t nodeIdx{ }; nodeIdx < nodeCount; ++nodeIdx)
+		{
+			auto &[pAiNode, parent, children]{ aiNodeSequence[nodeIdx] };
+			auto &node{ outNodes[nodeIdx] };
+
+			node.transform = __parseAIType(pAiNode->mTransformation);
+			if (parent.has_value())
+			{
+				auto const &parentTransform{ outNodes[parent.value()].transform };
+				node.transform = (parentTransform * node.transform);
+			}
+
+			uint32_t const meshCount{ pAiNode->mNumMeshes };
+			node.materials.resize(meshCount);
+			node.meshes.resize(meshCount);
+
+			for (uint32_t meshIt{ }; meshIt < meshCount; ++meshIt)
+			{
+				uint32_t const meshIdx	{ pAiNode->mMeshes[meshIt] };
+
+				node.materials[meshIt]	= pAiMeshes[meshIdx]->mMaterialIndex;
+				node.meshes[meshIt]		= meshIdx;
+			}
+
+			node.children = std::move(children);
+		}
+	}
+
+	glm::mat4 ModelLoader::__parseAIType(
+		aiMatrix4x4 const &value) noexcept
+	{
+		return glm::transpose(reinterpret_cast<glm::mat4 const &>(value));
 	}
 }
