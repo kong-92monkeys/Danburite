@@ -5,16 +5,18 @@
 
 namespace Frx
 {
-	class SceneObject : public Infra::Stateful<SceneObject>
+	class SceneNode : public Infra::Stateful<SceneNode>
 	{
 	public:
-		SceneObject() noexcept;
+		SceneNode() noexcept;
+		SceneNode(
+			glm::mat4 const &initialTransform);
 
 		void addChild(
-			SceneObject *pChild);
+			SceneNode *pChild);
 
 		void removeChild(
-			SceneObject *pChild);
+			SceneNode *pChild);
 
 		[[nodiscard]]
 		constexpr Transform &getTransform() noexcept;
@@ -35,29 +37,29 @@ namespace Frx
 		Transform __transform;
 		glm::mat4 __globalTransform{ 1.0f };
 
-		std::unordered_set<SceneObject *> __children;
-		std::unordered_set<SceneObject *> __invalidatedChildren;
+		std::unordered_set<SceneNode *> __children;
+		std::unordered_set<SceneNode *> __invalidatedChildren;
 
 		Infra::EventListenerPtr<Transform *> __pTransformInvalidateListener;
-		Infra::EventListenerPtr<SceneObject *> __pChildInvalidateListener;
+		Infra::EventListenerPtr<SceneNode *> __pChildInvalidateListener;
 
 		void __onTransformInvalidated();
 
 		void __onChildInvalidated(
-			SceneObject *pChild);
+			SceneNode *pChild);
 	};
 
-	constexpr Transform &SceneObject::getTransform() noexcept
+	constexpr Transform &SceneNode::getTransform() noexcept
 	{
 		return __transform;
 	}
 
-	constexpr Transform const &SceneObject::getTransform() const noexcept
+	constexpr Transform const &SceneNode::getTransform() const noexcept
 	{
 		return __transform;
 	}
 
-	constexpr glm::mat4 const &SceneObject::getGlobalTransform() const noexcept
+	constexpr glm::mat4 const &SceneNode::getGlobalTransform() const noexcept
 	{
 		return __globalTransform;
 	}

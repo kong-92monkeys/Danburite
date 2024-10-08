@@ -1,22 +1,39 @@
-#include "SceneObject.h"
+#include "SceneNode.h"
 
 namespace Frx
 {
-	SceneObject::SceneObject() noexcept
+	SceneNode::SceneNode() noexcept
 	{
 		__pTransformInvalidateListener =
 			Infra::EventListener<Transform *>::bind(
-				&SceneObject::__onTransformInvalidated, this);
+				&SceneNode::__onTransformInvalidated, this);
 
 		__pChildInvalidateListener =
-			Infra::EventListener<SceneObject *>::bind(
-				&SceneObject::__onChildInvalidated, this, std::placeholders::_1);
+			Infra::EventListener<SceneNode *>::bind(
+				&SceneNode::__onChildInvalidated, this, std::placeholders::_1);
 
 		__transform.getInvalidateEvent() += __pTransformInvalidateListener;
 	}
 
-	void SceneObject::addChild(
-		SceneObject *const pChild)
+	SceneNode::SceneNode(
+		glm::mat4 const &initialTransform) :
+		__transform{ initialTransform }
+	{
+		__globalTransform = __transform.getMatrix();
+
+		__pTransformInvalidateListener =
+			Infra::EventListener<Transform *>::bind(
+				&SceneNode::__onTransformInvalidated, this);
+
+		__pChildInvalidateListener =
+			Infra::EventListener<SceneNode *>::bind(
+				&SceneNode::__onChildInvalidated, this, std::placeholders::_1);
+
+		__transform.getInvalidateEvent() += __pTransformInvalidateListener;
+	}
+
+	void SceneNode::addChild(
+		SceneNode *const pChild)
 	{
 		if (!(__children.emplace(pChild).second))
 			throw std::runtime_error{ "The display is already registered." };
@@ -27,8 +44,8 @@ namespace Frx
 		_invalidate();
 	}
 
-	void SceneObject::removeChild(
-		SceneObject *const pChild)
+	void SceneNode::removeChild(
+		SceneNode *const pChild)
 	{
 		if (!(__children.erase(pChild)))
 			throw std::runtime_error{ "The display is not registered yet." };
@@ -37,7 +54,7 @@ namespace Frx
 		__invalidatedChildren.erase(pChild);
 	}
 
-	void SceneObject::_onValidate()
+	void SceneNode::_onValidate()
 	{
 		if (__transform.isInvalidated())
 		{
@@ -56,7 +73,7 @@ namespace Frx
 		__invalidatedChildren.clear();
 	}
 
-	void SceneObject::_validate(
+	void SceneNode::_validate(
 		glm::mat4 const &parentGlobalTransform)
 	{
 		if (__transform.isInvalidated())
@@ -79,13 +96,13 @@ namespace Frx
 		_markAsValidated();
 	}
 
-	void SceneObject::__onTransformInvalidated()
+	void SceneNode::__onTransformInvalidated()
 	{
 		_invalidate();
 	}
 
-	void SceneObject::__onChildInvalidated(
-		SceneObject *const pChild)
+	void SceneNode::__onChildInvalidated(
+		SceneNode *const pChild)
 	{
 		__invalidatedChildren.emplace(pChild);
 		_invalidate();

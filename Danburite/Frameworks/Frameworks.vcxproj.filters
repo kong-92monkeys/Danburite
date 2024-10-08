@@ -61,9 +61,6 @@
     <Filter Include="Utils\ModelLoader">
       <UniqueIdentifier>{0e259051-12c4-484d-a1e3-fe928ba91c18}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SceneObject">
-      <UniqueIdentifier>{b495f6a0-0e32-42ca-91b4-4f4f2b04c367}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Model">
       <UniqueIdentifier>{59d4071d-11b4-4b78-9d13-017d92d1a58e}</UniqueIdentifier>
     </Filter>
@@ -81,6 +78,9 @@
     </Filter>
     <Filter Include="Utils\Assimp\IOStream\String">
       <UniqueIdentifier>{bc733c85-d55a-48a4-a938-1045e7c84062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SceneNode">
+      <UniqueIdentifier>{b495f6a0-0e32-42ca-91b4-4f4f2b04c367}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,8 +138,8 @@
     <ClInclude Include="ModelLoader.h">
       <Filter>Utils\ModelLoader</Filter>
     </ClInclude>
-    <ClInclude Include="SceneObject.h">
-      <Filter>SceneObject</Filter>
+    <ClInclude Include="SceneNode.h">
+      <Filter>SceneNode</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Model</Filter>
@@ -200,8 +200,8 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Utils\ModelLoader</Filter>
     </ClCompile>
-    <ClCompile Include="SceneObject.cpp">
-      <Filter>SceneObject</Filter>
+    <ClCompile Include="SceneNode.cpp">
+      <Filter>SceneNode</Filter>
     </ClCompile>
     <ClCompile Include="AssimpAssetIOSystem.cpp">
       <Filter>Utils\Assimp\IOSystem</Filter>
@@ -211,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="AssimpAssetStringStream.cpp">
       <Filter>Utils\Assimp\IOStream\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

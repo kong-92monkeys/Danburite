@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ModelLoadingScene.h"
 #include "../Frameworks/PrimitiveBuilder.h"
-#include <glm/gtc/matrix_transform.hpp>
+#include "../Frameworks/Model.h"
 
 ModelLoadingScene::~ModelLoadingScene() noexcept
 {
@@ -63,7 +63,7 @@ std::any ModelLoadingScene::_onInit()
 	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_POINT, true);
 	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_LINE, true);
 
-	auto result{ __modelLoader.load(R"(Models\backpack\backpack.obj)") };
+	Frx::Model model{ __modelLoader.load(R"(Models\backpack\backpack.obj)") };
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);

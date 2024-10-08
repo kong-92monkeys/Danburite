@@ -10,6 +10,11 @@ namespace Frx
 	{
 	public:
 		Transform() noexcept;
+		Transform(
+			glm::mat4 const &src);
+
+		void setMatrix(
+			glm::mat4 const &src);
 
 		[[nodiscard]]
 		constexpr Position &getPosition() noexcept;

@@ -387,7 +387,6 @@ namespace Frx
 		{
 		public:
 			aiNode const *pAiNode{ };
-			std::optional<uint32_t> parent;
 			std::vector<uint32_t> children;
 		};
 
@@ -411,7 +410,7 @@ namespace Frx
 				aiNodeStack.pop();
 
 				uint32_t const nodeIdx{ static_cast<uint32_t>(aiNodeSequence.size()) };
-				aiNodeSequence.emplace_back(pAiNode, parent);
+				aiNodeSequence.emplace_back(pAiNode);
 
 				if (parent.has_value())
 				{
@@ -429,15 +428,10 @@ namespace Frx
 
 		for (size_t nodeIdx{ }; nodeIdx < nodeCount; ++nodeIdx)
 		{
-			auto &[pAiNode, parent, children]{ aiNodeSequence[nodeIdx] };
-			auto &node{ outNodes[nodeIdx] };
+			auto &[pAiNode, children]	{ aiNodeSequence[nodeIdx] };
+			auto &node					{ outNodes[nodeIdx] };
 
 			node.transform = __parseAIType(pAiNode->mTransformation);
-			if (parent.has_value())
-			{
-				auto const &parentTransform{ outNodes[parent.value()].transform };
-				node.transform = (parentTransform * node.transform);
-			}
 
 			uint32_t const meshCount{ pAiNode->mNumMeshes };
 			node.materials.resize(meshCount);

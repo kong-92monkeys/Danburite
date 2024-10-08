@@ -6,6 +6,8 @@
 #include "../Infra/GenericBuffer.h"
 #include "Vertex.h"
 #include <unordered_map>
+#include "SceneNode.h"
+#include <queue>
 
 namespace Frx
 {
@@ -448,7 +450,13 @@ namespace Frx
 			std::vector<Node> nodes;
 		};
 
-	private:
+		Model(
+			CreateInfo &&createInfo);
 
+		virtual ~Model() noexcept override;
+
+	private:
+		std::vector<SceneNode *> __sceneNodes;
+		std::queue<std::vector<glm::mat4>> __transformQue;
 	};
 }
