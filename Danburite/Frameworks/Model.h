@@ -398,6 +398,12 @@ namespace Frx
 
 		virtual ~Model() noexcept override;
 
+		void rcmd_addToLayer(
+			Render::Layer &layer);
+
+		void rcmd_removeFromLayer(
+			Render::Layer &layer);
+
 	private:
 		struct __RcmdResources
 		{

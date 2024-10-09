@@ -65,6 +65,10 @@ protected:
 	virtual std::any _onUpdate(
 		Time const &time) override;
 
+	virtual void _onModelLoaded(
+		uint32_t requestIdx,
+		Frx::Model::CreateInfo &&result) override;
+
 	virtual void _rcmd_onInit(
 		std::any const &initParam) override;
 
@@ -95,6 +99,8 @@ private:
 		glm::mat4 projMatrix	{ 1.0f };
 		glm::vec3 cameraPos		{ 0.0f };
 	};
+
+	std::unique_ptr<Frx::Model> __pModel;
 
 	std::unique_ptr<Render::Mesh> __rcmd_pPlaneMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pPlaneDrawParam;
@@ -128,8 +134,6 @@ private:
 
 	FPSCamera __camera;
 	RandomExt __randomExt;
-
-	Frx::ModelLoader __modelLoader;
 
 	__GlobalData __rcmd_globalData;
 

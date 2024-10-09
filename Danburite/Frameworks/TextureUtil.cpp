@@ -71,7 +71,7 @@ namespace Frx::TextureUtil
 	Render::Texture *loadTexture(
 		Render::Engine &engine,
 		Infra::Bitmap const &bitmap,
-		bool useMipmap,
+		bool const useMipmap,
 		VkPipelineStageFlags2 dstStageMask,
 		VkAccessFlags2 dstAccessMask)
 	{

@@ -167,10 +167,10 @@ void CApp::__onInitBeforeMainFrame()
 		.appVersion			{ 1U, 0U, 0U, 0U }
 	};
 
-#ifndef NDEBUG
-	contextCreateInfo.debugMode = true;
-	Infra::Logger::log(Infra::Logger::Severity::INFO, "Debug mode is activated.");
-#endif
+//#ifndef NDEBUG
+//	contextCreateInfo.debugMode = true;
+//	Infra::Logger::log(Infra::Logger::Severity::INFO, "Debug mode is activated.");
+//#endif
 
 	__pVulkanContext = std::make_unique<Dev::Context>(contextCreateInfo);
 	__pRenderSystem = std::make_unique<Frx::RenderSystem>(

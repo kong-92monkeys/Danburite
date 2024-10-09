@@ -33,7 +33,6 @@ namespace Frx
 			__importer.ReadFile(
 				assetPath.data(),
 				aiPostProcessSteps::aiProcess_Triangulate |
-				aiPostProcessSteps::aiProcess_FlipUVs |
 				aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
 				aiPostProcessSteps::aiProcess_GenUVCoords |
 				aiPostProcessSteps::aiProcess_OptimizeGraph |

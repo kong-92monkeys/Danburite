@@ -48,6 +48,20 @@ namespace Frx
 		});
 	}
 
+	void Model::rcmd_addToLayer(
+		Render::Layer &layer)
+	{
+		for (auto const &pObject : __pRcmdResources->renderObjects)
+			layer.addRenderObject(pObject.get());
+	}
+
+	void Model::rcmd_removeFromLayer(
+		Render::Layer &layer)
+	{
+		for (auto const &pObject : __pRcmdResources->renderObjects)
+			layer.removeRenderObject(pObject.get());
+	}
+
 	void Model::__rcmd_init(
 		CreateInfo const &createInfo,
 		Render::Engine &renderEngine,

@@ -3,6 +3,7 @@
 #include "Model.h"
 #include <chrono>
 #include <any>
+#include "ModelLoader.h"
 
 namespace Frx
 {
@@ -46,9 +47,16 @@ namespace Frx
 		virtual std::any _onUpdate(
 			Time const &time);
 
+		virtual void _onModelLoaded(
+			uint32_t requestIdx,
+			Model::CreateInfo &&result);
+
 		[[nodiscard]]
 		Model *_createModel(
 			Model::CreateInfo &&createInfo);
+
+		uint32_t _loadModel(
+			std::string_view const &assetPath);
 
 		[[nodiscard]]
 		Render::Layer *_rcmd_createLayer();
@@ -119,6 +127,10 @@ namespace Frx
 		std::chrono::steady_clock::duration __updateInterval{ std::chrono::steady_clock::duration::zero() };
 		std::chrono::time_point<std::chrono::steady_clock> __lastUpdateTime;
 
+		Infra::IdAllocator<uint32_t> __modelReqIdAllocator;
+		std::unordered_map<uint32_t, std::future<Model::CreateInfo>> __modelReqMap;
+		ModelLoader __modelLoader;
+
 		void __updateTime() noexcept;
 
 		[[nodiscard]]
@@ -126,6 +138,8 @@ namespace Frx
 
 		[[nodiscard]]
 		bool __checkUpdateInterval() noexcept;
+
+		void __handleModelRequests();
 
 		void __rcmd_update(
 			std::any const &updateParam);

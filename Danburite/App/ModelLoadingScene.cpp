@@ -2,6 +2,7 @@
 #include "ModelLoadingScene.h"
 #include "../Frameworks/PrimitiveBuilder.h"
 #include "../Frameworks/Model.h"
+#include <atomic>
 
 ModelLoadingScene::~ModelLoadingScene() noexcept
 {
@@ -24,6 +25,8 @@ ModelLoadingScene::~ModelLoadingScene() noexcept
 		__rcmd_pPlaneDrawParam = nullptr;
 		__rcmd_pPlaneMesh = nullptr;
 	}).wait();
+
+	__pModel = nullptr;
 }
 
 void ModelLoadingScene::setDisplay(
@@ -59,11 +62,7 @@ void ModelLoadingScene::syncDisplay()
 
 std::any ModelLoadingScene::_onInit()
 {
-	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_POINT, true);
-	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_LINE, true);
-
-	/*auto pModel{ std::unique_ptr<Frx::Model>{ _createModel(__modelLoader.load(R"(Models\backpack\backpack.obj)")) } };
-	pModel = nullptr;*/
+	_loadModel(R"(Models\backpack\backpack.obj)");
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
@@ -97,6 +96,19 @@ std::any ModelLoadingScene::_onUpdate(
 	}
 
 	return retVal;
+}
+
+void ModelLoadingScene::_onModelLoaded(
+	uint32_t requestIdx,
+	Frx::Model::CreateInfo &&result)
+{
+	__pModel = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+	std::atomic_thread_fence(std::memory_order::release);
+
+	_rcmd_silentRun([this]
+	{
+		__pModel->rcmd_addToLayer(*__rcmd_pLayer);
+	});
 }
 
 void ModelLoadingScene::_rcmd_onInit(

@@ -76,7 +76,7 @@ namespace Render
 		Dev::Context &__context;
 		VK::PhysicalDevice const &__physicalDevice;
 
-		Infra::DeferredDeleter __deferredDeleter{ Constants::MAX_IN_FLIGHT_FRAME_COUNT };
+		Infra::DeferredDeleter __deferredDeleter{ Constants::DEFERRED_DELETER_QUEUE_SIZE };
 		Dev::CommandExecutor __commandExecutor;
 		ImageReferenceManager __imageReferenceManager;
 

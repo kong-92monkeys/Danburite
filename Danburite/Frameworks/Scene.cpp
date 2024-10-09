@@ -19,6 +19,9 @@ namespace Frx
 
 		__beginningTime = std::chrono::steady_clock::now();
 
+		__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_POINT, true);
+		__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_LINE, true);
+
 		auto initParam{ std::move(_onInit()) };
 		_rcmd_silentRun([this, initParam{ initParam }]
 		{
@@ -41,6 +44,8 @@ namespace Frx
 			return;
 
 		__updateTime();
+		__handleModelRequests();
+
 		auto updateParam{ _onUpdate(__time) };
 		++__scmdFrameCount;
 
@@ -61,6 +66,11 @@ namespace Frx
 		return { };
 	}
 
+	void Scene::_onModelLoaded(
+		uint32_t const requestIdx,
+		Model::CreateInfo &&result)
+	{}
+
 	Model *Scene::_createModel(
 		Model::CreateInfo &&createInfo)
 	{
@@ -69,6 +79,20 @@ namespace Frx
 			std::move(createInfo), *__pRcmdExecutor,
 			*__pRenderEngine, *__pRendererFactory
 		};
+	}
+
+	uint32_t Scene::_loadModel(
+		std::string_view const &assetPath)
+	{
+		uint32_t const reqId{ __modelReqIdAllocator.allocate() };
+
+		std::string modelPath{ assetPath };
+		__modelReqMap[reqId] = std::async(std::launch::async, [this, modelPath]
+		{
+			return __modelLoader.load(modelPath);
+		});
+
+		return reqId;
 	}
 
 	Render::Layer *Scene::_rcmd_createLayer()
@@ -167,6 +191,26 @@ namespace Frx
 
 		__lastUpdateTime = curTime;
 		return true;
+	}
+
+	void Scene::__handleModelRequests()
+	{
+		using namespace std::chrono_literals;
+
+		for (auto reqIt{ __modelReqMap.begin() }; reqIt != __modelReqMap.end(); )
+		{
+			auto &[reqId, reqFuture] { *reqIt };
+			if (reqFuture.wait_for(0ns) != std::future_status::ready)
+			{
+				++reqIt;
+				continue;
+			}
+
+			__modelReqIdAllocator.free(reqId);
+			_onModelLoaded(reqId, reqFuture.get());
+
+			reqIt = __modelReqMap.erase(reqIt);
+		}
 	}
 
 	void Scene::__rcmd_update(
