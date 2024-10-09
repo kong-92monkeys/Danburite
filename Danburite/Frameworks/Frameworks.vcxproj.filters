@@ -82,6 +82,9 @@
     <Filter Include="SceneNode">
       <UniqueIdentifier>{b495f6a0-0e32-42ca-91b4-4f4f2b04c367}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RendererFactory">
+      <UniqueIdentifier>{e857c17b-e9a5-4998-8aa0-6fe31abefa8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -153,6 +156,12 @@
     <ClInclude Include="AssimpAssetStringStream.h">
       <Filter>Utils\Assimp\IOStream\String</Filter>
     </ClInclude>
+    <ClInclude Include="RendererFactory.h">
+      <Filter>RendererFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererType.h">
+      <Filter>RendererFactory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -214,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="RendererFactory.cpp">
+      <Filter>RendererFactory</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,5 +1,4 @@
 #include "TextureUtil.h"
-#include "../Infra/Bitmap.h"
 #include "../System/Env.h"
 
 namespace Frx::TextureUtil
@@ -68,17 +67,14 @@ namespace Frx::TextureUtil
 		return engine.createTexture(imageCreateInfo, imageViewCreateInfo);
 	}
 
+	[[nodiscard]]
 	Render::Texture *loadTexture(
 		Render::Engine &engine,
-		std::string_view const &assetPath,
-		bool const useMipmap,
-		VkPipelineStageFlags2 const dstStageMask,
-		VkAccessFlags2 const dstAccessMask)
+		Infra::Bitmap const &bitmap,
+		bool useMipmap,
+		VkPipelineStageFlags2 dstStageMask,
+		VkAccessFlags2 dstAccessMask)
 	{
-		auto &assetManager		{ Sys::Env::getInstance().getAssetManager() };
-		auto const binary		{ assetManager.readBinary(assetPath) };
-		Infra::Bitmap bitmap	{ binary.data(), binary.size(), 4ULL };
-
 		uint32_t const bitmapWidth		{ static_cast<uint32_t>(bitmap.getWidth()) };
 		uint32_t const bitmapHeight		{ static_cast<uint32_t>(bitmap.getHeight()) };
 		uint32_t const mipLevels		{ useMipmap ? __calcMipLevels(bitmapWidth, bitmapHeight) : 1U };
@@ -200,5 +196,21 @@ namespace Frx::TextureUtil
 			lastRange);
 
 		return pRetVal;
+	}
+
+	Render::Texture *loadTexture(
+		Render::Engine &engine,
+		std::string_view const &assetPath,
+		bool const useMipmap,
+		VkPipelineStageFlags2 const dstStageMask,
+		VkAccessFlags2 const dstAccessMask)
+	{
+		auto &assetManager		{ Sys::Env::getInstance().getAssetManager() };
+		auto const binary		{ assetManager.readBinary(assetPath) };
+		Infra::Bitmap bitmap	{ binary.data(), binary.size(), 4ULL };
+
+		return loadTexture(
+			engine, bitmap, useMipmap,
+			dstStageMask, dstAccessMask);
 	}
 }

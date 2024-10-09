@@ -10,10 +10,12 @@ namespace Frx
 
 	void Scene::init(
 		Infra::Executor &rcmdExecutor,
-		Render::Engine &renderEngine)
+		Render::Engine &renderEngine,
+		RendererFactory &rendererFactory)
 	{
-		__pRcmdExecutor = &rcmdExecutor;
-		__pRenderEngine = &renderEngine;
+		__pRcmdExecutor		= &rcmdExecutor;
+		__pRenderEngine		= &renderEngine;
+		__pRendererFactory	= &rendererFactory;
 
 		__beginningTime = std::chrono::steady_clock::now();
 
@@ -59,28 +61,41 @@ namespace Frx
 		return { };
 	}
 
-	std::unique_ptr<Render::Layer> Scene::_rcmd_createLayer()
+	Model *Scene::_createModel(
+		Model::CreateInfo &&createInfo)
 	{
-		return std::unique_ptr<Render::Layer>{ __pRenderEngine->createLayer() };
+		return new Model
+		{
+			std::move(createInfo), *__pRcmdExecutor,
+			*__pRenderEngine, *__pRendererFactory
+		};
 	}
 
-	std::unique_ptr<Render::Mesh> Scene::_rcmd_createMesh()
+	Render::Layer *Scene::_rcmd_createLayer()
 	{
-		return std::unique_ptr<Render::Mesh>{ __pRenderEngine->createMesh() };
+		return __pRenderEngine->createLayer();
 	}
 
-	std::unique_ptr<Render::Texture> Scene::_rcmd_createTexture(
+	Render::Mesh *Scene::_rcmd_createMesh()
+	{
+		return __pRenderEngine->createMesh();
+	}
+
+	Render::Texture *Scene::_rcmd_createTexture(
 		std::string_view const &assetPath,
 		bool const useMipmap,
 		VkPipelineStageFlags2 const dstStageMask,
 		VkAccessFlags2 const dstAccessMask)
 	{
-		return std::unique_ptr<Render::Texture>
-		{
-			TextureUtil::loadTexture(
-				*__pRenderEngine, assetPath,
-				useMipmap, dstStageMask, dstAccessMask)
-		};
+		return TextureUtil::loadTexture(
+			*__pRenderEngine, assetPath,
+			useMipmap, dstStageMask, dstAccessMask);
+	}
+
+	Render::Renderer const *Scene::_rcmd_getRendererOf(
+		RendererType const type) const
+	{
+		return __pRendererFactory->getInstanceOf(type);
 	}
 
 	void Scene::_rcmd_setGlobalData(

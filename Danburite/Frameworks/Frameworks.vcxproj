@@ -29,6 +29,8 @@
     <ClInclude Include="PhongRenderer.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="PrimitiveBuilder.h" />
+    <ClInclude Include="RendererFactory.h" />
+    <ClInclude Include="RendererType.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scale.h" />
@@ -53,6 +55,7 @@
     <ClCompile Include="PhongRenderer.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="PrimitiveBuilder.cpp" />
+    <ClCompile Include="RendererFactory.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Scale.cpp" />
     <ClCompile Include="Scene.cpp" />

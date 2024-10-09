@@ -79,7 +79,7 @@ int CMainView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
-	__pDisplay = theApp.createDisplay(GetSafeHwnd(), true, false);
+	__pDisplay = std::unique_ptr<Frx::Display>{ theApp.createDisplay(GetSafeHwnd(), true, false) };
 	theApp.setMainView(this);
 
 	return 0;

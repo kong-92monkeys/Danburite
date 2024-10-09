@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Render/Engine.h"
+#include "Model.h"
 #include <chrono>
 #include <any>
 
@@ -21,7 +21,8 @@ namespace Frx
 
 		void init(
 			Infra::Executor &rcmdExecutor,
-			Render::Engine &renderEngine);
+			Render::Engine &renderEngine,
+			RendererFactory &rendererFactory);
 		
 		[[nodiscard]]
 		double getFps() const noexcept;
@@ -46,13 +47,17 @@ namespace Frx
 			Time const &time);
 
 		[[nodiscard]]
-		std::unique_ptr<Render::Layer> _rcmd_createLayer();
+		Model *_createModel(
+			Model::CreateInfo &&createInfo);
 
 		[[nodiscard]]
-		std::unique_ptr<Render::Mesh> _rcmd_createMesh();
+		Render::Layer *_rcmd_createLayer();
 
 		[[nodiscard]]
-		std::unique_ptr<Render::Texture> _rcmd_createTexture(
+		Render::Mesh *_rcmd_createMesh();
+
+		[[nodiscard]]
+		Render::Texture *_rcmd_createTexture(
 			std::string_view const &assetPath,
 			bool useMipmap,
 			VkPipelineStageFlags2 dstStageMask,
@@ -60,11 +65,12 @@ namespace Frx
 
 		template <std::derived_from<Render::Material> $Material, typename ...$Args>
 		[[nodiscard]]
-		std::unique_ptr<$Material> _rcmd_createMaterial($Args &&...args);
+		$Material *_rcmd_createMaterial(
+			$Args &&...args);
 
-		template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
 		[[nodiscard]]
-		std::unique_ptr<$Renderer> _rcmd_createRenderer($Args &&...args);
+		Render::Renderer const *_rcmd_getRendererOf(
+			RendererType type) const;
 
 		void _rcmd_setGlobalData(
 			void const *pData,
@@ -104,6 +110,7 @@ namespace Frx
 
 		Infra::Executor *__pRcmdExecutor{ };
 		Render::Engine *__pRenderEngine{ };
+		RendererFactory *__pRendererFactory{ };
 
 		uint64_t __maxFrameDelay{ 3ULL };
 		uint64_t __scmdFrameCount{ };
@@ -143,23 +150,10 @@ namespace Frx
 	}
 
 	template <std::derived_from<Render::Material> $Material, typename ...$Args>
-	std::unique_ptr<$Material> Scene::_rcmd_createMaterial($Args &&...args)
+	$Material *Scene::_rcmd_createMaterial(
+		$Args &&...args)
 	{
-		return std::unique_ptr<$Material>
-		{
-			__pRenderEngine->createMaterial<$Material>(
-				std::forward<$Args>(args)...)
-		};
-	}
-
-	template <std::derived_from<Render::Renderer> $Renderer, typename ...$Args>
-	std::unique_ptr<$Renderer> Scene::_rcmd_createRenderer($Args &&...args)
-	{
-		return std::unique_ptr<$Renderer>
-		{
-			__pRenderEngine->createRenderer<$Renderer>(
-				std::forward<$Args>(args)...)
-		};
+		return __pRenderEngine->createMaterial<$Material>(std::forward<$Args>(args)...);
 	}
 
 	template <typename $Data>

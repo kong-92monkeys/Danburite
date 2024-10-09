@@ -14,7 +14,6 @@ ModelLoadingScene::~ModelLoadingScene() noexcept
 			__pDisplay->rcmd_getRenderTarget().removeLayer(__rcmd_pLayer.get());
 
 		__rcmd_pLayer = nullptr;
-		__rcmd_pRenderer = nullptr;
 
 		__rcmd_lightMaterials.clear();
 
@@ -63,7 +62,8 @@ std::any ModelLoadingScene::_onInit()
 	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_POINT, true);
 	__modelLoader.filterPrimitiveType(aiPrimitiveType::aiPrimitiveType_LINE, true);
 
-	Frx::Model model{ __modelLoader.load(R"(Models\backpack\backpack.obj)") };
+	/*auto pModel{ std::unique_ptr<Frx::Model>{ _createModel(__modelLoader.load(R"(Models\backpack\backpack.obj)")) } };
+	pModel = nullptr;*/
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
@@ -122,9 +122,7 @@ void ModelLoadingScene::_rcmd_onInit(
 	}
 
 	_rcmd_setGlobalData(__rcmd_globalData);
-
-	__rcmd_pLayer = _rcmd_createLayer();
-	__rcmd_pRenderer = _rcmd_createRenderer<Frx::PhongRenderer>();
+	__rcmd_pLayer = std::unique_ptr<Render::Layer>{ _rcmd_createLayer() };
 
 	__rcmd_createPlaneObject();
 
@@ -219,7 +217,7 @@ void ModelLoadingScene::__rcmd_createPlaneObject()
 			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 100.0f, 10.0f)
 	};
 
-	__rcmd_pPlaneMesh = _rcmd_createMesh();
+	__rcmd_pPlaneMesh = std::unique_ptr<Render::Mesh>{ _rcmd_createMesh() };
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
@@ -228,24 +226,30 @@ void ModelLoadingScene::__rcmd_createPlaneObject()
 
 	__rcmd_pPlaneDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);
 
-	__rcmd_pPlaneTexture = _rcmd_createTexture(
-		"Images/wood.jpg", true,
-		VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
-		VK_ACCESS_2_SHADER_SAMPLED_READ_BIT);
+	__rcmd_pPlaneTexture = std::unique_ptr<Render::Texture>
+	{
+		_rcmd_createTexture(
+			"Images/wood.jpg", true,
+			VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+			VK_ACCESS_2_SHADER_SAMPLED_READ_BIT)
+	};
 
-	__rcmd_pPlaneTransformMaterial = _rcmd_createMaterial<Frx::TransformMaterial>();
+	__rcmd_pPlaneTransformMaterial =
+		std::unique_ptr<Frx::TransformMaterial>{ _rcmd_createMaterial<Frx::TransformMaterial>() };
 
 	glm::mat4 transform{ 1.0f };
 	transform = glm::rotate(transform, -glm::half_pi<float>(), glm::vec3{ 1.0f, 0.0f, 0.0f });
 	__rcmd_pPlaneTransformMaterial->setTransform(transform);
 
-	__rcmd_pPlanePhongMaterial = _rcmd_createMaterial<Frx::PhongMaterial>();
+	__rcmd_pPlanePhongMaterial =
+		std::unique_ptr<Frx::PhongMaterial>{ _rcmd_createMaterial<Frx::PhongMaterial>() };
+
 	__rcmd_pPlanePhongMaterial->setAlbedoTexture(__rcmd_pPlaneTexture.get());
 
 	__rcmd_pPlaneObject = std::make_unique<Render::RenderObject>();
 	__rcmd_pPlaneObject->setMesh(__rcmd_pPlaneMesh.get());
 	__rcmd_pPlaneObject->setDrawParam(__rcmd_pPlaneDrawParam.get());
-	__rcmd_pPlaneObject->setRenderer(__rcmd_pRenderer.get());
+	__rcmd_pPlaneObject->setRenderer(_rcmd_getRendererOf(Frx::RendererType::PHONG));
 
 	auto &materialPack{ __rcmd_pPlaneObject->getMaterialPackOf(0U) };
 	materialPack.setMaterial(__rcmd_pPlaneTransformMaterial.get());
@@ -255,13 +259,12 @@ void ModelLoadingScene::__rcmd_createPlaneObject()
 void ModelLoadingScene::__rcmd_addLight()
 {
 	auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
-
 	pLightMaterial->setType(Frx::LightType::POINT);
 	pLightMaterial->setColor(__randomExt.nextVec3(0.0f, 1.0f));
 	pLightMaterial->setPosition(__randomExt.nextVec3(-35.0f, 35.0f, 2.0f, 15.0f, -35.0f, 35.0f));
 	pLightMaterial->setMaxDistance(130.0f);
 	pLightMaterial->setAttenuation(1.0f, 0.07f, 0.017f);
 
-	_rcmd_addGlobalMaterial(pLightMaterial.get());
-	__rcmd_lightMaterials.emplace_back(std::move(pLightMaterial));
+	_rcmd_addGlobalMaterial(pLightMaterial);
+	__rcmd_lightMaterials.emplace_back(pLightMaterial);
 }

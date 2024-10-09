@@ -97,7 +97,7 @@ int CApp::ExitInstance()
 	return CWinApp::ExitInstance();
 }
 
-std::unique_ptr<Frx::Display> CApp::createDisplay(
+Frx::Display *CApp::createDisplay(
 	HWND const hwnd,
 	bool const useDepthBuffer,
 	bool const useStencilBuffer)

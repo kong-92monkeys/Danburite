@@ -30,27 +30,29 @@ namespace Frx
 			aiMaterial const *const *pAiMaterials,
 			uint32_t materialCount,
 			std::filesystem::path const &assetDir,
-			std::vector<std::unique_ptr<Infra::Bitmap>> &outTextures,
-			std::vector<Model::Material> &outMaterials);
+			std::vector<std::shared_ptr<Infra::Bitmap>> &outTextures,
+			std::vector<Model::MaterialInfo> &outMaterials);
 
 		[[nodiscard]]
 		static void __loadMeshes(
 			aiMesh const *const *pAiMeshes,
 			uint32_t meshCount,
-			std::vector<Model::Mesh> &outMeshes);
+			std::vector<Model::MeshInfo> &outMeshes);
 
 		[[nodiscard]]
-		static void __loadNodes(
+		static void __loadDrawInfosAndNodes(
 			aiNode const *pAiRootNode,
 			aiMesh const *const *pAiMeshes,
-			std::vector<Model::Node> &outNodes);
+			std::vector<Model::MeshInfo> const &outMeshes,
+			std::vector<Model::DrawInfo> &outDrawInfos,
+			std::vector<Model::NodeInfo> &outNodes);
 
 		[[nodiscard]]
 		static constexpr glm::vec3 __parseAIType(
 			aiColor3D const &value) noexcept;
 
 		[[nodiscard]]
-		static constexpr Model::ShadingModel __parseAIType(
+		static constexpr RendererType __parseAIType(
 			aiShadingMode value) noexcept;
 
 		[[nodiscard]]
@@ -80,43 +82,43 @@ namespace Frx
 		return { value[0], value[1], value[2] };
 	}
 
-	constexpr Model::ShadingModel ModelLoader::__parseAIType(
+	constexpr RendererType ModelLoader::__parseAIType(
 		aiShadingMode const shadingModel) noexcept
 	{
 		switch (shadingModel)
 		{
 			case aiShadingMode::aiShadingMode_Flat:
-				return Model::ShadingModel::FLAT;
+				return RendererType::FLAT;
 
 			case aiShadingMode::aiShadingMode_Gouraud:
-				return Model::ShadingModel::GOURAUD;
+				return RendererType::GOURAUD;
 
 			case aiShadingMode::aiShadingMode_Phong:
-				return Model::ShadingModel::PHONG;
+				return RendererType::PHONG;
 
 			case aiShadingMode::aiShadingMode_Blinn:
-				return Model::ShadingModel::BLINN;
+				return RendererType::BLINN;
 
 			case aiShadingMode::aiShadingMode_OrenNayar:
-				return Model::ShadingModel::OREN_NAYAR;
+				return RendererType::OREN_NAYAR;
 
 			case aiShadingMode::aiShadingMode_Minnaert:
-				return Model::ShadingModel::MINNAERT;
+				return RendererType::MINNAERT;
 
 			case aiShadingMode::aiShadingMode_CookTorrance:
-				return Model::ShadingModel::COOK_TORRANCE;
+				return RendererType::COOK_TORRANCE;
 
 			case aiShadingMode::aiShadingMode_Unlit:
-				return Model::ShadingModel::UNLIT;
+				return RendererType::UNLIT;
 
 			case aiShadingMode::aiShadingMode_Fresnel:
-				return Model::ShadingModel::FRESNEL;
+				return RendererType::FRESNEL;
 
 			case aiShadingMode::aiShadingMode_PBR_BRDF:
-				return Model::ShadingModel::PBR_BRDF;
+				return RendererType::PBR_BRDF;
 		}
 
-		return Model::ShadingModel::GOURAUD;
+		return RendererType::GOURAUD;
 	}
 
 	constexpr Model::BlendMode ModelLoader::__parseAIType(

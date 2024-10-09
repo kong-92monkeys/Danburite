@@ -64,13 +64,14 @@ namespace Frx
 		jobs.emplace_back(
 			std::async(std::launch::async, [pScene, &retVal]
 		{
-			__loadMeshes(pScene->mMeshes, pScene->mNumMeshes, retVal.meshes);
-		}));
+			// TODO: mesh merging (if needed)
+			__loadMeshes(
+				pScene->mMeshes, pScene->mNumMeshes,
+				retVal.meshes);
 
-		jobs.emplace_back(
-			std::async(std::launch::async, [pScene, &retVal]
-		{
-			__loadNodes(pScene->mRootNode, pScene->mMeshes, retVal.nodes);
+			__loadDrawInfosAndNodes(
+				pScene->mRootNode, pScene->mMeshes,
+				retVal.meshes, retVal.drawInfos, retVal.nodes);
 		}));
 
 		for (auto const &job : jobs)
@@ -85,8 +86,8 @@ namespace Frx
 		aiMaterial const *const *pAiMaterials,
 		uint32_t const materialCount,
 		std::filesystem::path const &assetDir,
-		std::vector<std::unique_ptr<Infra::Bitmap>> &outTextures,
-		std::vector<Model::Material> &outMaterials)
+		std::vector<std::shared_ptr<Infra::Bitmap>> &outTextures,
+		std::vector<Model::MaterialInfo> &outMaterials)
 	{
 		outMaterials.resize(materialCount);
 
@@ -165,7 +166,7 @@ namespace Frx
 			{
 				aiShadingMode shadingModel{ aiShadingMode::aiShadingMode_Gouraud };
 				pAiMaterial->Get(AI_MATKEY_SHADING_MODEL, shadingModel);
-				material.shadingModel = __parseAIType(shadingModel);
+				material.rendererType = __parseAIType(shadingModel);
 			}
 
 			// Blend mode
@@ -187,8 +188,8 @@ namespace Frx
 				float shininess{ 0.0f };
 				pAiMaterial->Get(AI_MATKEY_SHININESS, shininess);
 				material.shininess = shininess;
-				if ((material.shadingModel == Model::ShadingModel::GOURAUD) && (shininess > 0.0f))
-					material.shadingModel = Model::ShadingModel::PHONG;
+				if ((material.rendererType == RendererType::GOURAUD) && (shininess > 0.0f))
+					material.rendererType = RendererType::PHONG;
 			}
 
 			// Shininess strength
@@ -216,7 +217,7 @@ namespace Frx
 					continue;
 
 				auto const texType	{ __parseAIType(aiTexType) };
-				auto &texInfos		{ material.textureInfos[texType] };
+				auto &texInfos		{ material.textureInfoMap[texType] };
 
 				texInfos.resize(texInfoCount);
 
@@ -274,7 +275,7 @@ namespace Frx
 						pAiMaterial->Get(AI_MATKEY_TEXFLAGS(texTypeIter, texInfoIter), flags);
 
 						texInfo.inverted = (flags & aiTextureFlags::aiTextureFlags_Invert);
-						texInfo.useAlpha = (flags &aiTextureFlags::aiTextureFlags_UseAlpha);
+						texInfo.useAlpha = (flags & aiTextureFlags::aiTextureFlags_UseAlpha);
 					}
 				}
 			}
@@ -292,7 +293,7 @@ namespace Frx
 			{
 				auto &assetManager	{ Sys::Env::getInstance().getAssetManager() };
 				auto const texData	{ assetManager.readBinary(texPath) };
-				outTexture = std::make_unique<Infra::Bitmap>(texData.data(), texData.size(), 4ULL);
+				outTexture = std::make_shared<Infra::Bitmap>(texData.data(), texData.size(), 4ULL);
 			}));
 		}
 
@@ -303,7 +304,7 @@ namespace Frx
 	void ModelLoader::__loadMeshes(
 		aiMesh const *const *const pAiMeshes,
 		uint32_t const meshCount,
-		std::vector<Model::Mesh> &outMeshes)
+		std::vector<Model::MeshInfo> &outMeshes)
 	{
 		outMeshes.resize(meshCount);
 
@@ -322,13 +323,13 @@ namespace Frx
 
 			if (pAiMesh->HasPositions())
 			{
-				auto &posBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::POS] };
+				auto &posBuffer{ mesh.vertexBuffers[VertexAttrib::POS_LOCATION] };
 				posBuffer.add(pAiMesh->mVertices, pAiMesh->mNumVertices * sizeof(Vertex_P));
 			}
 
 			if (pAiMesh->HasTextureCoords(0U))
 			{
-				auto &uvBuffer				{ mesh.vertexBuffers[VertexAttribFlagBits::UV] };
+				auto &uvBuffer				{ mesh.vertexBuffers[VertexAttrib::UV_LOCATION] };
 				auto const pAiTexCoords		{ pAiMesh->mTextureCoords[0] };
 
 				for (uint32_t texCoordIt{ }; texCoordIt < pAiMesh->mNumVertices; ++texCoordIt)
@@ -337,13 +338,13 @@ namespace Frx
 
 			if (pAiMesh->HasNormals())
 			{
-				auto &normalBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::NORMAL] };
+				auto &normalBuffer{ mesh.vertexBuffers[VertexAttrib::NORMAL_LOCATION] };
 				normalBuffer.add(pAiMesh->mNormals, pAiMesh->mNumVertices * sizeof(Vertex_N));
 			}
 
 			if (pAiMesh->HasVertexColors(0U))
 			{
-				auto &colorBuffer{ mesh.vertexBuffers[VertexAttribFlagBits::COLOR] };
+				auto &colorBuffer{ mesh.vertexBuffers[VertexAttrib::COLOR_LOCATION] };
 				colorBuffer.add(pAiMesh->mColors[0], pAiMesh->mNumVertices * sizeof(Vertex_C));
 			}
 
@@ -378,16 +379,18 @@ namespace Frx
 		}
 	}
 
-	void ModelLoader::__loadNodes(
+	void ModelLoader::__loadDrawInfosAndNodes(
 		aiNode const *const pAiRootNode,
 		aiMesh const *const *const pAiMeshes,
-		std::vector<Model::Node> &outNodes)
+		std::vector<Model::MeshInfo> const &outMeshes,
+		std::vector<Model::DrawInfo> &outDrawInfos,
+		std::vector<Model::NodeInfo> &outNodes)
 	{
 		struct AiNodeSequenceInfo
 		{
 		public:
 			aiNode const *pAiNode{ };
-			std::vector<uint32_t> children;
+			std::vector<uint32_t> childIndices;
 		};
 
 		std::vector<AiNodeSequenceInfo> aiNodeSequence;
@@ -415,7 +418,7 @@ namespace Frx
 				if (parent.has_value())
 				{
 					auto &parentInfo{ aiNodeSequence[parent.value()] };
-					parentInfo.children.emplace_back(nodeIdx);
+					parentInfo.childIndices.emplace_back(nodeIdx);
 				}
 
 				for (uint32_t childIter{ }; childIter < pAiNode->mNumChildren; ++childIter)
@@ -423,29 +426,34 @@ namespace Frx
 			}
 		}
 
+		outDrawInfos.clear();
+
 		size_t const nodeCount{ aiNodeSequence.size() };
 		outNodes.resize(nodeCount);
 
 		for (size_t nodeIdx{ }; nodeIdx < nodeCount; ++nodeIdx)
 		{
-			auto &[pAiNode, children]	{ aiNodeSequence[nodeIdx] };
-			auto &node					{ outNodes[nodeIdx] };
+			auto &[pAiNode, childIndices]	{ aiNodeSequence[nodeIdx] };
+			auto &node						{ outNodes[nodeIdx] };
 
 			node.transform = __parseAIType(pAiNode->mTransformation);
 
 			uint32_t const meshCount{ pAiNode->mNumMeshes };
-			node.materials.resize(meshCount);
-			node.meshes.resize(meshCount);
-
 			for (uint32_t meshIt{ }; meshIt < meshCount; ++meshIt)
 			{
-				uint32_t const meshIdx	{ pAiNode->mMeshes[meshIt] };
+				uint32_t const drawInfoIndex{ static_cast<uint32_t>(outDrawInfos.size()) };
+				node.drawInfoIndices.emplace_back(drawInfoIndex);
 
-				node.materials[meshIt]	= pAiMeshes[meshIdx]->mMaterialIndex;
-				node.meshes[meshIt]		= meshIdx;
+				uint32_t const meshIdx	{ pAiNode->mMeshes[meshIt] };
+				auto &drawInfo			{ outDrawInfos.emplace_back() };
+				drawInfo.meshIdx		= meshIdx;
+				drawInfo.materialIdx	= pAiMeshes[meshIdx]->mMaterialIndex;
+				drawInfo.indexCount		= outMeshes[meshIdx].indexCount;
+				drawInfo.firstIndex		= 0U;
+				drawInfo.vertexOffset	= 0;
 			}
 
-			node.children = std::move(children);
+			node.childIndices = std::move(childIndices);
 		}
 	}
 

@@ -110,8 +110,6 @@ private:
 		Frx::Transform transform;
 	};
 
-	std::unique_ptr<Frx::PhongRenderer> __rcmd_pRenderer;
-
 	std::unique_ptr<Render::Mesh> __rcmd_pPlaneMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pPlaneDrawParam;
 	std::unique_ptr<Render::Texture> __rcmd_pPlaneTexture;

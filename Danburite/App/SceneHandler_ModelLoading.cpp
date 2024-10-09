@@ -159,7 +159,7 @@ void SceneHandler_ModelLoading::onTick()
 
 void SceneHandler_ModelLoading::_onActivated()
 {
-	__pScene = _getRenderSystem().createScene<ModelLoadingScene>();
+	__pScene = std::unique_ptr<ModelLoadingScene>{ _getRenderSystem().createScene<ModelLoadingScene>() };
 
 	_getUIExecutor().silentRun([this]
 	{

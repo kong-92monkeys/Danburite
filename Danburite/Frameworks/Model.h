@@ -2,11 +2,14 @@
 
 #include "../Infra/Unique.h"
 #include "../Infra/Bitmap.h"
-#include "../Vulkan/Vulkan.h"
+#include "../Infra/Executor.h"
 #include "../Infra/GenericBuffer.h"
+#include "../Render/Engine.h"
+#include "RendererFactory.h"
 #include "Vertex.h"
-#include <unordered_map>
 #include "SceneNode.h"
+#include "TransformMaterial.h"
+#include <unordered_map>
 #include <queue>
 
 namespace Frx
@@ -201,79 +204,6 @@ namespace Frx
 			MIRROR
 		};
 
-		enum class ShadingModel
-		{
-			/*
-				Flat shading. Shading is done on per-face base,
-				diffuse only. Also known as 'faceted shading'.
-			*/
-			FLAT,
-
-			/*
-				Simple Gouraud shading
-			*/
-			GOURAUD,
-
-			/*
-				Phong-Shading
-			*/
-			PHONG,
-
-			/** Phong-Blinn-Shading
-			 */
-			BLINN,
-
-			/*
-				Toon-Shading per pixel
-				Also known as 'comic' shader.
-			*/
-			TOON,
-
-			/*
-				OrenNayar-Shading per pixel
-				Extension to standard Lambertian shading, taking the
-				roughness of the material into account
-			*/
-			OREN_NAYAR,
-
-			/*
-				Minnaert-Shading per pixel
-				Extension to standard Lambertian shading, taking the
-				"darkness" of the material into account
-			*/
-			MINNAERT,
-
-			/*
-				CookTorrance-Shading per pixel
-				Special shader for metallic surfaces.
-			*/
-			COOK_TORRANCE,
-
-			/*
-				No shading at all. Constant light influence of 1.0.
-			*/
-			UNLIT,
-
-			/*
-				Fresnel shading
-			*/
-			FRESNEL,
-
-			/*
-				Physically-Based Rendering (PBR) shading using
-				Bidirectional scattering/reflectance distribution function (BSDF/BRDF)
-				There are multiple methods under this banner, and model files may provide
-				data for more than one PBR-BRDF method.
-				Applications should use the set of provided properties to determine which
-				of their preferred PBR rendering methods are likely to be available
-				eg:
-				- If AI_MATKEY_METALLIC_FACTOR is set, then a Metallic/Roughness is available
-				- If AI_MATKEY_GLOSSINESS_FACTOR is set, then a Specular/Glossiness is available
-				Note that some PBR methods allow layering of techniques
-			*/
-			PBR_BRDF
-		};
-
 		enum class BlendMode
 		{
 			/*
@@ -311,7 +241,7 @@ namespace Frx
 			bool useAlpha{ };
 		};
 
-		struct Material
+		struct MaterialInfo
 		{
 		public:
 			/*
@@ -378,7 +308,7 @@ namespace Frx
 				The presence of this key might indicate a more complex material.
 				If absent, assume phong shading only if a specular exponent is given.
 			*/
-			ShadingModel shadingModel{ ShadingModel::GOURAUD };
+			RendererType rendererType{ RendererType::GOURAUD };
 
 			/*
 				Defines how the final color value in the screen buffer is computed
@@ -417,46 +347,81 @@ namespace Frx
 			*/
 			float indexOfRefraction{ 1.0f };
 
-			std::unordered_map<TextureType, std::vector<TextureInfo>> textureInfos;
+			std::unordered_map<TextureType, std::vector<TextureInfo>> textureInfoMap;
 		};
 
-		struct Mesh
+		struct MeshInfo
 		{
 		public:
 			uint32_t vertexCount{ };
-			std::unordered_map<VertexAttribFlagBits, Infra::GenericBuffer> vertexBuffers;
+			std::unordered_map<uint32_t, Infra::GenericBuffer> vertexBuffers;
 
 			uint32_t indexCount{ };
 			VkIndexType indexType{ VkIndexType::VK_INDEX_TYPE_UINT16 };
 			Infra::GenericBuffer indexBuffer;
 		};
 
-		struct Node
+		struct DrawInfo
+		{
+		public:
+			uint32_t materialIdx{ };
+			uint32_t meshIdx{ };
+
+			uint32_t indexCount{ };
+			uint32_t firstIndex{ };
+			int32_t vertexOffset{ };
+		};
+
+		struct NodeInfo
 		{
 		public:
 			glm::mat4 transform{ 1.0f };
-
-			std::vector<uint32_t> materials;
-			std::vector<uint32_t> meshes;
-			std::vector<uint32_t> children;
+			std::vector<uint32_t> drawInfoIndices;
+			std::vector<uint32_t> childIndices;
 		};
 
 		struct CreateInfo
 		{
 		public:
-			std::vector<std::unique_ptr<Infra::Bitmap>> textures;
-			std::vector<Material> materials;
-			std::vector<Mesh> meshes;
-			std::vector<Node> nodes;
+			std::vector<std::shared_ptr<Infra::Bitmap>> textures;
+			std::vector<MaterialInfo> materials;
+			std::vector<MeshInfo> meshes;
+			std::vector<DrawInfo> drawInfos;
+			std::vector<NodeInfo> nodes;
 		};
 
 		Model(
-			CreateInfo &&createInfo);
+			CreateInfo &&createInfo,
+			Infra::Executor &rcmdExecutor,
+			Render::Engine &renderEngine,
+			RendererFactory &rendererFactory);
 
 		virtual ~Model() noexcept override;
 
 	private:
+		struct __RcmdResources
+		{
+		public:
+			std::vector<std::shared_ptr<Render::Texture>> textures;
+			std::vector<std::shared_ptr<Render::Material>> materials;
+			std::vector<std::shared_ptr<Render::Mesh>> meshes;
+			std::vector<std::shared_ptr<Render::DrawParam>> drawParams;
+
+			std::vector<std::shared_ptr<Render::RenderObject>> renderObjects;
+			std::vector<std::shared_ptr<TransformMaterial>> transformMaterials;
+		};
+
+		Infra::Executor &__rcmdExecutor;
+
 		std::vector<SceneNode *> __sceneNodes;
 		std::queue<std::vector<glm::mat4>> __transformQue;
+
+		__RcmdResources *__pRcmdResources{ new __RcmdResources };
+
+		static void __rcmd_init(
+			CreateInfo const &createInfo,
+			Render::Engine &renderEngine,
+			RendererFactory &rendererFactory,
+			__RcmdResources &outResources);
 	};
 }

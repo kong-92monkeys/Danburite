@@ -75,12 +75,13 @@ namespace Render
 		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
-		__commandExecutor.reserve([=, pSrc{ std::move(pStagingBuffer) }, &dst{ *__pImage }] (auto &cmdBuffer) mutable
+		__commandExecutor.reserve(
+			[&src{ *pStagingBuffer }, &dst{ *__pImage }, region] (auto &cmdBuffer)
 		{
 			VkCopyBufferToImageInfo2 const copyInfo
 			{
 				.sType			{ VkStructureType::VK_STRUCTURE_TYPE_COPY_BUFFER_TO_IMAGE_INFO_2 },
-				.srcBuffer		{ pSrc->getHandle() },
+				.srcBuffer		{ src.getHandle() },
 				.dstImage		{ dst.getHandle() },
 				.dstImageLayout	{ VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL },
 				.regionCount	{ 1U },
@@ -88,8 +89,10 @@ namespace Render
 			};
 
 			cmdBuffer.vkCmdCopyBufferToImage2(&copyInfo);
-			__resourcePool.recycleBuffer(ResourcePool::BufferType::STAGING, std::move(pSrc));
 		});
+
+		__resourcePool.recycleBuffer(
+			ResourcePool::BufferType::STAGING, std::move(pStagingBuffer));
 	}
 
 	void Texture::blit(

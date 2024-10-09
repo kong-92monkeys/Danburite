@@ -14,6 +14,7 @@ namespace Frx
 		__rcmdExecutor.run([this, &context, &physicalDevice]
 		{
 			__createEngine(context, physicalDevice);
+			__createRenderFactory();
 		}).wait();
 	}
 
@@ -21,19 +22,22 @@ namespace Frx
 	{
 		__rcmdExecutor.run([this]
 		{
+			__getRendererFactory().~RendererFactory();
 			__getRenderEngine().~Engine();
 		}).wait();
 	}
 
-	std::unique_ptr<Display> RenderSystem::createDisplay(
+	Display *RenderSystem::createDisplay(
 		HINSTANCE const hinstance,
 		HWND const hwnd,
 		bool const useDepthBuffer,
 		bool const useStencilBuffer)
 	{
-		return std::make_unique<Display>(
+		return new Display
+		{
 			__rcmdExecutor, __getRenderEngine(),
-			hinstance, hwnd, useDepthBuffer, useStencilBuffer);
+			hinstance, hwnd, useDepthBuffer, useStencilBuffer
+		};
 	}
 
 	void RenderSystem::__createEngine(
@@ -50,8 +54,18 @@ namespace Frx
 		new (__enginePlaceholder.data()) Render::Engine{ context, physicalDevice, globalDescBindingInfo };
 	}
 
+	void RenderSystem::__createRenderFactory()
+	{
+		new (__rendererFactoryPlaceholder.data()) RendererFactory{ __getRenderEngine() };
+	}
+
 	Render::Engine &RenderSystem::__getRenderEngine() noexcept
 	{
 		return *(reinterpret_cast<Render::Engine *>(__enginePlaceholder.data()));
+	}
+
+	RendererFactory &RenderSystem::__getRendererFactory() noexcept
+	{
+		return *(reinterpret_cast<RendererFactory *>(__rendererFactoryPlaceholder.data()));
 	}
 }

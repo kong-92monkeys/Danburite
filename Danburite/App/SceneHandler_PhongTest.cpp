@@ -168,7 +168,7 @@ void SceneHandler_PhongTest::onTick()
 
 void SceneHandler_PhongTest::_onActivated()
 {
-	__pScene = _getRenderSystem().createScene<PhongTestScene>();
+	__pScene = std::unique_ptr<PhongTestScene>{ _getRenderSystem().createScene<PhongTestScene>() };
 
 	_getUIExecutor().silentRun([this]
 	{

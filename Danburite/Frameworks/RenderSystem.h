@@ -3,8 +3,8 @@
 #include "../Infra/SingleThreadPool.h"
 #include "Display.h"
 #include "Scene.h"
+#include "Model.h"
 #include <limits>
-#include <chrono>
 
 namespace Frx
 {
@@ -18,7 +18,7 @@ namespace Frx
 		virtual ~RenderSystem() noexcept override;
 
 		[[nodiscard]]
-		std::unique_ptr<Display> createDisplay(
+		Display *createDisplay(
 			HINSTANCE hinstance,
 			HWND hwnd,
 			bool useDepthBuffer,
@@ -26,25 +26,32 @@ namespace Frx
 
 		template <std::derived_from<Scene> $Scene, typename ...$Args>
 		[[nodiscard]]
-		std::unique_ptr<$Scene> createScene($Args &&...args);
+		$Scene *createScene($Args &&...args);
 
 	private:
 		Infra::SingleThreadPool __rcmdExecutor;
+
 		std::array<std::byte, sizeof(Render::Engine)> __enginePlaceholder{ };
+		std::array<std::byte, sizeof(RendererFactory)> __rendererFactoryPlaceholder{ };
 
 		void __createEngine(
 			Dev::Context &context,
 			VK::PhysicalDevice const &physicalDevice);
 
+		void __createRenderFactory();
+
 		[[nodiscard]]
 		Render::Engine &__getRenderEngine() noexcept;
+
+		[[nodiscard]]
+		RendererFactory &__getRendererFactory() noexcept;
 	};
 
 	template <std::derived_from<Scene> $Scene, typename ...$Args>
-	std::unique_ptr<$Scene> RenderSystem::createScene($Args &&...args)
+	$Scene *RenderSystem::createScene($Args &&...args)
 	{
-		auto pScene{ std::make_unique<$Scene>(std::forward<$Args>(args)...) };
-		pScene->init(__rcmdExecutor, __getRenderEngine());
+		auto pScene{ new $Scene{ std::forward<$Args>(args)... } };
+		pScene->init(__rcmdExecutor, __getRenderEngine(), __getRendererFactory());
 		return pScene;
 	}
 }

@@ -196,7 +196,7 @@ namespace Render
 		auto pStagingBuffer{ __resourcePool.getBuffer(ResourcePool::BufferType::STAGING, size) };
 		std::memcpy(pStagingBuffer->getData(), pData, size);
 
-		__commandExecutor.reserve([=, &dst, &src{ *pStagingBuffer }] (auto &cmdBuffer)
+		__commandExecutor.reserve([=, &src{ *pStagingBuffer }, &dst] (auto &cmdBuffer)
 		{
 			VkMemoryBarrier2 const beforeMemoryBarrier
 			{
