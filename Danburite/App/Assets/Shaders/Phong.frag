@@ -41,10 +41,13 @@ layout(push_constant) uniform PushConstants
 };
 
 layout(location = 0) in flat int instanceIndex;
-layout(location = 1) in vec2 inUV;
-layout(location = 2) in vec3 worldPos;
-layout(location = 3) in vec3 worldNormal;
-layout(location = 4) in vec4 inColor;
+layout(location = 1) in vec3 worldPos;
+layout(location = 2) in vec3 worldNormal;
+layout(location = 3) in vec4 inColor;
+layout(location = 4) in vec2 inUV0;
+layout(location = 5) in vec2 inUV1;
+layout(location = 6) in vec2 inUV2;
+layout(location = 7) in vec2 inUV3;
 
 layout(location = 0) out vec4 outColor;
 
@@ -54,12 +57,12 @@ void main()
     const PhongMaterial material = phongMaterials[phongMaterialId];
 
     vec4 materialColor = (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT) ? inColor : vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BIT))
+    if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BITS[0]))
     {
         const int albedoTexId = material.albedoTexId;
 
         if (albedoTexId >= 0)
-            materialColor *= texture(sampler2D(sampledImages[albedoTexId], imageSampler), inUV);
+            materialColor *= texture(sampler2D(sampledImages[albedoTexId], imageSampler), inUV0);
     }
 
     vec3 lightColor = vec3(0.0f, 0.0f, 0.0f);

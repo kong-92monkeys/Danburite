@@ -1,6 +1,8 @@
 #pragma once
 
-#include <cstdint>
+#include "../Vulkan/Vulkan.h"
+#include "../Infra/GLM.h"
+#include <array>
 
 namespace Frx
 {
@@ -9,10 +11,11 @@ namespace Frx
 	namespace VertexAttrib
 	{
 		constexpr uint32_t POS_LOCATION			{ 0U };
-		constexpr uint32_t UV_LOCATION			{ 1U };
-		constexpr uint32_t NORMAL_LOCATION		{ 2U };
+		constexpr uint32_t NORMAL_LOCATION		{ 1U };
+		constexpr uint32_t TANGENT_LOCATION		{ 2U };
 		constexpr uint32_t COLOR_LOCATION		{ 3U };
-		constexpr uint32_t TANGENT_LOCATION		{ 4U };
+
+		constexpr std::array UV_LOCATIONS		{ 4U, 5U, 6U, 7U };
 	}
 
 	enum class VertexAttribFlagBits : uint32_t
@@ -20,29 +23,45 @@ namespace Frx
 		NONE		= 0U,
 
 		POS			= (1U << VertexAttrib::POS_LOCATION),
-		UV			= (1U << VertexAttrib::UV_LOCATION),
 		NORMAL		= (1U << VertexAttrib::NORMAL_LOCATION),
+		TANGENT		= (1U << VertexAttrib::TANGENT_LOCATION),
 		COLOR		= (1U << VertexAttrib::COLOR_LOCATION),
-		TANGENT		= (1U << VertexAttrib::TANGENT_LOCATION)
+
+		UV0			= (1U << VertexAttrib::UV_LOCATIONS[0]),
+		UV1			= (1U << VertexAttrib::UV_LOCATIONS[1]),
+		UV2			= (1U << VertexAttrib::UV_LOCATIONS[2]),
+		UV3			= (1U << VertexAttrib::UV_LOCATIONS[3])
 	};
 
-	enum class VertexAttribFlags : uint32_t
+	enum class VertexAttribFlags : uint32_t {};
+
+	struct VertexAttribInfo
 	{
-		NONE					= 0U,
+	public:
+		uint32_t memSize{ };
+		VkFormat format{ };
+		VertexAttribFlagBits flagBit{ };
+	};
 
-		POS						= VertexAttribFlagBits::POS,
-		UV						= VertexAttribFlagBits::UV,
-		NORMAL					= VertexAttribFlagBits::NORMAL,
-		COLOR					= VertexAttribFlagBits::COLOR,
-		TANGENT					= VertexAttribFlagBits::TANGENT,
+	constexpr VertexAttribInfo VERTEX_ATTRIB_INFOS[]
+	{
+		// Pos
+		{ sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT, VertexAttribFlagBits::POS },
 
-		POS_UV					= (POS | UV),
-		POS_NORMAL				= (POS | NORMAL),
-		POS_COLOR				= (POS | COLOR),
+		// Normal
+		{ sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT, VertexAttribFlagBits::NORMAL },
 
-		POS_UV_NORMAL			= (POS | UV | NORMAL),
+		// Tangent
+		{ sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT, VertexAttribFlagBits::TANGENT },
 
-		POS_UV_NORMAL_COLOR		= (POS | UV | NORMAL | COLOR),
+		// Color
+		{ sizeof(glm::vec4), VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT, VertexAttribFlagBits::COLOR },
+
+		// UVs
+		{ sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT, VertexAttribFlagBits::UV0 },
+		{ sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT, VertexAttribFlagBits::UV1 },
+		{ sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT, VertexAttribFlagBits::UV2 },
+		{ sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT, VertexAttribFlagBits::UV3 }
 	};
 
 	constexpr bool hasFlagBit(

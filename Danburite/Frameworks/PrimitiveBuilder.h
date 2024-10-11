@@ -2,7 +2,7 @@
 
 #include "../Vulkan/Vulkan.h"
 #include "../Infra/GenericBuffer.h"
-#include "Vertex.h"
+#include "VertexAttribute.h"
 
 namespace Frx::PrimitiveBuilder
 {

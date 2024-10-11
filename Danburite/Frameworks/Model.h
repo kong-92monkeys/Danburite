@@ -6,7 +6,7 @@
 #include "../Infra/GenericBuffer.h"
 #include "../Render/Engine.h"
 #include "RendererFactory.h"
-#include "Vertex.h"
+#include "VertexAttribute.h"
 #include "SceneNode.h"
 #include "TransformMaterial.h"
 #include <unordered_map>
@@ -415,6 +415,8 @@ namespace Frx
 
 			std::vector<std::shared_ptr<Render::RenderObject>> renderObjects;
 			std::vector<std::shared_ptr<TransformMaterial>> transformMaterials;
+
+			__RcmdResources() noexcept;
 		};
 
 		Infra::Executor &__rcmdExecutor;

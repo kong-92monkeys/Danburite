@@ -226,14 +226,17 @@ void ModelLoadingScene::__rcmd_createPlaneObject()
 	auto const meshData
 	{
 		Frx::PrimitiveBuilder::buildSquare(
-			Frx::VertexAttribFlags::POS_UV_NORMAL_COLOR, 100.0f, 10.0f)
+			Frx::VertexAttribFlagBits::POS |
+			Frx::VertexAttribFlagBits::NORMAL |
+			Frx::VertexAttribFlagBits::COLOR |
+			Frx::VertexAttribFlagBits::UV0, 100.0f, 10.0f)
 	};
 
 	__rcmd_pPlaneMesh = std::unique_ptr<Render::Mesh>{ _rcmd_createMesh() };
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
-	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATION, meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
+	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATIONS[0], meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
 	__rcmd_pPlaneMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
 
 	__rcmd_pPlaneDrawParam = std::make_unique<Render::DrawParamIndexed>(meshData.indexCount, 0U, 0);

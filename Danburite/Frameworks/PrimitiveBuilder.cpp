@@ -20,7 +20,7 @@ namespace Frx::PrimitiveBuilder
 			posBuffer.typedAdd<glm::vec3>({ halfSize, halfSize, 0.0f });
 		}
 
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::UV))
+		if (hasFlagBit(attribFlags, VertexAttribFlagBits::UV0))
 		{
 			auto &uvBuffer{ retVal.uvBuffer };
 			uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
@@ -106,7 +106,7 @@ namespace Frx::PrimitiveBuilder
 			posBuffer.typedAdd<glm::vec3>({ -halfSize, halfSize, -halfSize });
 		}
 
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::UV))
+		if (hasFlagBit(attribFlags, VertexAttribFlagBits::UV0))
 		{
 			auto &uvBuffer{ retVal.uvBuffer };
 

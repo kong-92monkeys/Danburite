@@ -2,7 +2,7 @@
 #include "TransformMaterial.h"
 #include "PhongMaterial.h"
 #include "Constants.h"
-#include "Vertex.h"
+#include "VertexAttribute.h"
 #include <array>
 
 namespace Frx
@@ -21,7 +21,7 @@ namespace Frx
 	{
 		return hasFlagBits(
 			static_cast<VertexAttribFlags>(flags),
-			VertexAttribFlags::POS_NORMAL);
+			VertexAttribFlagBits::POS | VertexAttribFlagBits::NORMAL);
 	}
 
 	bool PhongRenderer::isValidMaterialPack(
@@ -70,7 +70,7 @@ namespace Frx
 			auto &posBindingDesc		{ bindingDescs.emplace_back() };
 			posBindingDesc.sType		= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
 			posBindingDesc.binding		= VertexAttrib::POS_LOCATION;
-			posBindingDesc.stride		= sizeof(Vertex_P);
+			posBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::POS_LOCATION].memSize;
 			posBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
 			posBindingDesc.divisor		= 1U;
 
@@ -78,25 +78,8 @@ namespace Frx
 			posAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
 			posAttribDesc.location		= VertexAttrib::POS_LOCATION;
 			posAttribDesc.binding		= VertexAttrib::POS_LOCATION;
-			posAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
+			posAttribDesc.format		= VERTEX_ATTRIB_INFOS[VertexAttrib::POS_LOCATION].format;
 			posAttribDesc.offset		= 0U;
-		}
-
-		if (vertexAttribFlags & VertexAttribFlagBits::UV)
-		{
-			auto &uvBindingDesc			{ bindingDescs.emplace_back() };
-			uvBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
-			uvBindingDesc.binding		= VertexAttrib::UV_LOCATION;
-			uvBindingDesc.stride		= sizeof(Vertex_U);
-			uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
-			uvBindingDesc.divisor		= 1U;
-
-			auto &uvAttribDesc			{ attribDescs.emplace_back() };
-			uvAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
-			uvAttribDesc.location		= VertexAttrib::UV_LOCATION;
-			uvAttribDesc.binding		= VertexAttrib::UV_LOCATION;
-			uvAttribDesc.format			= VkFormat::VK_FORMAT_R32G32_SFLOAT;
-			uvAttribDesc.offset			= 0U;
 		}
 
 		if (vertexAttribFlags & VertexAttribFlagBits::NORMAL)
@@ -104,7 +87,7 @@ namespace Frx
 			auto &normalBindingDesc			{ bindingDescs.emplace_back() };
 			normalBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
 			normalBindingDesc.binding		= VertexAttrib::NORMAL_LOCATION;
-			normalBindingDesc.stride		= sizeof(Vertex_N);
+			normalBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::NORMAL_LOCATION].memSize;
 			normalBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
 			normalBindingDesc.divisor		= 1U;
 
@@ -112,7 +95,7 @@ namespace Frx
 			normalAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
 			normalAttribDesc.location		= VertexAttrib::NORMAL_LOCATION;
 			normalAttribDesc.binding		= VertexAttrib::NORMAL_LOCATION;
-			normalAttribDesc.format			= VkFormat::VK_FORMAT_R32G32B32_SFLOAT;
+			normalAttribDesc.format			= VERTEX_ATTRIB_INFOS[VertexAttrib::NORMAL_LOCATION].format;
 			normalAttribDesc.offset			= 0U;
 		}
 
@@ -121,7 +104,7 @@ namespace Frx
 			auto &colorBindingDesc		{ bindingDescs.emplace_back() };
 			colorBindingDesc.sType		= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
 			colorBindingDesc.binding	= VertexAttrib::COLOR_LOCATION;
-			colorBindingDesc.stride		= sizeof(Vertex_C);
+			colorBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::COLOR_LOCATION].memSize;
 			colorBindingDesc.inputRate	= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
 			colorBindingDesc.divisor	= 1U;
 
@@ -129,8 +112,76 @@ namespace Frx
 			colorAttribDesc.sType		= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
 			colorAttribDesc.location	= VertexAttrib::COLOR_LOCATION;
 			colorAttribDesc.binding		= VertexAttrib::COLOR_LOCATION;
-			colorAttribDesc.format		= VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT;
+			colorAttribDesc.format		= VERTEX_ATTRIB_INFOS[VertexAttrib::COLOR_LOCATION].format;
 			colorAttribDesc.offset		= 0U;
+		}
+
+		if (vertexAttribFlags & VertexAttribFlagBits::UV0)
+		{
+			auto &uvBindingDesc			{ bindingDescs.emplace_back() };
+			uvBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			uvBindingDesc.binding		= VertexAttrib::UV_LOCATIONS[0];
+			uvBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[0]].memSize;
+			uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			uvBindingDesc.divisor		= 1U;
+
+			auto &uvAttribDesc			{ attribDescs.emplace_back() };
+			uvAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			uvAttribDesc.location		= VertexAttrib::UV_LOCATIONS[0];
+			uvAttribDesc.binding		= VertexAttrib::UV_LOCATIONS[0];
+			uvAttribDesc.format			= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[0]].format;
+			uvAttribDesc.offset			= 0U;
+		}
+		
+		if (vertexAttribFlags & VertexAttribFlagBits::UV1)
+		{
+			auto &uvBindingDesc			{ bindingDescs.emplace_back() };
+			uvBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			uvBindingDesc.binding		= VertexAttrib::UV_LOCATIONS[1];
+			uvBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[1]].memSize;
+			uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			uvBindingDesc.divisor		= 1U;
+
+			auto &uvAttribDesc			{ attribDescs.emplace_back() };
+			uvAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			uvAttribDesc.location		= VertexAttrib::UV_LOCATIONS[1];
+			uvAttribDesc.binding		= VertexAttrib::UV_LOCATIONS[1];
+			uvAttribDesc.format			= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[1]].format;
+			uvAttribDesc.offset			= 0U;
+		}
+
+		if (vertexAttribFlags & VertexAttribFlagBits::UV2)
+		{
+			auto &uvBindingDesc			{ bindingDescs.emplace_back() };
+			uvBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			uvBindingDesc.binding		= VertexAttrib::UV_LOCATIONS[2];
+			uvBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[2]].memSize;
+			uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			uvBindingDesc.divisor		= 1U;
+
+			auto &uvAttribDesc			{ attribDescs.emplace_back() };
+			uvAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			uvAttribDesc.location		= VertexAttrib::UV_LOCATIONS[2];
+			uvAttribDesc.binding		= VertexAttrib::UV_LOCATIONS[2];
+			uvAttribDesc.format			= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[2]].format;
+			uvAttribDesc.offset			= 0U;
+		}
+
+		if (vertexAttribFlags & VertexAttribFlagBits::UV3)
+		{
+			auto &uvBindingDesc			{ bindingDescs.emplace_back() };
+			uvBindingDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_BINDING_DESCRIPTION_2_EXT;
+			uvBindingDesc.binding		= VertexAttrib::UV_LOCATIONS[3];
+			uvBindingDesc.stride		= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[3]].memSize;
+			uvBindingDesc.inputRate		= VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
+			uvBindingDesc.divisor		= 1U;
+
+			auto &uvAttribDesc			{ attribDescs.emplace_back() };
+			uvAttribDesc.sType			= VkStructureType::VK_STRUCTURE_TYPE_VERTEX_INPUT_ATTRIBUTE_DESCRIPTION_2_EXT;
+			uvAttribDesc.location		= VertexAttrib::UV_LOCATIONS[3];
+			uvAttribDesc.binding		= VertexAttrib::UV_LOCATIONS[3];
+			uvAttribDesc.format			= VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[3]].format;
+			uvAttribDesc.offset			= 0U;
 		}
 
 		cmdBuffer.vkCmdSetVertexInputEXT(

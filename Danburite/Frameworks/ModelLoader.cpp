@@ -34,6 +34,7 @@ namespace Frx
 				assetPath.data(),
 				aiPostProcessSteps::aiProcess_Triangulate |
 				aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
+				aiPostProcessSteps::aiProcess_RemoveRedundantMaterials |
 				aiPostProcessSteps::aiProcess_GenUVCoords |
 				aiPostProcessSteps::aiProcess_OptimizeGraph |
 				aiPostProcessSteps::aiProcess_OptimizeMeshes |
@@ -205,7 +206,7 @@ namespace Frx
 				material.indexOfRefraction = indexOfRefraction;
 			}
 
-			// Handling texture infos
+			// Texture infos
 			for (
 				int texTypeIter{ aiTextureType::aiTextureType_NONE };
 				texTypeIter < AI_TEXTURE_TYPE_MAX; ++texTypeIter)
@@ -312,39 +313,80 @@ namespace Frx
 			auto const pAiMesh	{ pAiMeshes[meshIt] };
 			auto &mesh			{ outMeshes[meshIt] };
 
-			if (pAiMesh->GetNumUVChannels() > 1)
-				throw std::runtime_error{ "Cannot handle UV channels more than 1." };
+			uint32_t const uvChannelCount		{ pAiMesh->GetNumUVChannels() };
+			uint32_t const colorChannelCount	{ pAiMesh->GetNumColorChannels() };
 
-			if (pAiMesh->GetNumColorChannels() > 1)
-				throw std::runtime_error{ "Cannot handle color channels more than 1." };
+			if (uvChannelCount > VertexAttrib::UV_LOCATIONS.size())
+			{
+				throw std::runtime_error
+				{
+					std::format(
+						"Cannot handle UV channels more than {}.",
+						VertexAttrib::UV_LOCATIONS.size())
+				};
+			}
 
 			mesh.vertexCount = pAiMesh->mNumVertices;
 
 			if (pAiMesh->HasPositions())
 			{
 				auto &posBuffer{ mesh.vertexBuffers[VertexAttrib::POS_LOCATION] };
-				posBuffer.add(pAiMesh->mVertices, pAiMesh->mNumVertices * sizeof(Vertex_P));
-			}
-
-			if (pAiMesh->HasTextureCoords(0U))
-			{
-				auto &uvBuffer				{ mesh.vertexBuffers[VertexAttrib::UV_LOCATION] };
-				auto const pAiTexCoords		{ pAiMesh->mTextureCoords[0] };
-
-				for (uint32_t texCoordIt{ }; texCoordIt < pAiMesh->mNumVertices; ++texCoordIt)
-					uvBuffer.add(pAiTexCoords + texCoordIt, sizeof(Vertex_U));
+				posBuffer.add(
+					pAiMesh->mVertices,
+					pAiMesh->mNumVertices * VERTEX_ATTRIB_INFOS[VertexAttrib::POS_LOCATION].memSize);
 			}
 
 			if (pAiMesh->HasNormals())
 			{
 				auto &normalBuffer{ mesh.vertexBuffers[VertexAttrib::NORMAL_LOCATION] };
-				normalBuffer.add(pAiMesh->mNormals, pAiMesh->mNumVertices * sizeof(Vertex_N));
+				normalBuffer.add(
+					pAiMesh->mNormals,
+					pAiMesh->mNumVertices * VERTEX_ATTRIB_INFOS[VertexAttrib::NORMAL_LOCATION].memSize);
 			}
 
-			if (pAiMesh->HasVertexColors(0U))
+			// TODO: Tangents
+
+			if (colorChannelCount)
 			{
 				auto &colorBuffer{ mesh.vertexBuffers[VertexAttrib::COLOR_LOCATION] };
-				colorBuffer.add(pAiMesh->mColors[0], pAiMesh->mNumVertices * sizeof(Vertex_C));
+				colorBuffer.add(
+					pAiMesh->mColors[0],
+					pAiMesh->mNumVertices * VERTEX_ATTRIB_INFOS[VertexAttrib::COLOR_LOCATION].memSize);
+
+				auto const pColors{ colorBuffer.getTypedData<glm::vec4>() };
+
+				for (uint32_t colorChannelIt{ 1U }; colorChannelIt < colorChannelCount; ++colorChannelIt)
+				{
+					auto const pAiColors{ pAiMesh->mColors[colorChannelIt] };
+
+					for (uint32_t colorIt{ }; colorIt < pAiMesh->mNumVertices; ++colorIt)
+					{
+						auto const &frontColor	{ pAiColors[colorIt] };
+						auto &backColor			{ pColors[colorIt] };
+
+						backColor.r = ((frontColor.r * frontColor.a) + (backColor.r * (1.0f - frontColor.a)));
+						backColor.g = ((frontColor.g * frontColor.a) + (backColor.g * (1.0f - frontColor.a)));
+						backColor.b = ((frontColor.b * frontColor.a) + (backColor.b * (1.0f - frontColor.a)));
+						backColor.a = (frontColor.a + (backColor.a * (1.0f - frontColor.a)));
+					}
+				}
+			}
+
+			for (uint32_t uvChannelIt{ }; uvChannelIt < uvChannelCount; ++uvChannelIt)
+			{
+				uint32_t const componentCount{ pAiMesh->mNumUVComponents[uvChannelIt] };
+				if (componentCount != 2U)
+					throw std::runtime_error{ "Unsupported file format" };
+
+				auto const pAiTexCoords	{ pAiMesh->mTextureCoords[uvChannelIt] };
+				auto &uvBuffer			{ mesh.vertexBuffers[VertexAttrib::UV_LOCATIONS[uvChannelIt]] };
+
+				for (uint32_t texCoordIt{ }; texCoordIt < pAiMesh->mNumVertices; ++texCoordIt)
+				{
+					uvBuffer.add(
+						pAiTexCoords + texCoordIt,
+						VERTEX_ATTRIB_INFOS[VertexAttrib::UV_LOCATIONS[uvChannelIt]].memSize);
+				}
 			}
 
 			auto &indexType{ mesh.indexType };

@@ -219,6 +219,7 @@
     <None Include="Assets\Shaders\Phong.vert" />
     <None Include="Assets\Shaders\Images.glsl" />
     <None Include="Assets\Shaders\Materials\TransformMaterial.glsl" />
+    <None Include="Assets\Shaders\VertexInput.vert" />
     <None Include="Assets\Shaders\ShaderData.glsl" />
     <None Include="Assets\Shaders\Utils\LightUtil.glsl" />
     <None Include="res\App.rc2" />

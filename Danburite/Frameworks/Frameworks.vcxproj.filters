@@ -87,9 +87,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vertex.h">
-      <Filter>Vertex</Filter>
-    </ClInclude>
     <ClInclude Include="VertexAttribute.h">
       <Filter>Vertex</Filter>
     </ClInclude>

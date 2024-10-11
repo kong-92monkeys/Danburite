@@ -259,6 +259,9 @@
     <None Include="Assets\Shaders\Utils\LightUtil.glsl">
       <Filter>Assets\Shaders\Utils</Filter>
     </None>
+    <None Include="Assets\Shaders\VertexInput.vert">
+      <Filter>Assets\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\App.ico">

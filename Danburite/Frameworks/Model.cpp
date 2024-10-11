@@ -102,7 +102,12 @@ namespace Frx
 			{
 				auto const &materialInfo{ createInfo.materials[materialIter] };
 
-				if ((materialInfo.rendererType == RendererType::GOURAUD) || (materialInfo.rendererType == RendererType::PHONG))
+				/*
+					TODO:
+					2. fix phong
+					3. use all model params
+				*/
+				if (materialInfo.rendererType == RendererType::PHONG)
 				{
 					auto const pPhongMaterial{ renderEngine.createMaterial<PhongMaterial>() };
 					pPhongMaterial->setShininess(materialInfo.shininess);
@@ -187,5 +192,16 @@ namespace Frx
 				}
 			}
 		}
+	}
+
+	Model::__RcmdResources::__RcmdResources() noexcept
+	{
+		renderObjects.clear();
+		transformMaterials.clear();
+
+		textures.clear();
+		materials.clear();
+		meshes.clear();
+		drawParams.clear();
 	}
 };
