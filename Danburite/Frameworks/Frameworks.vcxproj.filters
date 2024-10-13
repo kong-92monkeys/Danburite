@@ -85,6 +85,9 @@
     <Filter Include="RendererFactory">
       <UniqueIdentifier>{e857c17b-e9a5-4998-8aa0-6fe31abefa8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MaterialParams">
+      <UniqueIdentifier>{d837958c-3227-44d2-8466-6cdb96faef04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VertexAttribute.h">
@@ -156,8 +159,8 @@
     <ClInclude Include="RendererFactory.h">
       <Filter>RendererFactory</Filter>
     </ClInclude>
-    <ClInclude Include="RendererType.h">
-      <Filter>RendererFactory</Filter>
+    <ClInclude Include="MaterialParams.h">
+      <Filter>MaterialParams</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

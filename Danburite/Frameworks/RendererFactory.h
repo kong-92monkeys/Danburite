@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RendererType.h"
+#include "MaterialParams.h"
 #include "../Render/Engine.h"
 
 namespace Frx

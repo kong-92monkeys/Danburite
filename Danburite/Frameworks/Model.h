@@ -5,6 +5,7 @@
 #include "../Infra/Executor.h"
 #include "../Infra/GenericBuffer.h"
 #include "../Render/Engine.h"
+#include "MaterialParams.h"
 #include "RendererFactory.h"
 #include "VertexAttribute.h"
 #include "SceneNode.h"
@@ -17,206 +18,6 @@ namespace Frx
 	class Model : public Infra::Unique
 	{
 	public:
-		enum class TextureType
-		{
-			/*
-				No texture, but the value to be used as 'texture semantic'
-			*/
-			NONE,
-
-			/*
-				The texture is combined with the result of the ambient
-				lighting equation.
-			*/
-			AMBIENT,
-
-			/*
-				The texture is combined with the result of the diffuse
-				lighting equation.
-				OR
-				PBR Specular/Glossiness
-			*/
-			DIFFUSE,
-
-			/*
-				The texture is combined with the result of the specular
-				lighting equation.
-				OR
-				PBR Specular/Glossiness
-			*/
-			SPECULAR,
-
-			/*
-				The texture is added to the result of the lighting
-				calculation. It isn't influenced by incoming light.
-			*/
-			EMISSIVE,
-
-			/*
-				The texture is a height map.
-				By convention, higher gray-scale values stand for
-				higher elevations from the base height.
-			*/
-			HEIGHT,
-
-			/*
-				The texture is a (tangent space) normal-map.
-				Again, there are several conventions for tangent-space
-				normal maps.
-			*/
-			NORMALS,
-
-			/*
-				The texture defines the glossiness of the material.
-				The glossiness is in fact the exponent of the specular
-				(phong) lighting equation. Usually there is a conversion
-				function defined to map the linear color values in the
-				texture to a suitable exponent.
-			*/
-			SHININESS,
-
-			/*
-				The texture defines per-pixel opacity.
-				Usually 'white' means opaque and 'black' means
-				'transparency'. Or quite the opposite.
-			*/
-			OPACITY,
-
-			/*
-				Displacement texture
-				The exact purpose and format is application-dependent.
-				Higher color values stand for higher vertex displacements.
-			*/
-			DISPLACEMENT,
-
-			/*
-				Lightmap texture (aka Ambient Occlusion)
-				Both 'Lightmaps' and dedicated 'ambient occlusion maps' are
-				covered by this material property. The texture contains a
-				scaling value for the final color value of a pixel. Its
-				intensity is not affected by incoming light.
-			*/
-			LIGHTMAP,
-
-			/*
-				Reflection texture
-				Contains the color of a perfect mirror reflection.
-				Rarely used, almost never for real-time applications.
-			*/
-			REFLECTION,
-
-			/*
-				PBR Materials
-				PBR definitions from maya and other modelling packages now use this standard.
-				This was originally introduced around 2012.
-				Support for this is in game engines like Godot, Unreal or Unity3D.
-				Modelling packages which use this are very common now.
-			*/
-			BASE_COLOR,
-			NORMAL_CAMERA,
-			EMISSION_COLOR,
-			METALNESS,
-			DIFFUSE_ROUGHNESS,
-			AMBIENT_OCCLUSION,
-
-			/*
-				Unknown texture
-				A texture reference that does not match any of the definitions
-				above is considered to be 'unknown'.
-			*/
-			UNKNOWN,
-
-			/*
-				Sheen
-				Generally used to simulate textiles that are covered in a layer of microfibers
-				eg velvet
-				https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen
-			*/
-			SHEEN,
-
-			/*
-				Clearcoat
-				Simulates a layer of 'polish' or 'lacquer' layered on top of a PBR substrate
-				https://autodesk.github.io/standard-surface/#closures/coating
-				https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
-			*/
-			CLEARCOAT,
-
-			/*
-				Transmission
-				Simulates transmission through the surface
-				May include further information such as wall thickness
-			*/
-			TRANSMISSION,
-
-			/*
-				Maya material declarations
-			*/
-			MAYA_BASE,
-			MAYA_SPECULAR,
-			MAYA_SPECULAR_COLOR,
-			MAYA_SPECULAR_ROUGHNESS
-		};
-
-		enum class TextureOp
-		{
-			// T = T1 * T2
-			MULTIPLY,
-
-			// T = T1 + T2
-			ADD,
-
-			// T = T1 - T2
-			SUBTRACT,
-
-			// T = T1 / T2
-			DIVIDE,
-
-			// T = (T1 + T2) - (T1 * T2)
-			SMOOTH_ADD,
-
-			// T = T1 + (T2-0.5)
-			SIGNED_ADD,
-		};
-
-		enum class TextureMapMode
-		{
-			/*
-				A texture coordinate u|v is translated to u%1|v%1
-			*/
-			WRAP,
-
-			/*
-				Texture coordinates outside [0...1] are clamped to the nearest valid value.
-			*/
-			CLAMP,
-
-			/*
-				If the texture coordinates for a pixel are outside [0...1]
-				the texture is not applied to that pixel
-			*/
-			DECAL,
-
-			/*
-				A texture coordinate u|v becomes u%1|v%1 if (u-(u%1))%2 is zero and
-				1-(u%1)|1-(v%1) otherwise
-			*/
-			MIRROR
-		};
-
-		enum class BlendMode
-		{
-			/*
-				SourceColor*SourceAlpha + DestColor*(1-SourceAlpha)
-			*/
-			DEFAULT,
-
-			/*
-				SourceColor*1 + DestColor*1
-			*/
-			ADDITIVE
-		};
-
 		struct TextureInfo
 		{
 		public:
@@ -226,19 +27,18 @@ namespace Frx
 				All color components (rgb) are multiplied
 				with this factor before any further processing is done.
 			*/
-			float blend{ 1.0f };
+			float strength{ 1.0f };
 
 			/*
 				Defines the arithmetic operation
 				to be used to combine the n¡¯th texture
 			*/
-			TextureOp op{ TextureOp::MULTIPLY };
+			TextureBlendOp op{ TextureBlendOp::MULTIPLY };
 
 			TextureMapMode mapModeU{ TextureMapMode::WRAP };
 			TextureMapMode mapModeV{ TextureMapMode::WRAP };
 
 			bool inverted{ };
-			bool useAlpha{ };
 		};
 
 		struct MaterialInfo
@@ -248,19 +48,19 @@ namespace Frx
 				Ambient color of the material.
 				This is typically scaled by the amount of ambient light
 			*/
-			glm::vec3 ambient{ 0.f, 0.f, 0.f };
+			glm::vec4 ambient{ 0.f, 0.f, 0.f, 1.0f };
 
 			/*
 				Diffuse color of the material.
 				This is typically scaled by the amount of incoming diffuse light (e.g. using gouraud shading)
 			*/
-			glm::vec3 diffuse{ 0.f, 0.f, 0.f };
+			glm::vec4 diffuse{ 0.f, 0.f, 0.f, 1.0f };
 
 			/*
 				Specular color of the material.
 				This is typically scaled by the amount of incoming specular light (e.g. using phong shading)
 			*/
-			glm::vec3 specular{ 0.f, 0.f, 0.f };
+			glm::vec4 specular{ 0.f, 0.f, 0.f, 1.0f };
 
 			/*
 				Emissive color of the material.
@@ -269,14 +69,14 @@ namespace Frx
 				In real time applications it will usually not affect surrounding objects,
 				but raytracing applications may wish to treat emissive objects as light sources.
 			*/
-			glm::vec3 emissive{ 0.f, 0.f, 0.f };
+			glm::vec4 emissive{ 0.f, 0.f, 0.f, 1.0f };
 
 			/*
 				Defines the transparent color of the material,
 				this is the color to be multiplied with the color of translucent light
 				to construct the final ¡®destination color¡¯ for a particular position in the screen buffer.
 			*/
-			glm::vec3 transparent{ 0.f, 0.f, 0.f };
+			glm::vec4 transparent{ 0.f, 0.f, 0.f, 1.0f };
 
 			/*
 				Defines the reflective color of the material.
@@ -285,7 +85,7 @@ namespace Frx
 				
 				Usually combined with an environment lightmap of some kind for real-time applications.
 			*/
-			glm::vec3 reflective{ 0.f, 0.f, 0.f };
+			glm::vec4 reflective{ 0.f, 0.f, 0.f, 1.0f };
 
 			/*
 				Scales the reflective color of the material.
@@ -317,15 +117,7 @@ namespace Frx
 				
 				Simply said, alpha blending settings.
 			*/
-			BlendMode blendMode{ BlendMode::DEFAULT };
-
-			/*
-				Defines the opacity of the material in a range between 0..1.
-				Use this value to decide whether you have to activate alpha blending
-				for rendering.
-				OPACITY !=1 usually also implies TWOSIDED=1 to avoid cull artifacts.
-			*/
-			float opacity{ 1.0f };
+			AlphaBlendOp blendOp{ AlphaBlendOp::DEFAULT };
 
 			/*
 				Defines the shininess of a phong-shaded material.
@@ -333,12 +125,6 @@ namespace Frx
 				SHININESS=0 is equivalent to SHADING_MODEL = Gouraud
 			*/
 			float shininess{ 0.0f };
-
-			/*
-				Scales the specular color of the material.
-				This value is kept separate from the specular color by most modelers.
-			*/
-			float shininessStrength{ 1.0f };
 
 			/*
 				Defines the Index Of Refraction for the material.

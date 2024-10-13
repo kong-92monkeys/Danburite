@@ -103,42 +103,54 @@ namespace Frx
 			{
 				aiColor3D ambient{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-				material.ambient = __parseAIType(ambient);
+				material.ambient.r = ambient.r;
+				material.ambient.g = ambient.g;
+				material.ambient.b = ambient.b;
 			}
 			
 			// Diffuse
 			{
 				aiColor3D diffuse{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-				material.diffuse = __parseAIType(diffuse);
+				material.diffuse.r = diffuse.r;
+				material.diffuse.g = diffuse.g;
+				material.diffuse.b = diffuse.b;
 			}
 
 			// Specular
 			{
 				aiColor3D specular{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-				material.specular = __parseAIType(specular);
+				material.specular.r = specular.r;
+				material.specular.g = specular.g;
+				material.specular.b = specular.b;
 			}
 
 			// Emissive
 			{
 				aiColor3D emissive{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
-				material.emissive = __parseAIType(emissive);
+				material.emissive.r = emissive.r;
+				material.emissive.g = emissive.g;
+				material.emissive.b = emissive.b;
 			}
 
 			// Transparent
 			{
 				aiColor3D transparent{ 1.0f, 1.0f, 1.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, transparent);
-				material.transparent = __parseAIType(transparent);
+				material.transparent.r = transparent.r;
+				material.transparent.g = transparent.g;
+				material.transparent.b = transparent.b;
 			}
 
 			// Reflective
 			{
 				aiColor3D reflective{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_REFLECTIVE, reflective);
-				material.reflective = __parseAIType(reflective);
+				material.reflective.r = reflective.r;
+				material.reflective.g = reflective.g;
+				material.reflective.b = reflective.b;
 			}
 
 			// Reflectivity
@@ -173,14 +185,19 @@ namespace Frx
 			{
 				aiBlendMode blendMode{ aiBlendMode::aiBlendMode_Default };
 				pAiMaterial->Get(AI_MATKEY_BLEND_FUNC, blendMode);
-				material.blendMode = __parseAIType(blendMode);
+				material.blendOp = __parseAIType(blendMode);
 			}
 
 			// Opacity
 			{
 				float opacity{ 1.0f };
 				pAiMaterial->Get(AI_MATKEY_OPACITY, opacity);
-				material.opacity = opacity;
+				material.ambient.a		= opacity;
+				material.diffuse.a		= opacity;
+				material.specular.a		= opacity;
+				material.emissive.a		= opacity;
+				material.transparent.a	= opacity;
+				material.reflective.a	= opacity;
 			}
 
 			// Shininess
@@ -196,7 +213,9 @@ namespace Frx
 			{
 				float shininessStrength{ 1.0f };
 				pAiMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, shininessStrength);
-				material.shininessStrength = shininessStrength;
+				material.specular.r *= shininessStrength;
+				material.specular.g *= shininessStrength;
+				material.specular.b *= shininessStrength;
 			}
 
 			// Index of refraction
@@ -241,11 +260,11 @@ namespace Frx
 						texInfo.index = texIndex;
 					}
 
-					// Blend
+					// Strength
 					{
 						float blend{ 1.0f };
 						pAiMaterial->Get(AI_MATKEY_TEXBLEND(texTypeIter, texInfoIter), blend);
-						texInfo.blend = blend;
+						texInfo.strength = blend;
 					}
 
 					// Operation
@@ -273,9 +292,7 @@ namespace Frx
 					{
 						aiTextureFlags flags{ };
 						pAiMaterial->Get(AI_MATKEY_TEXFLAGS(texTypeIter, texInfoIter), flags);
-
 						texInfo.inverted = (flags & aiTextureFlags::aiTextureFlags_Invert);
-						texInfo.useAlpha = (flags & aiTextureFlags::aiTextureFlags_UseAlpha);
 					}
 				}
 			}
@@ -361,13 +378,23 @@ namespace Frx
 
 					for (uint32_t colorIt{ }; colorIt < pAiMesh->mNumVertices; ++colorIt)
 					{
-						auto const &frontColor	{ pAiColors[colorIt] };
-						auto &backColor			{ pColors[colorIt] };
+						auto const &srcColor	{ pAiColors[colorIt] };
+						auto &dstColor			{ pColors[colorIt] };
 
-						backColor.r = ((frontColor.r * frontColor.a) + (backColor.r * (1.0f - frontColor.a)));
-						backColor.g = ((frontColor.g * frontColor.a) + (backColor.g * (1.0f - frontColor.a)));
-						backColor.b = ((frontColor.b * frontColor.a) + (backColor.b * (1.0f - frontColor.a)));
-						backColor.a = (frontColor.a + (backColor.a * (1.0f - frontColor.a)));
+						// Porter-Duff "Source Over"
+						float const outAlpha = (srcColor.a + (dstColor.a * (1.0f - srcColor.a)));
+
+						for (uint32_t componentIt{ }; componentIt <= 3U; ++componentIt)
+						{
+							float outColor{ };
+							outColor += (srcColor[componentIt] * srcColor.a);
+							outColor += (dstColor[componentIt] * dstColor.a * (1.0f - srcColor.a));
+							outColor /= outAlpha;
+
+							dstColor[componentIt] = outColor;
+						}
+
+						dstColor.a = outAlpha;
 					}
 				}
 			}

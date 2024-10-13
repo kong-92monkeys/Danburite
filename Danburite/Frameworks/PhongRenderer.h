@@ -74,9 +74,6 @@ namespace Frx
 
 		std::shared_ptr<VK::Sampler> __pSampler;
 
-		std::vector<VkVertexInputBindingDescription2EXT> __vertexBindingDescs;
-		std::vector<VkVertexInputAttributeDescription2EXT> __vertexAttribDescs;
-
 		void __createDescSetLayout();
 		void __createDescPool();
 		void __allocateDescSet();

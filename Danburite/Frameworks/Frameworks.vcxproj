@@ -22,6 +22,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="LightMaterial.h" />
+    <ClInclude Include="MaterialParams.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Orientation.h" />
@@ -30,7 +31,6 @@
     <ClInclude Include="Position.h" />
     <ClInclude Include="PrimitiveBuilder.h" />
     <ClInclude Include="RendererFactory.h" />
-    <ClInclude Include="RendererType.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scale.h" />
