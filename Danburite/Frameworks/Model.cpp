@@ -1,6 +1,5 @@
 #include "Model.h"
 #include "TextureUtil.h"
-#include "PhongMaterial.h"
 
 namespace Frx
 {
@@ -101,27 +100,14 @@ namespace Frx
 			for (size_t materialIter{ }; materialIter < materialCount; ++materialIter)
 			{
 				auto const &materialInfo{ createInfo.materials[materialIter] };
-
-				/*
-					TODO:
-					2. fix phong
-					3. use all model params
-				*/
-				if (materialInfo.rendererType == RendererType::PHONG)
+				switch (materialInfo.rendererType)
 				{
-					auto const pPhongMaterial{ renderEngine.createMaterial<PhongMaterial>() };
-					pPhongMaterial->setShininess(materialInfo.shininess);
-
-					for (auto const &[texType, texInfos] : materialInfo.textureInfoMap)
+					case RendererType::PHONG:
 					{
-						if (texType == TextureType::DIFFUSE)
-						{
-							if (!((texInfos.empty())))
-								pPhongMaterial->setAlbedoTexture(textures[texInfos[0].index].get());
-						}
+						auto const pMaterial{ __rcmd_createPhongMaterial(renderEngine, textures, materialInfo) };
+						materials.emplace_back(pMaterial);
 					}
-
-					materials.emplace_back(pPhongMaterial);
+						break;
 				}
 			}
 		}
@@ -192,6 +178,41 @@ namespace Frx
 				}
 			}
 		}
+	}
+
+	PhongMaterial *Model::__rcmd_createPhongMaterial(
+		Render::Engine &renderEngine,
+		std::vector<std::shared_ptr<Render::Texture>> const &textures,
+		MaterialInfo const &materialInfo)
+	{
+		auto const pPhongMaterial{ renderEngine.createMaterial<PhongMaterial>() };
+
+		pPhongMaterial->setAmbient(materialInfo.ambient);
+		pPhongMaterial->setDiffuse(materialInfo.diffuse);
+		pPhongMaterial->setSpecular(materialInfo.specular);
+		pPhongMaterial->setEmissive(materialInfo.emissive);
+
+		pPhongMaterial->setBlendOp(materialInfo.blendOp);
+		pPhongMaterial->setOpacity(materialInfo.opacity);
+		pPhongMaterial->setShininess(materialInfo.shininess);
+
+		for (auto const &[texType, texInfos] : materialInfo.textureInfoMap)
+		{
+			for (size_t channel{ }; channel < texInfos.size(); ++channel)
+			{
+				auto const &texInfo	{ texInfos[channel] };
+				auto const pTexture	{ textures[texInfo.index].get() };
+
+				pPhongMaterial->setTexture(texType, channel, pTexture);
+				pPhongMaterial->setTextureStrength(texType, channel, texInfo.strength);
+				pPhongMaterial->setTextureBlendOp(texType, channel, texInfo.blendOp);
+				pPhongMaterial->setTextureMapModeU(texType, channel, texInfo.mapModeU);
+				pPhongMaterial->setTextureMapModeV(texType, channel, texInfo.mapModeV);
+				pPhongMaterial->setTextureInverted(texType, channel, texInfo.inverted);
+			}
+		}
+
+		return pPhongMaterial;
 	}
 
 	Model::__RcmdResources::__RcmdResources() noexcept

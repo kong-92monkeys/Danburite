@@ -1,14 +1,13 @@
 #pragma once
 
-#include "../Infra/Unique.h"
 #include "../Infra/Bitmap.h"
 #include "../Infra/Executor.h"
 #include "../Infra/GenericBuffer.h"
 #include "../Render/Engine.h"
-#include "MaterialParams.h"
 #include "RendererFactory.h"
 #include "VertexAttribute.h"
 #include "SceneNode.h"
+#include "PhongMaterial.h"
 #include "TransformMaterial.h"
 #include <unordered_map>
 #include <queue>
@@ -31,9 +30,9 @@ namespace Frx
 
 			/*
 				Defines the arithmetic operation
-				to be used to combine the n¡¯th texture
+				to be used to combine the n'th texture
 			*/
-			TextureBlendOp op{ TextureBlendOp::MULTIPLY };
+			TextureBlendOp blendOp{ TextureBlendOp::MULTIPLY };
 
 			TextureMapMode mapModeU{ TextureMapMode::WRAP };
 			TextureMapMode mapModeV{ TextureMapMode::WRAP };
@@ -48,19 +47,19 @@ namespace Frx
 				Ambient color of the material.
 				This is typically scaled by the amount of ambient light
 			*/
-			glm::vec4 ambient{ 0.f, 0.f, 0.f, 1.0f };
+			glm::vec3 ambient{ 0.f, 0.f, 0.f };
 
 			/*
 				Diffuse color of the material.
 				This is typically scaled by the amount of incoming diffuse light (e.g. using gouraud shading)
 			*/
-			glm::vec4 diffuse{ 0.f, 0.f, 0.f, 1.0f };
+			glm::vec3 diffuse{ 0.f, 0.f, 0.f };
 
 			/*
 				Specular color of the material.
 				This is typically scaled by the amount of incoming specular light (e.g. using phong shading)
 			*/
-			glm::vec4 specular{ 0.f, 0.f, 0.f, 1.0f };
+			glm::vec3 specular{ 0.f, 0.f, 0.f };
 
 			/*
 				Emissive color of the material.
@@ -69,14 +68,14 @@ namespace Frx
 				In real time applications it will usually not affect surrounding objects,
 				but raytracing applications may wish to treat emissive objects as light sources.
 			*/
-			glm::vec4 emissive{ 0.f, 0.f, 0.f, 1.0f };
+			glm::vec3 emissive{ 0.f, 0.f, 0.f };
 
 			/*
 				Defines the transparent color of the material,
 				this is the color to be multiplied with the color of translucent light
-				to construct the final ¡®destination color¡¯ for a particular position in the screen buffer.
+				to construct the final 'destination color' for a particular position in the screen buffer.
 			*/
-			glm::vec4 transparent{ 0.f, 0.f, 0.f, 1.0f };
+			glm::vec3 transparent{ 0.f, 0.f, 0.f };
 
 			/*
 				Defines the reflective color of the material.
@@ -85,7 +84,7 @@ namespace Frx
 				
 				Usually combined with an environment lightmap of some kind for real-time applications.
 			*/
-			glm::vec4 reflective{ 0.f, 0.f, 0.f, 1.0f };
+			glm::vec3 reflective{ 0.f, 0.f, 0.f };
 
 			/*
 				Scales the reflective color of the material.
@@ -109,6 +108,14 @@ namespace Frx
 				If absent, assume phong shading only if a specular exponent is given.
 			*/
 			RendererType rendererType{ RendererType::GOURAUD };
+
+			/*
+				Defines the opacity of the material in a range between 0..1.
+				Use this value to decide whether you have to activate alpha blending
+				for rendering.
+				OPACITY !=1 usually also implies TWOSIDED=1 to avoid cull artifacts.
+			*/
+			float opacity{ 1.0f };
 
 			/*
 				Defines how the final color value in the screen buffer is computed
@@ -217,5 +224,11 @@ namespace Frx
 			Render::Engine &renderEngine,
 			RendererFactory &rendererFactory,
 			__RcmdResources &outResources);
+
+		[[nodiscard]]
+		static PhongMaterial *__rcmd_createPhongMaterial(
+			Render::Engine &renderEngine,
+			std::vector<std::shared_ptr<Render::Texture>> const &textures,
+			MaterialInfo const &materialInfo);
 	};
 }

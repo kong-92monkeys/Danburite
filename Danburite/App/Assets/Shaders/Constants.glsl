@@ -2,6 +2,8 @@
 #ifndef CONSTANTS_GLSL
 #define CONSTANTS_GLSL
 
+const uint MAX_TEX_CHANNEL_COUNT						= 4U;
+
 const uint VERTEX_ATTRIB_POS_LOCATION					= 0U;
 const uint VERTEX_ATTRIB_NORMAL_LOCATION				= 1U;
 const uint VERTEX_ATTRIB_TANGENT_LOCATION				= 2U;

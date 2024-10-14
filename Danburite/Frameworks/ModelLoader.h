@@ -48,6 +48,10 @@ namespace Frx
 			std::vector<Model::NodeInfo> &outNodes);
 
 		[[nodiscard]]
+		static constexpr glm::vec3 __parseAIType(
+			aiColor3D const &value) noexcept;
+
+		[[nodiscard]]
 		static constexpr RendererType __parseAIType(
 			aiShadingMode value) noexcept;
 
@@ -71,6 +75,12 @@ namespace Frx
 		static glm::mat4 __parseAIType(
 			aiMatrix4x4 const &value) noexcept;
 	};
+
+	constexpr glm::vec3 ModelLoader::__parseAIType(
+		aiColor3D const &value) noexcept
+	{
+		return { value[0], value[1], value[2] };
+	}
 
 	constexpr RendererType ModelLoader::__parseAIType(
 		aiShadingMode const shadingModel) noexcept

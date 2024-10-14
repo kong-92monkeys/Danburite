@@ -267,7 +267,7 @@ namespace Frx
 	enum class AlphaBlendOp : uint32_t
 	{
 		/*
-			Color = Porter-Duff "Over" op
+			Color = Porter-Duff "Over" blendOp
 			Alpha = SourceAlpha + DestAlpha*(1-SourceAlpha)
 		*/
 		DEFAULT,
@@ -277,5 +277,28 @@ namespace Frx
 			Alpha = SourceAlpha + DestAlpha*(1-SourceAlpha)
 		*/
 		ADDITIVE
+	};
+
+	struct TextureParam
+	{
+	public:
+		int id{ -1 };
+
+		/*
+			All color components (rgb) are multiplied
+			with this factor before any further processing is done.
+		*/
+		float strength{ 1.0f };
+
+		/*
+			Defines the arithmetic operation
+			to be used to combine the n'th texture
+		*/
+		TextureBlendOp blendOp{ TextureBlendOp::MULTIPLY };
+
+		TextureMapMode mapModeU{ TextureMapMode::WRAP };
+		TextureMapMode mapModeV{ TextureMapMode::WRAP };
+
+		alignas(4) bool inverted{ };
 	};
 }

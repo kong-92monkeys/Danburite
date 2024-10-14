@@ -59,7 +59,7 @@ void main()
     vec4 materialColor = (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT) ? inColor : vec4(1.0f, 1.0f, 1.0f, 1.0f));
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BITS[0]))
     {
-        const int albedoTexId = material.albedoTexId;
+        const int albedoTexId = material.diffuseTexs[0].id;
 
         if (albedoTexId >= 0)
             materialColor *= texture(sampler2D(sampledImages[albedoTexId], imageSampler), inUV0);

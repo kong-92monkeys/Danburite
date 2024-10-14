@@ -4,6 +4,8 @@
 
 namespace Frx::Constants
 {
+	constexpr uint32_t MAX_TEX_CHANNEL_COUNT					{ 4U };
+
 	// Descriptor locations
 
 	// MaterialInfo desc set

@@ -1,5 +1,6 @@
 #include "AssimpAssetIOSystem.h"
 #include "ModelLoader.h"
+#include "Constants.h"
 #include "../System/Env.h"
 #include <assimp/postprocess.h>
 #include <stdexcept>
@@ -103,54 +104,42 @@ namespace Frx
 			{
 				aiColor3D ambient{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-				material.ambient.r = ambient.r;
-				material.ambient.g = ambient.g;
-				material.ambient.b = ambient.b;
+				material.ambient = __parseAIType(ambient);
 			}
 			
 			// Diffuse
 			{
 				aiColor3D diffuse{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-				material.diffuse.r = diffuse.r;
-				material.diffuse.g = diffuse.g;
-				material.diffuse.b = diffuse.b;
+				material.diffuse = __parseAIType(diffuse);
 			}
 
 			// Specular
 			{
 				aiColor3D specular{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-				material.specular.r = specular.r;
-				material.specular.g = specular.g;
-				material.specular.b = specular.b;
+				material.specular = __parseAIType(specular);
 			}
 
 			// Emissive
 			{
 				aiColor3D emissive{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, emissive);
-				material.emissive.r = emissive.r;
-				material.emissive.g = emissive.g;
-				material.emissive.b = emissive.b;
+				material.emissive = __parseAIType(emissive);
 			}
 
 			// Transparent
 			{
 				aiColor3D transparent{ 1.0f, 1.0f, 1.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_TRANSPARENT, transparent);
-				material.transparent.r = transparent.r;
-				material.transparent.g = transparent.g;
-				material.transparent.b = transparent.b;
+				material.transparent = __parseAIType(transparent);
 			}
 
 			// Reflective
 			{
 				aiColor3D reflective{ 0.0f, 0.0f, 0.0f };
 				pAiMaterial->Get(AI_MATKEY_COLOR_REFLECTIVE, reflective);
-				material.reflective.r = reflective.r;
-				material.reflective.g = reflective.g;
-				material.reflective.b = reflective.b;
+				material.reflective = __parseAIType(reflective);
 			}
 
 			// Reflectivity
@@ -192,12 +181,7 @@ namespace Frx
 			{
 				float opacity{ 1.0f };
 				pAiMaterial->Get(AI_MATKEY_OPACITY, opacity);
-				material.ambient.a		= opacity;
-				material.diffuse.a		= opacity;
-				material.specular.a		= opacity;
-				material.emissive.a		= opacity;
-				material.transparent.a	= opacity;
-				material.reflective.a	= opacity;
+				material.opacity = opacity;
 			}
 
 			// Shininess
@@ -213,9 +197,7 @@ namespace Frx
 			{
 				float shininessStrength{ 1.0f };
 				pAiMaterial->Get(AI_MATKEY_SHININESS_STRENGTH, shininessStrength);
-				material.specular.r *= shininessStrength;
-				material.specular.g *= shininessStrength;
-				material.specular.b *= shininessStrength;
+				material.specular *= shininessStrength;
 			}
 
 			// Index of refraction
@@ -271,7 +253,7 @@ namespace Frx
 					{
 						aiTextureOp aiOp{ aiTextureOp::aiTextureOp_Multiply };
 						pAiMaterial->Get(AI_MATKEY_TEXOP(texTypeIter, texInfoIter), aiOp);
-						texInfo.op = __parseAIType(aiOp);
+						texInfo.blendOp = __parseAIType(aiOp);
 					}
 
 					// Mapping mode U
@@ -333,13 +315,13 @@ namespace Frx
 			uint32_t const uvChannelCount		{ pAiMesh->GetNumUVChannels() };
 			uint32_t const colorChannelCount	{ pAiMesh->GetNumColorChannels() };
 
-			if (uvChannelCount > VertexAttrib::UV_LOCATIONS.size())
+			if (uvChannelCount > Constants::MAX_TEX_CHANNEL_COUNT)
 			{
 				throw std::runtime_error
 				{
 					std::format(
 						"Cannot handle UV channels more than {}.",
-						VertexAttrib::UV_LOCATIONS.size())
+						Constants::MAX_TEX_CHANNEL_COUNT)
 				};
 			}
 

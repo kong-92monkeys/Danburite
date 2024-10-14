@@ -1,0 +1,18 @@
+diff a/Danburite/Frameworks/Model.h b/Danburite/Frameworks/Model.h	(rejected hunks)
+@@ -69,14 +69,14 @@
+ 				In real time applications it will usually not affect surrounding objects,
+ 				but raytracing applications may wish to treat emissive objects as light sources.
+ 			*/
+-			glm::vec3 emissive{ 0.f, 0.f, 0.f };
++			glm::vec4 emissive{ 0.f, 0.f, 0.f, 1.0f };
+ 
+ 			/*
+ 				Defines the transparent color of the material,
+ 				this is the color to be multiplied with the color of translucent light
+ 				to construct the final ��destination color�� for a particular position in the screen buffer.
+ 			*/
+-			glm::vec3 transparent{ 0.f, 0.f, 0.f };
++			glm::vec4 transparent{ 0.f, 0.f, 0.f, 1.0f };
+ 
+ 			/*
+ 				Defines the reflective color of the material.
