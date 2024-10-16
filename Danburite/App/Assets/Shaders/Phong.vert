@@ -41,7 +41,7 @@ layout(location = 7) out vec2 outUV3;
 
 void main()
 {
-	const int transformMaterialId				= instanceInfos[gl_InstanceIndex].materialIds[0];
+	const int transformMaterialId				= instanceInfos[gl_InstanceIndex].materialIds[PHONG_RENDERER_TRANSFORM_MATERIAL_SLOT_IDX];
 	const TransformMaterial transformMaterial	= transformMaterials[transformMaterialId];
 
 	const mat4 modelMatrix		= transformMaterial.transform;

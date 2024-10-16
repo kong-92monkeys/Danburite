@@ -8,6 +8,9 @@ namespace Frx
 	class PhongRenderer : public Render::Renderer
 	{
 	public:
+		static constexpr uint32_t TRANSFORM_MATERIAL_SLOT_IDX	{ 0U };
+		static constexpr uint32_t PHONG_MATERIAL_SLOT_IDX		{ 1U };
+
 		PhongRenderer() = default;
 		virtual ~PhongRenderer() noexcept override;
 

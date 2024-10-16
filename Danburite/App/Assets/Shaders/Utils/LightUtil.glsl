@@ -9,108 +9,124 @@ const uint LIGHT_TYPE_SPOT			= 2U;
 
 float LightUtil_calcDiffuseFactor(
 	in const vec3 lightDir,
-	in const vec3 normal)
+	in const vec3 objectNormal)
 {
-	return max(dot(-lightDir, normal), 0.0f);
+	return max(dot(-lightDir, objectNormal), 0.0f);
 }
 
 float LightUtil_calcSpecularFactor(
-	in const vec3 lightDir,
-	in const vec3 cameraPos,
-	in const vec3 position,
-	in const vec3 normal,
-	in const float shininess)
+	const vec3 lightDir,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal)
 {
-	const vec3 lightReflectionDir = reflect(lightDir, normal);
-	const vec3 viewDir = normalize(position - cameraPos);
+	const vec3 lightReflectionDir = reflect(lightDir, objectNormal);
+	const vec3 viewDir = normalize(objectPos - cameraPos);
 
 	return pow(max(dot(lightReflectionDir, -viewDir), 0.0f), shininess);
 }
 
-float LightUtil_calcIntensity_directional(
-	in const LightMaterial light,
-	in const vec3 cameraPos,
-	in const vec3 position,
-	in const vec3 normal,
-	in const float shininess)
+void LightUtil_calcFactors_directional(
+	const LightMaterial light,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal,
+	out float ambientFactor,
+	out float diffuseFactor,
+	out float specularFactor)
 {
-	const float ambientFactor	= light.ambientFactor;
-	const float diffuseFactor	= LightUtil_calcDiffuseFactor(light.direction, normal);
-	const float specularFactor	= LightUtil_calcSpecularFactor(light.direction, cameraPos, position, normal, shininess);
-
-	return (ambientFactor + diffuseFactor + specularFactor);
+	ambientFactor	= light.ambientFactor;
+	diffuseFactor	= LightUtil_calcDiffuseFactor(light.direction, objectNormal);
+	specularFactor	= LightUtil_calcSpecularFactor(light.direction, shininess, cameraPos, objectPos, objectNormal);
 }
 
-float LightUtil_calcIntensity_point(
-	in const LightMaterial light,
-	in const vec3 cameraPos,
-	in const vec3 position,
-	in const vec3 normal,
-	in const float shininess)
+void LightUtil_calcFactors_point(
+	const LightMaterial light,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal,
+	out float ambientFactor,
+	out float diffuseFactor,
+	out float specularFactor)
 {
-	const vec3 lightDir = normalize(position - light.position);
+	const vec3 lightDir = normalize(objectPos - light.position);
 
-	const float ambientFactor	= light.ambientFactor;
-	const float diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, normal);
-	const float specularFactor	= LightUtil_calcSpecularFactor(lightDir, cameraPos, position, normal, shininess);
-
-	return (ambientFactor + diffuseFactor + specularFactor);
+	ambientFactor	= light.ambientFactor;
+	diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, objectNormal);
+	specularFactor	= LightUtil_calcSpecularFactor(lightDir, shininess, cameraPos, objectPos, objectNormal);
 }
 
-float LightUtil_calcIntensity_spot(
-	in const LightMaterial light,
-	in const vec3 cameraPos,
-	in const vec3 position,
-	in const vec3 normal,
-	in const float shininess)
+void LightUtil_calcFactors_spot(
+	const LightMaterial light,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal,
+	out float ambientFactor,
+	out float diffuseFactor,
+	out float specularFactor)
 {
-	const float ambientFactor	= light.ambientFactor;
+	ambientFactor	= light.ambientFactor;
+	diffuseFactor	= 0.0f;
+	specularFactor	= 0.0f;
 
-	const vec3 lightDir		= normalize(position - light.position);
+	const vec3 lightDir		= normalize(objectPos - light.position);
 	const float cosAngle	= dot(light.direction, lightDir);
 
 	float cutOffFactor = ((cosAngle - light.cosOuterCutOff) / (light.cosInnerCutOff - light.cosOuterCutOff));
 	cutOffFactor = min(cutOffFactor, 1.0f);
 
 	if (cutOffFactor <= 0.0f)
-		return ambientFactor;
+		return;
 
-	const float diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, normal);
-	const float specularFactor	= LightUtil_calcSpecularFactor(lightDir, cameraPos, position, normal, shininess);
-
-	return (ambientFactor + (cutOffFactor * (diffuseFactor + specularFactor)));
+	diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, objectNormal);
+	specularFactor	= LightUtil_calcSpecularFactor(lightDir, shininess, cameraPos, objectPos, objectNormal);
 }
 
-float LightUtil_calcIntensity(
-	in const LightMaterial light,
-	in const vec3 cameraPos,
-	in const vec3 position,
-	in const vec3 normal,
-	in const float shininess)
+void LightUtil_calcFactors(
+	const LightMaterial light,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal,
+	out float ambientFactor,
+	out float diffuseFactor,
+	out float specularFactor)
 {
-	float intensity = 0.0f;
-
 	switch (light.type)
 	{
 		case LIGHT_TYPE_DIRECTIONAL:
-			intensity = LightUtil_calcIntensity_directional(light, cameraPos, position, normal, shininess);
+			LightUtil_calcFactors_directional(
+				light, shininess,
+				cameraPos, objectPos, objectNormal,
+				ambientFactor, diffuseFactor, specularFactor);
+
 			break;
 
 		case LIGHT_TYPE_POINT:
-			intensity = LightUtil_calcIntensity_point(light, cameraPos, position, normal, shininess);
+			LightUtil_calcFactors_point(
+				light, shininess,
+				cameraPos, objectPos, objectNormal,
+				ambientFactor, diffuseFactor, specularFactor);
+
 			break;
 
 		case LIGHT_TYPE_SPOT:
-			intensity = LightUtil_calcIntensity_spot(light, cameraPos, position, normal, shininess);
+			LightUtil_calcFactors_spot(
+				light, shininess,
+				cameraPos, objectPos, objectNormal,
+				ambientFactor, diffuseFactor, specularFactor);
+
 			break;
 	}
-
-	return intensity;
 }
 
 float LightUtil_calcAttenuation(
-	in const vec3 attenuation,
-	in const float lightDistance)
+	const vec3 attenuation,
+	const float lightDistance)
 {
 	const float attConst	= attenuation[0];
 	const float attLinear	= attenuation[1];
@@ -118,25 +134,39 @@ float LightUtil_calcAttenuation(
 	return (1.0 / (attConst + (attLinear * lightDistance) + (attQuad * lightDistance * lightDistance)));
 }
 
-vec3 LightUtil_calcColor(
-	in const LightMaterial light,
-	in const vec3 cameraPos,
-	in const vec3 position,
-	in const vec3 normal,
-	in const float shininess)
+void LightUtil_calcColor(
+	const LightMaterial light,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal,
+	out vec3 outAmbient,
+	out vec3 outDiffuse,
+	out vec3 outSpecular)
 {
-	vec3 retVal = vec3(0.0f, 0.0f, 0.0f);
+	float ambientFactor		= 0.0f;
+	float diffuseFactor		= 0.0f;
+	float specularFactor	= 0.0f;
 
-	const float lightDistance = length(position - light.position);
+	const float lightDistance = length(objectPos - light.position);
 	if (lightDistance < light.maxDistance)
 	{
-		const float intensity		= LightUtil_calcIntensity(light, cameraPos, position, normal, shininess);
-		const float attenuation		= LightUtil_calcAttenuation(light.attenuation, lightDistance);
+		LightUtil_calcFactors(
+			light, shininess,
+			cameraPos, objectPos, objectNormal,
+			ambientFactor, diffuseFactor, specularFactor);
 
-		retVal = ((intensity * attenuation) * light.color);
+		const float attenuation	=
+			LightUtil_calcAttenuation(light.attenuation, lightDistance);
+		
+		ambientFactor	*= attenuation;
+		diffuseFactor	*= attenuation;
+		specularFactor	*= attenuation;
 	}
 
-	return retVal;
+	outAmbient		= (ambientFactor * light.color);
+    outDiffuse		= (diffuseFactor * light.color);
+    outSpecular		= (specularFactor * light.color);
 }
 
 #endif

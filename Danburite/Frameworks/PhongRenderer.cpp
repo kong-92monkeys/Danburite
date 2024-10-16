@@ -40,10 +40,10 @@ namespace Frx
 		std::type_index const &materialType) const noexcept
 	{
 		if (materialType == typeid(TransformMaterial))
-			return 0U;
+			return TRANSFORM_MATERIAL_SLOT_IDX;
 
 		if (materialType == typeid(PhongMaterial))
-			return 1U;
+			return PHONG_MATERIAL_SLOT_IDX;
 
 		return std::nullopt;
 	}

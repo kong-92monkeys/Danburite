@@ -22,6 +22,9 @@ const uint VERTEX_ATTRIB_UV_BITS[]						=
 	1U << VERTEX_ATTRIB_UV_LOCATIONS[3]
 };
 
+const uint PHONG_RENDERER_TRANSFORM_MATERIAL_SLOT_IDX	= 0U;
+const uint PHONG_RENDERER_PHONG_MATERIAL_SLOT_IDX		= 1U;
+
 // Descriptor set locations
 const uint GLOBAL_DESC_SET_LOCATION						= 0U;
 const uint MATERIALS_DESC_SET_LOCATION					= 1U;

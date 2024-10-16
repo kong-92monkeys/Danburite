@@ -260,6 +260,7 @@ void ModelLoadingScene::__rcmd_createPlaneObject()
 		std::unique_ptr<Frx::PhongMaterial>{ _rcmd_createMaterial<Frx::PhongMaterial>() };
 
 	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::DIFFUSE, 0U, __rcmd_pPlaneTexture.get());
+	__rcmd_pPlanePhongMaterial->setShininess(32.0f);
 
 	__rcmd_pPlaneObject = std::make_unique<Render::RenderObject>();
 	__rcmd_pPlaneObject->setMesh(__rcmd_pPlaneMesh.get());
