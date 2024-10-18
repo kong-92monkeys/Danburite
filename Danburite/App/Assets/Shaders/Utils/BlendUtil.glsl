@@ -4,9 +4,9 @@
 #include <Shaders/MaterialParams.glsl>
 
 vec3 BlendUtil_blendTex(
-    in const uint texBlendOp,
-    in const vec3 src,
-    in const vec3 dst)
+    const uint texBlendOp,
+    const vec3 src,
+    const vec3 dst)
 {
     vec3 retVal = vec3(0.0f);
 
@@ -41,9 +41,9 @@ vec3 BlendUtil_blendTex(
 }
 
 float BlendUtil_blendTex(
-    in const uint texBlendOp,
-    in const float src,
-    in const float dst)
+    const uint texBlendOp,
+    const float src,
+    const float dst)
 {
     float retVal = 0.0f;
 
