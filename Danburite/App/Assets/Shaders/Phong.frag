@@ -108,7 +108,12 @@ vec3 Phong_blendTex(
     if (texId < 0)
         return dst;
 
+    // TODO: Handling mapModes
+
     vec3 src = texture(sampler2D(sampledImages[texId], imageSampler), uv).rgb;
+    if (texParam.inverted)
+        src = (vec3(1.0f) - src);
+
     src *= texParam.strength;
     return BlendUtil_blendTex(texParam.blendOp, src, dst);
 }
@@ -122,7 +127,12 @@ float Phong_blendTex(
     if (texId < 0)
         return dst;
 
+    // TODO: Handling mapModes
+
     float src = texture(sampler2D(sampledImages[texId], imageSampler), uv).r;
+    if (texParam.inverted)
+        src = (1.0f - src);
+
     src *= texParam.strength;
     return BlendUtil_blendTex(texParam.blendOp, src, dst);
 }

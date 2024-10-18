@@ -83,7 +83,10 @@ void LightUtil_calcFactors_spot(
 		return;
 
 	diffuseFactor	= LightUtil_calcDiffuseFactor(lightDir, objectNormal);
+	diffuseFactor	*= cutOffFactor;
+
 	specularFactor	= LightUtil_calcSpecularFactor(lightDir, shininess, cameraPos, objectPos, objectNormal);
+	specularFactor	*= cutOffFactor;
 }
 
 void LightUtil_calcFactors(

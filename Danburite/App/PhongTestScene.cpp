@@ -351,7 +351,9 @@ void PhongTestScene::__rcmd_createPlaneObject()
 	__rcmd_pPlanePhongMaterial =
 		std::unique_ptr<Frx::PhongMaterial>{ _rcmd_createMaterial<Frx::PhongMaterial>() };
 
+	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::AMBIENT, 0U, __rcmd_pPlaneTexture.get());
 	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::DIFFUSE, 0U, __rcmd_pPlaneTexture.get());
+	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::SPECULAR, 0U, __rcmd_pPlaneTexture.get());
 	__rcmd_pPlanePhongMaterial->setShininess(32.0f);
 	__rcmd_pPlanePhongMaterial->setOpacity(0.0f);
 
@@ -392,10 +394,21 @@ void PhongTestScene::__rcmd_createContainerObject()
 			VK_ACCESS_2_SHADER_SAMPLED_READ_BIT)
 	};
 
+	__rcmd_pContainerSpecularTexture = std::unique_ptr<Render::Texture>
+	{
+		_rcmd_createTexture(
+			"Images/container_specular.png", true,
+			VK_PIPELINE_STAGE_2_FRAGMENT_SHADER_BIT,
+			VK_ACCESS_2_SHADER_SAMPLED_READ_BIT)
+	};
+
 	__rcmd_pContainerPhongMaterial =
 		std::unique_ptr<Frx::PhongMaterial>{ _rcmd_createMaterial<Frx::PhongMaterial>() };
 
+	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::AMBIENT, 0U, __rcmd_pContainerTexture.get());
 	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::DIFFUSE, 0U, __rcmd_pContainerTexture.get());
+	//__rcmd_pContainerPhongMaterial->setTextureInverted(Frx::TextureType::DIFFUSE, 0U, true);
+	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::SPECULAR, 0U, __rcmd_pContainerSpecularTexture.get());
 	__rcmd_pContainerPhongMaterial->setShininess(32.0f);
 	__rcmd_pContainerPhongMaterial->setOpacity(0.0f);
 

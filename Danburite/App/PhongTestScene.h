@@ -120,6 +120,7 @@ private:
 	std::unique_ptr<Render::Mesh> __rcmd_pContainerMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pContainerDrawParam;
 	std::unique_ptr<Render::Texture> __rcmd_pContainerTexture;
+	std::unique_ptr<Render::Texture> __rcmd_pContainerSpecularTexture;
 	std::array<std::unique_ptr<Frx::TransformMaterial>, __CONTAINER_COUNT> __rcmd_containerTransformMaterials;
 	std::unique_ptr<Frx::PhongMaterial> __rcmd_pContainerPhongMaterial;
 	std::unique_ptr<Render::RenderObject> __rcmd_pContainerObject;
