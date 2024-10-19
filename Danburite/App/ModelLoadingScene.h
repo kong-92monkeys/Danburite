@@ -76,7 +76,7 @@ protected:
 		std::any const &updateParam) override;
 
 private:
-	static constexpr size_t __MAX_LIGHT_COUNT{ 7U };
+	static constexpr size_t __MAX_LIGHT_COUNT{ 3U };
 
 	struct __GlobalData
 	{

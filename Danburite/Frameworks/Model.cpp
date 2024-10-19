@@ -10,6 +10,12 @@ namespace Frx
 		RendererFactory &rendererFactory) :
 		__rcmdExecutor	{ rcmdExecutor }
 	{
+		__pRootNodeInvalidateListener =
+			Infra::EventListener<SceneNode *>::bind(
+				&Model::__onRootNodeInvalidated, this);
+
+		__rootNode.getInvalidateEvent() += __pRootNodeInvalidateListener;
+
 		size_t const nodeCount{ createInfo.nodes.size() };
 		__sceneNodes.resize(nodeCount);
 
@@ -26,6 +32,8 @@ namespace Frx
 			if (!nodeIter)
 				break;
 		}
+
+		__rootNode.addChild(__sceneNodes.front());
 
 		__rcmdExecutor.silentRun([
 			&renderEngine, &rendererFactory,
@@ -59,6 +67,40 @@ namespace Frx
 	{
 		for (auto const &pObject : __pRcmdResources->renderObjects)
 			layer.removeRenderObject(pObject.get());
+	}
+
+	void Model::_onValidate()
+	{
+		if (__nodeTransformInvalidated)
+			__validateNodeTransforms();
+
+		__nodeTransformInvalidated = false;
+	}
+
+	void Model::__validateNodeTransforms()
+	{
+		__rootNode.validate();
+
+		std::vector<glm::mat4> nodeTransforms;
+
+		size_t const nodeCount{ __sceneNodes.size() };
+		nodeTransforms.resize(nodeCount);
+
+		for (size_t nodeIt{ }; nodeIt < nodeCount; ++nodeIt)
+			nodeTransforms[nodeIt] = __sceneNodes[nodeIt]->getGlobalTransform();
+
+		__rcmdExecutor.silentRun([
+			pRcmdResources{ __pRcmdResources },
+			nodeTransforms{ std::move(nodeTransforms) }]
+		{
+			__rcmd_updateNodeTransforms(*pRcmdResources, nodeTransforms);
+		});
+	}
+
+	void Model::__onRootNodeInvalidated()
+	{
+		__nodeTransformInvalidated = true;
+		_invalidate();
 	}
 
 	void Model::__rcmd_init(
@@ -213,6 +255,17 @@ namespace Frx
 		}
 
 		return pPhongMaterial;
+	}
+
+	void Model::__rcmd_updateNodeTransforms(
+		__RcmdResources const &resources,
+		std::vector<glm::mat4> const &transforms)
+	{
+		auto const &transformMaterials{ resources.transformMaterials };
+
+		size_t const nodeCount{ transforms.size() };
+		for (size_t nodeIt{ }; nodeIt < nodeCount; ++nodeIt)
+			transformMaterials[nodeIt]->setTransform(transforms[nodeIt]);
 	}
 
 	Model::__RcmdResources::__RcmdResources() noexcept

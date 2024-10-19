@@ -84,6 +84,12 @@ std::any ModelLoadingScene::_onUpdate(
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
 	__updateCamera(delta);
 
+	if (__pModel)
+	{
+		__pModel->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pModel->validate();
+	}
+
 	__UpdateParam retVal;
 
 	if (__camera.isInvalidated())
@@ -103,6 +109,9 @@ void ModelLoadingScene::_onModelLoaded(
 	Frx::Model::CreateInfo &&result)
 {
 	__pModel = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+	__pModel->getTransform().getPosition().set(0.0f, 2.0f, 0.0f);
+	__pModel->validate();
+
 	std::atomic_thread_fence(std::memory_order::release);
 
 	_rcmd_silentRun([this]
@@ -279,8 +288,8 @@ void ModelLoadingScene::__rcmd_addLight()
 {
 	auto pLightMaterial{ _rcmd_createMaterial<Frx::LightMaterial>() };
 	pLightMaterial->setType(Frx::LightType::POINT);
+	pLightMaterial->setPosition(__randomExt.nextVec3(-10.0f, 10.0f, 1.0f, 5.0f, -10.0f, 10.0f));
 	pLightMaterial->setColor(__randomExt.nextVec3(0.0f, 1.0f));
-	pLightMaterial->setPosition(__randomExt.nextVec3(-35.0f, 35.0f, 2.0f, 15.0f, -35.0f, 35.0f));
 	pLightMaterial->setMaxDistance(130.0f);
 	pLightMaterial->setAttenuation(1.0f, 0.07f, 0.017f);
 

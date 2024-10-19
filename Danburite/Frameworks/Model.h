@@ -14,7 +14,7 @@
 
 namespace Frx
 {
-	class Model : public Infra::Unique
+	class Model : public Infra::Stateful<Model>
 	{
 	public:
 		struct TextureInfo
@@ -197,6 +197,15 @@ namespace Frx
 		void rcmd_removeFromLayer(
 			Render::Layer &layer);
 
+		[[nodiscard]]
+		constexpr Transform &getTransform() noexcept;
+
+		[[nodiscard]]
+		constexpr Transform const &getTransform() const noexcept;
+
+	protected:
+		virtual void _onValidate() override;
+
 	private:
 		struct __RcmdResources
 		{
@@ -214,10 +223,18 @@ namespace Frx
 
 		Infra::Executor &__rcmdExecutor;
 
+		SceneNode __rootNode;
 		std::vector<SceneNode *> __sceneNodes;
-		std::queue<std::vector<glm::mat4>> __transformQue;
+
+		bool __nodeTransformInvalidated{ };
 
 		__RcmdResources *__pRcmdResources{ new __RcmdResources };
+
+		Infra::EventListenerPtr<SceneNode *> __pRootNodeInvalidateListener;
+
+		void __validateNodeTransforms();
+
+		void __onRootNodeInvalidated();
 
 		static void __rcmd_init(
 			CreateInfo const &createInfo,
@@ -230,5 +247,19 @@ namespace Frx
 			Render::Engine &renderEngine,
 			std::vector<std::shared_ptr<Render::Texture>> const &textures,
 			MaterialInfo const &materialInfo);
+
+		static void __rcmd_updateNodeTransforms(
+			__RcmdResources const &resources,
+			std::vector<glm::mat4> const &transforms);
 	};
+
+	constexpr Transform &Model::getTransform() noexcept
+	{
+		return __rootNode.getTransform();
+	}
+
+	constexpr Transform const &Model::getTransform() const noexcept
+	{
+		return __rootNode.getTransform();
+	}
 }
