@@ -26,7 +26,8 @@ ModelLoadingScene::~ModelLoadingScene() noexcept
 		__rcmd_pPlaneMesh = nullptr;
 	}).wait();
 
-	__pModel = nullptr;
+	__pNanosuit = nullptr;
+	__pBackpack = nullptr;
 }
 
 void ModelLoadingScene::setDisplay(
@@ -62,7 +63,8 @@ void ModelLoadingScene::syncDisplay()
 
 std::any ModelLoadingScene::_onInit()
 {
-	_loadModel(R"(Models\backpack\backpack.obj)");
+	__backpackReqId = _loadModel(R"(Models\backpack\backpack.obj)");
+	__nanosuitReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00007f);
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
@@ -84,10 +86,16 @@ std::any ModelLoadingScene::_onUpdate(
 	float const delta{ static_cast<float>(time.deltaTime.count() * 1.0e-9) };
 	__updateCamera(delta);
 
-	if (__pModel)
+	if (__pBackpack)
 	{
-		__pModel->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
-		__pModel->validate();
+		__pBackpack->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pBackpack->validate();
+	}
+
+	if (__pNanosuit)
+	{
+		__pNanosuit->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pNanosuit->validate();
 	}
 
 	__UpdateParam retVal;
@@ -108,15 +116,28 @@ void ModelLoadingScene::_onModelLoaded(
 	uint32_t requestIdx,
 	Frx::Model::CreateInfo &&result)
 {
-	__pModel = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-	__pModel->getTransform().getPosition().set(0.0f, 2.0f, 0.0f);
-	__pModel->validate();
+	Frx::Model *pModel{ };
+
+	if (requestIdx == __backpackReqId)
+	{
+		__pBackpack = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+		__pBackpack->getTransform().getPosition().set(0.0f, 2.0f, 0.0f);
+		__pBackpack->validate();
+		pModel = __pBackpack.get();
+	}
+	else if (requestIdx == __nanosuitReqId)
+	{
+		__pNanosuit = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+		__pNanosuit->getTransform().getPosition().set(4.0f, 2.0f, 0.0f);
+		__pNanosuit->validate();
+		pModel = __pNanosuit.get();
+	}
 
 	std::atomic_thread_fence(std::memory_order::release);
 
-	_rcmd_silentRun([this]
+	_rcmd_silentRun([this, pModel]
 	{
-		__pModel->rcmd_addToLayer(*__rcmd_pLayer);
+		pModel->rcmd_addToLayer(*__rcmd_pLayer);
 	});
 }
 

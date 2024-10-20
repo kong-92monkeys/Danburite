@@ -100,7 +100,11 @@ private:
 		glm::vec3 cameraPos		{ 0.0f };
 	};
 
-	std::unique_ptr<Frx::Model> __pModel;
+	uint32_t __backpackReqId{ };
+	std::unique_ptr<Frx::Model> __pBackpack;
+
+	uint32_t __nanosuitReqId{ };
+	std::unique_ptr<Frx::Model> __pNanosuit;
 
 	std::unique_ptr<Render::Mesh> __rcmd_pPlaneMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pPlaneDrawParam;

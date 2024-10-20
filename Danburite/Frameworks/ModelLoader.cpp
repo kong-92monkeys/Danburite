@@ -27,7 +27,8 @@ namespace Frx
 	}
 
 	Model::CreateInfo ModelLoader::load(
-		std::string_view const &assetPath)
+		std::string_view const &assetPath,
+		std::optional<float> const &meshScale)
 	{
 		auto const pScene
 		{
@@ -63,12 +64,12 @@ namespace Frx
 		}));
 
 		jobs.emplace_back(
-			std::async(std::launch::async, [pScene, &retVal]
+			std::async(std::launch::async, [pScene, meshScale, &retVal]
 		{
 			// TODO: mesh merging (if needed)
 			__loadMeshes(
 				pScene->mMeshes, pScene->mNumMeshes,
-				retVal.meshes);
+				meshScale, retVal.meshes);
 
 			__loadDrawInfosAndNodes(
 				pScene->mRootNode, pScene->mMeshes,
@@ -303,6 +304,7 @@ namespace Frx
 	void ModelLoader::__loadMeshes(
 		aiMesh const *const *const pAiMeshes,
 		uint32_t const meshCount,
+		std::optional<float> const &meshScale,
 		std::vector<Model::MeshInfo> &outMeshes)
 	{
 		outMeshes.resize(meshCount);
@@ -330,9 +332,23 @@ namespace Frx
 			if (pAiMesh->HasPositions())
 			{
 				auto &posBuffer{ mesh.vertexBuffers[VertexAttrib::POS_LOCATION] };
-				posBuffer.add(
-					pAiMesh->mVertices,
-					pAiMesh->mNumVertices * VERTEX_ATTRIB_INFOS[VertexAttrib::POS_LOCATION].memSize);
+
+				if (meshScale.has_value())
+				{
+					auto const scale{ meshScale.value() };
+
+					for (uint32_t vertexIt{ }; vertexIt < pAiMesh->mNumVertices; ++vertexIt)
+					{
+						auto const vertex{ pAiMesh->mVertices[vertexIt] * scale };
+						posBuffer.typedAdd(vertex);
+					}
+				}
+				else
+				{
+					posBuffer.add(
+						pAiMesh->mVertices,
+						pAiMesh->mNumVertices * VERTEX_ATTRIB_INFOS[VertexAttrib::POS_LOCATION].memSize);
+				}
 			}
 
 			if (pAiMesh->HasNormals())

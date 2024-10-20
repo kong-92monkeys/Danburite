@@ -19,7 +19,8 @@ namespace Frx
 
 		[[nodiscard]]
 		Model::CreateInfo load(
-			std::string_view const &assetPath);
+			std::string_view const &assetPath,
+			std::optional<float> const &meshScale);
 
 	private:
 		Assimp::Importer __importer;
@@ -37,6 +38,7 @@ namespace Frx
 		static void __loadMeshes(
 			aiMesh const *const *pAiMeshes,
 			uint32_t meshCount,
+			std::optional<float> const &meshScale,
 			std::vector<Model::MeshInfo> &outMeshes);
 
 		[[nodiscard]]

@@ -82,14 +82,15 @@ namespace Frx
 	}
 
 	uint32_t Scene::_loadModel(
-		std::string_view const &assetPath)
+		std::string_view const &assetPath,
+		std::optional<float> const &meshScale)
 	{
 		uint32_t const reqId{ __modelReqIdAllocator.allocate() };
 
 		std::string modelPath{ assetPath };
-		__modelReqMap[reqId] = std::async(std::launch::async, [this, modelPath]
+		__modelReqMap[reqId] = std::async(std::launch::async, [this, modelPath, meshScale]
 		{
-			return __modelLoader.load(modelPath);
+			return __modelLoader.load(modelPath, meshScale);
 		});
 
 		return reqId;

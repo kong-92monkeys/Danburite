@@ -56,7 +56,8 @@ namespace Frx
 			Model::CreateInfo &&createInfo);
 
 		uint32_t _loadModel(
-			std::string_view const &assetPath);
+			std::string_view const &assetPath,
+			std::optional<float> const &meshScale = std::nullopt);
 
 		[[nodiscard]]
 		Render::Layer *_rcmd_createLayer();
