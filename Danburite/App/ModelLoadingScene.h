@@ -106,6 +106,9 @@ private:
 	uint32_t __bunnyReqId{ };
 	std::unique_ptr<Frx::Model> __pBunny;
 
+	uint32_t __armadilloReqId{ };
+	std::unique_ptr<Frx::Model> __pArmadillo;
+
 	std::unique_ptr<Render::Mesh> __rcmd_pPlaneMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pPlaneDrawParam;
 	std::unique_ptr<Render::Texture> __rcmd_pPlaneTexture;

@@ -26,6 +26,7 @@ ModelLoadingScene::~ModelLoadingScene() noexcept
 		__rcmd_pPlaneMesh = nullptr;
 	}).wait();
 
+	__pArmadillo = nullptr;
 	__pBunny = nullptr;
 	__pBackpack = nullptr;
 }
@@ -65,6 +66,7 @@ std::any ModelLoadingScene::_onInit()
 {
 	__backpackReqId = _loadModel(R"(Models\backpack\backpack.obj)");
 	__bunnyReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00007f);
+	__armadilloReqId = _loadModel(R"(Models\armadillo\armadillo.ply)", 100.0f);
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
@@ -98,6 +100,12 @@ std::any ModelLoadingScene::_onUpdate(
 		__pBunny->validate();
 	}
 
+	if (__pArmadillo)
+	{
+		__pArmadillo->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pArmadillo->validate();
+	}
+
 	__UpdateParam retVal;
 
 	if (__camera.isInvalidated())
@@ -121,16 +129,23 @@ void ModelLoadingScene::_onModelLoaded(
 	if (requestIdx == __backpackReqId)
 	{
 		__pBackpack = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pBackpack->getTransform().getPosition().set(0.0f, 2.0f, 0.0f);
+		__pBackpack->getTransform().getPosition().set(-6.0f, 2.0f, 0.0f);
 		__pBackpack->validate();
 		pModel = __pBackpack.get();
 	}
 	else if (requestIdx == __bunnyReqId)
 	{
 		__pBunny = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pBunny->getTransform().getPosition().set(6.0f, 2.0f, 0.0f);
+		__pBunny->getTransform().getPosition().set(0.0f, 2.0f, 0.0f);
 		__pBunny->validate();
 		pModel = __pBunny.get();
+	}
+	else if (requestIdx == __armadilloReqId)
+	{
+		__pArmadillo = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+		__pArmadillo->getTransform().getPosition().set(6.0f, 2.0f, 0.0f);
+		__pArmadillo->validate();
+		pModel = __pArmadillo.get();
 	}
 
 	std::atomic_thread_fence(std::memory_order::release);

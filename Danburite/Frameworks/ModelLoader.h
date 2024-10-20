@@ -11,7 +11,8 @@ namespace Frx
 	class ModelLoader : public Infra::Unique
 	{
 	public:
-		ModelLoader();
+		ModelLoader() = default;
+		virtual ~ModelLoader() noexcept override = default;
 
 		void filterPrimitiveType(
 			aiPrimitiveType type,
@@ -23,8 +24,10 @@ namespace Frx
 			std::optional<float> const &meshScale);
 
 	private:
-		Assimp::Importer __importer;
 		int __primitiveTypeFlags{ };
+
+		[[nodiscard]]
+		std::unique_ptr<Assimp::Importer> __createImporter() const;
 
 		[[nodiscard]]
 		static void __loadTexturesAndMaterials(

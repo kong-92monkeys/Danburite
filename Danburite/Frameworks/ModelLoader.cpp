@@ -9,11 +9,6 @@
 
 namespace Frx
 {
-	ModelLoader::ModelLoader()
-	{
-		__importer.SetIOHandler(new AssimpAssetIOSystem);
-	}
-
 	void ModelLoader::filterPrimitiveType(
 		aiPrimitiveType const type,
 		bool const filtered) noexcept
@@ -22,22 +17,23 @@ namespace Frx
 			__primitiveTypeFlags |= type;
 		else
 			__primitiveTypeFlags &= ~type;
-
-		__importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, __primitiveTypeFlags);
 	}
 
 	Model::CreateInfo ModelLoader::load(
 		std::string_view const &assetPath,
 		std::optional<float> const &meshScale)
 	{
+		auto const pImporter{ __createImporter() };
+
 		auto const pScene
 		{
-			__importer.ReadFile(
+			pImporter->ReadFile(
 				assetPath.data(),
 				aiPostProcessSteps::aiProcess_Triangulate |
 				aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
 				aiPostProcessSteps::aiProcess_RemoveRedundantMaterials |
 				aiPostProcessSteps::aiProcess_GenUVCoords |
+				aiPostProcessSteps::aiProcess_GenNormals |
 				aiPostProcessSteps::aiProcess_OptimizeGraph |
 				aiPostProcessSteps::aiProcess_OptimizeMeshes |
 				aiPostProcessSteps::aiProcess_SortByPType)
@@ -45,7 +41,7 @@ namespace Frx
 
 		if (!pScene || (pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE))
 		{
-			auto const errStr{ __importer.GetErrorString() };
+			auto const errStr{ pImporter->GetErrorString() };
 			throw std::runtime_error{ errStr };
 		}
 
@@ -79,9 +75,17 @@ namespace Frx
 		for (auto const &job : jobs)
 			job.wait();
 
-		__importer.FreeScene();
-
 		return retVal;
+	}
+
+	std::unique_ptr<Assimp::Importer> ModelLoader::__createImporter() const
+	{
+		auto pRetVal{ std::make_unique<Assimp::Importer>() };
+
+		pRetVal->SetIOHandler(new AssimpAssetIOSystem);
+		pRetVal->SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, __primitiveTypeFlags);
+
+		return pRetVal;
 	}
 
 	void ModelLoader::__loadTexturesAndMaterials(
