@@ -66,7 +66,7 @@ std::any ModelLoadingScene::_onInit()
 {
 	__backpackReqId = _loadModel(R"(Models\backpack\backpack.obj)");
 	__bunnyReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00007f);
-	__armadilloReqId = _loadModel(R"(Models\armadillo\armadillo.ply)", 100.0f);
+	__armadilloReqId = _loadModel(R"(Models\armadillo\armadillo.ply)", 0.05f);
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
@@ -143,7 +143,7 @@ void ModelLoadingScene::_onModelLoaded(
 	else if (requestIdx == __armadilloReqId)
 	{
 		__pArmadillo = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pArmadillo->getTransform().getPosition().set(6.0f, 2.0f, 0.0f);
+		__pArmadillo->getTransform().getPosition().set(8.0f, 3.0f, 0.0f);
 		__pArmadillo->validate();
 		pModel = __pArmadillo.get();
 	}
