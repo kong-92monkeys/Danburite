@@ -103,8 +103,8 @@ private:
 	uint32_t __backpackReqId{ };
 	std::unique_ptr<Frx::Model> __pBackpack;
 
-	uint32_t __nanosuitReqId{ };
-	std::unique_ptr<Frx::Model> __pNanosuit;
+	uint32_t __bunnyReqId{ };
+	std::unique_ptr<Frx::Model> __pBunny;
 
 	std::unique_ptr<Render::Mesh> __rcmd_pPlaneMesh;
 	std::unique_ptr<Render::DrawParam> __rcmd_pPlaneDrawParam;

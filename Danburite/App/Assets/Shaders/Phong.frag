@@ -230,7 +230,7 @@ void Phong_calcLightColors(
 
         LightUtil_calcColor(
             lightMaterials[lightIndex], shininess,
-            globalData.cameraPos, worldPos, worldNormal,
+            globalData.cameraPos, worldPos, normalize(worldNormal),
             ambient, diffuse, specular);
 
         outAmbient      += ambient;

@@ -26,7 +26,7 @@ ModelLoadingScene::~ModelLoadingScene() noexcept
 		__rcmd_pPlaneMesh = nullptr;
 	}).wait();
 
-	__pNanosuit = nullptr;
+	__pBunny = nullptr;
 	__pBackpack = nullptr;
 }
 
@@ -64,7 +64,7 @@ void ModelLoadingScene::syncDisplay()
 std::any ModelLoadingScene::_onInit()
 {
 	__backpackReqId = _loadModel(R"(Models\backpack\backpack.obj)");
-	__nanosuitReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00007f);
+	__bunnyReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00007f);
 
 	__camera.setPosition(0.0f, 5.0f, 10.0f);
 	__camera.setNear(0.1f);
@@ -92,10 +92,10 @@ std::any ModelLoadingScene::_onUpdate(
 		__pBackpack->validate();
 	}
 
-	if (__pNanosuit)
+	if (__pBunny)
 	{
-		__pNanosuit->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
-		__pNanosuit->validate();
+		__pBunny->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pBunny->validate();
 	}
 
 	__UpdateParam retVal;
@@ -125,12 +125,12 @@ void ModelLoadingScene::_onModelLoaded(
 		__pBackpack->validate();
 		pModel = __pBackpack.get();
 	}
-	else if (requestIdx == __nanosuitReqId)
+	else if (requestIdx == __bunnyReqId)
 	{
-		__pNanosuit = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pNanosuit->getTransform().getPosition().set(4.0f, 2.0f, 0.0f);
-		__pNanosuit->validate();
-		pModel = __pNanosuit.get();
+		__pBunny = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+		__pBunny->getTransform().getPosition().set(6.0f, 2.0f, 0.0f);
+		__pBunny->validate();
+		pModel = __pBunny.get();
 	}
 
 	std::atomic_thread_fence(std::memory_order::release);
