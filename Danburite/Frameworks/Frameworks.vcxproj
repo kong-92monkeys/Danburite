@@ -27,6 +27,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Orientation.h" />
     <ClInclude Include="PhongMaterial.h" />
+    <ClInclude Include="GouraudRenderer.h" />
     <ClInclude Include="PhongRenderer.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="PrimitiveBuilder.h" />
@@ -51,6 +52,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="Orientation.cpp" />
     <ClCompile Include="PhongMaterial.cpp" />
+    <ClCompile Include="GouraudRenderer.cpp" />
     <ClCompile Include="PhongRenderer.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="PrimitiveBuilder.cpp" />

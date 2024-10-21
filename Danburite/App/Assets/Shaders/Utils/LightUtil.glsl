@@ -172,4 +172,36 @@ void LightUtil_calcColor(
     outSpecular		= (specularFactor * light.color);
 }
 
+void LightUtil_calcColor(
+	const LightMaterial light,
+	const float shininess,
+	const vec3 cameraPos,
+	const vec3 objectPos,
+	const vec3 objectNormal,
+	out vec3 outAmbient,
+	out vec3 outDiffuse)
+{
+	float ambientFactor		= 0.0f;
+	float diffuseFactor		= 0.0f;
+	float specularFactor	= 0.0f;
+
+	const float lightDistance = length(objectPos - light.position);
+	if (lightDistance < light.maxDistance)
+	{
+		LightUtil_calcFactors(
+			light, shininess,
+			cameraPos, objectPos, objectNormal,
+			ambientFactor, diffuseFactor, specularFactor);
+
+		const float attenuation	=
+			LightUtil_calcAttenuation(light.attenuation, lightDistance);
+		
+		ambientFactor	*= attenuation;
+		diffuseFactor	*= attenuation;
+	}
+
+	outAmbient		= (ambientFactor * light.color);
+    outDiffuse		= (diffuseFactor * light.color);
+}
+
 #endif

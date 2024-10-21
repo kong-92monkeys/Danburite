@@ -88,6 +88,9 @@
     <Filter Include="MaterialParams">
       <UniqueIdentifier>{d837958c-3227-44d2-8466-6cdb96faef04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderers\Gouraud">
+      <UniqueIdentifier>{ee4f83ca-b96f-427e-b9cd-e88b0cb82186}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VertexAttribute.h">
@@ -162,6 +165,9 @@
     <ClInclude Include="MaterialParams.h">
       <Filter>MaterialParams</Filter>
     </ClInclude>
+    <ClInclude Include="GouraudRenderer.h">
+      <Filter>Renderers\Gouraud</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -226,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="RendererFactory.cpp">
       <Filter>RendererFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="GouraudRenderer.cpp">
+      <Filter>Renderers\Gouraud</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

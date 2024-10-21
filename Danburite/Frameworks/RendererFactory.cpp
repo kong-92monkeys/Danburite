@@ -1,5 +1,6 @@
 #include "RendererFactory.h"
 #include "PhongRenderer.h"
+#include "GouraudRenderer.h"
 
 namespace Frx
 {
@@ -11,7 +12,8 @@ namespace Frx
 			std::shared_ptr<Frx::PhongRenderer>{ __renderEngine.createRenderer<Frx::PhongRenderer>() };
 
 		// FIXME
-		__renderers[RendererType::GOURAUD] = __renderers[RendererType::PHONG];
+		__renderers[RendererType::GOURAUD] =
+			std::shared_ptr<Frx::GouraudRenderer>{ __renderEngine.createRenderer<Frx::GouraudRenderer>() };
 	}
 
 	Render::Renderer const *RendererFactory::getInstanceOf(

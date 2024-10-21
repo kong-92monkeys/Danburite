@@ -144,6 +144,7 @@ namespace Frx
 				auto const &materialInfo{ createInfo.materials[materialIter] };
 				switch (materialInfo.rendererType)
 				{
+					case RendererType::GOURAUD:
 					case RendererType::PHONG:
 					{
 						auto const pMaterial{ __rcmd_createPhongMaterial(renderEngine, textures, materialInfo) };

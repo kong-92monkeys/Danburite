@@ -95,6 +95,9 @@
     <Filter Include="Scenes\ModelLoading">
       <UniqueIdentifier>{8e98584a-9ccf-4518-845e-c35c21c069f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Assets\Shaders\Gouraud">
+      <UniqueIdentifier>{029d81ac-7cbc-449d-9980-17317ccb631f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -267,6 +270,12 @@
     </None>
     <None Include="Assets\Shaders\Utils\BlendUtil.glsl">
       <Filter>Assets\Shaders\Utils</Filter>
+    </None>
+    <None Include="Assets\Shaders\Gouraud.vert">
+      <Filter>Assets\Shaders\Gouraud</Filter>
+    </None>
+    <None Include="Assets\Shaders\Gouraud.frag">
+      <Filter>Assets\Shaders\Gouraud</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
