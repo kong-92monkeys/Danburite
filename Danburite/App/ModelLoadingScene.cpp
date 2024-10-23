@@ -65,10 +65,12 @@ void ModelLoadingScene::syncDisplay()
 std::any ModelLoadingScene::_onInit()
 {
 	__backpackReqId = _loadModel(R"(Models\backpack\backpack.obj)");
-	__bunnyReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00007f);
+	__teapotReqId = _loadModel(R"(Models\teapot\teapot.obj)", 0.8f);
+	__dragonReqId = _loadModel(R"(Models\dragon\dragon.ply)", 30.0f);
+	__bunnyReqId = _loadModel(R"(Models\bunny\bunny.fbx)", 0.00009f);
 	__armadilloReqId = _loadModel(R"(Models\armadillo\armadillo.ply)", 0.05f);
 
-	__camera.setPosition(0.0f, 5.0f, 10.0f);
+	__camera.setPosition(0.0f, 5.0f, 20.0f);
 	__camera.setNear(0.1f);
 	__camera.validate();
 
@@ -92,6 +94,18 @@ std::any ModelLoadingScene::_onUpdate(
 	{
 		__pBackpack->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
 		__pBackpack->validate();
+	}
+
+	if (__pTeapot)
+	{
+		__pTeapot->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pTeapot->validate();
+	}
+
+	if (__pDragon)
+	{
+		__pDragon->getTransform().getOrientation().rotate(delta, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		__pDragon->validate();
 	}
 
 	if (__pBunny)
@@ -129,21 +143,35 @@ void ModelLoadingScene::_onModelLoaded(
 	if (requestIdx == __backpackReqId)
 	{
 		__pBackpack = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pBackpack->getTransform().getPosition().set(-6.0f, 2.0f, 0.0f);
+		__pBackpack->getTransform().getPosition().set(-14.0f, 2.0f, 0.0f);
 		__pBackpack->validate();
 		pModel = __pBackpack.get();
+	}
+	else if (requestIdx == __teapotReqId)
+	{
+		__pTeapot = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+		__pTeapot->getTransform().getPosition().set(-7.0f, 0.0f, 0.0f);
+		__pTeapot->validate();
+		pModel = __pTeapot.get();
+	}
+	else if (requestIdx == __dragonReqId)
+	{
+		__pDragon = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
+		__pDragon->getTransform().getPosition().set(0.0f, -1.0f, 0.0f);
+		__pDragon->validate();
+		pModel = __pDragon.get();
 	}
 	else if (requestIdx == __bunnyReqId)
 	{
 		__pBunny = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pBunny->getTransform().getPosition().set(0.0f, 2.0f, 0.0f);
+		__pBunny->getTransform().getPosition().set(7.0f, 2.0f, 0.0f);
 		__pBunny->validate();
 		pModel = __pBunny.get();
 	}
 	else if (requestIdx == __armadilloReqId)
 	{
 		__pArmadillo = std::unique_ptr<Frx::Model>{ _createModel(std::move(result)) };
-		__pArmadillo->getTransform().getPosition().set(8.0f, 3.0f, 0.0f);
+		__pArmadillo->getTransform().getPosition().set(14.0f, 2.5f, 0.0f);
 		__pArmadillo->validate();
 		pModel = __pArmadillo.get();
 	}

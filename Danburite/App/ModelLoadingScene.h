@@ -103,6 +103,12 @@ private:
 	uint32_t __backpackReqId{ };
 	std::unique_ptr<Frx::Model> __pBackpack;
 
+	uint32_t __teapotReqId{ };
+	std::unique_ptr<Frx::Model> __pTeapot;
+
+	uint32_t __dragonReqId{ };
+	std::unique_ptr<Frx::Model> __pDragon;
+
 	uint32_t __bunnyReqId{ };
 	std::unique_ptr<Frx::Model> __pBunny;
 
