@@ -17,18 +17,17 @@ namespace Frx::PrimitiveBuilder
 		Infra::GenericBuffer posBuffer;
 		Infra::GenericBuffer uvBuffer;
 		Infra::GenericBuffer normalBuffer;
-		Infra::GenericBuffer colorBuffer;
 
 		Infra::GenericBuffer indexBuffer;
 	};
 
 	[[nodiscard]]
 	PrimitiveData buildSquare(
-		VertexAttribFlags attribFlags,
-		float size, float uvSize) noexcept;
+		float size = 1.0f,
+		float uvSize = 1.0f) noexcept;
 
 	[[nodiscard]]
 	PrimitiveData buildCube(
-		VertexAttribFlags attribFlags,
-		float size = 1.0f) noexcept;
+		float size = 1.0f,
+		float uvSize = 1.0f) noexcept;
 }

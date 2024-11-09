@@ -8,6 +8,7 @@
 #include <Shaders/Materials/PhongMaterial.glsl>
 #include <Shaders/Utils/BlendUtil.glsl>
 #include <Shaders/Utils/LightUtil.glsl>
+#include <Shaders/Utils/TexUtil.glsl>
 
 layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCATION) readonly buffer GlobalDataBuffer
 {
@@ -99,16 +100,53 @@ void Phong_blendMaterialColor(
     }
 }
 
+bool Phong_resolveTexCoord(
+    const uint mapMode,
+    inout float texCoord)
+{
+    switch (mapMode)
+    {
+        // Handled by sampler itself
+        case TEXTURE_MAP_MODE_WRAP:
+            return true;
+
+        case TEXTURE_MAP_MODE_CLAMP:
+            texCoord = TexUtil_clamp(texCoord);
+            return true;
+
+        case TEXTURE_MAP_MODE_DECAL:
+            return TexUtil_isValidDecal(texCoord);
+
+        case TEXTURE_MAP_MODE_MIRROR:
+            texCoord = TexUtil_mirror(texCoord);
+            return true;
+    }
+
+    return true;
+}
+
+bool Phong_resolveUV(
+    const uint mapModeU,
+    const uint mapModeV,
+    inout vec2 uv)
+{
+    return (
+        Phong_resolveTexCoord(mapModeU, uv.x) &&
+        Phong_resolveTexCoord(mapModeV, uv.y));
+}
+
 vec3 Phong_blendTex(
     const TextureParam texParam,
-    const vec2 uv,
+    vec2 uv,
     const vec3 dst)
 {
     const int texId = texParam.id;
     if (texId < 0)
         return dst;
 
-    // TODO: Handling mapModes
+    const bool isValid = Phong_resolveUV(texParam.mapModeU, texParam.mapModeV, uv);
+    if (!isValid)
+        return dst;
 
     vec3 src = texture(sampler2D(sampledImages[texId], imageSampler), uv).rgb;
     if (texParam.inverted)
@@ -126,8 +164,6 @@ float Phong_blendTex(
     const int texId = texParam.id;
     if (texId < 0)
         return dst;
-
-    // TODO: Handling mapModes
 
     float src = texture(sampler2D(sampledImages[texId], imageSampler), uv).r;
     if (texParam.inverted)

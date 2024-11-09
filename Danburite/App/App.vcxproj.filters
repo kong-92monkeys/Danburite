@@ -277,6 +277,9 @@
     <None Include="Assets\Shaders\Gouraud.frag">
       <Filter>Assets\Shaders\Gouraud</Filter>
     </None>
+    <None Include="Assets\Shaders\Utils\TexUtil.glsl">
+      <Filter>Assets\Shaders\Utils</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\App.ico">

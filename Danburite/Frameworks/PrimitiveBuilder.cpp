@@ -3,7 +3,6 @@
 namespace Frx::PrimitiveBuilder
 {
 	PrimitiveData buildSquare(
-		VertexAttribFlags const attribFlags,
 		float const size,
 		float const uvSize) noexcept
 	{
@@ -11,7 +10,7 @@ namespace Frx::PrimitiveBuilder
 
 		float const halfSize{ 0.5f * size };
 
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::POS))
+		// Position
 		{
 			auto &posBuffer{ retVal.posBuffer };
 			posBuffer.typedAdd<glm::vec3>({ -halfSize, halfSize, 0.0f });
@@ -19,8 +18,8 @@ namespace Frx::PrimitiveBuilder
 			posBuffer.typedAdd<glm::vec3>({ halfSize, -halfSize, 0.0f });
 			posBuffer.typedAdd<glm::vec3>({ halfSize, halfSize, 0.0f });
 		}
-
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::UV0))
+		
+		// UV
 		{
 			auto &uvBuffer{ retVal.uvBuffer };
 			uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
@@ -28,8 +27,8 @@ namespace Frx::PrimitiveBuilder
 			uvBuffer.typedAdd<glm::vec2>({ uvSize, uvSize });
 			uvBuffer.typedAdd<glm::vec2>({ uvSize, 0.0f });
 		}
-
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::NORMAL))
+		
+		// Normal
 		{
 			auto &normalBuffer{ retVal.normalBuffer };
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, 1.0f });
@@ -37,16 +36,7 @@ namespace Frx::PrimitiveBuilder
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, 1.0f });
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, 1.0f });
 		}
-
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::COLOR))
-		{
-			auto &colorBuffer{ retVal.colorBuffer };
-			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
-			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
-			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
-			colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
-		}
-
+		
 		auto &indexBuffer{ retVal.indexBuffer };
 		indexBuffer.typedAdd<uint16_t>({ 0U, 1U, 2U, 0U, 2U, 3U });
 
@@ -58,14 +48,14 @@ namespace Frx::PrimitiveBuilder
 	}
 
 	PrimitiveData buildCube(
-		VertexAttribFlags const attribFlags,
-		float const size) noexcept
+		float const size,
+		float const uvSize) noexcept
 	{
 		PrimitiveData retVal;
 
 		float const halfSize{ 0.5f * size };
 
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::POS))
+		// Position
 		{
 			auto &posBuffer{ retVal.posBuffer };
 
@@ -105,21 +95,20 @@ namespace Frx::PrimitiveBuilder
 			posBuffer.typedAdd<glm::vec3>({ -halfSize, -halfSize, -halfSize });
 			posBuffer.typedAdd<glm::vec3>({ -halfSize, halfSize, -halfSize });
 		}
-
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::UV0))
+		
+		// UV
 		{
 			auto &uvBuffer{ retVal.uvBuffer };
-
 			for (size_t planeIter{ }; planeIter < 6ULL; ++planeIter)
 			{
 				uvBuffer.typedAdd<glm::vec2>({ 0.0f, 0.0f });
-				uvBuffer.typedAdd<glm::vec2>({ 0.0f, 1.0f });
-				uvBuffer.typedAdd<glm::vec2>({ 1.0f, 1.0f });
-				uvBuffer.typedAdd<glm::vec2>({ 1.0f, 0.0f });
+				uvBuffer.typedAdd<glm::vec2>({ 0.0f, uvSize });
+				uvBuffer.typedAdd<glm::vec2>({ uvSize, uvSize });
+				uvBuffer.typedAdd<glm::vec2>({ uvSize, 0.0f });
 			}
 		}
-
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::NORMAL))
+		
+		// Normal
 		{
 			auto &normalBuffer{ retVal.normalBuffer };
 
@@ -158,14 +147,6 @@ namespace Frx::PrimitiveBuilder
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, -1.0f });
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, -1.0f });
 			normalBuffer.typedAdd<glm::vec3>({ 0.0f, 0.0f, -1.0f });
-		}
-
-		if (hasFlagBit(attribFlags, VertexAttribFlagBits::COLOR))
-		{
-			auto &colorBuffer{ retVal.colorBuffer };
-
-			for (uint32_t vtxIter{ }; vtxIter < 24U; ++vtxIter)
-				colorBuffer.typedAdd<glm::vec4>({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
 
 		auto &indexBuffer{ retVal.indexBuffer };

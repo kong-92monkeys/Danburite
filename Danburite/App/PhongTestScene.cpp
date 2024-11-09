@@ -316,19 +316,11 @@ void PhongTestScene::__onDisplaySync()
 
 void PhongTestScene::__rcmd_createPlaneObject()
 {
-	auto const meshData
-	{
-		Frx::PrimitiveBuilder::buildSquare(
-			Frx::VertexAttribFlagBits::POS |
-			Frx::VertexAttribFlagBits::NORMAL |
-			Frx::VertexAttribFlagBits::COLOR |
-			Frx::VertexAttribFlagBits::UV0, 100.0f, 10.0f)
-	};
+	auto const meshData{ Frx::PrimitiveBuilder::buildSquare(100.0f, 10.0f) };
 
 	__rcmd_pPlaneMesh = std::unique_ptr<Render::Mesh>{ _rcmd_createMesh() };
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
-	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
 	__rcmd_pPlaneMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATIONS[0], meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
 	__rcmd_pPlaneMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
 
@@ -369,19 +361,11 @@ void PhongTestScene::__rcmd_createPlaneObject()
 
 void PhongTestScene::__rcmd_createContainerObject()
 {
-	auto const meshData
-	{
-		Frx::PrimitiveBuilder::buildCube(
-			Frx::VertexAttribFlagBits::POS |
-			Frx::VertexAttribFlagBits::NORMAL |
-			Frx::VertexAttribFlagBits::COLOR |
-			Frx::VertexAttribFlagBits::UV0, 1.0f)
-	};
+	auto const meshData{ Frx::PrimitiveBuilder::buildCube() };
 
 	__rcmd_pContainerMesh = std::unique_ptr<Render::Mesh>{ _rcmd_createMesh() };
 	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::POS_LOCATION, meshData.posBuffer.getData(), meshData.posBuffer.getSize());
 	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::NORMAL_LOCATION, meshData.normalBuffer.getData(), meshData.normalBuffer.getSize());
-	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::COLOR_LOCATION, meshData.colorBuffer.getData(), meshData.colorBuffer.getSize());
 	__rcmd_pContainerMesh->createVertexBuffer(Frx::VertexAttrib::UV_LOCATIONS[0], meshData.uvBuffer.getData(), meshData.uvBuffer.getSize());
 	__rcmd_pContainerMesh->createIndexBuffer(meshData.indexType, meshData.indexBuffer.getData(), meshData.indexBuffer.getSize());
 
@@ -407,7 +391,6 @@ void PhongTestScene::__rcmd_createContainerObject()
 
 	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::AMBIENT, 0U, __rcmd_pContainerTexture.get());
 	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::DIFFUSE, 0U, __rcmd_pContainerTexture.get());
-	//__rcmd_pContainerPhongMaterial->setTextureInverted(Frx::TextureType::DIFFUSE, 0U, true);
 	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::SPECULAR, 0U, __rcmd_pContainerSpecularTexture.get());
 	__rcmd_pContainerPhongMaterial->setShininess(32.0f);
 	__rcmd_pContainerPhongMaterial->setOpacity(0.0f);
