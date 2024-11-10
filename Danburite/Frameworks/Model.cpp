@@ -145,6 +145,12 @@ namespace Frx
 				switch (materialInfo.rendererType)
 				{
 					case RendererType::GOURAUD:
+					{
+						auto const pMaterial{ __rcmd_createGouraudMaterial(renderEngine, textures, materialInfo) };
+						materials.emplace_back(pMaterial);
+					}
+						break;
+
 					case RendererType::PHONG:
 					{
 						auto const pMaterial{ __rcmd_createPhongMaterial(renderEngine, textures, materialInfo) };
@@ -223,20 +229,35 @@ namespace Frx
 		}
 	}
 
+	GouraudMaterial *Model::__rcmd_createGouraudMaterial(
+		Render::Engine &renderEngine,
+		std::vector<std::shared_ptr<Render::Texture>> const &textures,
+		MaterialInfo const &materialInfo)
+	{
+		auto const pMaterial{ renderEngine.createMaterial<GouraudMaterial>() };
+
+		pMaterial->setAmbient(materialInfo.ambient);
+		pMaterial->setDiffuse(materialInfo.diffuse);
+		pMaterial->setEmissive(materialInfo.emissive);
+		pMaterial->setBlendOp(materialInfo.blendOp);
+
+		return pMaterial;
+	}
+
 	PhongMaterial *Model::__rcmd_createPhongMaterial(
 		Render::Engine &renderEngine,
 		std::vector<std::shared_ptr<Render::Texture>> const &textures,
 		MaterialInfo const &materialInfo)
 	{
-		auto const pPhongMaterial{ renderEngine.createMaterial<PhongMaterial>() };
+		auto const pMaterial{ renderEngine.createMaterial<PhongMaterial>() };
 
-		pPhongMaterial->setAmbient(materialInfo.ambient);
-		pPhongMaterial->setDiffuse(materialInfo.diffuse);
-		pPhongMaterial->setSpecular(materialInfo.specular);
-		pPhongMaterial->setEmissive(materialInfo.emissive);
+		pMaterial->setAmbient(materialInfo.ambient);
+		pMaterial->setDiffuse(materialInfo.diffuse);
+		pMaterial->setSpecular(materialInfo.specular);
+		pMaterial->setEmissive(materialInfo.emissive);
 
-		pPhongMaterial->setBlendOp(materialInfo.blendOp);
-		pPhongMaterial->setShininess(materialInfo.shininess);
+		pMaterial->setBlendOp(materialInfo.blendOp);
+		pMaterial->setShininess(materialInfo.shininess);
 
 		for (auto const &[texType, texInfos] : materialInfo.textureInfoMap)
 		{
@@ -248,16 +269,16 @@ namespace Frx
 				auto const &texInfo	{ texInfos[channel] };
 				auto const pTexture	{ textures[texInfo.index].get() };
 
-				pPhongMaterial->setTexture(texType, channel, pTexture);
-				pPhongMaterial->setTextureStrength(texType, channel, texInfo.strength);
-				pPhongMaterial->setTextureBlendOp(texType, channel, texInfo.blendOp);
-				pPhongMaterial->setTextureMapModeU(texType, channel, texInfo.mapModeU);
-				pPhongMaterial->setTextureMapModeV(texType, channel, texInfo.mapModeV);
-				pPhongMaterial->setTextureInverted(texType, channel, texInfo.inverted);
+				pMaterial->setTexture(texType, channel, pTexture);
+				pMaterial->setTextureStrength(texType, channel, texInfo.strength);
+				pMaterial->setTextureBlendOp(texType, channel, texInfo.blendOp);
+				pMaterial->setTextureMapModeU(texType, channel, texInfo.mapModeU);
+				pMaterial->setTextureMapModeV(texType, channel, texInfo.mapModeV);
+				pMaterial->setTextureInverted(texType, channel, texInfo.inverted);
 			}
 		}
 
-		return pPhongMaterial;
+		return pMaterial;
 	}
 
 	void Model::__rcmd_updateNodeTransforms(

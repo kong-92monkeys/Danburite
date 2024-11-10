@@ -61,7 +61,7 @@ namespace Frx
 			aiShadingMode value) noexcept;
 
 		[[nodiscard]]
-		static constexpr AlphaBlendOp __parseAIType(
+		static constexpr ColorBlendOp __parseAIType(
 			aiBlendMode value) noexcept;
 
 		[[nodiscard]]
@@ -126,19 +126,19 @@ namespace Frx
 		return RendererType::GOURAUD;
 	}
 
-	constexpr AlphaBlendOp ModelLoader::__parseAIType(
+	constexpr ColorBlendOp ModelLoader::__parseAIType(
 		aiBlendMode const value) noexcept
 	{
 		switch (value)
 		{
 			case aiBlendMode::aiBlendMode_Default:
-				return AlphaBlendOp::DEFAULT;
+				return ColorBlendOp::DEFAULT;
 
 			case aiBlendMode::aiBlendMode_Additive:
-				return AlphaBlendOp::ADDITIVE;
+				return ColorBlendOp::ADDITIVE;
 		}
 
-		return AlphaBlendOp::DEFAULT;
+		return ColorBlendOp::DEFAULT;
 	}
 
 	constexpr TextureType ModelLoader::__parseAIType(

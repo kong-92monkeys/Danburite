@@ -264,7 +264,7 @@ namespace Frx
 		MIRROR
 	};
 
-	enum class AlphaBlendOp : uint32_t
+	enum class ColorBlendOp : uint32_t
 	{
 		/*
 			Color = Porter-Duff "Over" blendOp

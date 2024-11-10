@@ -29,7 +29,6 @@ float LightUtil_calcSpecularFactor(
 
 void LightUtil_calcFactors_directional(
 	const LightMaterial light,
-	const float shininess,
 	const vec3 cameraPos,
 	const vec3 objectPos,
 	const vec3 objectNormal,
@@ -57,7 +56,6 @@ void LightUtil_calcFactors_directional(
 
 void LightUtil_calcFactors_point(
 	const LightMaterial light,
-	const float shininess,
 	const vec3 cameraPos,
 	const vec3 objectPos,
 	const vec3 objectNormal,
@@ -89,7 +87,6 @@ void LightUtil_calcFactors_point(
 
 void LightUtil_calcFactors_spot(
 	const LightMaterial light,
-	const float shininess,
 	const vec3 cameraPos,
 	const vec3 objectPos,
 	const vec3 objectNormal,
@@ -144,7 +141,6 @@ void LightUtil_calcFactors_spot(
 
 void LightUtil_calcFactors(
 	const LightMaterial light,
-	const float shininess,
 	const vec3 cameraPos,
 	const vec3 objectPos,
 	const vec3 objectNormal,
@@ -155,24 +151,21 @@ void LightUtil_calcFactors(
 	{
 		case LIGHT_TYPE_DIRECTIONAL:
 			LightUtil_calcFactors_directional(
-				light, shininess,
-				cameraPos, objectPos, objectNormal,
+				light, cameraPos, objectPos, objectNormal,
 				ambientFactor, diffuseFactor);
 
 			break;
 
 		case LIGHT_TYPE_POINT:
 			LightUtil_calcFactors_point(
-				light, shininess,
-				cameraPos, objectPos, objectNormal,
+				light, cameraPos, objectPos, objectNormal,
 				ambientFactor, diffuseFactor);
 
 			break;
 
 		case LIGHT_TYPE_SPOT:
 			LightUtil_calcFactors_spot(
-				light, shininess,
-				cameraPos, objectPos, objectNormal,
+				light, cameraPos, objectPos, objectNormal,
 				ambientFactor, diffuseFactor);
 
 			break;
@@ -229,7 +222,6 @@ float LightUtil_calcAttenuation(
 
 void LightUtil_calcColor(
 	const LightMaterial light,
-	const float shininess,
 	const vec3 cameraPos,
 	const vec3 objectPos,
 	const vec3 objectNormal,
@@ -243,8 +235,7 @@ void LightUtil_calcColor(
 	if (lightDistance < light.maxDistance)
 	{
 		LightUtil_calcFactors(
-			light, shininess,
-			cameraPos, objectPos, objectNormal,
+			light, cameraPos, objectPos, objectNormal,
 			ambientFactor, diffuseFactor);
 
 		const float attenuation	=

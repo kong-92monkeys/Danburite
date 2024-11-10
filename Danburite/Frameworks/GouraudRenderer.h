@@ -8,7 +8,7 @@ namespace Frx
 	{
 	public:
 		static constexpr uint32_t TRANSFORM_MATERIAL_SLOT_IDX	{ 0U };
-		static constexpr uint32_t PHONG_MATERIAL_SLOT_IDX		{ 1U };
+		static constexpr uint32_t GOURAUD_MATERIAL_SLOT_IDX		{ 1U };
 
 		GouraudRenderer() = default;
 		virtual ~GouraudRenderer() noexcept override;

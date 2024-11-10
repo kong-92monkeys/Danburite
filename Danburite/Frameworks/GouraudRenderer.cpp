@@ -1,6 +1,6 @@
 #include "GouraudRenderer.h"
 #include "TransformMaterial.h"
-#include "PhongMaterial.h"
+#include "GouraudMaterial.h"
 #include "Constants.h"
 #include "VertexAttribute.h"
 #include <array>
@@ -29,7 +29,7 @@ namespace Frx
 		if (!(materialPack.hasValidMaterialOf<TransformMaterial>()))
 			return false;
 
-		if (!(materialPack.hasValidMaterialOf<PhongMaterial>()))
+		if (!(materialPack.hasValidMaterialOf<GouraudMaterial>()))
 			return false;
 
 		return true;
@@ -41,8 +41,8 @@ namespace Frx
 		if (materialType == typeid(TransformMaterial))
 			return TRANSFORM_MATERIAL_SLOT_IDX;
 
-		if (materialType == typeid(PhongMaterial))
-			return PHONG_MATERIAL_SLOT_IDX;
+		if (materialType == typeid(GouraudMaterial))
+			return GOURAUD_MATERIAL_SLOT_IDX;
 
 		return std::nullopt;
 	}

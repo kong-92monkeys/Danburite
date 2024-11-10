@@ -217,6 +217,7 @@
     <None Include="Assets\Shaders\Gouraud.vert" />
     <None Include="Assets\Shaders\MaterialParams.glsl" />
     <None Include="Assets\Shaders\Materials\LightMaterial.glsl" />
+    <None Include="Assets\Shaders\Materials\GouraudMaterial.glsl" />
     <None Include="Assets\Shaders\Materials\PhongMaterial.glsl" />
     <None Include="Assets\Shaders\Phong.frag" />
     <None Include="Assets\Shaders\Phong.vert" />

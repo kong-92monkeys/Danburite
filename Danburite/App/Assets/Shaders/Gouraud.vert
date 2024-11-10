@@ -5,7 +5,7 @@
 #include <Shaders/VertexInput.vert>
 #include <Shaders/ShaderData.glsl>
 #include <Shaders/Materials/TransformMaterial.glsl>
-#include <Shaders/Materials/PhongMaterial.glsl>
+#include <Shaders/Materials/GouraudMaterial.glsl>
 #include <Shaders/Utils/LightUtil.glsl>
 
 layout(std430, set = GLOBAL_DESC_SET_LOCATION, binding = GLOBAL_DATA_BUFFER_LOCATION) readonly buffer GlobalDataBuffer
@@ -22,9 +22,9 @@ layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = TRANSFORM_MATERIAL_L
 	TransformMaterial transformMaterials[];
 };
 
-layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = PHONG_MATERIAL_LOCATION) readonly buffer PhongMaterialBuffer
+layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = GOURAUD_MATERIAL_LOCATION) readonly buffer GouraudMaterialBuffer
 {
-	PhongMaterial phongMaterials[];
+	GouraudMaterial gouraudMaterials[];
 };
 
 layout(std430, set = MATERIALS_DESC_SET_LOCATION, binding = LIGHT_MATERIAL_LOCATION) readonly buffer LightMaterialBuffer
@@ -53,15 +53,15 @@ vec3 Gouraud_getVertexColor()
 }
 
 void Gouraud_blendMaterialColor(
-    const PhongMaterial phongMaterial,
+    const GouraudMaterial gouraudMaterial,
     out vec3 outAmbient,
     out vec3 outDiffuse)
 {
-    const vec3 materialAmbient      = phongMaterial.ambient;
-    const vec3 materialDiffuse      = phongMaterial.diffuse;
+    const vec3 materialAmbient      = gouraudMaterial.ambient;
+    const vec3 materialDiffuse      = gouraudMaterial.diffuse;
     const vec3 dstColor             = Gouraud_getVertexColor();
 
-    if (phongMaterial.blendOp == ALPHA_BLEND_OP_DEFAULT)
+    if (gouraudMaterial.blendOp == ALPHA_BLEND_OP_DEFAULT)
     {
         outAmbient   = (materialAmbient * dstColor);
         outDiffuse   = (materialDiffuse * dstColor);
@@ -74,17 +74,16 @@ void Gouraud_blendMaterialColor(
 }
 
 void Gouraud_calcObjectColors(
-    const PhongMaterial phongMaterial,
+    const GouraudMaterial gouraudMaterial,
     out vec3 outAmbient,
     out vec3 outDiffuse,
     out vec3 outEmissive)
 {
-    Gouraud_blendMaterialColor(phongMaterial, outAmbient, outDiffuse);
-    outEmissive = phongMaterial.emissive;
+    Gouraud_blendMaterialColor(gouraudMaterial, outAmbient, outDiffuse);
+    outEmissive = gouraudMaterial.emissive;
 }
 
 void Gouraud_calcLightColors(
-	const float shininess,
     const vec3 worldPos,
     const vec3 worldNormal,
     out vec3 outAmbient,
@@ -101,7 +100,7 @@ void Gouraud_calcLightColors(
         vec3 diffuse;
 
         LightUtil_calcColor(
-            lightMaterials[lightIndex], shininess,
+            lightMaterials[lightIndex],
             globalData.cameraPos, worldPos, worldNormal,
             ambient, diffuse);
 
@@ -114,7 +113,7 @@ void main()
 {
 	const InstanceInfo instanceInfo				= instanceInfos[gl_InstanceIndex];
 
-	const int transformMaterialId				= instanceInfo.materialIds[PHONG_RENDERER_TRANSFORM_MATERIAL_SLOT_IDX];
+	const int transformMaterialId				= instanceInfo.materialIds[GOURAUD_RENDERER_TRANSFORM_MATERIAL_SLOT_IDX];
 	const TransformMaterial transformMaterial	= transformMaterials[transformMaterialId];
 
 	const mat4 modelMatrix		= transformMaterial.transform;
@@ -126,23 +125,20 @@ void main()
 	const vec3 worldPos = (modelMatrix * vec4(inPos, 1.0f)).xyz;
 	const vec3 worldNormal = (normalMatrix * inNormal);
 
-	const int phongMaterialId					= instanceInfo.materialIds[PHONG_RENDERER_PHONG_MATERIAL_SLOT_IDX];
-    const PhongMaterial phongMaterial			= phongMaterials[phongMaterialId];
+	const int gouraudMaterialId					= instanceInfo.materialIds[GOURAUD_RENDERER_GOURAUD_MATERIAL_SLOT_IDX];
+    const GouraudMaterial gouraudMaterial		= gouraudMaterials[gouraudMaterialId];
 
     vec3 objectAmbient;
     vec3 objectDiffuse;
     vec3 objectEmissive;
 
     Gouraud_calcObjectColors(
-        phongMaterial,
+        gouraudMaterial,
         objectAmbient, objectDiffuse, objectEmissive);
 
     vec3 lightAmbient;
     vec3 lightDiffuse;
-
-    Gouraud_calcLightColors(
-        phongMaterial.shininess, worldPos, worldNormal,
-        lightAmbient, lightDiffuse);
+    Gouraud_calcLightColors(worldPos, worldNormal, lightAmbient, lightDiffuse);
 
     outColor = (objectAmbient * lightAmbient);
     outColor += (objectDiffuse * lightDiffuse);

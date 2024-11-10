@@ -280,6 +280,9 @@
     <None Include="Assets\Shaders\Utils\TexUtil.glsl">
       <Filter>Assets\Shaders\Utils</Filter>
     </None>
+    <None Include="Assets\Shaders\Materials\GouraudMaterial.glsl">
+      <Filter>Assets\Shaders\Materials</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\App.ico">

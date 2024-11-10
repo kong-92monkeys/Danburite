@@ -1,6 +1,7 @@
 #include "RenderSystem.h"
 #include "Constants.h"
 #include "TransformMaterial.h"
+#include "GouraudMaterial.h"
 #include "PhongMaterial.h"
 #include "LightMaterial.h"
 #include <new>
@@ -48,6 +49,7 @@ namespace Frx
 
 		Render::GlobalDescriptorManager::BindingInfo globalDescBindingInfo;
 		globalDescBindingInfo.materialBufferLocations[typeid(TransformMaterial)]	= Constants::TRANSFORM_MATERIAL_LOCATION;
+		globalDescBindingInfo.materialBufferLocations[typeid(GouraudMaterial)]		= Constants::GOURAUD_MATERIAL_LOCATION;
 		globalDescBindingInfo.materialBufferLocations[typeid(PhongMaterial)]		= Constants::PHONG_MATERIAL_LOCATION;
 		globalDescBindingInfo.materialBufferLocations[typeid(LightMaterial)]		= Constants::LIGHT_MATERIAL_LOCATION;
 

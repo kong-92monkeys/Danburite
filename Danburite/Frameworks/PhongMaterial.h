@@ -16,7 +16,7 @@ namespace Frx
 		alignas(16) glm::vec3 specular	{ 0.f, 0.f, 0.f };
 		alignas(16) glm::vec3 emissive	{ 0.f, 0.f, 0.f };
 
-		AlphaBlendOp blendOp	{ AlphaBlendOp::DEFAULT };
+		ColorBlendOp blendOp	{ ColorBlendOp::DEFAULT };
 		float shininess			{ 0.0f };
 
 		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> ambientTexs;
@@ -45,7 +45,7 @@ namespace Frx
 			glm::vec3 const &color);
 
 		void setBlendOp(
-			AlphaBlendOp blendOp);
+			ColorBlendOp blendOp);
 
 		void setShininess(
 			float shininess);

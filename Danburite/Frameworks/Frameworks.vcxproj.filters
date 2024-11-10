@@ -171,6 +171,9 @@
     <ClInclude Include="GouraudRenderer.h">
       <Filter>Renderers\Gouraud</Filter>
     </ClInclude>
+    <ClInclude Include="GouraudMaterial.h">
+      <Filter>Materials\GouraudMaterial</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scene.cpp">
@@ -238,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="GouraudRenderer.cpp">
       <Filter>Renderers\Gouraud</Filter>
+    </ClCompile>
+    <ClCompile Include="GouraudMaterial.cpp">
+      <Filter>Materials\GouraudMaterial</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

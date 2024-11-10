@@ -45,7 +45,7 @@ namespace Frx
 	}
 
 	void PhongMaterial::setBlendOp(
-		AlphaBlendOp const blendOp)
+		ColorBlendOp const blendOp)
 	{
 		_getTypedData().blendOp = blendOp;
 		_invokeUpdateEvent();

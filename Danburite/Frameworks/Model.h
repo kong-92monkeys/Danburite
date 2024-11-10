@@ -7,6 +7,7 @@
 #include "RendererFactory.h"
 #include "VertexAttribute.h"
 #include "SceneNode.h"
+#include "GouraudMaterial.h"
 #include "PhongMaterial.h"
 #include "TransformMaterial.h"
 #include <unordered_map>
@@ -124,7 +125,7 @@ namespace Frx
 				
 				Simply said, alpha blending settings.
 			*/
-			AlphaBlendOp blendOp{ AlphaBlendOp::DEFAULT };
+			ColorBlendOp blendOp{ ColorBlendOp::DEFAULT };
 
 			/*
 				Defines the shininess of a phong-shaded material.
@@ -241,6 +242,12 @@ namespace Frx
 			Render::Engine &renderEngine,
 			RendererFactory &rendererFactory,
 			__RcmdResources &outResources);
+
+		[[nodiscard]]
+		static GouraudMaterial *__rcmd_createGouraudMaterial(
+			Render::Engine &renderEngine,
+			std::vector<std::shared_ptr<Render::Texture>> const &textures,
+			MaterialInfo const &materialInfo);
 
 		[[nodiscard]]
 		static PhongMaterial *__rcmd_createPhongMaterial(
