@@ -44,7 +44,7 @@ layout(push_constant) uniform PushConstants
 layout(location = 0) in flat int instanceIndex;
 layout(location = 1) in vec3 worldPos;
 layout(location = 2) in vec3 worldNormal;
-layout(location = 3) in vec4 inColor;
+layout(location = 3) in vec3 inColor;
 layout(location = 4) in vec2 inUV0;
 layout(location = 5) in vec2 inUV1;
 layout(location = 6) in vec2 inUV2;
@@ -52,51 +52,36 @@ layout(location = 7) in vec2 inUV3;
 
 layout(location = 0) out vec4 outColor;
 
-vec4 Phong_getVertexColor()
+vec3 Phong_getVertexColor()
 {
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT))
         return inColor;
 
-    return vec4(1.0f);
+    return vec3(1.0f);
 }
 
 void Phong_blendMaterialColor(
     const PhongMaterial phongMaterial,
     out vec3 outAmbient,
     out vec3 outDiffuse,
-    out vec3 outSpecular,
-    out float outAlpha)
+    out vec3 outSpecular)
 {
-    const vec4 vertexColor = Phong_getVertexColor();
-
     const vec3 materialAmbient      = phongMaterial.ambient;
     const vec3 materialDiffuse      = phongMaterial.diffuse;
     const vec3 materialSpecular     = phongMaterial.specular;
-    const vec3 dstColor             = vertexColor.rgb;
-
-    const float srcAlpha = phongMaterial.opacity;
-    const float dstAlpha = vertexColor.a;
-
-	const float backAlpha = (dstAlpha * (1.0f - srcAlpha));
-    outAlpha = (srcAlpha + backAlpha);
+    const vec3 dstColor             = Phong_getVertexColor();
 
     if (phongMaterial.blendOp == ALPHA_BLEND_OP_DEFAULT)
     {
-        const vec3 dstColorAdj = (dstColor * backAlpha);
-
-        outAmbient   = ((materialAmbient * srcAlpha) + dstColorAdj);
-        outDiffuse   = ((materialDiffuse * srcAlpha) + dstColorAdj);
-        outSpecular  = ((materialSpecular * srcAlpha) + dstColorAdj);
-
-        outAmbient   /= outAlpha;
-        outDiffuse   /= outAlpha;
-        outSpecular  /= outAlpha;
+        outAmbient   = (materialAmbient * dstColor);
+        outDiffuse   = (materialDiffuse * dstColor);
+        outSpecular  = (materialSpecular * dstColor);
     }
     else
     {
-        outAmbient   = ((materialAmbient * srcAlpha) + dstColor);
-        outDiffuse   = ((materialDiffuse * srcAlpha) + dstColor);
-        outSpecular  = ((materialSpecular * srcAlpha) + dstColor);
+        outAmbient   = (materialAmbient + dstColor);
+        outDiffuse   = (materialDiffuse + dstColor);
+        outSpecular  = (materialSpecular + dstColor);
     }
 }
 
@@ -181,14 +166,12 @@ void Phong_blendTexChannel(
     inout vec3 objectDiffuse,
     inout vec3 objectSpecular,
     inout vec3 objectEmissive,
-    inout float objectAlpha,
     inout float occlusion)
 {
     objectAmbient   = Phong_blendTex(phongMaterial.ambientTexs[channel], uv, objectAmbient);
     objectDiffuse   = Phong_blendTex(phongMaterial.diffuseTexs[channel], uv, objectDiffuse);
     objectSpecular  = Phong_blendTex(phongMaterial.specularTexs[channel], uv, objectSpecular);
     objectEmissive  = Phong_blendTex(phongMaterial.emissiveTexs[channel], uv, objectEmissive);
-    objectAlpha     = Phong_blendTex(phongMaterial.opacityTexs[channel], uv, objectAlpha);
     occlusion       = Phong_blendTex(phongMaterial.aoTexs[channel], uv, occlusion);
 }
 
@@ -197,14 +180,9 @@ void Phong_calcObjectColors(
     out vec3 outAmbient,
     out vec3 outDiffuse,
     out vec3 outSpecular,
-    out vec3 outEmissive,
-    out float outAlpha)
+    out vec3 outEmissive)
 {
-    Phong_blendMaterialColor(
-        phongMaterial,
-        outAmbient, outDiffuse, outSpecular,
-        outAlpha);
-
+    Phong_blendMaterialColor(phongMaterial, outAmbient, outDiffuse, outSpecular);
     outEmissive = phongMaterial.emissive;
 
     float occlusion = 1.0f;
@@ -213,32 +191,28 @@ void Phong_calcObjectColors(
     {
         Phong_blendTexChannel(
             phongMaterial, 0U, inUV0,
-            outAmbient, outDiffuse, outSpecular, outEmissive,
-            outAlpha, occlusion);
+            outAmbient, outDiffuse, outSpecular, outEmissive, occlusion);
     }
 
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BITS[1U]))
     {
         Phong_blendTexChannel(
             phongMaterial, 1U, inUV1,
-            outAmbient, outDiffuse, outSpecular, outEmissive,
-            outAlpha, occlusion);
+            outAmbient, outDiffuse, outSpecular, outEmissive, occlusion);
     }
 
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BITS[2U]))
     {
         Phong_blendTexChannel(
             phongMaterial, 2U, inUV2,
-            outAmbient, outDiffuse, outSpecular, outEmissive,
-            outAlpha, occlusion);
+            outAmbient, outDiffuse, outSpecular, outEmissive, occlusion);
     }
 
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BITS[3U]))
     {
         Phong_blendTexChannel(
             phongMaterial, 3U, inUV3,
-            outAmbient, outDiffuse, outSpecular, outEmissive,
-            outAlpha, occlusion);
+            outAmbient, outDiffuse, outSpecular, outEmissive, occlusion);
     }
 
     outAmbient   *= occlusion;
@@ -284,12 +258,10 @@ void main()
     vec3 objectDiffuse;
     vec3 objectSpecular;
     vec3 objectEmissive;
-    float objectAlpha;
 
     Phong_calcObjectColors(
         phongMaterial,
-        objectAmbient, objectDiffuse, objectSpecular, objectEmissive,
-        objectAlpha);
+        objectAmbient, objectDiffuse, objectSpecular, objectEmissive);
     
     vec3 lightAmbient;
     vec3 lightDiffuse;
@@ -303,5 +275,5 @@ void main()
     outColor.rgb    += (objectDiffuse * lightDiffuse);
     outColor.rgb    += (objectSpecular * lightSpecular);
     outColor.rgb    += objectEmissive;
-    outColor.a      = objectAlpha;
+    outColor.a      = 1.0f;
 }

@@ -42,48 +42,34 @@ layout(push_constant) uniform PushConstants
 	uint vertexAttribFlags;
 };
 
-layout(location = 0) out vec4 outColor;
+layout(location = 0) out vec3 outColor;
 
-vec4 Gouraud_getVertexColor()
+vec3 Gouraud_getVertexColor()
 {
     if (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT))
-        return inColor;
+        return inColor.rgb;
 
-    return vec4(1.0f);
+    return vec3(1.0f);
 }
 
 void Gouraud_blendMaterialColor(
     const PhongMaterial phongMaterial,
     out vec3 outAmbient,
-    out vec3 outDiffuse,
-    out float outAlpha)
+    out vec3 outDiffuse)
 {
-    const vec4 vertexColor = Gouraud_getVertexColor();
-
     const vec3 materialAmbient      = phongMaterial.ambient;
     const vec3 materialDiffuse      = phongMaterial.diffuse;
-    const vec3 dstColor             = vertexColor.rgb;
-
-    const float srcAlpha = phongMaterial.opacity;
-    const float dstAlpha = vertexColor.a;
-
-	const float backAlpha = (dstAlpha * (1.0f - srcAlpha));
-    outAlpha = (srcAlpha + backAlpha);
+    const vec3 dstColor             = Gouraud_getVertexColor();
 
     if (phongMaterial.blendOp == ALPHA_BLEND_OP_DEFAULT)
     {
-        const vec3 dstColorAdj = (dstColor * backAlpha);
-
-        outAmbient   = ((materialAmbient * srcAlpha) + dstColorAdj);
-        outDiffuse   = ((materialDiffuse * srcAlpha) + dstColorAdj);
-
-        outAmbient   /= outAlpha;
-        outDiffuse   /= outAlpha;
+        outAmbient   = (materialAmbient * dstColor);
+        outDiffuse   = (materialDiffuse * dstColor);
     }
     else
     {
-        outAmbient   = ((materialAmbient * srcAlpha) + dstColor);
-        outDiffuse   = ((materialDiffuse * srcAlpha) + dstColor);
+        outAmbient   = (materialAmbient + dstColor);
+        outDiffuse   = (materialDiffuse + dstColor);
     }
 }
 
@@ -91,10 +77,9 @@ void Gouraud_calcObjectColors(
     const PhongMaterial phongMaterial,
     out vec3 outAmbient,
     out vec3 outDiffuse,
-    out vec3 outEmissive,
-    out float outAlpha)
+    out vec3 outEmissive)
 {
-    Gouraud_blendMaterialColor(phongMaterial, outAmbient, outDiffuse, outAlpha);
+    Gouraud_blendMaterialColor(phongMaterial, outAmbient, outDiffuse);
     outEmissive = phongMaterial.emissive;
 }
 
@@ -147,12 +132,10 @@ void main()
     vec3 objectAmbient;
     vec3 objectDiffuse;
     vec3 objectEmissive;
-    float objectAlpha;
 
     Gouraud_calcObjectColors(
         phongMaterial,
-        objectAmbient, objectDiffuse, objectEmissive,
-        objectAlpha);
+        objectAmbient, objectDiffuse, objectEmissive);
 
     vec3 lightAmbient;
     vec3 lightDiffuse;
@@ -161,8 +144,6 @@ void main()
         phongMaterial.shininess, worldPos, worldNormal,
         lightAmbient, lightDiffuse);
 
-    outColor.rgb    = (objectAmbient * lightAmbient);
-    outColor.rgb    += (objectDiffuse * lightDiffuse);
-    outColor.rgb    += objectEmissive;
-    outColor.a      = objectAlpha;
+    outColor = (objectAmbient * lightAmbient);
+    outColor += (objectDiffuse * lightDiffuse);
 }

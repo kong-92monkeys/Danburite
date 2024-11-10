@@ -33,7 +33,7 @@ layout(push_constant) uniform PushConstants
 layout(location = 0) out flat int instanceIndex;
 layout(location = 1) out vec3 worldPos;
 layout(location = 2) out vec3 worldNormal;
-layout(location = 3) out vec4 outColor;
+layout(location = 3) out vec3 outColor;
 layout(location = 4) out vec2 outUV0;
 layout(location = 5) out vec2 outUV1;
 layout(location = 6) out vec2 outUV2;
@@ -55,7 +55,7 @@ void main()
 	worldNormal = (normalMatrix * inNormal);
 
 	if (bool(vertexAttribFlags & VERTEX_ATTRIB_COLOR_BIT))
-		outColor = inColor;
+		outColor = inColor.xyz;
 
 	if (bool(vertexAttribFlags & VERTEX_ATTRIB_UV_BITS[0]))
 		outUV0 = inUV0;

@@ -343,11 +343,15 @@ void PhongTestScene::__rcmd_createPlaneObject()
 	__rcmd_pPlanePhongMaterial =
 		std::unique_ptr<Frx::PhongMaterial>{ _rcmd_createMaterial<Frx::PhongMaterial>() };
 
+	__rcmd_pPlanePhongMaterial->setAmbient({ 1.0f, 1.0f, 1.0f });
+	__rcmd_pPlanePhongMaterial->setDiffuse({ 1.0f, 1.0f, 1.0f });
+	__rcmd_pPlanePhongMaterial->setSpecular({ 1.0f, 1.0f, 1.0f });
+
 	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::AMBIENT, 0U, __rcmd_pPlaneTexture.get());
 	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::DIFFUSE, 0U, __rcmd_pPlaneTexture.get());
 	__rcmd_pPlanePhongMaterial->setTexture(Frx::TextureType::SPECULAR, 0U, __rcmd_pPlaneTexture.get());
 	__rcmd_pPlanePhongMaterial->setShininess(32.0f);
-	__rcmd_pPlanePhongMaterial->setOpacity(0.0f);
+	__rcmd_pPlanePhongMaterial->setOpacity(1.0f);
 
 	__rcmd_pPlaneObject = std::make_unique<Render::RenderObject>();
 	__rcmd_pPlaneObject->setMesh(__rcmd_pPlaneMesh.get());
@@ -388,6 +392,10 @@ void PhongTestScene::__rcmd_createContainerObject()
 
 	__rcmd_pContainerPhongMaterial =
 		std::unique_ptr<Frx::PhongMaterial>{ _rcmd_createMaterial<Frx::PhongMaterial>() };
+
+	__rcmd_pContainerPhongMaterial->setAmbient({ 1.0f, 1.0f, 1.0f });
+	__rcmd_pContainerPhongMaterial->setDiffuse({ 1.0f, 1.0f, 1.0f });
+	__rcmd_pContainerPhongMaterial->setSpecular({ 1.0f, 1.0f, 1.0f });
 
 	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::AMBIENT, 0U, __rcmd_pContainerTexture.get());
 	__rcmd_pContainerPhongMaterial->setTexture(Frx::TextureType::DIFFUSE, 0U, __rcmd_pContainerTexture.get());
