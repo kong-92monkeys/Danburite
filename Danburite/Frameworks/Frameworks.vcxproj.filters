@@ -91,6 +91,9 @@
     <Filter Include="Renderers\Gouraud">
       <UniqueIdentifier>{ee4f83ca-b96f-427e-b9cd-e88b0cb82186}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Materials\GouraudMaterial">
+      <UniqueIdentifier>{2d5c0a80-2683-4101-ad14-7560c698d994}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VertexAttribute.h">

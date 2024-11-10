@@ -236,11 +236,13 @@ namespace Frx
 		pPhongMaterial->setEmissive(materialInfo.emissive);
 
 		pPhongMaterial->setBlendOp(materialInfo.blendOp);
-		pPhongMaterial->setOpacity(materialInfo.opacity);
 		pPhongMaterial->setShininess(materialInfo.shininess);
 
 		for (auto const &[texType, texInfos] : materialInfo.textureInfoMap)
 		{
+			if (texType == TextureType::OPACITY)
+				continue;
+
 			for (size_t channel{ }; channel < texInfos.size(); ++channel)
 			{
 				auto const &texInfo	{ texInfos[channel] };

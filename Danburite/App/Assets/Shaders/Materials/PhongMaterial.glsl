@@ -12,7 +12,6 @@ struct PhongMaterial
 	vec3 emissive;
 
 	uint blendOp;
-	float opacity;
 	float shininess;
 
 	TextureParam ambientTexs[MAX_TEX_CHANNEL_COUNT];
@@ -20,7 +19,6 @@ struct PhongMaterial
 	TextureParam specularTexs[MAX_TEX_CHANNEL_COUNT];
 	TextureParam emissiveTexs[MAX_TEX_CHANNEL_COUNT];
 	TextureParam normalTexs[MAX_TEX_CHANNEL_COUNT];
-	TextureParam opacityTexs[MAX_TEX_CHANNEL_COUNT];
 	TextureParam aoTexs[MAX_TEX_CHANNEL_COUNT];
 };
 

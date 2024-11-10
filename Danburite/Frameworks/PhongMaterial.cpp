@@ -51,13 +51,6 @@ namespace Frx
 		_invokeUpdateEvent();
 	}
 
-	void PhongMaterial::setOpacity(
-		float const opacity)
-	{
-		_getTypedData().opacity = opacity;
-		_invokeUpdateEvent();
-	}
-
 	void PhongMaterial::setShininess(
 		float const shininess)
 	{

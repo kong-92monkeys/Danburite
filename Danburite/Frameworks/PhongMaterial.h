@@ -17,7 +17,6 @@ namespace Frx
 		alignas(16) glm::vec3 emissive	{ 0.f, 0.f, 0.f };
 
 		AlphaBlendOp blendOp	{ AlphaBlendOp::DEFAULT };
-		float opacity			{ 1.0f };
 		float shininess			{ 0.0f };
 
 		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> ambientTexs;
@@ -25,7 +24,6 @@ namespace Frx
 		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> specularTexs;
 		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> emissiveTexs;
 		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> normalTexs;
-		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> opacityTexs;
 		std::array<TextureParam, Constants::MAX_TEX_CHANNEL_COUNT> aoTexs;
 	};
 
@@ -48,9 +46,6 @@ namespace Frx
 
 		void setBlendOp(
 			AlphaBlendOp blendOp);
-
-		void setOpacity(
-			float opacity);
 
 		void setShininess(
 			float shininess);
@@ -121,10 +116,6 @@ namespace Frx
 
 			case TextureType::NORMALS:
 				texArr = _getTypedData().normalTexs.data();
-				break;
-
-			case TextureType::OPACITY:
-				texArr = _getTypedData().opacityTexs.data();
 				break;
 
 			case TextureType::AMBIENT_OCCLUSION:
